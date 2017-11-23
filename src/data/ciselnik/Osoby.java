@@ -1,0 +1,41 @@
+package data.ciselnik;
+import java.util.ArrayList;
+
+import javax.swing.JOptionPane;
+
+import ostatni.Konstanty;
+import data.polozky.PolozkaCiselnik;
+import databaze.CiselnikyDAO;
+import databaze.ICiselnikyDAO;
+
+/**
+ * Třída osob zděděná z třídy Ciselnik
+ * @author michalvselko
+ *
+ */
+public class Osoby extends Ciselnik{
+	
+	/**
+	 * Konstruktor číselníku
+	 * @param idProjekt id projektu pro výběr osob
+	 */
+	public Osoby(int idProjekt) {
+		super(Konstanty.PRIRAZEN, idProjekt);
+	}
+
+	/**
+	 * Načte položky z databáze a vloží je do číselníku
+	 */
+	public void nactiPolozky(int idProjekt) {
+		try{
+			ICiselnikyDAO ciselnik = new CiselnikyDAO();
+			ArrayList<PolozkaCiselnik> osoby = ciselnik.getOsoby(idProjekt);
+			for(int i = 0; i < osoby.size(); i++){
+				this.addPolozkaCiselniku(osoby.get(i));
+			}
+		} catch (Exception e){
+			JOptionPane.showMessageDialog(null , "Nepodařilo se správně načíst data číselníku osob! Zkuste znovu načíst projekt a filtr osob.");
+			e.printStackTrace();
+		}		
+	}
+}
