@@ -11,6 +11,7 @@ import databaze.ArtefaktDAO;
 import databaze.IArtefaktDAO;
 import databaze.IKonfiguraceDAO;
 import databaze.KonfiguraceDAO;
+import ostatni.Konstanty;
 
 /**
  * Datová třída konfigurace zděděná ze třídy PolozkaVytvoreni
@@ -121,7 +122,7 @@ public class Konfigurace extends PolozkaVytvoreni {
 			this.vetve = databazeKonfigurace.getVetveKonfigurace(this.getID());
 			this.tagy = databazeKonfigurace.getTagyKonfigurace(this.getID());
 		}  catch (Exception e){
-			JOptionPane.showMessageDialog(null , "Nepodařilo se správně načíst data konfigurací! Zkuste přejít na jiný projekt a vrátit se.");
+			JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaNacitaniKonfigurace") + Konstanty.POPISY.getProperty("chybaZkusteJiny"));
 			e.printStackTrace();
 		}
 	}
@@ -135,7 +136,7 @@ public class Konfigurace extends PolozkaVytvoreni {
 			IArtefaktDAO databazeArtefakt = new ArtefaktDAO();
 			this.artefakty = databazeArtefakt.getArtefaktyKonfigurace(this.getID(), seznamIdArtefaktu);
 		}  catch (Exception e){
-			JOptionPane.showMessageDialog(null , "Nepodařilo se správně načíst data konfigurací! Zkuste přejít na jiný projekt a vrátit se.");
+			JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaNacitaniKonfigurace") + Konstanty.POPISY.getProperty("chybaZkusteJiny"));
 			e.printStackTrace();
 		}
 	}

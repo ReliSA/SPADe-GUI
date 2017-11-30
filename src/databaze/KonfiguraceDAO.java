@@ -175,10 +175,10 @@ public class KonfiguraceDAO implements IKonfiguraceDAO{
 			}
 			
 		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(null , "Chyba při spuštění skriptu konfigurací!");
+			JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaScriptKonfigurace"));
 			e.printStackTrace();
 		} catch (Exception e){
-			JOptionPane.showMessageDialog(null , "Chyba při výběru dat konfigurací z databáze!");
+			JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaDataKonfigurace"));
 			e.printStackTrace();
 		} finally {
 			try {

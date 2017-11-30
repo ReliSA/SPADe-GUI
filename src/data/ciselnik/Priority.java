@@ -34,7 +34,7 @@ public class Priority extends Ciselnik{
 				this.addPolozkaCiselniku(priority.get(i));
 			}
 		} catch (Exception e){
-			JOptionPane.showMessageDialog(null , "Nepodařilo se správně načíst data číselníku priorit! Zkuste znovu načíst projekt a filtr priorit.");
+			JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaNacitaniCiselnikPriorit"));
 			e.printStackTrace();
 		}		
 	}

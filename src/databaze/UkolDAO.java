@@ -312,10 +312,10 @@ public class UkolDAO implements IUkolDAO {
 			}
 			
 		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(null , "Chyba při spuštění skriptu úkolů!");
+			JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaScriptUkol"));
 			e.printStackTrace();
 		} catch (Exception e){
-			JOptionPane.showMessageDialog(null , "Chyba při výběru dat úkolů z databáze!");
+			JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaDataUkol"));
 			e.printStackTrace();
 		} finally {
 			try {

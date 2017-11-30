@@ -283,10 +283,10 @@ public class ProjektDAO implements IProjektDAO {
 			}
 			
 		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(null , "Chyba při spuštění skriptu segmentů projektu!");
+			JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaScriptSegment"));
 			e.printStackTrace();
 		} catch (Exception e){
-			JOptionPane.showMessageDialog(null , "Chyba při výběru dat segmentů z databáze!");
+			JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaDataSegment"));
 			e.printStackTrace();
 		} finally {
 			try {

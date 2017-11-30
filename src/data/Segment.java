@@ -122,7 +122,7 @@ public class Segment extends PolozkaPocatek{
 			default: break;
 			}				
 		}  catch (Exception e){
-			JOptionPane.showMessageDialog(null , "Nepodařilo se správně načíst data segmentu: " + this.getNazevTypuSegmentu() + "! Zkuste přejít na jiný projekt a vrátit se.");
+			JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaNacitaniSegmentu") + this.getNazevTypuSegmentu() + Konstanty.POPISY.getProperty("chybaZkusteJiny"));
 			e.printStackTrace();
 		}
 	}
@@ -156,7 +156,7 @@ public class Segment extends PolozkaPocatek{
 			}				
 	
 		}  catch (Exception e){
-			JOptionPane.showMessageDialog(null , "Nepodařilo se správně načíst data segmentu: " + this.getNazevTypuSegmentu() + "! Zkuste přejít na jiný projekt a vrátit se.");
+			JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaNacitaniSegmentu") + this.getNazevTypuSegmentu() + Konstanty.POPISY.getProperty("chybaZkusteJiny"));
 			e.printStackTrace();
 		}
 	}

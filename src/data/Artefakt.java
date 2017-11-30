@@ -8,6 +8,7 @@ import javax.swing.JOptionPane;
 import data.polozky.PolozkaVytvoreni;
 import databaze.IUkolDAO;
 import databaze.UkolDAO;
+import ostatni.Konstanty;
 
 /**
  * Datová třída artefaktů zděděná ze třídy PolozkaVytvoreni
@@ -92,7 +93,7 @@ public class Artefakt extends PolozkaVytvoreni{
 			this.ukoly.clear();
 			this.ukoly = databazeUkoly.getUkolArtefakt(this.getID());			
 		} catch (Exception e){
-			JOptionPane.showMessageDialog(null , "Nepodařilo se správně načíst data artefaktů! Zkuste přejít na jiný projekt a vrátit se.");
+			JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaNacitaniArtefaktu") + Konstanty.POPISY.getProperty("chybaZkusteJiny"));
 			e.printStackTrace();
 		}
 		
@@ -117,7 +118,7 @@ public class Artefakt extends PolozkaVytvoreni{
 			this.ukoly = databazeUkoly.getUkolFaze(this.getID(), seznamIdUkolu, seznamIdPriorit, seznamIdSeverit, 
 		   														seznamIdResoluci, seznamIdStatusu, seznamIdTypu, seznamIdOsob);			
 		}  catch (Exception e){
-			JOptionPane.showMessageDialog(null , "Nepodařilo se správně načíst data artefaktů! Zkuste přejít na jiný projekt a vrátit se.");
+			JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaNacitaniArtefaktu") + Konstanty.POPISY.getProperty("chybaZkusteJiny"));
 			e.printStackTrace();
 		}
 		

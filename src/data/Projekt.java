@@ -719,7 +719,7 @@ public class Projekt{
 			this.artefakty = databazeArtefakt.getArtefaktyProjekt(this.id);
 			Konstanty.CITAC_PROGRESU++;
 		}  catch (Exception e){
-			JOptionPane.showMessageDialog(null , "Nepodařilo se správně načíst data projektu! Zkuste přejít na jiný projekt a vrátit se.");
+			JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaNacitaniProjektu") + Konstanty.POPISY.getProperty("chybaZkusteJiny"));
 			e.printStackTrace();
 		}		
 	}
@@ -784,7 +784,7 @@ public class Projekt{
 				this.artefakty.get(i).nactiData(seznamIdUkolu, seznamIdPriorit, seznamIdSeverit, seznamIdResoluci, seznamIdStatusu, seznamIdTypu, seznamIdOsob);
 			Konstanty.CITAC_PROGRESU++;
 		}  catch (Exception e){
-			JOptionPane.showMessageDialog(null , "Nepodařilo se správně načíst data projektu! Zkuste přejít na jiný projekt a vrátit se.");
+			JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaNacitaniProjektu") + Konstanty.POPISY.getProperty("chybaZkusteJiny"));
 			e.printStackTrace();
 		}				
 	}

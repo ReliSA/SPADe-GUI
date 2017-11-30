@@ -34,7 +34,7 @@ public class Osoby extends Ciselnik{
 				this.addPolozkaCiselniku(osoby.get(i));
 			}
 		} catch (Exception e){
-			JOptionPane.showMessageDialog(null , "Nepodařilo se správně načíst data číselníku osob! Zkuste znovu načíst projekt a filtr osob.");
+			JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaNacitaniCiselnikOsob"));
 			e.printStackTrace();
 		}		
 	}

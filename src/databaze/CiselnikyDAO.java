@@ -132,10 +132,10 @@ public class CiselnikyDAO implements ICiselnikyDAO {
 			}
 			
 		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(null , "Chyba při spuštění skriptu číselníků!");
+			JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaScriptCiselniky"));
 			e.printStackTrace();
 		} catch (Exception e){
-			JOptionPane.showMessageDialog(null , "Chyba při výběru dat číselníků z databáze!");
+			JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaDataCiselniky"));
 			e.printStackTrace();
 		} finally {
 			try {

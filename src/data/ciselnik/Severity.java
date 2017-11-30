@@ -35,7 +35,7 @@ public class Severity extends Ciselnik{
 				this.addPolozkaCiselniku(severity.get(i));
 			}
 		} catch (Exception e){
-			JOptionPane.showMessageDialog(null , "Nepodařilo se správně načíst data číselníku severit! Zkuste znovu načíst projekt a filtr severit.");
+			JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaNacitaniSeverit"));
 			e.printStackTrace();
 		}		
 	}

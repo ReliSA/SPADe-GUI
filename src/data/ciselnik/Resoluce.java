@@ -34,7 +34,7 @@ public class Resoluce extends Ciselnik{
 				this.addPolozkaCiselniku(resoluce.get(i));
 			}
 		} catch (Exception e){
-			JOptionPane.showMessageDialog(null , "Nepodařilo se správně načíst data číselníku resolucí! Zkuste znovu načíst projekt a filtr resolucí.");
+			JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaNacitaniCiselnikResoluce"));
 			e.printStackTrace();
 		}		
 	}

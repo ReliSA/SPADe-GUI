@@ -47,6 +47,7 @@ public class PanelGrafu extends JPanel {
 	 */
 	public void setSizeScroll(){
 		scroll.setPreferredSize(new Dimension(this.getWidth() - 20, this.getHeight() - 20));
+		scroll.revalidate();
 	}
 	
 	/**

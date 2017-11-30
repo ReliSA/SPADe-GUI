@@ -137,7 +137,7 @@ public class Osoba extends Polozka{
 			this.konfigurace = databazeKonfigurace.getKonfiguraceOsoba(this.getID());
 			this.artefakty = databazeArtefakt.getArtefaktyOsoba(this.getID());
 		}  catch (Exception e){
-			JOptionPane.showMessageDialog(null , "Nepodařilo se správně načíst data osob! Zkuste přejít na jiný projekt a vrátit se.");
+			JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaNacitaniOsob") + Konstanty.POPISY.getProperty("chybaZkusteJiny"));
 			e.printStackTrace();
 		}				
 	}
@@ -167,7 +167,7 @@ public class Osoba extends Polozka{
 			this.konfigurace = databazeKonfigurace.getKonfiguraceOsoba(this.getID(), seznamIdKonfiguraci);
 			this.artefakty = databazeArtefakt.getArtefaktyOsoba(this.getID(), seznamIdArtefaktu);
 		}  catch (Exception e){
-			JOptionPane.showMessageDialog(null , "Nepodařilo se správně načíst data osob! Zkuste přejít na jiný projekt a vrátit se.");
+			JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaNacitaniOsob") + Konstanty.POPISY.getProperty("chybaZkusteJiny"));
 			e.printStackTrace();
 		}		
 	}

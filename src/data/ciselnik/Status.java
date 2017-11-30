@@ -34,7 +34,7 @@ public class Status extends Ciselnik{
 				this.addPolozkaCiselniku(statusy.get(i));
 			}
 		} catch (Exception e){
-			JOptionPane.showMessageDialog(null , "Nepodařilo se správně načíst data číselníku statusů! Zkuste znovu načíst projekt a filtr statusů.");
+			JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaNacitaniStatusu"));
 			e.printStackTrace();
 		}		
 	}

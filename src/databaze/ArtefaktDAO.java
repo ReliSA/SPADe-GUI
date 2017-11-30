@@ -148,10 +148,10 @@ public class ArtefaktDAO implements IArtefaktDAO{
 			}
 			
 		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(null , "Chyba při spuštění skriptu artefaktů!");
+			JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaScriptArtefakt"));
 			e.printStackTrace();
 		} catch (Exception e){
-			JOptionPane.showMessageDialog(null , "Chyba při výběru dat artefaktů z databáze!");
+			JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaDataArtefakt"));
 			e.printStackTrace();
 		} finally {
 			try {

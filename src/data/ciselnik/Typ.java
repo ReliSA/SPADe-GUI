@@ -35,7 +35,7 @@ public class Typ extends Ciselnik{
 				this.addPolozkaCiselniku(typy.get(i));
 			}
 		} catch (Exception e){
-			JOptionPane.showMessageDialog(null , "Nepodařilo se správně načíst data číselníku typů! Zkuste znovu načíst projekt a filtr typů.");
+			JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaNacitaniCiselnikTypu"));
 			e.printStackTrace();
 		}		
 	}
