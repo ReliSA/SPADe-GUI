@@ -119,9 +119,9 @@ public class PanelGrafu extends JPanel {
 			
 		panel.setLayout(Konstanty.FLOW_LAYOUT);
 
-		scroll = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		scroll = new JScrollPane(panel);
 		scroll.getVerticalScrollBar().setUnitIncrement(15);
-		panel.setPreferredSize(Konstanty.VELIKOST_PANELU);		
+		panel.setPreferredSize(Konstanty.VELIKOST_PANELU);
 		this.setSizeScroll();
 		
 		JScrollPane scrollUkoly = new JScrollPane(new PanelGrafuUkol(this.projekt));
@@ -187,10 +187,12 @@ public class PanelGrafu extends JPanel {
 		panel.add(lblNazev, g); g.gridy++;
 		panel.add(lblDatumOD, g); g.gridy++;
 		panel.add(lblDatumDO, g); g.gridy++;
+		g.gridheight=4;
+		g.gridy=0;
+		g.gridx++;
 		panel.add(getPanelStatistiky(true), g);
 		g.gridy = 0;
-		g.gridx = 1;
-		g.gridheight = 5;
+		g.gridx++;
 		panel.add(getPanelStatistiky(false), g);
 		
 		panel.setBorder(BorderFactory.createTitledBorder(Konstanty.POPISY.getProperty("titlePanelStatistik")));
@@ -246,18 +248,38 @@ public class PanelGrafu extends JPanel {
 			}
 			else {
 				JLabel lblUkolyNa = new JLabel(Konstanty.POPISY.getProperty("popisUkolyNa") + ":");
-				JLabel lblMinimum = new JLabel(Konstanty.POPISY.getProperty("nadpisMinimum"));
-				JLabel lblPrumer = new JLabel(Konstanty.POPISY.getProperty("nadpisPrumer"));
-				JLabel lblMaximum = new JLabel(Konstanty.POPISY.getProperty("nadpisMaximum"));
 				JLabel lblUkol = new JLabel(Konstanty.POPISY.getProperty("popisUkol") + ": ");
 				JLabel lblKonfiguraceNa = new JLabel(Konstanty.POPISY.getProperty("popisKonfiguraceNa") + ": ");
 				JLabel lblArtefaktNa = new JLabel(Konstanty.POPISY.getProperty("popisArtefaktNa") + ": ");
 				
-				panelStatistik.setBorder(BorderFactory.createTitledBorder(Konstanty.POPISY.getProperty("titleMinMaxAvg")));
+				JLabel lblMinimum = new JLabel(Konstanty.POPISY.getProperty("nadpisMinimum"));
+				JLabel lblPrumer = new JLabel(Konstanty.POPISY.getProperty("nadpisPrumer"));
+				JLabel lblMaximum = new JLabel(Konstanty.POPISY.getProperty("nadpisMaximum"));				
+				JLabel lblMinimum2 = new JLabel(Konstanty.POPISY.getProperty("nadpisMinimum"));
+				JLabel lblPrumer2 = new JLabel(Konstanty.POPISY.getProperty("nadpisPrumer"));
+				JLabel lblMaximum2 = new JLabel(Konstanty.POPISY.getProperty("nadpisMaximum"));				
+				JLabel lblMinimum3 = new JLabel(Konstanty.POPISY.getProperty("nadpisMinimum"));
+				JLabel lblPrumer3 = new JLabel(Konstanty.POPISY.getProperty("nadpisPrumer"));
+				JLabel lblMaximum3 = new JLabel(Konstanty.POPISY.getProperty("nadpisMaximum"));				
+				JLabel lblMinimum4 = new JLabel(Konstanty.POPISY.getProperty("nadpisMinimum"));
+				JLabel lblPrumer4 = new JLabel(Konstanty.POPISY.getProperty("nadpisPrumer"));
+				JLabel lblMaximum4 = new JLabel(Konstanty.POPISY.getProperty("nadpisMaximum"));
+								
+				panelStatistik.setBorder(BorderFactory.createTitledBorder(Konstanty.POPISY.getProperty("titleMinMaxAvg")));	
 				panelStatistik.add(new JLabel(""), grid); grid.gridx++;		
 				panelStatistik.add(lblMinimum, grid); grid.gridx++;		
 				panelStatistik.add(lblPrumer, grid); grid.gridx++;		
-				panelStatistik.add(lblMaximum, grid); grid.gridx = 0;		
+				panelStatistik.add(lblMaximum, grid); grid.gridx++;	grid.gridx++;
+				panelStatistik.add(lblMinimum2, grid); grid.gridx++;		
+				panelStatistik.add(lblPrumer2, grid); grid.gridx++;		
+				panelStatistik.add(lblMaximum2, grid); grid.gridx++;grid.gridx++;	
+				panelStatistik.add(lblMinimum3, grid); grid.gridx++;		
+				panelStatistik.add(lblPrumer3, grid); grid.gridx++;		
+				panelStatistik.add(lblMaximum3, grid); grid.gridx++;grid.gridx++;	
+				panelStatistik.add(lblMinimum4, grid); grid.gridx++;		
+				panelStatistik.add(lblPrumer4, grid); grid.gridx++;		
+				panelStatistik.add(lblMaximum4, grid); grid.gridx = 0;	
+				
 				grid.gridy++;
 				panelStatistik.add(lblUkolyNa, grid);		
 				grid.gridy++;
@@ -287,22 +309,16 @@ public class PanelGrafu extends JPanel {
 				panelStatistik.add(new JLabel("" + projekt.getMinOsobaUkol()), grid); grid.gridx++;
 				panelStatistik.add(new JLabel("" + projekt.getPrumerOsobaUkol()), grid); grid.gridx++;
 				panelStatistik.add(new JLabel("" + projekt.getMaxOsobaUkol()), grid); grid.gridx = 0;
-				grid.gridy++;
-				grid.fill = GridBagConstraints.HORIZONTAL;
-				grid.insets = new Insets(0, 0, 0, 0);
-				panelStatistik.add(new JSeparator(), grid);	grid.gridx++;
-				panelStatistik.add(new JSeparator(), grid); grid.gridx++;
-				panelStatistik.add(new JSeparator(), grid); grid.gridx++;
-				panelStatistik.add(new JSeparator(), grid); grid.gridx = 0;
-				grid.insets = new Insets(3, 3, 3, 3);				
-				grid.gridy++;
+				grid.fill = GridBagConstraints.HORIZONTAL;			
+				grid.gridy=1;
+				grid.gridx=4;
 				panelStatistik.add(lblUkol, grid);
 				grid.gridy++;
 				panelStatistik.add(new JLabel(Konstanty.POPISY.getProperty("popisCasovyOdhad") + ": "), grid); grid.gridx++;
 				grid.fill = GridBagConstraints.EAST;
 				panelStatistik.add(new JLabel("" + projekt.getMinPredpokladanyCas()), grid); grid.gridx++;
 				panelStatistik.add(new JLabel("" + projekt.getPrumerPredpokladanyCas()), grid); grid.gridx++;
-				panelStatistik.add(new JLabel("" + projekt.getMaxPredpokladanyCas()), grid); grid.gridx = 0;
+				panelStatistik.add(new JLabel("" + projekt.getMaxPredpokladanyCas()), grid); grid.gridx = 4;
 				grid.gridy++;
 				grid.fill = GridBagConstraints.HORIZONTAL;
 				panelStatistik.add(new JLabel(Konstanty.POPISY.getProperty("popisStravenyCas") + ": "), grid); grid.gridx++;
@@ -310,31 +326,19 @@ public class PanelGrafu extends JPanel {
 				panelStatistik.add(new JLabel("" + projekt.getMinStravenyCas()), grid); grid.gridx++;
 				panelStatistik.add(new JLabel("" + projekt.getPrumerStravenyCas()), grid); grid.gridx++;
 				panelStatistik.add(new JLabel("" + projekt.getMaxStravenyCas()), grid); grid.gridx = 0;
-				grid.gridy++;
 				grid.fill = GridBagConstraints.HORIZONTAL;
-				grid.insets = new Insets(0, 0, 0, 0);
-				panelStatistik.add(new JSeparator(), grid);	grid.gridx++;
-				panelStatistik.add(new JSeparator(), grid); grid.gridx++;
-				panelStatistik.add(new JSeparator(), grid); grid.gridx++;
-				panelStatistik.add(new JSeparator(), grid); grid.gridx = 0;
-				grid.insets = new Insets(3, 3, 3, 3);
-				grid.gridy++;
+				grid.gridy=1;
+				grid.gridx=8;
 				panelStatistik.add(lblKonfiguraceNa, grid); 
 				grid.gridy++;
 				panelStatistik.add(new JLabel(Konstanty.POPISY.getProperty("popisCloveka") + ": "), grid); grid.gridx++;
 				grid.fill = GridBagConstraints.EAST;
 				panelStatistik.add(new JLabel("" + projekt.getMinOsobaKonf()), grid); grid.gridx++;
 				panelStatistik.add(new JLabel("" + projekt.getPrumerOsobaKonf()), grid); grid.gridx++;
-				panelStatistik.add(new JLabel("" + projekt.getMaxOsobaKonf()), grid); grid.gridx = 0;
-				grid.gridy++;
+				panelStatistik.add(new JLabel("" + projekt.getMaxOsobaKonf()), grid); grid.gridx = 8;
 				grid.fill = GridBagConstraints.HORIZONTAL;
-				grid.insets = new Insets(0, 0, 0, 0);
-				panelStatistik.add(new JSeparator(), grid);	grid.gridx++;
-				panelStatistik.add(new JSeparator(), grid); grid.gridx++;
-				panelStatistik.add(new JSeparator(), grid); grid.gridx++;
-				panelStatistik.add(new JSeparator(), grid); grid.gridx = 0;
-				grid.insets = new Insets(3, 3, 3, 3);
-				grid.gridy++;
+				grid.gridy=1;
+				grid.gridx=12;
 				grid.fill = GridBagConstraints.HORIZONTAL;
 				panelStatistik.add(lblArtefaktNa, grid);
 				grid.gridy++;
@@ -342,7 +346,7 @@ public class PanelGrafu extends JPanel {
 				grid.fill = GridBagConstraints.EAST;
 				panelStatistik.add(new JLabel("" + projekt.getMinKonfiguraceArtef()), grid); grid.gridx++;
 				panelStatistik.add(new JLabel("" + projekt.getPrumerKonfiguraceArtef()), grid); grid.gridx++;
-				panelStatistik.add(new JLabel("" + projekt.getMaxKonfiguraceArtef()), grid); grid.gridx = 0;
+				panelStatistik.add(new JLabel("" + projekt.getMaxKonfiguraceArtef()), grid); grid.gridx =12;
 				grid.gridy++;
 				grid.fill = GridBagConstraints.HORIZONTAL;
 				panelStatistik.add(new JLabel(Konstanty.POPISY.getProperty("popisCloveka") + ": "), grid); grid.gridx++;
@@ -358,6 +362,15 @@ public class PanelGrafu extends JPanel {
 				lblMinimum.setFont(Konstanty.FONT_NADPIS_STATISTIK);
 				lblPrumer.setFont(Konstanty.FONT_NADPIS_STATISTIK);
 				lblMaximum.setFont(Konstanty.FONT_NADPIS_STATISTIK);
+				lblMinimum2.setFont(Konstanty.FONT_NADPIS_STATISTIK);
+				lblPrumer2.setFont(Konstanty.FONT_NADPIS_STATISTIK);
+				lblMaximum2.setFont(Konstanty.FONT_NADPIS_STATISTIK);
+				lblMinimum3.setFont(Konstanty.FONT_NADPIS_STATISTIK);
+				lblPrumer3.setFont(Konstanty.FONT_NADPIS_STATISTIK);
+				lblMaximum3.setFont(Konstanty.FONT_NADPIS_STATISTIK);
+				lblMinimum4.setFont(Konstanty.FONT_NADPIS_STATISTIK);
+				lblPrumer4.setFont(Konstanty.FONT_NADPIS_STATISTIK);
+				lblMaximum4.setFont(Konstanty.FONT_NADPIS_STATISTIK);
 				lblUkol.setFont(Konstanty.FONT_NADPIS_STATISTIK);
 				lblKonfiguraceNa.setFont(Konstanty.FONT_NADPIS_STATISTIK);
 				lblArtefaktNa.setFont(Konstanty.FONT_NADPIS_STATISTIK);

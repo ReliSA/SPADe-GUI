@@ -22,6 +22,7 @@ import javax.swing.text.StyledDocument;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
 import org.jfree.data.gantt.Task;
 import org.jfree.data.gantt.TaskSeries;
 import org.jfree.data.gantt.TaskSeriesCollection;
@@ -60,18 +61,8 @@ public class PanelGrafuSegment extends PanelGrafuRodic{
         panelGrafu1.setPreferredSize(Konstanty.VELIKOST_GRAFU);
         panelGrafu2.setPreferredSize(Konstanty.VELIKOST_GRAFU);
         panelGrafu3.setPreferredSize(Konstanty.VELIKOST_GRAFU);
-        /*     
-        DropPanel dropPanelGrafu1 = new DropPanel(new BorderLayout());
-        DropPanel dropPanelGrafu2 = new DropPanel(new BorderLayout());
-        DropPanel dropPanelGrafu3 = new DropPanel(new BorderLayout());
+              
         
-        dropPanelGrafu1.setBorder(new EmptyBorder(10, 0, 0, 0));
-        
-        dropPanelGrafu1.add(panelGrafu1);
-        dropPanelGrafu2.add(panelGrafu2);
-        dropPanelGrafu3.add(panelGrafu3);*/
-       
-               
  		this.add(panelGrafu1);
  		this.add(panelGrafu2);
  		this.add(panelGrafu3);

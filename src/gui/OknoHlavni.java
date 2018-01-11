@@ -210,8 +210,12 @@ public class OknoHlavni extends JFrame {
 		}
 	}
 
+	/**
+	 * Metoda sloužící pro restart hlavního okna a nového načtení konfigurací.
+	 */
 	private void restartOkna() {
 		setVisible(false);
+		Konstanty.CITAC_PROGRESU=0;
 		Thread t1 = new Thread(new Runnable() {
 			public void run() {
 				OknoProgresNacitani oknoProgres = new OknoProgresNacitani();

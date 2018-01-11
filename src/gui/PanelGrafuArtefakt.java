@@ -50,7 +50,7 @@ public class PanelGrafuArtefakt extends PanelGrafuRodic {
         panelGrafu1.setPreferredSize(Konstanty.VELIKOST_GRAFU);
         panelGrafu2.setPreferredSize(Konstanty.VELIKOST_GRAFU);
         panelGrafu3.setPreferredSize(Konstanty.VELIKOST_GRAFU);
-        
+                
  		this.add(panelGrafu1);
  		this.add(panelGrafu2);
  		this.add(panelGrafu3);
