@@ -1,9 +1,12 @@
 package gui;
 
 import java.awt.BorderLayout;
+import java.awt.Button;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Frame;
+import java.awt.Insets;
 import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -34,9 +37,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
-
-import org.jfree.data.KeyedObject;
 
 import ostatni.Konstanty;
 import data.*;
@@ -53,12 +53,15 @@ public class OknoHlavni extends JFrame {
 
 	private JPanel panelMenu; // levý panel pro výběr projektu a dodání filtrů
 	private PanelGrafu panelGrafu; // centrální panel zobrazující statistiky a grafy
+	private JPanel centralPanel;
+
 	private JMenuBar menuBar; // horní ovládací bar
 
 	private DefaultComboBoxModel<Projekt> modelProjekt = new DefaultComboBoxModel<Projekt>(); // model pro seznam
 																								// projektů
 	private ComboBoxDynamicky lsSeznamProjektu = new ComboBoxDynamicky(modelProjekt); // seznam projektů
 	private JComboBox<String> cbTypFiltru = new JComboBox<String>(Konstanty.POLE_FILTRU); // seznam možných filtrů
+	
 	private JButton btPridejFiltr = new JButton(Konstanty.POPISY.getProperty("tlacitkoPridejFiltr")); // tlačítko pro
 																										// přidání
 																										// filtru do
@@ -66,7 +69,8 @@ public class OknoHlavni extends JFrame {
 	private Box pnBoxFiltru = Box.createVerticalBox(); // box s vybranými filtry
 	private JButton btZapniFiltr = new JButton(Konstanty.POPISY.getProperty("tlacitkoZapniFiltr")); // tlačítko pro
 																									// spuštění podmínek
-																									// filtrů
+	
+	private JButton btSipkaFiltr = new JButton("<");
 	private JMenu fileMenu; // Tlačítko menu baru
 	private JMenu settingsMenu; // Tlačítko menu baru
 	private JMenu languageMenu; // Tlačítko menu baru
@@ -156,7 +160,10 @@ public class OknoHlavni extends JFrame {
 		btZapniFiltr.setPreferredSize(Konstanty.VELIKOST_CELA_SIRKA);
 
 		scScrollFiltru.setPreferredSize(new Dimension(270, 550));
-
+		
+		btSipkaFiltr.setPreferredSize(Konstanty.VELIKOST_SIPKY);
+		btSipkaFiltr.setFont(new Font("Arial", Font.PLAIN, 15));
+		btSipkaFiltr.setMargin(new Insets(0, 0, 0, 0));
 		panelMenu.add(nadpis);
 		panelMenu.add(lsSeznamProjektu);
 		panelMenu.add(scScrollFiltru);
@@ -169,11 +176,14 @@ public class OknoHlavni extends JFrame {
 		fileMenu.add(exitAction);
 		languageMenu.add(czech);
 		languageMenu.add(english);
-		
+
+		centralPanel = new JPanel(new BorderLayout());
+		centralPanel.add(panelGrafu, BorderLayout.CENTER);
+		centralPanel.add(btSipkaFiltr, BorderLayout.WEST);
 
 		this.setLayout(new BorderLayout());
 		this.add(panelMenu, BorderLayout.WEST);
-		this.add(panelGrafu, BorderLayout.CENTER);
+		this.add(centralPanel, BorderLayout.CENTER);
 	}
 
 	/**
@@ -190,7 +200,7 @@ public class OknoHlavni extends JFrame {
 
 	private void odstranPanelFiltru() {
 		this.remove(panelMenu);
-		
+
 		if (this.getExtendedState() == JFrame.MAXIMIZED_BOTH) {
 			this.setExtendedState(JFrame.ICONIFIED);
 			this.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -215,7 +225,7 @@ public class OknoHlavni extends JFrame {
 	 */
 	private void restartOkna() {
 		setVisible(false);
-		Konstanty.CITAC_PROGRESU=0;
+		Konstanty.CITAC_PROGRESU = 0;
 		Thread t1 = new Thread(new Runnable() {
 			public void run() {
 				OknoProgresNacitani oknoProgres = new OknoProgresNacitani();
@@ -647,16 +657,34 @@ public class OknoHlavni extends JFrame {
 
 			}
 		};
-		
-		/* akce pro změnu jazyka na čestinu */
-		ActionListener actZobrazeniFiltru = new ActionListener() {
+
+		/* akce pro schování panelu filtrů  */
+		ActionListener actZobrazeniFiltruMenu = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(filtry.isSelected()==true) {
+				if (filtry.isSelected() == true) {
 					pridejPanelFiltru();
+					btSipkaFiltr.setText("<");
+				} else {
+					odstranPanelFiltru();
+					btSipkaFiltr.setText(">");
 				}
-				else {odstranPanelFiltru();}
 			}
-		};		
+		};
+		
+		/* akce pro schování panelu filtrů  */
+		ActionListener actZobrazeniFiltruSipka = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (filtry.isSelected() == false) {
+					pridejPanelFiltru();
+					filtry.setSelected(true);
+					btSipkaFiltr.setText("<");
+				} else {
+					odstranPanelFiltru();
+					btSipkaFiltr.setText(">");
+					filtry.setSelected(false);
+				}
+			}
+		};
 
 		/* vložení akcí k příslušným komponentám */
 		lsSeznamProjektu.addActionListener(actZmenaProjektu);
@@ -665,7 +693,8 @@ public class OknoHlavni extends JFrame {
 		exitAction.addActionListener(actZavri);
 		czech.addActionListener(actJazykCzech);
 		english.addActionListener(actJazykEnglish);
-		filtry.addActionListener(actZobrazeniFiltru);
+		filtry.addActionListener(actZobrazeniFiltruMenu);
+		btSipkaFiltr.addActionListener(actZobrazeniFiltruSipka);
 
 		this.addComponentListener(actResizePaneluGrafu);
 		this.addWindowListener(actUkonceniOkna);
