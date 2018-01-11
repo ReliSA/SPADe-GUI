@@ -1,5 +1,6 @@
 package data;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -22,8 +23,9 @@ import databaze.UkolDAO;
  * @author michalvselko
  *
  */
-public class Projekt{
+public class Projekt implements Serializable {
 
+	private static final long serialVersionUID = -3177043289922401712L;
 	private int id;																	//id projektu
 	private String nazev;															//název projektu	
 	

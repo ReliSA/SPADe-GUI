@@ -1,5 +1,6 @@
 package data.ciselnik;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import ostatni.Konstanty;
@@ -11,8 +12,9 @@ import data.polozky.PolozkaCiselnik;
  * @author michalvselko
  *
  */
-public abstract class Ciselnik {
+public abstract class Ciselnik implements Serializable{
 
+	private static final long serialVersionUID = 1219725890839447209L;
 	private ArrayList<PolozkaCiselnik> seznam = new ArrayList<PolozkaCiselnik>();	//seznam položek číselníku
 	private int typ;																//typ číselníku
 	

@@ -1,5 +1,6 @@
 package data;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -18,8 +19,10 @@ import ostatni.Konstanty;
  * @author michalvselko
  *
  */
-public class Konfigurace extends PolozkaVytvoreni {
+public class Konfigurace extends PolozkaVytvoreni implements Serializable{
 
+
+	private static final long serialVersionUID = 3243453625395646244L;
 	private ArrayList<Artefakt> artefakty = new ArrayList<Artefakt>();	//seznam artefaktů patřící ke konfiguraci (tabulka artifact)
 	private ArrayList<Polozka> vetve = new ArrayList<Polozka>();		//seznam větví patřící ke konfiguraci (tabulka branch)
 	private ArrayList<Polozka> tagy = new ArrayList<Polozka>();			//seznam tagů patřící ke konfiguraci (tabulka tag)

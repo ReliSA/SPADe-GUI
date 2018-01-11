@@ -1,21 +1,23 @@
 package gui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
-
+import javax.swing.JTabbedPane;
 import ostatni.Konstanty;
 import data.*;
-
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
@@ -28,6 +30,10 @@ public class PanelGrafu extends JPanel {
 	
 	private Projekt projekt;		//aktuálně vybraný projekt
 	private JScrollPane scroll;		//scroll panel
+	private DropTarget dropTarget;
+	private DropHandler dropHandler;
+	private DropTarget dropTarget2;
+	private DropHandler dropHandler2;
 	
 	/**
 	 * Konstruktor třídy, nastaví projekt, spustí načtení dat projektu a nastaví zobrazení okna
@@ -41,6 +47,7 @@ public class PanelGrafu extends JPanel {
 		this.projekt.nactiData();
 		this.nastavZobrazeni();		
 	}
+	
 	
 	/**
 	 * Nastaví velikost scroll panelu v závislosti na velikosti panelu
@@ -96,6 +103,20 @@ public class PanelGrafu extends JPanel {
 		this.removeAll();
 		JPanel panel = new JPanel();
 		
+		JPanel dropSlot = new JPanel(new BorderLayout());
+		dropSlot.setBackground(Color.WHITE);
+		dropSlot.setPreferredSize(Konstanty.VELIKOST_GRAFU_VELKY);
+		
+		JPanel dropSlot2 = new JPanel(new BorderLayout());
+		dropSlot2.setBackground(Color.WHITE);
+		dropSlot2.setPreferredSize(Konstanty.VELIKOST_GRAFU_VELKY);
+				
+		dropHandler = new DropHandler();
+		dropTarget = new DropTarget(dropSlot, DnDConstants.ACTION_COPY, dropHandler, true);
+		
+		dropHandler2 = new DropHandler();
+		dropTarget2 = new DropTarget(dropSlot2, DnDConstants.ACTION_COPY, dropHandler2, true);
+			
 		panel.setLayout(Konstanty.FLOW_LAYOUT);
 
 		scroll = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
@@ -103,11 +124,34 @@ public class PanelGrafu extends JPanel {
 		panel.setPreferredSize(Konstanty.VELIKOST_PANELU);		
 		this.setSizeScroll();
 		
+		JScrollPane scrollUkoly = new JScrollPane(new PanelGrafuUkol(this.projekt));
+		scrollUkoly.getVerticalScrollBar().setUnitIncrement(15);
+		scrollUkoly.setPreferredSize(new Dimension(Konstanty.SIRKA_PANELU_GRAFU+20,Konstanty.VYSKA_PANELU_GRAFU_STANDART+20));
+		scrollUkoly.revalidate();
+		
+		JTabbedPane tabbedPanelGrafu = new JTabbedPane();		
+		tabbedPanelGrafu.add(Konstanty.POPISY.getProperty("segment"),new PanelGrafuSegment(this.projekt));
+		tabbedPanelGrafu.add(Konstanty.POPISY.getProperty("ukoly"),scrollUkoly);
+		tabbedPanelGrafu.add(Konstanty.POPISY.getProperty("konfigurace"),new PanelGrafuKonfigurace(this.projekt));
+		tabbedPanelGrafu.add(Konstanty.POPISY.getProperty("artefakty"),new PanelGrafuArtefakt(this.projekt));
+		
+		
+		JLabel label = new JLabel(Konstanty.POPISY.getProperty("grafTady"));
+		JLabel label2= new JLabel(Konstanty.POPISY.getProperty("grafTady"));
+		label.setFont(new Font("Arial", Font.PLAIN, 40));
+		label2.setFont(new Font("Arial", Font.PLAIN, 40));
+		label.setHorizontalAlignment(JLabel.CENTER);
+		label.setVerticalAlignment(JLabel.CENTER);
+		label2.setHorizontalAlignment(JLabel.CENTER);
+		label2.setVerticalAlignment(JLabel.CENTER);
+				
+		dropSlot.add(label);
+		dropSlot2.add(label2);
+	
 		panel.add(getPopisProjektu());
-		panel.add(new PanelGrafuSegment(this.projekt));
-		panel.add(new PanelGrafuUkol(this.projekt));
-		panel.add(new PanelGrafuKonfigurace(this.projekt));
-		panel.add(new PanelGrafuArtefakt(this.projekt));
+		panel.add(tabbedPanelGrafu);
+		panel.add(dropSlot);
+		panel.add(dropSlot2);
 		
         this.add(scroll);
       

@@ -3,7 +3,6 @@ package gui;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
-
 import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
 

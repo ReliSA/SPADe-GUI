@@ -1,5 +1,6 @@
 package data;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -15,8 +16,9 @@ import ostatni.Konstanty;
  * @author michalvselko
  *
  */
-public class Artefakt extends PolozkaVytvoreni{
+public class Artefakt extends PolozkaVytvoreni implements Serializable{
 
+	private static final long serialVersionUID = 5681005943291067314L;
 	private String typ;										//typ artefaktu - sloupec mimeType tabulky Artifact
 	private int velikost;									//velikost artefaktu - sloupec size tabulky Artifact
 	private ArrayList<Ukol> ukoly = new ArrayList<Ukol>();	//seznam úkolů obsahující daný artefakt

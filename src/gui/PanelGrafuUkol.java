@@ -73,33 +73,33 @@ public class PanelGrafuUkol extends PanelGrafuRodic{
 		this.setBorder(BorderFactory.createTitledBorder(Konstanty.POPISY.getProperty("nazevUkoly")));
 		this.removeAll();
 
-		ChartPanel panelGrafu1 = new ChartPanel(this.getCiselnikGraf(this.priority, Konstanty.HODNOTA, false) );        
-		ChartPanel panelGrafu2 = new ChartPanel(this.getCiselnikGraf(this.priority, Konstanty.TRIDA, false) );
-		ChartPanel panelGrafu3 = new ChartPanel(this.getCiselnikGraf(this.priority, Konstanty.SUPERTRIDA, false) );
+		DropChartPanel panelGrafu1 = new DropChartPanel(this.getCiselnikGraf(this.priority, Konstanty.HODNOTA, false) );        
+		DropChartPanel panelGrafu2 = new DropChartPanel(this.getCiselnikGraf(this.priority, Konstanty.TRIDA, false) );
+		DropChartPanel panelGrafu3 = new DropChartPanel(this.getCiselnikGraf(this.priority, Konstanty.SUPERTRIDA, false) );
                 
-		ChartPanel panelGrafu4 = new ChartPanel(this.getCiselnikGraf(this.severity, Konstanty.HODNOTA, false) );
-		ChartPanel panelGrafu5 = new ChartPanel(this.getCiselnikGraf(this.severity, Konstanty.TRIDA, false) );
-		ChartPanel panelGrafu6 = new ChartPanel(this.getCiselnikGraf(this.severity, Konstanty.SUPERTRIDA, false) );
+		DropChartPanel panelGrafu4 = new DropChartPanel(this.getCiselnikGraf(this.severity, Konstanty.HODNOTA, false) );
+		DropChartPanel panelGrafu5 = new DropChartPanel(this.getCiselnikGraf(this.severity, Konstanty.TRIDA, false) );
+		DropChartPanel panelGrafu6 = new DropChartPanel(this.getCiselnikGraf(this.severity, Konstanty.SUPERTRIDA, false) );
         
-		ChartPanel panelGrafu7 = new ChartPanel(this.getCiselnikGraf(this.statusy, Konstanty.HODNOTA, false) );
-		ChartPanel panelGrafu8 = new ChartPanel(this.getCiselnikGraf(this.statusy, Konstanty.TRIDA, false) );
-		ChartPanel panelGrafu9 = new ChartPanel(this.getCiselnikGraf(this.statusy, Konstanty.SUPERTRIDA, false) );
+		DropChartPanel panelGrafu7 = new DropChartPanel(this.getCiselnikGraf(this.statusy, Konstanty.HODNOTA, false) );
+		DropChartPanel panelGrafu8 = new DropChartPanel(this.getCiselnikGraf(this.statusy, Konstanty.TRIDA, false) );
+		DropChartPanel panelGrafu9 = new DropChartPanel(this.getCiselnikGraf(this.statusy, Konstanty.SUPERTRIDA, false) );
         
         
-		ChartPanel panelGrafu10 = new ChartPanel(this.getCiselnikGraf(this.resoluce, Konstanty.HODNOTA, false) );
-		ChartPanel panelGrafu11 = new ChartPanel(this.getCiselnikGraf(this.resoluce, Konstanty.TRIDA, false) );
-		ChartPanel panelGrafu12 = new ChartPanel(this.getCiselnikGraf(this.resoluce, Konstanty.SUPERTRIDA, false) );
+		DropChartPanel panelGrafu10 = new DropChartPanel(this.getCiselnikGraf(this.resoluce, Konstanty.HODNOTA, false) );
+		DropChartPanel panelGrafu11 = new DropChartPanel(this.getCiselnikGraf(this.resoluce, Konstanty.TRIDA, false) );
+		DropChartPanel panelGrafu12 = new DropChartPanel(this.getCiselnikGraf(this.resoluce, Konstanty.SUPERTRIDA, false) );
         
-		ChartPanel panelGrafu13 = new ChartPanel(this.getCiselnikGraf(this.typy, Konstanty.HODNOTA, false) );
-		ChartPanel panelGrafu14 = new ChartPanel(this.getCiselnikGraf(this.typy, Konstanty.TRIDA, false) );
+		DropChartPanel panelGrafu13 = new DropChartPanel(this.getCiselnikGraf(this.typy, Konstanty.HODNOTA, false) );
+		DropChartPanel panelGrafu14 = new DropChartPanel(this.getCiselnikGraf(this.typy, Konstanty.TRIDA, false) );
         
-		ChartPanel panelGrafu15 = new ChartPanel(this.getCiselnikGraf(this.osoby, Konstanty.HODNOTA, false) );
+		DropChartPanel panelGrafu15 = new DropChartPanel(this.getCiselnikGraf(this.osoby, Konstanty.HODNOTA, false) );
         
-        ChartPanel panelGrafu16 = new ChartPanel(this.getSegmentGraf(this.projekt.getFaze(), Konstanty.FAZE, false) );
-        ChartPanel panelGrafu17 = new ChartPanel(this.getSegmentGraf(this.projekt.getIterace(), Konstanty.ITERACE, false) );
-        ChartPanel panelGrafu18 = new ChartPanel(this.getHistogramCasy() );
-        ChartPanel panelGrafu19 = new ChartPanel(this.getSpojnicovyGrafPocet(this.projekt.getUkoly(), Konstanty.POPISY.getProperty("popisPocetUkolu")) );
-        ChartPanel panelGrafu20 = new ChartPanel(this.getAutorGraf(Konstanty.UKOL, false) );
+        DropChartPanel panelGrafu16 = new DropChartPanel(this.getSegmentGraf(this.projekt.getFaze(), Konstanty.FAZE, false) );
+        DropChartPanel panelGrafu17 = new DropChartPanel(this.getSegmentGraf(this.projekt.getIterace(), Konstanty.ITERACE, false) );
+        DropChartPanel panelGrafu18 = new DropChartPanel(this.getHistogramCasy() );
+        DropChartPanel panelGrafu19 = new DropChartPanel(this.getSpojnicovyGrafPocet(this.projekt.getUkoly(), Konstanty.POPISY.getProperty("popisPocetUkolu")) );
+        DropChartPanel panelGrafu20 = new DropChartPanel(this.getAutorGraf(Konstanty.UKOL, false) );
         
         vlozCheckBoxBezNulCiselnik(panelGrafu1, this.priority, Konstanty.HODNOTA);
         vlozCheckBoxBezNulCiselnik(panelGrafu2, this.priority, Konstanty.TRIDA);

@@ -1,11 +1,23 @@
 package gui;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Label;
+import java.sql.DriverPropertyInfo;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 
 import javax.swing.BorderFactory;
 import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextPane;
+import javax.swing.border.EmptyBorder;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -41,14 +53,25 @@ public class PanelGrafuSegment extends PanelGrafuRodic{
 		this.setPreferredSize(Konstanty.VELIKOST_PANELU_STANDARD);		
 		
 		this.setBorder(BorderFactory.createTitledBorder(Konstanty.POPISY.getProperty("titleSegmenty")));
-		ChartPanel panelGrafu1 = new ChartPanel(this.getGanttGraf(Konstanty.FAZE) );
-		ChartPanel panelGrafu2 = new ChartPanel(this.getGanttGraf(Konstanty.ITERACE) );
-		ChartPanel panelGrafu3 = new ChartPanel(this.getGanttGraf(Konstanty.AKTIVITY) );
+		DropChartPanel panelGrafu1 = new DropChartPanel(this.getGanttGraf(Konstanty.FAZE) );
+		DropChartPanel panelGrafu2 = new DropChartPanel(this.getGanttGraf(Konstanty.ITERACE) );
+		DropChartPanel panelGrafu3 = new DropChartPanel(this.getGanttGraf(Konstanty.AKTIVITY) );
 		
         panelGrafu1.setPreferredSize(Konstanty.VELIKOST_GRAFU);
         panelGrafu2.setPreferredSize(Konstanty.VELIKOST_GRAFU);
         panelGrafu3.setPreferredSize(Konstanty.VELIKOST_GRAFU);
+        /*     
+        DropPanel dropPanelGrafu1 = new DropPanel(new BorderLayout());
+        DropPanel dropPanelGrafu2 = new DropPanel(new BorderLayout());
+        DropPanel dropPanelGrafu3 = new DropPanel(new BorderLayout());
         
+        dropPanelGrafu1.setBorder(new EmptyBorder(10, 0, 0, 0));
+        
+        dropPanelGrafu1.add(panelGrafu1);
+        dropPanelGrafu2.add(panelGrafu2);
+        dropPanelGrafu3.add(panelGrafu3);*/
+       
+               
  		this.add(panelGrafu1);
  		this.add(panelGrafu2);
  		this.add(panelGrafu3);

@@ -9,6 +9,7 @@ package data.polozky;
  */
 public class PolozkaCiselnik extends Polozka {
 
+	private static final long serialVersionUID = -3620899375049836196L;
 	private int idTrida;			//identifikátor třídy
 	private String trida;			//třída položky
 	private String superTrida;		//supertřída položky

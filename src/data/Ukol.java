@@ -1,5 +1,6 @@
 package data;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 import data.polozky.PolozkaPocatek;
@@ -9,8 +10,9 @@ import data.polozky.PolozkaPocatek;
  * @author michalvselko
  *
  */
-public class Ukol extends PolozkaPocatek{
+public class Ukol extends PolozkaPocatek implements Serializable{
 
+	private static final long serialVersionUID = -7778041383815324514L;
 	private double predpokladanyCas;	//předpokládaný čas úkolu
 	private double stravenyCas;			//skutečně strávený čas na úkolu
 	

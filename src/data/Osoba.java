@@ -1,5 +1,6 @@
 package data;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
@@ -18,8 +19,9 @@ import databaze.UkolDAO;
  * @author michalvselko
  *
  */
-public class Osoba extends Polozka{
+public class Osoba extends Polozka implements Serializable{
 
+	private static final long serialVersionUID = 1965049927520010683L;
 	private ArrayList<Ukol> ukoly = new ArrayList<Ukol>();						//seznam úkolů přiřazených osobě
 	private ArrayList<Konfigurace> konfigurace = new ArrayList<Konfigurace>();	//seznam konfigurací provedených osobou
 	private ArrayList<Artefakt> artefakty = new ArrayList<Artefakt>();			//seznam artefaktů vložených osobou

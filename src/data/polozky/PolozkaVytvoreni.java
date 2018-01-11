@@ -1,5 +1,6 @@
 package data.polozky;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 /**
@@ -9,8 +10,9 @@ import java.time.LocalDate;
  * @author michalvselko
  *
  */
-public class PolozkaVytvoreni extends Polozka {
+public class PolozkaVytvoreni extends Polozka implements Serializable{
 	
+	private static final long serialVersionUID = 4294442297563556464L;
 	private LocalDate datumVytvoreni;		//datum vytvoření položky
 	
 	/**

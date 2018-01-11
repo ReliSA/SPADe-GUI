@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -189,6 +190,7 @@ public class OknoHlavni extends JFrame {
 
 	private void odstranPanelFiltru() {
 		this.remove(panelMenu);
+		
 		if (this.getExtendedState() == JFrame.MAXIMIZED_BOTH) {
 			this.setExtendedState(JFrame.ICONIFIED);
 			this.setExtendedState(JFrame.MAXIMIZED_BOTH);

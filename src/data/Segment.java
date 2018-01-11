@@ -1,5 +1,6 @@
 package data;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -15,8 +16,9 @@ import databaze.UkolDAO;
  * @author michalvselko
  *
  */
-public class Segment extends PolozkaPocatek{
+public class Segment extends PolozkaPocatek implements Serializable{
 
+	private static final long serialVersionUID = 6860117068510315611L;
 	private int typSegmentu;								//Typ segmentu -> Třída Konstanty: 7=Fáze, 8=Iterace, 9=Aktivity
 	private LocalDate datumKonce;							//Datum konce segmentu
 	private ArrayList<Ukol> ukoly = new ArrayList<Ukol>();	//Seznam úkolu spadající do daného segmentu

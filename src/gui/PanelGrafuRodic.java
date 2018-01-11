@@ -2,6 +2,9 @@ package gui;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DragGestureRecognizer;
+import java.awt.dnd.DragSource;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -41,7 +44,7 @@ import data.polozky.PolozkaVytvoreni;
 public abstract class PanelGrafuRodic extends JPanel{
 
 	protected Projekt projekt;	//vybraný projekt
-		
+	    
 	/**
 	 * Konstruktor třídy, nastaví projekt
 	 * @param projekt vybraný projekt

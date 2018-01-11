@@ -18,11 +18,11 @@ public class Konstanty {
 	public static final int SIRKA_OKNA = 1024;
 	public static final int VYSKA_OKNA = 768;
 	public static final int SIRKA_PANELU_MENU = 300;
-	public static final int SIRKA_PANELU_GRAFU = 2200;
+	public static final int SIRKA_PANELU_GRAFU = 800;
 	
-	public static final int VYSKA_PANELU_GRAFU_STANDART = 600;
+	public static final int VYSKA_PANELU_GRAFU_STANDART = 450;
 	public static final int POCET_STANDART_PANELU = 4;
-	public static final int VYSKA_PANELU_GRAFU_UKOL = 3600;
+	public static final int VYSKA_PANELU_GRAFU_UKOL = 2100;
 	
 	public static final Dimension VELIKOST_OKNA = new Dimension(SIRKA_OKNA, VYSKA_OKNA);
 	public static final Dimension VELIKOST_PRIHLASOVACIHO_OKNA = new Dimension(380, 180);
@@ -36,7 +36,8 @@ public class Konstanty {
 	public static final Dimension VELIKOST_PANELU_STANDARD = new Dimension(SIRKA_PANELU_GRAFU, VYSKA_PANELU_GRAFU_STANDART);
 	public static final Dimension VELIKOST_PANELU_UKOL = new Dimension(SIRKA_PANELU_GRAFU, VYSKA_PANELU_GRAFU_UKOL);
 	
-	public static final Dimension VELIKOST_GRAFU = new Dimension(700, 500);
+	public static final Dimension VELIKOST_GRAFU = new Dimension(280, 200);
+	public static final Dimension VELIKOST_GRAFU_VELKY = new Dimension(700, 500);
 	
 	public static final Dimension VELIKOST_SEZNAMU_CELA_SIRKA = new Dimension(230, 80);
 	public static final Dimension VELIKOST_CELA_SIRKA = new Dimension(230, 28);
@@ -103,7 +104,7 @@ public class Konstanty {
 	/*-----------------------------------------------*/
 	
 	public static Connection PRIPOJENI = null;														//připojení k databázi
-	public static final String CESTA_K_DATABAZI = "jdbc:mysql://students.kiv.zcu.cz:3306/ppicha";	//cesta k databázi
+	public static final String CESTA_K_DATABAZI = "jdbc:mysql://127.0.0.1:3306/ppicha";	//cesta k databázi
 	
 	public static int CITAC_PROGRESU = 0;															//čítač progresu
 	public static final int POCET_KROKU_PROGRESU = 7;												//počet načítaných skupin dat
