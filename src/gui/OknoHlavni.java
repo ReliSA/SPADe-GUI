@@ -1,13 +1,10 @@
 package gui;
 
 import java.awt.BorderLayout;
-import java.awt.Button;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
+import java.awt.FlowLayout;
 import java.awt.Frame;
-import java.awt.Insets;
-import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -21,8 +18,6 @@ import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.concurrent.SynchronousQueue;
-
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.DefaultComboBoxModel;
@@ -37,7 +32,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-
 import ostatni.Konstanty;
 import data.*;
 import data.ciselnik.*;
@@ -52,6 +46,7 @@ import databaze.ProjektDAO;
 public class OknoHlavni extends JFrame {
 
 	private JPanel panelMenu; // levý panel pro výběr projektu a dodání filtrů
+	private JPanel panelProjektMenu;
 	private PanelGrafu panelGrafu; // centrální panel zobrazující statistiky a grafy
 	private JPanel centralPanel;
 
@@ -70,7 +65,8 @@ public class OknoHlavni extends JFrame {
 	private JButton btZapniFiltr = new JButton(Konstanty.POPISY.getProperty("tlacitkoZapniFiltr")); // tlačítko pro
 																									// spuštění podmínek
 	
-	private JButton btSipkaFiltr = new JButton("<");
+	JScrollPane scScrollFiltru;
+	private JButton filtryZobrazeniButton = new JButton("Filtry");
 	private JMenu fileMenu; // Tlačítko menu baru
 	private JMenu settingsMenu; // Tlačítko menu baru
 	private JMenu languageMenu; // Tlačítko menu baru
@@ -132,20 +128,23 @@ public class OknoHlavni extends JFrame {
 		exitAction = new JMenuItem(Konstanty.POPISY.getProperty("menuExit"));
 		czech = new JMenuItem(Konstanty.POPISY.getProperty("menuCestina"));
 		english = new JMenuItem(Konstanty.POPISY.getProperty("menuAnglictina"));
-		filtry = new JCheckBoxMenuItem(Konstanty.POPISY.getProperty("filtryTrue"), true);
+		filtry = new JCheckBoxMenuItem(Konstanty.POPISY.getProperty("filtryTrue"), false);
 
 		JLabel nadpis = new JLabel(Konstanty.POPISY.getProperty("nadpisFiltru"));
 		panelGrafu = new PanelGrafu(this.getProjekt());
 		panelMenu = new JPanel();
+		panelProjektMenu = new JPanel(new BorderLayout());
 		menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 		JPanel pnFiltr = new JPanel();
-		JScrollPane scScrollFiltru = new JScrollPane(pnBoxFiltru, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+		scScrollFiltru = new JScrollPane(pnBoxFiltru, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
 		nastavAkce(); // nastaví akce k jednotlivým komponentám
 		panelMenu.setPreferredSize(Konstanty.VELIKOST_PANELU_MENU);
-		panelMenu.setLayout(Konstanty.FLOW_LAYOUT);
+		panelProjektMenu.add(panelMenu,BorderLayout.WEST);
+		panelProjektMenu.add(filtryZobrazeniButton,BorderLayout.EAST);
+		panelMenu.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
 		nadpis.setFont(Konstanty.FONT_NADPIS);
 
 		pnFiltr.setLayout(Konstanty.FLOW_LAYOUT);
@@ -159,15 +158,13 @@ public class OknoHlavni extends JFrame {
 		btPridejFiltr.setPreferredSize(Konstanty.VELIKOST_POLOVICNI_SIRKA);
 		btZapniFiltr.setPreferredSize(Konstanty.VELIKOST_CELA_SIRKA);
 
-		scScrollFiltru.setPreferredSize(new Dimension(270, 550));
-		
-		btSipkaFiltr.setPreferredSize(Konstanty.VELIKOST_SIPKY);
-		btSipkaFiltr.setFont(new Font("Arial", Font.PLAIN, 15));
-		btSipkaFiltr.setMargin(new Insets(0, 0, 0, 0));
+		scScrollFiltru.setPreferredSize(new Dimension(270, 200));
+				
 		panelMenu.add(nadpis);
 		panelMenu.add(lsSeznamProjektu);
-		panelMenu.add(scScrollFiltru);
-		panelMenu.add(btZapniFiltr);
+		//panelMenu.add(filtryZobrazeniButton);
+		//panelMenu.add(btZapniFiltr);
+		
 
 		menuBar.add(fileMenu);
 		menuBar.add(settingsMenu);
@@ -179,10 +176,10 @@ public class OknoHlavni extends JFrame {
 
 		centralPanel = new JPanel(new BorderLayout());
 		centralPanel.add(panelGrafu, BorderLayout.CENTER);
-		centralPanel.add(btSipkaFiltr, BorderLayout.WEST);
+		
 
 		this.setLayout(new BorderLayout());
-		this.add(panelMenu, BorderLayout.WEST);
+		this.add(panelProjektMenu, BorderLayout.NORTH);
 		this.add(centralPanel, BorderLayout.CENTER);
 	}
 
@@ -199,7 +196,7 @@ public class OknoHlavni extends JFrame {
 	}
 
 	private void odstranPanelFiltru() {
-		this.remove(panelMenu);
+		panelGrafu.schovejFiltry(scScrollFiltru);
 
 		if (this.getExtendedState() == JFrame.MAXIMIZED_BOTH) {
 			this.setExtendedState(JFrame.ICONIFIED);
@@ -211,7 +208,7 @@ public class OknoHlavni extends JFrame {
 
 	private void pridejPanelFiltru() {
 
-		this.add(panelMenu, BorderLayout.WEST);
+		panelGrafu.zobrazFiltry(scScrollFiltru);
 		if (this.getExtendedState() == JFrame.MAXIMIZED_BOTH) {
 			this.setExtendedState(JFrame.ICONIFIED);
 			this.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -663,28 +660,25 @@ public class OknoHlavni extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if (filtry.isSelected() == true) {
 					pridejPanelFiltru();
-					btSipkaFiltr.setText("<");
 				} else {
 					odstranPanelFiltru();
-					btSipkaFiltr.setText(">");
 				}
 			}
 		};
 		
 		/* akce pro schování panelu filtrů  */
-		ActionListener actZobrazeniFiltruSipka = new ActionListener() {
+		ActionListener actZobrazeniFiltruButton = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (filtry.isSelected() == false) {
 					pridejPanelFiltru();
 					filtry.setSelected(true);
-					btSipkaFiltr.setText("<");
 				} else {
 					odstranPanelFiltru();
-					btSipkaFiltr.setText(">");
 					filtry.setSelected(false);
 				}
 			}
 		};
+		
 
 		/* vložení akcí k příslušným komponentám */
 		lsSeznamProjektu.addActionListener(actZmenaProjektu);
@@ -694,7 +688,7 @@ public class OknoHlavni extends JFrame {
 		czech.addActionListener(actJazykCzech);
 		english.addActionListener(actJazykEnglish);
 		filtry.addActionListener(actZobrazeniFiltruMenu);
-		btSipkaFiltr.addActionListener(actZobrazeniFiltruSipka);
+		filtryZobrazeniButton.addActionListener(actZobrazeniFiltruButton);
 
 		this.addComponentListener(actResizePaneluGrafu);
 		this.addWindowListener(actUkonceniOkna);

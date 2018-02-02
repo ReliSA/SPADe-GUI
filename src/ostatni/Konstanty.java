@@ -17,7 +17,7 @@ public class Konstanty {
 	/*----------------Velikosti komponent------------------*/
 	public static final int SIRKA_OKNA = 1024;
 	public static final int VYSKA_OKNA = 768;
-	public static final int SIRKA_PANELU_MENU = 300;
+	public static final int SIRKA_PANELU_MENU = 600;
 	public static final int SIRKA_PANELU_GRAFU = 1540;
 	
 	public static final int VYSKA_PANELU_GRAFU_STANDART = 210;
@@ -29,16 +29,19 @@ public class Konstanty {
 	public static final Dimension VELIKOST_NACITACIHO_OKNA = new Dimension(500, 150);
 	public static final Dimension MINIMALNI_VELIKOST_OKNA = new Dimension(SIRKA_PANELU_MENU + 100, 750);
 	
-	public static final Dimension VELIKOST_PANELU_MENU = new Dimension(SIRKA_PANELU_MENU, VYSKA_OKNA);
+	public static final Dimension VELIKOST_PANELU_MENU = new Dimension(SIRKA_PANELU_MENU, 50);
 	public static final Dimension VELIKOST_PANELU_GRAFU = new Dimension(SIRKA_PANELU_GRAFU, VYSKA_OKNA);
 	
-	public static final Dimension VELIKOST_PANELU = new Dimension(SIRKA_PANELU_GRAFU+40,2 * VYSKA_PANELU_GRAFU_STANDART +550);
+	public static final Dimension VELIKOST_PANELU = new Dimension(SIRKA_PANELU_GRAFU+40,2 * VYSKA_PANELU_GRAFU_STANDART +475);
 	public static final Dimension VELIKOST_SIPKY = new Dimension(15, 2 * VYSKA_PANELU_GRAFU_STANDART +550);
 	public static final Dimension VELIKOST_PANELU_STANDARD = new Dimension(SIRKA_PANELU_GRAFU, VYSKA_PANELU_GRAFU_STANDART);
 	public static final Dimension VELIKOST_PANELU_UKOL = new Dimension(SIRKA_PANELU_GRAFU, VYSKA_PANELU_GRAFU_UKOL);
 	
+	
+	public static final Dimension VELIKOST_STAT = new Dimension(300, 200);
+	public static final Dimension VELIKOST_STAT_MAX = new Dimension(500, 200);
 	public static final Dimension VELIKOST_GRAFU = new Dimension(280, 200);
-	public static final Dimension VELIKOST_GRAFU_VELKY = new Dimension(775, 450);
+	public static final Dimension VELIKOST_GRAFU_VELKY = new Dimension(955, 415);
 	
 	public static final Dimension VELIKOST_SEZNAMU_CELA_SIRKA = new Dimension(230, 80);
 	public static final Dimension VELIKOST_CELA_SIRKA = new Dimension(230, 28);
