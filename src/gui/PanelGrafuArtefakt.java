@@ -48,17 +48,16 @@ public class PanelGrafuArtefakt extends PanelGrafuRodic {
 
 		vlozCheckBoxBezNulAutor(panelGrafu3, Konstanty.ARTEFAKT);
 
-        panelGrafu1.setPreferredSize(Konstanty.VELIKOST_GRAFU);
-        panelGrafu2.setPreferredSize(Konstanty.VELIKOST_GRAFU);
-        panelGrafu3.setPreferredSize(Konstanty.VELIKOST_GRAFU);
-                
-       
-        
+        panelGrafu1.setComponentPopupMenu(null);
+        panelGrafu2.setComponentPopupMenu(null);
+        panelGrafu3.setComponentPopupMenu(null);
+                  
         
  		this.add(panelGrafu1);
  		this.add(panelGrafu2);
  		this.add(panelGrafu3);
             
+ 		this.odstranMenu();
 		this.nastavZobrazeni();
 	}
 

@@ -57,15 +57,12 @@ public class PanelGrafuSegment extends PanelGrafuRodic{
 		DropChartPanel panelGrafu1 = new DropChartPanel(this.getGanttGraf(Konstanty.FAZE),Konstanty.GANTT ,Konstanty.SEGMENT);
 		DropChartPanel panelGrafu2 = new DropChartPanel(this.getGanttGraf(Konstanty.ITERACE),Konstanty.GANTT ,Konstanty.SEGMENT);
 		DropChartPanel panelGrafu3 = new DropChartPanel(this.getGanttGraf(Konstanty.AKTIVITY),Konstanty.GANTT ,Konstanty.SEGMENT);
-		
-        panelGrafu1.setPreferredSize(Konstanty.VELIKOST_GRAFU);
-        panelGrafu2.setPreferredSize(Konstanty.VELIKOST_GRAFU);
-        panelGrafu3.setPreferredSize(Konstanty.VELIKOST_GRAFU);
-              
+		       
  		this.add(panelGrafu1);
  		this.add(panelGrafu2);
  		this.add(panelGrafu3);
         
+ 		this.odstranMenu();
 		this.nastavZobrazeni();
 	}
 		

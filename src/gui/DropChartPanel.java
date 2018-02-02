@@ -8,6 +8,7 @@ import java.awt.dnd.DragSource;
 import java.text.SimpleDateFormat;
 
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -37,6 +38,7 @@ public class DropChartPanel extends ChartPanel {
 
 	private int typGrafu;
 	protected int typPanelu;
+	protected JPopupMenu menu;
 
 	/**
 	 * Kontruktor DropChartPanelu. Vytvoří panel a zakáže zoomování grafu.
@@ -50,6 +52,7 @@ public class DropChartPanel extends ChartPanel {
 		this.typPanelu = typPanelu;
 		this.setDomainZoomable(false);
 		this.setRangeZoomable(false);
+		this.menu = this.getPopupMenu();
 	}
 
 	/**

@@ -54,6 +54,7 @@ public class PanelGrafuKonfigurace extends PanelGrafuRodic{
 		this.add(panelGrafu2);
 		this.add(panelGrafu3);
         
+		this.odstranMenu();
 		this.nastavZobrazeni();
 	}
 

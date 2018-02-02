@@ -90,6 +90,7 @@ public class DropHandler implements DropTargetListener {
 						panel.setDomainZoomable(true);
 						panel.setRangeZoomable(true);
 						panel.zobrazLegendu(true);
+						panel.setPopupMenu(panel.menu);
 
 						vratMiniaturu((((JComponent) component).getComponent(0)));
 

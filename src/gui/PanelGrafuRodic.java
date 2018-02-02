@@ -71,6 +71,16 @@ public abstract class PanelGrafuRodic extends JPanel {
 		}
 		;
 	};
+	
+	/**
+	 * Odstraní menu panelu
+	 */
+	protected void odstranMenu() {
+		for (int i = 0; i < this.getComponentCount(); i++) {
+			((DropChartPanel)this.getComponent(i)).setPopupMenu(null);
+		}
+		;
+	};
 
 	protected void vratGrafMiniatura(DropChartPanel panel) {
 
@@ -79,6 +89,7 @@ public abstract class PanelGrafuRodic extends JPanel {
 		panel.setRangeZoomable(false);
 		panel.zobrazLegendu(false);
 		panel.setPreferredSize(Konstanty.VELIKOST_GRAFU);
+		panel.setPopupMenu(null);
 		this.add(panel);
 
 	}
@@ -94,7 +105,7 @@ public abstract class PanelGrafuRodic extends JPanel {
 	protected void nastavGraf(JFreeChart graf, int typGrafu) {
 		try {
 			graf.getTitle().setFont(Konstanty.FONT_NAZEV_GRAFU);
-
+			
 			if (typGrafu == Konstanty.SLOUPCOVY) {
 				CategoryPlot plot = (CategoryPlot) graf.getPlot();
 

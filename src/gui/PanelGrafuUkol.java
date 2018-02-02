@@ -140,6 +140,7 @@ public class PanelGrafuUkol extends PanelGrafuRodic{
         this.add(panelGrafu19);		
         this.add(panelGrafu20);		
         
+        this.odstranMenu();
 		this.nastavZobrazeni();      
 	}
 	
