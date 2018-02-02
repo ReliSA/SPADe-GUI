@@ -1,11 +1,24 @@
 package gui;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragGestureRecognizer;
 import java.awt.dnd.DragSource;
+import java.text.SimpleDateFormat;
+
+import javax.swing.JOptionPane;
 
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.CategoryLabelPositions;
+import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.XYPlot;
+
+import ostatni.Konstanty;
 
 /**
  * Třída zděděná od ChartPanel. Přidává podporu drag and drop.
@@ -22,14 +35,17 @@ public class DropChartPanel extends ChartPanel {
 	/** Slouží pro povolení a zakázaní přetahování panelu. */
 	private boolean dragable = true;
 
+	private int typGrafu;
+
 	/**
 	 * Kontruktor DropChartPanelu. Vytvoří panel a zakáže zoomování grafu.
 	 * 
 	 * @param chart
 	 *            JFreeChart graf
 	 */
-	public DropChartPanel(JFreeChart chart) {
+	public DropChartPanel(JFreeChart chart, int typGrafu) {
 		super(chart);
+		this.typGrafu = typGrafu;
 		this.setDomainZoomable(false);
 		this.setRangeZoomable(false);
 	}
@@ -87,6 +103,57 @@ public class DropChartPanel extends ChartPanel {
 	 */
 	public void setDragable(boolean dragable) {
 		this.dragable = dragable;
+	}
+
+	
+	
+	
+	
+	/**
+	 * Metoda pro zobrazení/skrytí legendy grafu
+	 * @param zobraz určuje zda se má legenda zobrazit nebo schovat
+	 */
+	protected void zobrazLegendu(boolean zobraz) {
+		try {
+
+			JFreeChart graf = this.getChart();
+
+			if (typGrafu == Konstanty.SLOUPCOVY || typGrafu == Konstanty.GANTT) {
+				CategoryPlot plot = (CategoryPlot) graf.getPlot();
+				ValueAxis rangeAxis = plot.getRangeAxis();
+				CategoryAxis domainAxis = plot.getDomainAxis();
+				if (zobraz = true) {
+					rangeAxis.setVisible(true);
+					domainAxis.setVisible(true);
+				} else {
+					rangeAxis.setVisible(false);
+					domainAxis.setVisible(false);
+				}
+			}
+
+			if (typGrafu == Konstanty.HISTOGRAM || typGrafu == Konstanty.SPOJNICOVY) {
+				XYPlot xyplot = graf.getXYPlot();
+				DateAxis domainAxis = new DateAxis();
+				ValueAxis rangeAxis = xyplot.getRangeAxis();
+
+				xyplot.setDomainAxis(domainAxis);
+				rangeAxis.setTickLabelFont(Konstanty.FONT_POPISKY_GRAFU);
+				domainAxis.setTickLabelFont(Konstanty.FONT_POPISKY_GRAFU);
+
+				if (zobraz = true) {
+					rangeAxis.setVisible(true);
+					domainAxis.setVisible(true);
+				} else {
+					rangeAxis.setVisible(false);
+					domainAxis.setVisible(false);
+				}
+
+			}
+
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, Konstanty.POPISY.getProperty("chybaNastaveniVzhleduGrafu"));
+			e.printStackTrace();
+		}
 	}
 
 }

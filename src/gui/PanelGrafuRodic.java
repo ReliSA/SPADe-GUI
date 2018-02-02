@@ -76,9 +76,10 @@ public abstract class PanelGrafuRodic extends JPanel{
 	 * @param typGrafu typ grafu
 	 */
 	protected void nastavGraf(JFreeChart graf, int typGrafu){
-		try{
+		try{			
 			graf.getTitle().setFont(Konstanty.FONT_NAZEV_GRAFU);
 	        
+			
 			if(typGrafu == Konstanty.SLOUPCOVY){
 				CategoryPlot plot = (CategoryPlot)graf.getPlot();  
 		        
@@ -88,7 +89,10 @@ public abstract class PanelGrafuRodic extends JPanel{
 		        rangeAxis.setTickLabelFont(Konstanty.FONT_POPISKY_GRAFU);
 		        domainAxis.setTickLabelFont(Konstanty.FONT_POPISKY_GRAFU);
 		        
-		        domainAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_45);		        
+		        domainAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_45);		  
+		        
+		        rangeAxis.setVisible(false);
+		        domainAxis.setVisible(false);
 			}
 			
 			
@@ -100,6 +104,10 @@ public abstract class PanelGrafuRodic extends JPanel{
 	    		xyplot.setDomainAxis(domainAxis);
 		        rangeAxis.setTickLabelFont(Konstanty.FONT_POPISKY_GRAFU);
 		        domainAxis.setTickLabelFont(Konstanty.FONT_POPISKY_GRAFU);
+		        
+		        domainAxis.setVisible(false);
+		        rangeAxis.setVisible(false);
+
 		        
 		        if(typGrafu == Konstanty.HISTOGRAM)
 		        	domainAxis.setDateFormatOverride(new SimpleDateFormat("MM/yyyy"));
@@ -114,8 +122,13 @@ public abstract class PanelGrafuRodic extends JPanel{
 	        if(typGrafu == Konstanty.GANTT){
 	        	CategoryPlot ganttPlot = (CategoryPlot)graf.getPlot();  
 		        ValueAxis rangeAxis = ganttPlot.getRangeAxis();
+		        CategoryAxis domainAxis = ganttPlot.getDomainAxis();
 		        DateAxis axis = (DateAxis)rangeAxis;
 	        	axis.setDateFormatOverride(new SimpleDateFormat("dd.MM.yyyy")  );
+	        	
+	        	rangeAxis.setVisible(false);
+	        	domainAxis.setVisible(false);	        	
+	        	
 	        }
 		} catch (Exception e){
 			JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaNastaveniVzhleduGrafu"));

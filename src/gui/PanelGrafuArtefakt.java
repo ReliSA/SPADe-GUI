@@ -9,6 +9,7 @@ import javax.swing.JOptionPane;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.time.Month;
 import org.jfree.data.time.TimeSeries;
@@ -41,9 +42,9 @@ public class PanelGrafuArtefakt extends PanelGrafuRodic {
 		this.setPreferredSize(Konstanty.VELIKOST_PANELU_STANDARD);		
 		this.setBorder(BorderFactory.createTitledBorder(Konstanty.POPISY.getProperty("nazevArtefakty")));
 		
-		DropChartPanel panelGrafu1 = new DropChartPanel(this.getHistogramArtefakty() );
-		DropChartPanel panelGrafu2 = new DropChartPanel(this.getSpojnicovyGrafPocet(this.projekt.getArtefakty(), Konstanty.POPISY.getProperty("artefaktNadpisSpojnicovy")) );
-		DropChartPanel panelGrafu3 = new DropChartPanel(this.getAutorGraf(Konstanty.ARTEFAKT, false) );
+		DropChartPanel panelGrafu1 = new DropChartPanel(this.getHistogramArtefakty(),Konstanty.HISTOGRAM );
+		DropChartPanel panelGrafu2 = new DropChartPanel(this.getSpojnicovyGrafPocet(this.projekt.getArtefakty(), Konstanty.POPISY.getProperty("artefaktNadpisSpojnicovy")),Konstanty.SPOJNICOVY );
+		DropChartPanel panelGrafu3 = new DropChartPanel(this.getAutorGraf(Konstanty.ARTEFAKT, false),Konstanty.SLOUPCOVY);
 
 		vlozCheckBoxBezNulAutor(panelGrafu3, Konstanty.ARTEFAKT);
 
@@ -51,6 +52,9 @@ public class PanelGrafuArtefakt extends PanelGrafuRodic {
         panelGrafu2.setPreferredSize(Konstanty.VELIKOST_GRAFU);
         panelGrafu3.setPreferredSize(Konstanty.VELIKOST_GRAFU);
                 
+       
+        
+        
  		this.add(panelGrafu1);
  		this.add(panelGrafu2);
  		this.add(panelGrafu3);

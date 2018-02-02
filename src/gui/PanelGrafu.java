@@ -16,6 +16,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingConstants;
+
 import ostatni.Konstanty;
 import data.*;
 import java.time.format.DateTimeFormatter;
@@ -269,6 +271,7 @@ public class PanelGrafu extends JPanel {
 				panelStatistik.add(new JLabel(""), grid); grid.gridx++;		
 				panelStatistik.add(lblMinimum, grid); grid.gridx++;		
 				panelStatistik.add(lblPrumer, grid); grid.gridx++;		
+				panelStatistik.add(new JSeparator(SwingConstants.VERTICAL),grid);
 				panelStatistik.add(lblMaximum, grid); grid.gridx++;	grid.gridx++;
 				panelStatistik.add(lblMinimum2, grid); grid.gridx++;		
 				panelStatistik.add(lblPrumer2, grid); grid.gridx++;		

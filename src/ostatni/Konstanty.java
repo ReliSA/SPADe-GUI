@@ -105,8 +105,8 @@ public class Konstanty {
 	/*-----------------------------------------------*/
 	
 	public static Connection PRIPOJENI = null;														//připojení k databázi
-	//public static final String CESTA_K_DATABAZI = "jdbc:mysql://127.0.0.1:3306/ppicha";				//cesta k databázi
-	public static final String CESTA_K_DATABAZI = "jdbc:mysql://students.kiv.zcu.cz:3306/ppicha";
+	public static final String CESTA_K_DATABAZI = "jdbc:mysql://127.0.0.1:3306/ppicha";				//cesta k databázi
+	//public static final String CESTA_K_DATABAZI = "jdbc:mysql://students.kiv.zcu.cz:3306/ppicha";
 	
 	public static int CITAC_PROGRESU = 0;															//čítač progresu
 	public static final int POCET_KROKU_PROGRESU = 7;												//počet načítaných skupin dat

@@ -40,9 +40,9 @@ public class PanelGrafuKonfigurace extends PanelGrafuRodic{
 	protected void vlozGrafy(){
 		this.setPreferredSize(Konstanty.VELIKOST_PANELU_STANDARD);		
 		this.setBorder(BorderFactory.createTitledBorder(Konstanty.POPISY.getProperty("nazevKonfigurace")));
-		DropChartPanel panelGrafu1 = new DropChartPanel(this.getHistogramKonfigurace() );
-		DropChartPanel panelGrafu2 = new DropChartPanel(this.getSpojnicovyGrafPocet(this.projekt.getKonfigurace(), Konstanty.POPISY.getProperty("konfiguraceNadpisSpojnicovy")) );
-		DropChartPanel panelGrafu3 = new DropChartPanel(this.getAutorGraf(Konstanty.KONFIGURACE, false) );
+		DropChartPanel panelGrafu1 = new DropChartPanel(this.getHistogramKonfigurace(),Konstanty.HISTOGRAM );
+		DropChartPanel panelGrafu2 = new DropChartPanel(this.getSpojnicovyGrafPocet(this.projekt.getKonfigurace(), Konstanty.POPISY.getProperty("konfiguraceNadpisSpojnicovy")),Konstanty.SPOJNICOVY );
+		DropChartPanel panelGrafu3 = new DropChartPanel(this.getAutorGraf(Konstanty.KONFIGURACE, false),Konstanty.SLOUPCOVY);
 		
         panelGrafu1.setPreferredSize(Konstanty.VELIKOST_GRAFU);
         panelGrafu2.setPreferredSize(Konstanty.VELIKOST_GRAFU);

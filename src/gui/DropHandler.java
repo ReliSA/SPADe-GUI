@@ -76,6 +76,7 @@ public class DropHandler implements DropTargetListener {
 						panel.setDragable(false);
 						panel.setDomainZoomable(true);
 						panel.setRangeZoomable(true);
+						panel.zobrazLegendu(true);
 
 						((JComponent) component).removeAll();
 						((JComponent) component).add(panel);
