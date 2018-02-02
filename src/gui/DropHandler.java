@@ -22,6 +22,19 @@ import ostatni.Konstanty;
  */
 public class DropHandler implements DropTargetListener {
 
+	PanelGrafuSegment panelSegment;
+	PanelGrafuUkol panelUkol;
+	PanelGrafuKonfigurace panelKonfigurace;
+	PanelGrafuArtefakt panelArtefakt;
+
+	public DropHandler(PanelGrafuSegment panelSegment, PanelGrafuUkol panelUkol, PanelGrafuKonfigurace panelKonfigurace,
+			PanelGrafuArtefakt panelArtefakt) {
+		this.panelSegment = panelSegment;
+		this.panelUkol = panelUkol;
+		this.panelKonfigurace = panelKonfigurace;
+		this.panelArtefakt = panelArtefakt;
+	}
+
 	/**
 	 * Metoda pro urření zda lze zpracovat data daného dropu.
 	 */
@@ -71,12 +84,14 @@ public class DropHandler implements DropTargetListener {
 							parent.remove(panel);
 
 						}
-						
+
 						panel.setPreferredSize(Konstanty.VELIKOST_GRAFU_VELKY);
 						panel.setDragable(false);
 						panel.setDomainZoomable(true);
 						panel.setRangeZoomable(true);
 						panel.zobrazLegendu(true);
+
+						vratMiniaturu((((JComponent) component).getComponent(0)));
 
 						((JComponent) component).removeAll();
 						((JComponent) component).add(panel);
@@ -117,6 +132,26 @@ public class DropHandler implements DropTargetListener {
 
 		dtde.dropComplete(success);
 
+	}
+
+	public void vratMiniaturu(Component component) {
+		if (component instanceof DropChartPanel) {
+			DropChartPanel panel = (DropChartPanel) component;
+			switch (panel.typPanelu) {
+			case Konstanty.UKOL:
+				panelUkol.vratGrafMiniatura(panel);
+				break;
+			case Konstanty.KONFIGURACE:
+				panelKonfigurace.vratGrafMiniatura(panel);
+				break;
+			case Konstanty.ARTEFAKT:
+				panelArtefakt.vratGrafMiniatura(panel);
+				break;
+			case Konstanty.SEGMENT:
+				panelSegment.vratGrafMiniatura(panel);
+				break;
+			}
+		}
 	}
 
 	@Override

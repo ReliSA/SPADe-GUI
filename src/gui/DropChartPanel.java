@@ -36,6 +36,7 @@ public class DropChartPanel extends ChartPanel {
 	private boolean dragable = true;
 
 	private int typGrafu;
+	protected int typPanelu;
 
 	/**
 	 * Kontruktor DropChartPanelu. Vytvoří panel a zakáže zoomování grafu.
@@ -43,9 +44,10 @@ public class DropChartPanel extends ChartPanel {
 	 * @param chart
 	 *            JFreeChart graf
 	 */
-	public DropChartPanel(JFreeChart chart, int typGrafu) {
+	public DropChartPanel(JFreeChart chart, int typGrafu, int typPanelu) {
 		super(chart);
 		this.typGrafu = typGrafu;
+		this.typPanelu = typPanelu;
 		this.setDomainZoomable(false);
 		this.setRangeZoomable(false);
 	}
@@ -61,7 +63,7 @@ public class DropChartPanel extends ChartPanel {
 		if (dgr == null && dragable) {
 
 			dragGestureHandler = new DragGestureHandler(this);
-			dgr = DragSource.getDefaultDragSource().createDefaultDragGestureRecognizer(this, DnDConstants.ACTION_COPY,
+			dgr = DragSource.getDefaultDragSource().createDefaultDragGestureRecognizer(this, DnDConstants.ACTION_MOVE,
 					dragGestureHandler);
 
 		}
@@ -122,7 +124,7 @@ public class DropChartPanel extends ChartPanel {
 				CategoryPlot plot = (CategoryPlot) graf.getPlot();
 				ValueAxis rangeAxis = plot.getRangeAxis();
 				CategoryAxis domainAxis = plot.getDomainAxis();
-				if (zobraz = true) {
+				if (zobraz == true) {
 					rangeAxis.setVisible(true);
 					domainAxis.setVisible(true);
 				} else {
@@ -140,7 +142,7 @@ public class DropChartPanel extends ChartPanel {
 				rangeAxis.setTickLabelFont(Konstanty.FONT_POPISKY_GRAFU);
 				domainAxis.setTickLabelFont(Konstanty.FONT_POPISKY_GRAFU);
 
-				if (zobraz = true) {
+				if (zobraz == true) {
 					rangeAxis.setVisible(true);
 					domainAxis.setVisible(true);
 				} else {

@@ -22,8 +22,6 @@ public class PanelTransferable implements Transferable {
     @Override
     public boolean isDataFlavorSupported(DataFlavor flavor) {
 
-        // Okay, for this example, this is over kill, but makes it easier
-        // to add new flavor support by subclassing
         boolean supported = false;
 
         for (DataFlavor mine : getTransferDataFlavors()) {

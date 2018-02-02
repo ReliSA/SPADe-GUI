@@ -73,32 +73,32 @@ public class PanelGrafuUkol extends PanelGrafuRodic{
 		this.setBorder(BorderFactory.createTitledBorder(Konstanty.POPISY.getProperty("nazevUkoly")));
 		this.removeAll();
 
-		DropChartPanel panelGrafu1 = new DropChartPanel(this.getCiselnikGraf(this.priority, Konstanty.HODNOTA, false),Konstanty.SLOUPCOVY );        
-		DropChartPanel panelGrafu2 = new DropChartPanel(this.getCiselnikGraf(this.priority, Konstanty.TRIDA, false),Konstanty.SLOUPCOVY );
-		DropChartPanel panelGrafu3 = new DropChartPanel(this.getCiselnikGraf(this.priority, Konstanty.SUPERTRIDA, false),Konstanty.SLOUPCOVY );
+		DropChartPanel panelGrafu1 = new DropChartPanel(this.getCiselnikGraf(this.priority, Konstanty.HODNOTA, false),Konstanty.SLOUPCOVY ,Konstanty.UKOL);        
+		DropChartPanel panelGrafu2 = new DropChartPanel(this.getCiselnikGraf(this.priority, Konstanty.TRIDA, false),Konstanty.SLOUPCOVY ,Konstanty.UKOL);
+		DropChartPanel panelGrafu3 = new DropChartPanel(this.getCiselnikGraf(this.priority, Konstanty.SUPERTRIDA, false),Konstanty.SLOUPCOVY ,Konstanty.UKOL);
                 
-		DropChartPanel panelGrafu4 = new DropChartPanel(this.getCiselnikGraf(this.severity, Konstanty.HODNOTA, false),Konstanty.SLOUPCOVY );
-		DropChartPanel panelGrafu5 = new DropChartPanel(this.getCiselnikGraf(this.severity, Konstanty.TRIDA, false),Konstanty.SLOUPCOVY );
-		DropChartPanel panelGrafu6 = new DropChartPanel(this.getCiselnikGraf(this.severity, Konstanty.SUPERTRIDA, false),Konstanty.SLOUPCOVY );
+		DropChartPanel panelGrafu4 = new DropChartPanel(this.getCiselnikGraf(this.severity, Konstanty.HODNOTA, false),Konstanty.SLOUPCOVY ,Konstanty.UKOL);
+		DropChartPanel panelGrafu5 = new DropChartPanel(this.getCiselnikGraf(this.severity, Konstanty.TRIDA, false),Konstanty.SLOUPCOVY ,Konstanty.UKOL);
+		DropChartPanel panelGrafu6 = new DropChartPanel(this.getCiselnikGraf(this.severity, Konstanty.SUPERTRIDA, false),Konstanty.SLOUPCOVY ,Konstanty.UKOL);
         
-		DropChartPanel panelGrafu7 = new DropChartPanel(this.getCiselnikGraf(this.statusy, Konstanty.HODNOTA, false),Konstanty.SLOUPCOVY );
-		DropChartPanel panelGrafu8 = new DropChartPanel(this.getCiselnikGraf(this.statusy, Konstanty.TRIDA, false),Konstanty.SLOUPCOVY );
-		DropChartPanel panelGrafu9 = new DropChartPanel(this.getCiselnikGraf(this.statusy, Konstanty.SUPERTRIDA, false),Konstanty.SLOUPCOVY );
+		DropChartPanel panelGrafu7 = new DropChartPanel(this.getCiselnikGraf(this.statusy, Konstanty.HODNOTA, false),Konstanty.SLOUPCOVY ,Konstanty.UKOL);
+		DropChartPanel panelGrafu8 = new DropChartPanel(this.getCiselnikGraf(this.statusy, Konstanty.TRIDA, false),Konstanty.SLOUPCOVY ,Konstanty.UKOL);
+		DropChartPanel panelGrafu9 = new DropChartPanel(this.getCiselnikGraf(this.statusy, Konstanty.SUPERTRIDA, false),Konstanty.SLOUPCOVY ,Konstanty.UKOL);
         
         
-		DropChartPanel panelGrafu10 = new DropChartPanel(this.getCiselnikGraf(this.resoluce, Konstanty.HODNOTA, false),Konstanty.SLOUPCOVY );
-		DropChartPanel panelGrafu11 = new DropChartPanel(this.getCiselnikGraf(this.resoluce, Konstanty.TRIDA, false),Konstanty.SLOUPCOVY );
-		DropChartPanel panelGrafu12 = new DropChartPanel(this.getCiselnikGraf(this.resoluce, Konstanty.SUPERTRIDA, false),Konstanty.SLOUPCOVY );
+		DropChartPanel panelGrafu10 = new DropChartPanel(this.getCiselnikGraf(this.resoluce, Konstanty.HODNOTA, false),Konstanty.SLOUPCOVY ,Konstanty.UKOL);
+		DropChartPanel panelGrafu11 = new DropChartPanel(this.getCiselnikGraf(this.resoluce, Konstanty.TRIDA, false),Konstanty.SLOUPCOVY ,Konstanty.UKOL);
+		DropChartPanel panelGrafu12 = new DropChartPanel(this.getCiselnikGraf(this.resoluce, Konstanty.SUPERTRIDA, false),Konstanty.SLOUPCOVY ,Konstanty.UKOL);
         
-		DropChartPanel panelGrafu13 = new DropChartPanel(this.getCiselnikGraf(this.typy, Konstanty.HODNOTA, false),Konstanty.SLOUPCOVY );
-		DropChartPanel panelGrafu14 = new DropChartPanel(this.getCiselnikGraf(this.typy, Konstanty.TRIDA, false),Konstanty.SLOUPCOVY );
-		DropChartPanel panelGrafu15 = new DropChartPanel(this.getCiselnikGraf(this.osoby, Konstanty.HODNOTA, false),Konstanty.SLOUPCOVY );
+		DropChartPanel panelGrafu13 = new DropChartPanel(this.getCiselnikGraf(this.typy, Konstanty.HODNOTA, false),Konstanty.SLOUPCOVY ,Konstanty.UKOL);
+		DropChartPanel panelGrafu14 = new DropChartPanel(this.getCiselnikGraf(this.typy, Konstanty.TRIDA, false),Konstanty.SLOUPCOVY ,Konstanty.UKOL);
+		DropChartPanel panelGrafu15 = new DropChartPanel(this.getCiselnikGraf(this.osoby, Konstanty.HODNOTA, false),Konstanty.SLOUPCOVY ,Konstanty.UKOL);
         
-        DropChartPanel panelGrafu16 = new DropChartPanel(this.getSegmentGraf(this.projekt.getFaze(), Konstanty.FAZE, false), Konstanty.SLOUPCOVY);
-        DropChartPanel panelGrafu17 = new DropChartPanel(this.getSegmentGraf(this.projekt.getIterace(), Konstanty.ITERACE, false), Konstanty.SLOUPCOVY);
-        DropChartPanel panelGrafu18 = new DropChartPanel(this.getHistogramCasy(),Konstanty.HISTOGRAM );
-        DropChartPanel panelGrafu19 = new DropChartPanel(this.getSpojnicovyGrafPocet(this.projekt.getUkoly(), Konstanty.POPISY.getProperty("popisPocetUkolu")),Konstanty.SPOJNICOVY );
-        DropChartPanel panelGrafu20 = new DropChartPanel(this.getAutorGraf(Konstanty.UKOL, false), Konstanty.SLOUPCOVY);
+        DropChartPanel panelGrafu16 = new DropChartPanel(this.getSegmentGraf(this.projekt.getFaze(), Konstanty.FAZE, false), Konstanty.SLOUPCOVY,Konstanty.UKOL);
+        DropChartPanel panelGrafu17 = new DropChartPanel(this.getSegmentGraf(this.projekt.getIterace(), Konstanty.ITERACE, false), Konstanty.SLOUPCOVY,Konstanty.UKOL);
+        DropChartPanel panelGrafu18 = new DropChartPanel(this.getHistogramCasy(),Konstanty.HISTOGRAM ,Konstanty.UKOL);
+        DropChartPanel panelGrafu19 = new DropChartPanel(this.getSpojnicovyGrafPocet(this.projekt.getUkoly(), Konstanty.POPISY.getProperty("popisPocetUkolu")),Konstanty.SPOJNICOVY ,Konstanty.UKOL);
+        DropChartPanel panelGrafu20 = new DropChartPanel(this.getAutorGraf(Konstanty.UKOL, false), Konstanty.SLOUPCOVY,Konstanty.UKOL);
         
         vlozCheckBoxBezNulCiselnik(panelGrafu1, this.priority, Konstanty.HODNOTA);
         vlozCheckBoxBezNulCiselnik(panelGrafu2, this.priority, Konstanty.TRIDA);

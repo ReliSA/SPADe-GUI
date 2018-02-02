@@ -42,9 +42,9 @@ public class PanelGrafuArtefakt extends PanelGrafuRodic {
 		this.setPreferredSize(Konstanty.VELIKOST_PANELU_STANDARD);		
 		this.setBorder(BorderFactory.createTitledBorder(Konstanty.POPISY.getProperty("nazevArtefakty")));
 		
-		DropChartPanel panelGrafu1 = new DropChartPanel(this.getHistogramArtefakty(),Konstanty.HISTOGRAM );
-		DropChartPanel panelGrafu2 = new DropChartPanel(this.getSpojnicovyGrafPocet(this.projekt.getArtefakty(), Konstanty.POPISY.getProperty("artefaktNadpisSpojnicovy")),Konstanty.SPOJNICOVY );
-		DropChartPanel panelGrafu3 = new DropChartPanel(this.getAutorGraf(Konstanty.ARTEFAKT, false),Konstanty.SLOUPCOVY);
+		DropChartPanel panelGrafu1 = new DropChartPanel(this.getHistogramArtefakty(),Konstanty.HISTOGRAM ,Konstanty.ARTEFAKT);
+		DropChartPanel panelGrafu2 = new DropChartPanel(this.getSpojnicovyGrafPocet(this.projekt.getArtefakty(), Konstanty.POPISY.getProperty("artefaktNadpisSpojnicovy")),Konstanty.SPOJNICOVY ,Konstanty.ARTEFAKT);
+		DropChartPanel panelGrafu3 = new DropChartPanel(this.getAutorGraf(Konstanty.ARTEFAKT, false),Konstanty.SLOUPCOVY, Konstanty.ARTEFAKT);
 
 		vlozCheckBoxBezNulAutor(panelGrafu3, Konstanty.ARTEFAKT);
 

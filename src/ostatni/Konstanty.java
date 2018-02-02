@@ -85,6 +85,7 @@ public class Konstanty {
 	public static final int UKOL = 10;
 	public static final int KONFIGURACE = 11;
 	public static final int ARTEFAKT = 12;
+	public static final int SEGMENT = 13;
 
 	
 	public static final int HODNOTA = 0;

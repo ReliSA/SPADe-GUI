@@ -54,9 +54,9 @@ public class PanelGrafuSegment extends PanelGrafuRodic{
 		this.setPreferredSize(Konstanty.VELIKOST_PANELU_STANDARD);		
 		
 		this.setBorder(BorderFactory.createTitledBorder(Konstanty.POPISY.getProperty("titleSegmenty")));
-		DropChartPanel panelGrafu1 = new DropChartPanel(this.getGanttGraf(Konstanty.FAZE),Konstanty.GANTT );
-		DropChartPanel panelGrafu2 = new DropChartPanel(this.getGanttGraf(Konstanty.ITERACE),Konstanty.GANTT );
-		DropChartPanel panelGrafu3 = new DropChartPanel(this.getGanttGraf(Konstanty.AKTIVITY),Konstanty.GANTT );
+		DropChartPanel panelGrafu1 = new DropChartPanel(this.getGanttGraf(Konstanty.FAZE),Konstanty.GANTT ,Konstanty.SEGMENT);
+		DropChartPanel panelGrafu2 = new DropChartPanel(this.getGanttGraf(Konstanty.ITERACE),Konstanty.GANTT ,Konstanty.SEGMENT);
+		DropChartPanel panelGrafu3 = new DropChartPanel(this.getGanttGraf(Konstanty.AKTIVITY),Konstanty.GANTT ,Konstanty.SEGMENT);
 		
         panelGrafu1.setPreferredSize(Konstanty.VELIKOST_GRAFU);
         panelGrafu2.setPreferredSize(Konstanty.VELIKOST_GRAFU);
@@ -68,7 +68,7 @@ public class PanelGrafuSegment extends PanelGrafuRodic{
         
 		this.nastavZobrazeni();
 	}
-	
+		
 	/**
 	 * Vytvoří ganttův diagram pro fáze, iterace nebo aktivity podle zadaného parametru
 	 * @param typGrafu typ grafu, který je požadován

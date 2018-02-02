@@ -103,22 +103,7 @@ public class PanelGrafu extends JPanel {
 	 */
 	private void nastavZobrazeni(){
 		this.removeAll();
-		JPanel panel = new JPanel();
-		
-		JPanel dropSlot = new JPanel(new BorderLayout());
-		dropSlot.setBackground(Color.WHITE);
-		dropSlot.setPreferredSize(Konstanty.VELIKOST_GRAFU_VELKY);
-		
-		JPanel dropSlot2 = new JPanel(new BorderLayout());
-		dropSlot2.setBackground(Color.WHITE);
-		dropSlot2.setPreferredSize(Konstanty.VELIKOST_GRAFU_VELKY);
-				
-		dropHandler = new DropHandler();
-		dropTarget = new DropTarget(dropSlot, DnDConstants.ACTION_COPY, dropHandler, true);
-		
-		dropHandler2 = new DropHandler();
-		dropTarget2 = new DropTarget(dropSlot2, DnDConstants.ACTION_COPY, dropHandler2, true);
-			
+		JPanel panel = new JPanel();	
 		panel.setLayout(Konstanty.FLOW_LAYOUT);
 
 		scroll = new JScrollPane(panel);
@@ -126,18 +111,34 @@ public class PanelGrafu extends JPanel {
 		panel.setPreferredSize(Konstanty.VELIKOST_PANELU);
 		this.setSizeScroll();
 		
-		JScrollPane scrollUkoly = new JScrollPane(new PanelGrafuUkol(this.projekt));
+		PanelGrafuSegment panelSegment = new PanelGrafuSegment(this.projekt);
+		PanelGrafuUkol panelUkol = new PanelGrafuUkol(this.projekt);
+		PanelGrafuKonfigurace panelKonfigurace = new PanelGrafuKonfigurace(this.projekt);
+		PanelGrafuArtefakt panelArtefakt = new PanelGrafuArtefakt(this.projekt);
+		
+		JScrollPane scrollUkoly = new JScrollPane(panelUkol);
 		scrollUkoly.getVerticalScrollBar().setUnitIncrement(15);
 		scrollUkoly.setPreferredSize(new Dimension(Konstanty.SIRKA_PANELU_GRAFU+20,Konstanty.VYSKA_PANELU_GRAFU_STANDART+20));
 		scrollUkoly.revalidate();
 		
 		JTabbedPane tabbedPanelGrafu = new JTabbedPane();		
-		tabbedPanelGrafu.add(Konstanty.POPISY.getProperty("segment"),new PanelGrafuSegment(this.projekt));
+		tabbedPanelGrafu.add(Konstanty.POPISY.getProperty("segment"),panelSegment);
 		tabbedPanelGrafu.add(Konstanty.POPISY.getProperty("ukoly"),scrollUkoly);
-		tabbedPanelGrafu.add(Konstanty.POPISY.getProperty("konfigurace"),new PanelGrafuKonfigurace(this.projekt));
-		tabbedPanelGrafu.add(Konstanty.POPISY.getProperty("artefakty"),new PanelGrafuArtefakt(this.projekt));
+		tabbedPanelGrafu.add(Konstanty.POPISY.getProperty("konfigurace"),panelKonfigurace);
+		tabbedPanelGrafu.add(Konstanty.POPISY.getProperty("artefakty"),panelArtefakt);
 		
-		
+		JPanel dropSlot = new JPanel(new BorderLayout());
+		dropSlot.setBackground(Color.WHITE);
+		dropSlot.setPreferredSize(Konstanty.VELIKOST_GRAFU_VELKY);		
+		JPanel dropSlot2 = new JPanel(new BorderLayout());
+		dropSlot2.setBackground(Color.WHITE);
+		dropSlot2.setPreferredSize(Konstanty.VELIKOST_GRAFU_VELKY);
+				
+		dropHandler = new DropHandler(panelSegment,panelUkol,panelKonfigurace,panelArtefakt);
+		dropTarget = new DropTarget(dropSlot, DnDConstants.ACTION_MOVE, dropHandler, true);
+		dropHandler2 = new DropHandler(panelSegment,panelUkol,panelKonfigurace,panelArtefakt);
+		dropTarget2 = new DropTarget(dropSlot2, DnDConstants.ACTION_MOVE, dropHandler2, true);
+				
 		JLabel label = new JLabel(Konstanty.POPISY.getProperty("grafTady"));
 		JLabel label2= new JLabel(Konstanty.POPISY.getProperty("grafTady"));
 		label.setFont(new Font("Arial", Font.PLAIN, 40));
