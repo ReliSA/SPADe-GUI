@@ -162,19 +162,19 @@ public class PanelFiltrCiselnik extends PanelFiltr{
 		GridBagConstraints grid = this.getGrid();
 		
 		if(!nazev.equals("Osoby")){
-	        grid.gridx = 0;
-	        grid.gridy++;
+	        grid.gridx = 5;
+	        grid.gridy = 0;
 	        grid.gridwidth = 1;
 	        this.add(cbSpojeniTridy, grid);
-	        grid.gridx = 1;
+	        grid.gridx = 6;
 	        grid.gridwidth = 3;
 	        this.add(scScrollPaneTrid, grid);
 	        if(!nazev.equals("Typ")){
 		        grid.gridy++;
-		        grid.gridx = 0;
+		        grid.gridx = 5;
 		        grid.gridwidth = 1;
 		        this.add(cbSpojeniSuperTridy, grid);
-		        grid.gridx = 1;
+		        grid.gridx = 6;
 		        grid.gridwidth = 3;
 		        this.add(scScrollPaneSuperTrid, grid);
 		     }

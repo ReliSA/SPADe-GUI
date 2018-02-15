@@ -63,7 +63,7 @@ public class OknoHlavni extends JFrame {
 																										// přidání
 																										// filtru do
 																										// panelu menu
-	private Box pnBoxFiltru = Box.createVerticalBox(); // box s vybranými filtry
+	private JPanel pnBoxFiltru = new JPanel(); // box s vybranými filtry
 	private JButton btZapniFiltr = new JButton(Konstanty.POPISY.getProperty("tlacitkoZapniFiltr")); // tlačítko pro
 																									// spuštění podmínek
 	
@@ -145,7 +145,7 @@ public class OknoHlavni extends JFrame {
 		setJMenuBar(menuBar);
 		JPanel pnFiltr = new JPanel();
 		scScrollFiltru = new JScrollPane(pnBoxFiltru, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
 		nastavAkce(); // nastaví akce k jednotlivým komponentám
 		panelMenu.setPreferredSize(Konstanty.VELIKOST_PANELU_MENU);
@@ -161,14 +161,13 @@ public class OknoHlavni extends JFrame {
 		pnFiltr.add(btPridejFiltr);
 		pnBoxFiltru.add(pnFiltr);
 		pnBoxFiltru.setBorder(BorderFactory.createTitledBorder(Konstanty.POPISY.getProperty("titleFiltrVyberu")));
-		pnBoxFiltru.setBackground(Color.WHITE);
 
 		lsSeznamProjektu.setPreferredSize(Konstanty.VELIKOST_CELA_SIRKA);
 
 		btPridejFiltr.setPreferredSize(Konstanty.VELIKOST_POLOVICNI_SIRKA);
 		btZapniFiltr.setPreferredSize(Konstanty.VELIKOST_CELA_SIRKA);
 
-		scScrollFiltru.setPreferredSize(new Dimension(270, 200));
+		scScrollFiltru.setPreferredSize(new Dimension(270, 210));
 				
 		panelMenu.add(nadpis);
 		panelMenu.add(lsSeznamProjektu);

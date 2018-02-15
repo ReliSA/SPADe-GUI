@@ -260,16 +260,16 @@ public class PanelFiltrPolozkaPocatek extends PanelFiltr{
         dpDatumDO.setPreferredSize(Konstanty.VELIKOST_POLOVICNI_SIRKA);
 		
 		GridBagConstraints grid = this.getGrid();
-		grid.gridx = 0;
-        grid.gridy++;
+		grid.gridx = 5;
+        grid.gridy = 0;
         grid.gridwidth = 2;
         this.add(lblDatum, grid);
-        grid.gridx = 2;
+        grid.gridx = 7;
         this.add(cbOperatorDatum, grid);
-        grid.gridx = 0;
+        grid.gridx = 5;
         grid.gridy++;
         this.add(dpDatumOD, grid);
-        grid.gridx = 2;
+        grid.gridx = 7;
         this.add(dpDatumDO, grid);
         
 	}
