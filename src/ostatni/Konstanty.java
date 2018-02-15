@@ -41,7 +41,7 @@ public class Konstanty {
 	public static final Dimension VELIKOST_STAT = new Dimension(300, 200);
 	public static final Dimension VELIKOST_STAT_MAX = new Dimension(500, 200);
 	public static final Dimension VELIKOST_GRAFU = new Dimension(280, 200);
-	public static final Dimension VELIKOST_GRAFU_VELKY = new Dimension(955, 415);
+	public static final Dimension VELIKOST_GRAFU_VELKY = new Dimension(835, 415);
 	
 	public static final Dimension VELIKOST_SEZNAMU_CELA_SIRKA = new Dimension(230, 80);
 	public static final Dimension VELIKOST_CELA_SIRKA = new Dimension(230, 28);

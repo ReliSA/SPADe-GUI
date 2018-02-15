@@ -197,24 +197,10 @@ public class OknoHlavni extends JFrame {
 
 	private void odstranPanelFiltru() {
 		panelGrafu.schovejFiltry(scScrollFiltru);
-
-		if (this.getExtendedState() == JFrame.MAXIMIZED_BOTH) {
-			this.setExtendedState(JFrame.ICONIFIED);
-			this.setExtendedState(JFrame.MAXIMIZED_BOTH);
-		} else {
-			this.setSize(getWidth() + 1, getHeight() + 1);
-		}
 	}
 
 	private void pridejPanelFiltru() {
-
 		panelGrafu.zobrazFiltry(scScrollFiltru);
-		if (this.getExtendedState() == JFrame.MAXIMIZED_BOTH) {
-			this.setExtendedState(JFrame.ICONIFIED);
-			this.setExtendedState(JFrame.MAXIMIZED_BOTH);
-		} else {
-			this.setSize(getWidth() + 1, getHeight() + 1);
-		}
 	}
 
 	/**

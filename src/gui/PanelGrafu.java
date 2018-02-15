@@ -3,7 +3,6 @@ package gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -17,7 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
-import javax.swing.SwingConstants;
+import javax.swing.JTextArea;
 
 import ostatni.Konstanty;
 import data.*;
@@ -33,7 +32,8 @@ public class PanelGrafu extends JPanel {
 	
 	private Projekt projekt;		//aktuálně vybraný projekt
 	private JScrollPane scroll;		//scroll panel
-	private JPanel filtryPanel;
+	private JPanel panel;
+	private JPanel grafyPanel;
 	private DropTarget dropTarget;
 	private DropHandler dropHandler;
 	private DropTarget dropTarget2;
@@ -75,11 +75,13 @@ public class PanelGrafu extends JPanel {
 	}
 	
 	public void zobrazFiltry(JScrollPane panel) {
-		filtryPanel.add(panel,BorderLayout.NORTH);		
+		this.panel.add(panel,BorderLayout.NORTH);	
+		this.revalidate();
 	}
 	
 	public void schovejFiltry(JScrollPane panel) {
-		filtryPanel.remove(panel);	
+		this.panel.remove(panel);	
+		this.revalidate();
 	}
 
 	/**
@@ -113,7 +115,7 @@ public class PanelGrafu extends JPanel {
 	 */
 	private void nastavZobrazeni(){
 		this.removeAll();
-		JPanel panel = new JPanel();	
+		panel = new JPanel();	
 		panel.setLayout(new BorderLayout());
 
 		scroll = new JScrollPane(panel);
@@ -139,7 +141,7 @@ public class PanelGrafu extends JPanel {
 		
 		JPanel dropSloty = new JPanel(new BorderLayout());
 		JPanel grafy = new JPanel(new BorderLayout());
-		filtryPanel = new JPanel(new BorderLayout());
+		grafyPanel = new JPanel(new BorderLayout());
 		
 		JPanel dropSlot = new JPanel(new BorderLayout());
 		dropSlot.setBackground(Color.WHITE);
@@ -169,13 +171,18 @@ public class PanelGrafu extends JPanel {
 		dropSloty.add(dropSlot2,BorderLayout.EAST);
 		
 		
-		filtryPanel.add(tabbedPanelGrafu,BorderLayout.CENTER);
+		grafyPanel.add(tabbedPanelGrafu,BorderLayout.CENTER);
 		
-		grafy.add(this.getPopisProjektu(),BorderLayout.WEST);
-		grafy.add(filtryPanel,BorderLayout.CENTER);
 		
-		panel.add(grafy,BorderLayout.NORTH);
-		panel.add(dropSloty,BorderLayout.CENTER);
+		
+		grafy.add(grafyPanel,BorderLayout.NORTH);
+		grafy.add(dropSloty,BorderLayout.CENTER);
+		
+				
+		
+		panel.add(this.getPopisProjektu(),BorderLayout.WEST);
+		panel.add(grafy,BorderLayout.CENTER);
+		
 		
 		
         this.add(scroll);
@@ -187,22 +194,20 @@ public class PanelGrafu extends JPanel {
 	 * @return panel projektu
 	 */
 	private JPanel getPopisProjektu(){
-		JLabel lblNazev = new JLabel(Konstanty.POPISY.getProperty("popisNazev") + ": " + projekt.getNazev());
+		JTextArea lblNazev = new JTextArea(Konstanty.POPISY.getProperty("popisNazev") + ": " + projekt.getNazev());
+		lblNazev.setLineWrap(true);
+		lblNazev.setWrapStyleWord(true);
+		lblNazev.setEditable(false);
 		JLabel lblDatumOD = new JLabel(Konstanty.POPISY.getProperty("popisDatumOd") + ": " + projekt.getDatumPocatku().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
 		JLabel lblDatumDO;
-		JPanel datumy;
 		if(projekt.getDatumKonce().equals(Konstanty.DATUM_PRAZDNY))
 			lblDatumDO = new JLabel(Konstanty.POPISY.getProperty("popisDatumDoNeomezeny"));
 		else
 			lblDatumDO = new JLabel(Konstanty.POPISY.getProperty("popisDatumDo") + ": " + projekt.getDatumKonce().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
 		
-		
 		lblNazev.setFont(Konstanty.FONT_NADPIS_STATISTIK);
 		lblDatumOD.setFont(Konstanty.FONT_NADPIS_STATISTIK);
 		lblDatumDO.setFont(Konstanty.FONT_NADPIS_STATISTIK);
-		datumy=new JPanel(new FlowLayout());
-		datumy.add(lblDatumOD);
-		datumy.add(lblDatumDO);
 		
 		JPanel panel = new JPanel();
 		
@@ -215,11 +220,12 @@ public class PanelGrafu extends JPanel {
 		g.gridx = 0;
 		g.gridy = 0;
 		panel.add(lblNazev, g); g.gridy++;
-		panel.add(datumy, g); g.gridy++;
+		panel.add(lblDatumOD, g); g.gridy++;
+		panel.add(lblDatumDO, g); g.gridy++;
 		panel.add(getPanelStatistiky(true), g);
 		g.gridy = 5;
 		g.gridx = 0;
-		g.gridheight = 15;
+		g.gridheight = 5;
 		panel.add(getPanelStatistiky(false), g);
 		
 		panel.setBorder(BorderFactory.createTitledBorder(Konstanty.POPISY.getProperty("titlePanelStatistik")));
@@ -251,22 +257,19 @@ public class PanelGrafu extends JPanel {
 				grid.gridy++;
 				panelStatistik.add(new JLabel(Konstanty.POPISY.getProperty("nazevIterace") + ": "), grid); grid.gridx++;
 				panelStatistik.add(new JLabel("" + projekt.getPocetIteraci()), grid); grid.gridx--;
-				grid.gridy=0;
-				grid.gridx++; grid.gridx++;
+				grid.gridy++;
 				panelStatistik.add(new JLabel(Konstanty.POPISY.getProperty("nazevAktivity") + ": "), grid); grid.gridx++;
 				panelStatistik.add(new JLabel("" + projekt.getPocetAktivit()), grid); grid.gridx--;
 				grid.gridy++;
 				panelStatistik.add(new JLabel(Konstanty.POPISY.getProperty("nazevUkoly") + ": "), grid); grid.gridx++;
 				panelStatistik.add(new JLabel("" + projekt.getPocetUkolu()), grid); grid.gridx--;
-				grid.gridy=0;
-				grid.gridx++; grid.gridx++;
+				grid.gridy++;
 				panelStatistik.add(new JLabel(Konstanty.POPISY.getProperty("nazevKonfigurace") + ": "), grid); grid.gridx++;
 				panelStatistik.add(new JLabel("" + projekt.getPocetKonfiguraci()), grid); grid.gridx--;
 				grid.gridy++;
 				panelStatistik.add(new JLabel(Konstanty.POPISY.getProperty("nazevVetve") + ": "), grid); grid.gridx++;
 				panelStatistik.add(new JLabel("" + projekt.getPocetVetvi()), grid); grid.gridx--;
-				grid.gridy=0;
-				grid.gridx++; grid.gridx++;
+				grid.gridy++;
 				panelStatistik.add(new JLabel(Konstanty.POPISY.getProperty("nazevTagy") + ": "), grid); grid.gridx++;
 				panelStatistik.add(new JLabel("" + projekt.getPocetTagu()), grid); grid.gridx--;
 				grid.gridy++;
@@ -278,19 +281,18 @@ public class PanelGrafu extends JPanel {
 			}
 			else {
 				JLabel lblUkolyNa = new JLabel(Konstanty.POPISY.getProperty("popisUkolyNa") + ":");
-				JLabel lblMinimum = new JLabel(Konstanty.POPISY.getProperty("nadpisMinimum"));
+				JLabel lblMinimum = new JLabel("Min");
 				JLabel lblPrumer = new JLabel(Konstanty.POPISY.getProperty("nadpisPrumer"));
-				JLabel lblMaximum = new JLabel(Konstanty.POPISY.getProperty("nadpisMaximum"));
+				JLabel lblMaximum = new JLabel("Max");
 				JLabel lblUkol = new JLabel(Konstanty.POPISY.getProperty("popisUkol") + ": ");
 				JLabel lblKonfiguraceNa = new JLabel(Konstanty.POPISY.getProperty("popisKonfiguraceNa") + ": ");
 				JLabel lblArtefaktNa = new JLabel(Konstanty.POPISY.getProperty("popisArtefaktNa") + ": ");
 				
-				grid.gridy=3;
 				panelStatistik.setBorder(BorderFactory.createTitledBorder(Konstanty.POPISY.getProperty("titleMinMaxAvg")));
 				panelStatistik.add(new JLabel(""), grid); grid.gridx++;		
 				panelStatistik.add(lblMinimum, grid); grid.gridx++;		
 				panelStatistik.add(lblPrumer, grid); grid.gridx++;		
-				panelStatistik.add(lblMaximum, grid); grid.gridx = 0;	
+				panelStatistik.add(lblMaximum, grid); grid.gridx = 0;		
 				grid.gridy++;
 				panelStatistik.add(lblUkolyNa, grid);		
 				grid.gridy++;
