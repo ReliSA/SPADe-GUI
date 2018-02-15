@@ -3,13 +3,21 @@ package gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.sql.SQLException;
+
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -17,6 +25,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.border.Border;
 
 import ostatni.Konstanty;
 import data.*;
@@ -38,6 +47,13 @@ public class PanelGrafu extends JPanel {
 	private DropHandler dropHandler;
 	private DropTarget dropTarget2;
 	private DropHandler dropHandler2;
+	private JPanel panelStatistikSipka;
+	protected JPanel panelFiltrySipka;
+	private JPanel panelStatistik;
+	public boolean statistikyVisible = true;
+	private JButton btSipkaStatistiky;	
+	private JPanel dropSlot;
+	private JPanel dropSlot2;
 	
 	/**
 	 * Konstruktor třídy, nastaví projekt, spustí načtení dat projektu a nastaví zobrazení okna
@@ -49,7 +65,8 @@ public class PanelGrafu extends JPanel {
 		
 		this.projekt = projekt;
 		this.projekt.nactiData();
-		this.nastavZobrazeni();		
+		this.nastavZobrazeni();	
+		this.nastavAkce();
 	}
 	
 	
@@ -70,17 +87,18 @@ public class PanelGrafu extends JPanel {
 		this.projekt.nactiData();
 		
 		this.nastavZobrazeni();
+		this.nastavAkce();
 		this.revalidate();
 		
 	}
 	
 	public void zobrazFiltry(JScrollPane panel) {
-		this.panel.add(panel,BorderLayout.NORTH);	
+		this.panelFiltrySipka.add(panel,BorderLayout.NORTH);	
 		this.revalidate();
 	}
 	
 	public void schovejFiltry(JScrollPane panel) {
-		this.panel.remove(panel);	
+		this.panelFiltrySipka.remove(panel);	
 		this.revalidate();
 	}
 
@@ -106,6 +124,7 @@ public class PanelGrafu extends JPanel {
 		this.projekt.nactiData(seznamIdUkolu, seznamIdPriorit, seznamIdSeverit, seznamIdResoluci, seznamIdStatusu, seznamIdTypu, seznamIdOsob, seznamIdFazi, seznamIdIteraci, seznamIdAktivit, seznamIdKonfiguraci, seznamIdArtefaktu);
 		
 		this.nastavZobrazeni();
+		this.nastavAkce();
 		this.revalidate();
 		
 	}
@@ -123,6 +142,11 @@ public class PanelGrafu extends JPanel {
 		panel.setPreferredSize(Konstanty.VELIKOST_PANELU);
 		this.setSizeScroll();
 		
+		btSipkaStatistiky = new JButton("<");
+		btSipkaStatistiky.setPreferredSize(Konstanty.VELIKOST_SIPKY_STATISTIKY);
+		btSipkaStatistiky.setFont(new Font("Arial", Font.PLAIN, 15));
+		btSipkaStatistiky.setMargin(new Insets(0, 0, 0, 0));
+				
 		PanelGrafuSegment panelSegment = new PanelGrafuSegment(this.projekt);
 		PanelGrafuUkol panelUkol = new PanelGrafuUkol(this.projekt);
 		PanelGrafuKonfigurace panelKonfigurace = new PanelGrafuKonfigurace(this.projekt);
@@ -143,10 +167,10 @@ public class PanelGrafu extends JPanel {
 		JPanel grafy = new JPanel(new BorderLayout());
 		grafyPanel = new JPanel(new BorderLayout());
 		
-		JPanel dropSlot = new JPanel(new BorderLayout());
+		dropSlot = new JPanel(new BorderLayout());
 		dropSlot.setBackground(Color.WHITE);
 		dropSlot.setPreferredSize(Konstanty.VELIKOST_GRAFU_VELKY);		
-		JPanel dropSlot2 = new JPanel(new BorderLayout());
+		dropSlot2 = new JPanel(new BorderLayout());
 		dropSlot2.setBackground(Color.WHITE);
 		dropSlot2.setPreferredSize(Konstanty.VELIKOST_GRAFU_VELKY);
 				
@@ -178,10 +202,17 @@ public class PanelGrafu extends JPanel {
 		grafy.add(grafyPanel,BorderLayout.NORTH);
 		grafy.add(dropSloty,BorderLayout.CENTER);
 		
-				
 		
-		panel.add(this.getPopisProjektu(),BorderLayout.WEST);
+		panelStatistik=this.getPopisProjektu();
+		
+		panelStatistikSipka = new JPanel(new BorderLayout());	
+		panelStatistikSipka.add(panelStatistik,BorderLayout.WEST);
+		panelStatistikSipka.add(btSipkaStatistiky,BorderLayout.EAST);
+		
+		panelFiltrySipka = new JPanel(new BorderLayout());	
+		panel.add(panelStatistikSipka,BorderLayout.WEST);
 		panel.add(grafy,BorderLayout.CENTER);
+		panel.add(panelFiltrySipka,BorderLayout.NORTH);
 		
 		
 		
@@ -402,6 +433,32 @@ public class PanelGrafu extends JPanel {
 			e.printStackTrace();
 		}
 		return panelStatistik;
+	}
+	
+	public void nastavAkce() {
+		
+		/* akce pro schovani panelu statistik*/
+		ActionListener actZobrazeniStatistikButton = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (statistikyVisible == false) {
+					panelStatistikSipka.add(panelStatistik);
+					statistikyVisible=true;
+					dropSlot.setPreferredSize(Konstanty.VELIKOST_GRAFU_VELKY);
+					dropSlot2.setPreferredSize(Konstanty.VELIKOST_GRAFU_VELKY);
+					btSipkaStatistiky.setText("<");
+					panelStatistikSipka.revalidate();
+				} else {
+					panelStatistikSipka.remove(panelStatistik);
+					statistikyVisible=false;
+					dropSlot.setPreferredSize(Konstanty.VELIKOST_GRAFU_NEJVETSI);
+					dropSlot2.setPreferredSize(Konstanty.VELIKOST_GRAFU_NEJVETSI);
+					btSipkaStatistiky.setText(">");
+					panelStatistikSipka.revalidate();
+				}
+			}
+		};
+		
+		btSipkaStatistiky.addActionListener(actZobrazeniStatistikButton);
 	}
 }
 

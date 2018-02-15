@@ -33,7 +33,8 @@ public class Konstanty {
 	public static final Dimension VELIKOST_PANELU_GRAFU = new Dimension(SIRKA_PANELU_GRAFU, VYSKA_OKNA);
 	
 	public static final Dimension VELIKOST_PANELU = new Dimension(SIRKA_PANELU_GRAFU+40,2 * VYSKA_PANELU_GRAFU_STANDART +475);
-	public static final Dimension VELIKOST_SIPKY = new Dimension(15, 2 * VYSKA_PANELU_GRAFU_STANDART +550);
+	public static final Dimension VELIKOST_SIPKY_STATISTIKY = new Dimension(15, 2 * VYSKA_PANELU_GRAFU_STANDART +550);
+	public static final Dimension VELIKOST_SIPKY_FILTRY = new Dimension(SIRKA_PANELU_GRAFU, 15);
 	public static final Dimension VELIKOST_PANELU_STANDARD = new Dimension(SIRKA_PANELU_GRAFU, VYSKA_PANELU_GRAFU_STANDART);
 	public static final Dimension VELIKOST_PANELU_UKOL = new Dimension(SIRKA_PANELU_GRAFU, VYSKA_PANELU_GRAFU_UKOL);
 	
@@ -42,6 +43,8 @@ public class Konstanty {
 	public static final Dimension VELIKOST_STAT_MAX = new Dimension(500, 200);
 	public static final Dimension VELIKOST_GRAFU = new Dimension(280, 200);
 	public static final Dimension VELIKOST_GRAFU_VELKY = new Dimension(835, 415);
+	public static final Dimension VELIKOST_GRAFU_NEJVETSI = new Dimension(945, 415);
+
 	
 	public static final Dimension VELIKOST_SEZNAMU_CELA_SIRKA = new Dimension(230, 80);
 	public static final Dimension VELIKOST_CELA_SIRKA = new Dimension(230, 28);
