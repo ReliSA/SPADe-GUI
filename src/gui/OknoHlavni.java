@@ -1,6 +1,7 @@
 package gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -46,6 +47,7 @@ import databaze.ProjektDAO;
 public class OknoHlavni extends JFrame {
 
 	private JPanel panelMenu; // levý panel pro výběr projektu a dodání filtrů
+	private JPanel listaFiltru;
 	private JPanel panelProjektMenu;
 	private PanelGrafu panelGrafu; // centrální panel zobrazující statistiky a grafy
 	private JPanel centralPanel;
@@ -97,6 +99,11 @@ public class OknoHlavni extends JFrame {
 	public Projekt getProjekt() {
 		return (Projekt) this.modelProjekt.getSelectedItem();
 	}
+	
+	public void revalidujOkno()
+	{
+		this.revalidate();
+	}
 
 	/**
 	 * Načte projekty z databáze, seznamy v projektu se načítají až po vybrání
@@ -143,7 +150,9 @@ public class OknoHlavni extends JFrame {
 		nastavAkce(); // nastaví akce k jednotlivým komponentám
 		panelMenu.setPreferredSize(Konstanty.VELIKOST_PANELU_MENU);
 		panelProjektMenu.add(panelMenu,BorderLayout.WEST);
-		panelProjektMenu.add(filtryZobrazeniButton,BorderLayout.EAST);
+		listaFiltru=new JPanel();
+		panelProjektMenu.add(listaFiltru,BorderLayout.CENTER);
+		//panelProjektMenu.add(filtryZobrazeniButton,BorderLayout.EAST);
 		panelMenu.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
 		nadpis.setFont(Konstanty.FONT_NADPIS);
 
@@ -152,6 +161,7 @@ public class OknoHlavni extends JFrame {
 		pnFiltr.add(btPridejFiltr);
 		pnBoxFiltru.add(pnFiltr);
 		pnBoxFiltru.setBorder(BorderFactory.createTitledBorder(Konstanty.POPISY.getProperty("titleFiltrVyberu")));
+		pnBoxFiltru.setBackground(Color.WHITE);
 
 		lsSeznamProjektu.setPreferredSize(Konstanty.VELIKOST_CELA_SIRKA);
 
@@ -163,7 +173,7 @@ public class OknoHlavni extends JFrame {
 		panelMenu.add(nadpis);
 		panelMenu.add(lsSeznamProjektu);
 		//panelMenu.add(filtryZobrazeniButton);
-		//panelMenu.add(btZapniFiltr);
+		panelProjektMenu.add(btZapniFiltr,BorderLayout.EAST);
 		
 
 		menuBar.add(fileMenu);
@@ -174,13 +184,13 @@ public class OknoHlavni extends JFrame {
 		languageMenu.add(czech);
 		languageMenu.add(english);
 
-		centralPanel = new JPanel(new BorderLayout());
-		centralPanel.add(panelGrafu, BorderLayout.CENTER);
+		//centralPanel = new JPanel(new BorderLayout());
+		//centralPanel.add(panelGrafu, BorderLayout.CENTER);
 		
 
 		this.setLayout(new BorderLayout());
 		this.add(panelProjektMenu, BorderLayout.NORTH);
-		this.add(centralPanel, BorderLayout.CENTER);
+		this.add(panelGrafu, BorderLayout.CENTER);
 	}
 
 	/**
@@ -202,7 +212,23 @@ public class OknoHlavni extends JFrame {
 	private void pridejPanelFiltru() {
 		panelGrafu.zobrazFiltry(scScrollFiltru);
 	}
-
+	
+	private TlacitkoMazaniFiltru pridejTlacitkoListyFiltru (String nazev, Component comp) {
+		
+		for (int i = 0; i < listaFiltru.getComponentCount(); i++) { 
+			if(listaFiltru.getComponent(i).getName()==nazev) {
+				listaFiltru.remove(i);
+			}
+		}
+		
+		TlacitkoMazaniFiltru tlacitkoMazaniFilru = new TlacitkoMazaniFiltru(comp);
+		tlacitkoMazaniFilru.setName(nazev);
+		tlacitkoMazaniFilru.setText(nazev);
+		listaFiltru.add(tlacitkoMazaniFilru);	
+		
+		return tlacitkoMazaniFilru;
+	}
+	
 	/**
 	 * Metoda sloužící pro restart hlavního okna a nového načtení konfigurací.
 	 */
@@ -425,9 +451,14 @@ public class OknoHlavni extends JFrame {
 			}
 		};
 
-		/* akce pro spuštění zadaných filtrů */
-		ActionListener actZapniFiltr = new ActionListener() {
+		ActionListener actSmazaniFiltru = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				TlacitkoMazaniFiltru tlacitko = (TlacitkoMazaniFiltru) e.getSource();
+				pnBoxFiltru.remove(tlacitko.getComp());
+				listaFiltru.remove(tlacitko);
+				listaFiltru.revalidate();
+				listaFiltru.repaint();
+				
 				try {
 					/* vlákno zobrazuje okno s progresem načítání */
 					Thread t1 = new Thread(new Runnable() {
@@ -488,7 +519,7 @@ public class OknoHlavni extends JFrame {
 																													// podmínkám
 										break;
 									case "Priority":
-										seznamIdPriorit = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
+										seznamIdPriorit = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();							
 										break;
 									case "Severity":
 										seznamIdSeverit = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
@@ -519,6 +550,138 @@ public class OknoHlavni extends JFrame {
 										break;
 									case "Artefakty":
 										seznamIdArtefaktu = ((PanelFiltrPolozkaVytvoreni) pnPanelFiltr).getSeznamId();
+										break;
+									default:
+										break;
+									}
+
+								} else {
+									pnBoxFiltru.remove(i--); // není-li zaškrtnuto Použít filtr, filtr se z boxu smaže
+																// kontrola musí přejí o jedno míst zpět (před smazaný
+																// filtr)
+								}
+							}
+							pnBoxFiltru.revalidate();
+							/* spustí se nastavení podmínek a tím i nové načtení panelu grafů */
+							panelGrafu.setPodminkyProjektu(seznamIdUkolu, seznamIdPriorit, seznamIdSeverit,
+									seznamIdResoluci, seznamIdStatusu, seznamIdTypu, seznamIdOsob, seznamIdFazi,
+									seznamIdIteraci, seznamIdAktivit, seznamIdKonfiguraci, seznamIdArtefaktu);
+						}
+
+					});
+					t1.start();
+					t2.start();
+				} catch (Exception e1) {
+					JOptionPane.showMessageDialog(null, Konstanty.POPISY.getProperty("chybaPodminekFiltru"));
+					e1.printStackTrace();
+				}
+			}
+		};
+				
+		/* akce pro spuštění zadaných filtrů */
+		ActionListener actZapniFiltr = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					/* vlákno zobrazuje okno s progresem načítání */
+					Thread t1 = new Thread(new Runnable() {
+						public void run() {
+							btPridejFiltr.setEnabled(false);
+							btZapniFiltr.setEnabled(false);
+
+							OknoProgresNacitani oknoProgres = new OknoProgresNacitani(panelGrafu);
+							while (Konstanty.CITAC_PROGRESU <= Konstanty.POCET_KROKU_PROGRESU) {
+								oknoProgres.nastavProgres();
+								if (Konstanty.CITAC_PROGRESU >= Konstanty.POCET_KROKU_PROGRESU) {
+									break;
+								}
+								Thread.yield();
+							}
+							btPridejFiltr.setEnabled(true);
+							btZapniFiltr.setEnabled(true);
+							oknoProgres.setVisible(false);
+						}
+
+					});
+
+					
+					
+					/*
+					 * vlákno zjišťuje id odpovídající parametrům filtrů a spustí nové načtení
+					 * panelu grafů, filtry které nemají zaškrtnuto Použít filtr se z boxu filtrů
+					 * odmažou
+					 */
+					Thread t2 = new Thread(new Runnable() {
+
+						@Override
+						public void run() {
+							// TODO Auto-generated method stub
+							String podminkaPriority = "";
+							ArrayList<Integer> seznamIdUkolu = null;
+							ArrayList<Integer> seznamIdPriorit = null;
+							ArrayList<Integer> seznamIdSeverit = null;
+							ArrayList<Integer> seznamIdResoluci = null;
+							ArrayList<Integer> seznamIdStatusu = null;
+							ArrayList<Integer> seznamIdTypu = null;
+							ArrayList<Integer> seznamIdOsob = null;
+							ArrayList<Integer> seznamIdFazi = null;
+							ArrayList<Integer> seznamIdIteraci = null;
+							ArrayList<Integer> seznamIdAktivit = null;
+							ArrayList<Integer> seznamIdKonfiguraci = null;
+							ArrayList<Integer> seznamIdArtefaktu = null;
+							TlacitkoMazaniFiltru tlacitkoMazaniFilru;
+							
+							for (int i = 1; i < pnBoxFiltru.getComponentCount(); i++) { // prochází všechny vložené
+																						// filtry
+								PanelFiltr pnPanelFiltr = (PanelFiltr) (pnBoxFiltru.getComponents()[i]);
+								if (pnPanelFiltr.jePouzit()) { // je-li zaškrtnuto použít, zjistí se o jaký filtr jde
+									switch (pnPanelFiltr.getName()) { // pomocí názvu se zjišťuje o jaký jde filtr
+									case "Ukol":
+										seznamIdUkolu = ((PanelFiltrPolozkaPocatek) pnPanelFiltr).getSeznamId(); // zjistí id odpovídající zadaným podmínkám 
+										pridejTlacitkoListyFiltru("Ukol X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
+										break;
+									case "Priority":
+										seznamIdPriorit = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();		
+										pridejTlacitkoListyFiltru("Priority X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
+										break;
+									case "Severity":
+										seznamIdSeverit = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
+										pridejTlacitkoListyFiltru("Severity X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
+										break;
+									case "Status":
+										seznamIdStatusu = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
+										pridejTlacitkoListyFiltru("Status X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
+										break;
+									case "Typ":
+										seznamIdTypu = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
+										pridejTlacitkoListyFiltru("Typ X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
+										break;
+									case "Resoluce":
+										seznamIdResoluci = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
+										pridejTlacitkoListyFiltru("Resoluce X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
+										break;
+									case "Osoby":
+										seznamIdOsob = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
+										pridejTlacitkoListyFiltru("Osoby X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
+										break;
+									case "Faze":
+										seznamIdFazi = ((PanelFiltrPolozkaPocatek) pnPanelFiltr).getSeznamId();
+										pridejTlacitkoListyFiltru("Faze X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
+										break;
+									case "Iterace":
+										seznamIdIteraci = ((PanelFiltrPolozkaPocatek) pnPanelFiltr).getSeznamId();
+										pridejTlacitkoListyFiltru("Iterace X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
+										break;
+									case "Aktivity":
+										seznamIdAktivit = ((PanelFiltrPolozkaPocatek) pnPanelFiltr).getSeznamId();
+										pridejTlacitkoListyFiltru("Aktivity X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
+										break;
+									case "Konfigurace":
+										seznamIdKonfiguraci = ((PanelFiltrPolozkaVytvoreni) pnPanelFiltr).getSeznamId();
+										pridejTlacitkoListyFiltru("Konfigurace X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
+										break;
+									case "Artefakty":
+										seznamIdArtefaktu = ((PanelFiltrPolozkaVytvoreni) pnPanelFiltr).getSeznamId();
+										pridejTlacitkoListyFiltru("Artefakty X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
 										break;
 									default:
 										break;
@@ -664,6 +827,7 @@ public class OknoHlavni extends JFrame {
 				}
 			}
 		};
+		
 		
 
 		/* vložení akcí k příslušným komponentám */
