@@ -58,11 +58,6 @@ public class OknoHlavni extends JFrame {
 																								// projektů
 	private ComboBoxDynamicky lsSeznamProjektu = new ComboBoxDynamicky(modelProjekt); // seznam projektů
 	private JComboBox<String> cbTypFiltru = new JComboBox<String>(Konstanty.POLE_FILTRU); // seznam možných filtrů
-	
-	private JButton btPridejFiltr = new JButton(Konstanty.POPISY.getProperty("tlacitkoPridejFiltr")); // tlačítko pro
-																										// přidání
-																										// filtru do
-																										// panelu menu
 	private JPanel pnBoxFiltru = new JPanel(); // box s vybranými filtry
 	private JButton btZapniFiltr = new JButton(Konstanty.POPISY.getProperty("tlacitkoZapniFiltr")); // tlačítko pro
 																									// spuštění podmínek
@@ -158,13 +153,11 @@ public class OknoHlavni extends JFrame {
 
 		pnFiltr.setLayout(Konstanty.FLOW_LAYOUT);
 		pnFiltr.add(cbTypFiltru);
-		pnFiltr.add(btPridejFiltr);
 		pnBoxFiltru.add(pnFiltr);
 		pnBoxFiltru.setBorder(BorderFactory.createTitledBorder(Konstanty.POPISY.getProperty("titleFiltrVyberu")));
 
 		lsSeznamProjektu.setPreferredSize(Konstanty.VELIKOST_CELA_SIRKA);
 
-		btPridejFiltr.setPreferredSize(Konstanty.VELIKOST_POLOVICNI_SIRKA);
 		btZapniFiltr.setPreferredSize(Konstanty.VELIKOST_CELA_SIRKA);
 
 		scScrollFiltru.setPreferredSize(new Dimension(270, 210));
@@ -272,7 +265,7 @@ public class OknoHlavni extends JFrame {
 
 						@Override
 						public void run() {
-							btPridejFiltr.setEnabled(false);
+							cbTypFiltru.setEnabled(false);
 							btZapniFiltr.setEnabled(false);
 
 							OknoProgresNacitani oknoProgres = new OknoProgresNacitani(panelGrafu);
@@ -283,7 +276,7 @@ public class OknoHlavni extends JFrame {
 								}
 								Thread.yield();
 							}
-							btPridejFiltr.setEnabled(true);
+							cbTypFiltru.setEnabled(true);
 							btZapniFiltr.setEnabled(true);
 							oknoProgres.setVisible(false);
 						}
@@ -462,7 +455,7 @@ public class OknoHlavni extends JFrame {
 					/* vlákno zobrazuje okno s progresem načítání */
 					Thread t1 = new Thread(new Runnable() {
 						public void run() {
-							btPridejFiltr.setEnabled(false);
+							cbTypFiltru.setEnabled(false);
 							btZapniFiltr.setEnabled(false);
 
 							OknoProgresNacitani oknoProgres = new OknoProgresNacitani(panelGrafu);
@@ -473,7 +466,7 @@ public class OknoHlavni extends JFrame {
 								}
 								Thread.yield();
 							}
-							btPridejFiltr.setEnabled(true);
+							cbTypFiltru.setEnabled(true);
 							btZapniFiltr.setEnabled(true);
 							oknoProgres.setVisible(false);
 						}
@@ -584,7 +577,7 @@ public class OknoHlavni extends JFrame {
 					/* vlákno zobrazuje okno s progresem načítání */
 					Thread t1 = new Thread(new Runnable() {
 						public void run() {
-							btPridejFiltr.setEnabled(false);
+							cbTypFiltru.setEnabled(false);
 							btZapniFiltr.setEnabled(false);
 
 							OknoProgresNacitani oknoProgres = new OknoProgresNacitani(panelGrafu);
@@ -595,7 +588,7 @@ public class OknoHlavni extends JFrame {
 								}
 								Thread.yield();
 							}
-							btPridejFiltr.setEnabled(true);
+							cbTypFiltru.setEnabled(true);
 							btZapniFiltr.setEnabled(true);
 							oknoProgres.setVisible(false);
 						}
@@ -627,7 +620,6 @@ public class OknoHlavni extends JFrame {
 							ArrayList<Integer> seznamIdAktivit = null;
 							ArrayList<Integer> seznamIdKonfiguraci = null;
 							ArrayList<Integer> seznamIdArtefaktu = null;
-							TlacitkoMazaniFiltru tlacitkoMazaniFilru;
 							
 							for (int i = 1; i < pnBoxFiltru.getComponentCount(); i++) { // prochází všechny vložené
 																						// filtry
@@ -831,7 +823,7 @@ public class OknoHlavni extends JFrame {
 
 		/* vložení akcí k příslušným komponentám */
 		lsSeznamProjektu.addActionListener(actZmenaProjektu);
-		btPridejFiltr.addActionListener(actVlozFiltr);
+		cbTypFiltru.addActionListener(actVlozFiltr);
 		btZapniFiltr.addActionListener(actZapniFiltr);
 		exitAction.addActionListener(actZavri);
 		czech.addActionListener(actJazykCzech);
