@@ -258,26 +258,15 @@ public class PanelFiltrPolozkaVytvoreni extends PanelFiltr{
         dpDatumDO = new JDatePickerImpl(datumDOPanel, new DateComponentFormatter());        
                 
         JLabel lblDatum = new JLabel(Konstanty.POPISY.getProperty("popisDatumVytvoreni") + ": ");        		
-        lblDatum.setPreferredSize(Konstanty.VELIKOST_POLOVICNI_SIRKA);
-        cbOperatorDatum.setPreferredSize(Konstanty.VELIKOST_POLOVICNI_SIRKA);
-        
+        cbOperatorDatum.setPreferredSize(Konstanty.VELIKOST_CTVRTINOVA_SIRKA);        
         dpDatumOD.setPreferredSize(Konstanty.VELIKOST_CTVRTINOVA_SIRKA);
         dpDatumDO.setPreferredSize(Konstanty.VELIKOST_CTVRTINOVA_SIRKA);
 		
-		GridBagConstraints grid = this.getGrid();
-		grid.gridx = 5;
-        grid.gridy = 0;
-        grid.gridwidth = 2;
-        this.add(lblDatum, grid);
-        grid.gridx = 7;
-        this.add(cbOperatorDatum, grid);
-        grid.gridx = 5;
-        grid.gridy++;     
-        this.add(dpDatumOD, grid);
-        grid.gridx = 7;
-        this.add(dpDatumDO, grid);
-        
-        
+        this.add(lblDatum);
+        this.add(cbOperatorDatum);  
+        this.add(dpDatumOD);
+        this.add(dpDatumDO);
+              
 	}
 	
 	/**

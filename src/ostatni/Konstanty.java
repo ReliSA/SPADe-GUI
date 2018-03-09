@@ -1,5 +1,6 @@
 package ostatni;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -49,7 +50,7 @@ public class Konstanty {
 	public static final Dimension VELIKOST_SEZNAMU_CELA_SIRKA = new Dimension(230, 80);
 	public static final Dimension VELIKOST_CELA_SIRKA = new Dimension(230, 28);
 	public static final Dimension VELIKOST_POLOVICNI_SIRKA = new Dimension(115, 28);
-	public static final Dimension VELIKOST_CTVRTINOVA_SIRKA = new Dimension(55, 28);
+	public static final Dimension VELIKOST_CTVRTINOVA_SIRKA = new Dimension(150, 23);
 	
 	/*-------------Nastavení grafů------------------*/
 	public static final FlowLayout FLOW_LAYOUT = new FlowLayout(FlowLayout.CENTER, 10, 10);
@@ -105,6 +106,15 @@ public class Konstanty {
 	public static final String[] VYSOKASUPERTRIDA = {"HIGH", "MAJOR"};
 	/*-----------------------------------------------*/
 	
+	/*--------------Barvy panelů--------------------*/
+	public static final Color barvaUkol = new Color(180, 216, 231);
+	public static final Color barvaOsoby = new Color(180, 216, 231);
+	public static final Color barvaFaze = new Color(173, 223, 173);
+	public static final Color barvaIterace = new Color(255, 153, 153);
+	public static final Color barvaAktivity= new Color(190, 158, 217);
+	public static final Color barvaKonfigurace = new Color(236,186,147);
+	public static final Color barvaArtefakty = new Color(248,131,85);	
+	
 	public static Connection PRIPOJENI = null;														//připojení k databázi
 	public static final String CESTA_K_DATABAZI = "jdbc:mysql://127.0.0.1:3306/ppicha";				//cesta k databázi
 	//public static final String CESTA_K_DATABAZI = "jdbc:mysql://students.kiv.zcu.cz:3306/ppicha";
@@ -121,10 +131,11 @@ public class Konstanty {
 	
 /*---------------------------------------------------------*/
 	
-	public static final String [] POLE_LOG_OPERATORU = {"and","or","xor","not"};
+	public static String [] POLE_LOG_OPERATORU;
 	public static String [] POLE_OPERATORU;								//hodnoty seznamů comboboxů ve filtrech
 	public static String [] POLE_PODMINEK;								//hodnoty seznamů podmínkových comboboxů ve filtrech
-	public static String [] POLE_FILTRU; 							//seznam možných filtrů	
+	public static String [] POLE_FILTRU; 	 							//seznam možných filtrů	
+	public static String [] POLE_PODFILTRU;
 	
 	/**
 	 * Vrací seznam ? podle seznamu id (využívá se v DAO třídách)
@@ -141,6 +152,8 @@ public class Konstanty {
 	public static void nastavPopisComboBox(){
 		POLE_PODMINEK = new String[]{POPISY.getProperty("a"), POPISY.getProperty("nebo")};
 		POLE_OPERATORU = new String[]{POPISY.getProperty("mezi"), ">", ">=", "=", "!=", "<=", "<"};
-		POLE_FILTRU = new String[]{POPISY.getProperty("nazevUkoly"), POPISY.getProperty("nazevPriority"), POPISY.getProperty("nazevSeverity"), POPISY.getProperty("nazevStatusy"), POPISY.getProperty("nazevTypy"), POPISY.getProperty("nazevResoluce"), POPISY.getProperty("nazevOsoby"), POPISY.getProperty("nazevFaze"), POPISY.getProperty("nazevIterace"), POPISY.getProperty("nazevAktivity"), POPISY.getProperty("nazevKonfigurace"), POPISY.getProperty("nazevArtefakty")};
+		POLE_FILTRU = new String[]{POPISY.getProperty("nazevUkoly"), POPISY.getProperty("nazevFaze"), POPISY.getProperty("nazevIterace"), POPISY.getProperty("nazevAktivity"), POPISY.getProperty("nazevKonfigurace"), POPISY.getProperty("nazevArtefakty")};
+		POLE_LOG_OPERATORU = new String[]{POPISY.getProperty("and"),POPISY.getProperty("or"),POPISY.getProperty("xor"),POPISY.getProperty("not")};
+		POLE_PODFILTRU = new String[]{POPISY.getProperty("nazevPriority"), POPISY.getProperty("nazevSeverity"), POPISY.getProperty("nazevStatusy"), POPISY.getProperty("nazevTypy"), POPISY.getProperty("nazevResoluce"), POPISY.getProperty("nazevOsoby")};
 	}
 }

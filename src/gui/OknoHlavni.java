@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
@@ -35,6 +36,9 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+
+import com.keypoint.PngEncoder;
+
 import ostatni.Konstanty;
 import data.*;
 import data.ciselnik.*;
@@ -58,6 +62,7 @@ public class OknoHlavni extends JFrame {
 																								// projektů
 	private ComboBoxDynamicky lsSeznamProjektu = new ComboBoxDynamicky(modelProjekt); // seznam projektů
 	private JComboBox<String> cbTypFiltru = new JComboBox<String>(Konstanty.POLE_FILTRU); // seznam možných filtrů
+	private JComboBox<String> cbTypPodfiltru = new JComboBox<String>(Konstanty.POLE_PODFILTRU);
 	private JPanel pnBoxFiltru = new JPanel(); // box s vybranými filtry
 	private JButton btZapniFiltr = new JButton(Konstanty.POPISY.getProperty("tlacitkoZapniFiltr")); // tlačítko pro
 																									// spuštění podmínek
@@ -70,7 +75,7 @@ public class OknoHlavni extends JFrame {
 	private JMenuItem czech; // Tlačítko menu baru
 	private JMenuItem english; // Tlačítko menu baru
 	private JCheckBoxMenuItem filtry; // Tlačítko menu baru
-
+	private int polohaPaneluUkol;
 	/**
 	 * Konstruktor třídy, naplní ve třídě konstant připojení, načte projekty a
 	 * nastaví zobrazení a akce
@@ -134,6 +139,7 @@ public class OknoHlavni extends JFrame {
 		JPanel pnFiltr = new JPanel();
 		scScrollFiltru = new JScrollPane(pnBoxFiltru, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		pnBoxFiltru.setLayout(new BoxLayout(pnBoxFiltru, BoxLayout.PAGE_AXIS));
 				
 		
 		panelMenu.setPreferredSize(Konstanty.VELIKOST_PANELU_MENU);
@@ -157,6 +163,7 @@ public class OknoHlavni extends JFrame {
 		lsSeznamProjektu.setPreferredSize(Konstanty.VELIKOST_CELA_SIRKA);
 
 		scScrollFiltru.setPreferredSize(new Dimension(270, 225));
+		scScrollFiltru.getVerticalScrollBar().setUnitIncrement(15);
 				
 		panelMenu.add(nadpis);
 		panelMenu.add(lsSeznamProjektu);
@@ -202,9 +209,75 @@ public class OknoHlavni extends JFrame {
 		tlacitkoMazaniFilru.setName(nazev);
 		tlacitkoMazaniFilru.setText(nazev);
 		listaFiltru.add(tlacitkoMazaniFilru);	
+		tlacitkoMazaniFilru.setContentAreaFilled(false);
+		tlacitkoMazaniFilru.setOpaque(true);
+		
+		nazev = nazev.substring(0, nazev.length() - 2);	
+		switch (nazev) {
+		case "Tasks":
+		case "Úkoly":
+			tlacitkoMazaniFilru.setBackground(Konstanty.barvaUkol);
+			break;
+		case "Priorities":
+		case "Priority":
+			tlacitkoMazaniFilru.setBackground(Konstanty.barvaUkol);
+			break;
+		case "Severity":
+			tlacitkoMazaniFilru.setBackground(Konstanty.barvaUkol);
+			break;
+		case "Status":
+		case "Statusy":
+			tlacitkoMazaniFilru.setBackground(Konstanty.barvaUkol);
+			break;
+		case "Types":
+		case "Typy":
+			tlacitkoMazaniFilru.setBackground(Konstanty.barvaUkol);
+			break;
+		case "Resolution":
+		case "Rezoluce":
+			tlacitkoMazaniFilru.setBackground(Konstanty.barvaUkol);
+			break;
+		case "Persons":
+		case "Osoby":
+			tlacitkoMazaniFilru.setBackground(Konstanty.barvaOsoby);
+			break;
+		case "Phase":
+		case "Fáze":
+			tlacitkoMazaniFilru.setBackground(Konstanty.barvaFaze);
+			break;
+		case "Iterations":
+		case "Iterace":
+			tlacitkoMazaniFilru.setBackground(Konstanty.barvaIterace);
+			break;
+		case "Activities":
+		case "Aktivity":
+			tlacitkoMazaniFilru.setBackground(Konstanty.barvaAktivity);
+			break;
+		case "Configurations":
+		case "Konfigurace":
+			tlacitkoMazaniFilru.setBackground(Konstanty.barvaKonfigurace);
+			break;
+		case "Artifacts":
+		case "Artefakty":
+			tlacitkoMazaniFilru.setBackground(Konstanty.barvaArtefakty);
+			break;
+		default:
+			break;
+		}
 		
 		return tlacitkoMazaniFilru;
 	}
+	
+	private void smazTlacitkoListyFiltru (String nazev) {
+		
+		for (int i = 0; i < listaFiltru.getComponentCount(); i++) { 
+			if(listaFiltru.getComponent(i).getName().equals(nazev)) {
+				listaFiltru.remove(i);
+			}
+		}		
+		listaFiltru.repaint();
+	}
+	
 	
 	/**
 	 * Metoda sloužící pro restart hlavního okna a nového načtení konfigurací.
@@ -296,6 +369,8 @@ public class OknoHlavni extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					
+					PanelFiltrPolozkaPocatek panelPridani = null;
+					
 					if (filtry.isSelected() == false) {
 						panelGrafu.zobrazFiltry(scScrollFiltru);
 						filtry.setSelected(true);
@@ -310,70 +385,13 @@ public class OknoHlavni extends JFrame {
 								JOptionPane.showMessageDialog(pnBoxFiltru,
 										Konstanty.POPISY.getProperty("chybaVlozUkol"));
 							else
-								pnBoxFiltru.add(new PanelFiltrPolozkaPocatek(Konstanty.POPISY.getProperty("nazevUkoly"), getProjekt().getUkoly())); // do
-																												// boxu
-																												// filtrů
-																												// vloží
-																												// panel
-																												// konkrétním
-																												// filtrem
+								panelPridani = new PanelFiltrPolozkaPocatek(Konstanty.POPISY.getProperty("nazevUkoly"), getProjekt().getUkoly(),cbTypPodfiltru);
+								pnBoxFiltru.add(panelPridani); 
+								polohaPaneluUkol=pnBoxFiltru.getComponentZOrder(panelPridani);
 						}	
-						
-						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevPriority"), pnBoxFiltru.getComponents())) {
-							if ((new Priority(getProjekt().getID())).getSeznam().isEmpty())
-								JOptionPane.showMessageDialog(pnBoxFiltru,
-										Konstanty.POPISY.getProperty("chybaVlozPriority"));
-							else
-								pnBoxFiltru.add(new PanelFiltrCiselnik(Konstanty.POPISY.getProperty("nazevPriority"),
-										(new Priority(getProjekt().getID())).getSeznam()));
-						}
-
-						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevSeverity"), pnBoxFiltru.getComponents())) {
-							if ((new Severity(getProjekt().getID())).getSeznam().isEmpty())
-								JOptionPane.showMessageDialog(pnBoxFiltru,
-										Konstanty.POPISY.getProperty("chybaVlozSeverity"));
-							else
-								pnBoxFiltru.add(new PanelFiltrCiselnik(Konstanty.POPISY.getProperty("nazevSeverity"),
-										(new Severity(getProjekt().getID())).getSeznam()));
-						}
-
-						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevStatusy"), pnBoxFiltru.getComponents())) {
-							if ((new Status(getProjekt().getID())).getSeznam().isEmpty())
-								JOptionPane.showMessageDialog(pnBoxFiltru,
-										Konstanty.POPISY.getProperty("chybaVlozStatusy"));
-							else
-								pnBoxFiltru.add(new PanelFiltrCiselnik(Konstanty.POPISY.getProperty("nazevStatusy"),
-										(new Status(getProjekt().getID())).getSeznam()));
-						}
-
-						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevTypy"), pnBoxFiltru.getComponents())) {
-							if ((new Typ(getProjekt().getID())).getSeznam().isEmpty())
-								JOptionPane.showMessageDialog(pnBoxFiltru,
-										Konstanty.POPISY.getProperty("chybaVlozTypy"));
-							else
-								pnBoxFiltru.add(
-										new PanelFiltrCiselnik(Konstanty.POPISY.getProperty("nazevTypy"), (new Typ(getProjekt().getID())).getSeznam()));
-						}
-
-						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevResoluce"), pnBoxFiltru.getComponents())) {
-							if ((new Resoluce(getProjekt().getID())).getSeznam().isEmpty())
-								JOptionPane.showMessageDialog(pnBoxFiltru,
-										Konstanty.POPISY.getProperty("chybaVlozResoluce"));
-							else
-								pnBoxFiltru.add(new PanelFiltrCiselnik(Konstanty.POPISY.getProperty("nazevResoluce"),
-										(new Resoluce(getProjekt().getID())).getSeznam()));
-						}
-
-						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevOsoby"), pnBoxFiltru.getComponents())) {
-							if ((new Osoby(getProjekt().getID())).getSeznam().isEmpty())
-								JOptionPane.showMessageDialog(pnBoxFiltru,
-										Konstanty.POPISY.getProperty("chybaVlozOsoby"));
-							else
-								pnBoxFiltru.add(
-										new PanelFiltrCiselnik(Konstanty.POPISY.getProperty("nazevOsoby"), (new Osoby(getProjekt().getID())).getSeznam()));
-						}
 						break;
-					case 7:
+					
+					case 1:
 						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevFaze"), pnBoxFiltru.getComponents())) {
 							if (getProjekt().getFaze().isEmpty())
 								JOptionPane.showMessageDialog(pnBoxFiltru,
@@ -382,7 +400,7 @@ public class OknoHlavni extends JFrame {
 								pnBoxFiltru.add(new PanelFiltrPolozkaPocatek(Konstanty.POPISY.getProperty("nazevFaze"), getProjekt().getFaze()));
 						}
 						break;
-					case 8:
+					case 2:
 						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevIterace"), pnBoxFiltru.getComponents())) {
 							if (getProjekt().getIterace().isEmpty())
 								JOptionPane.showMessageDialog(pnBoxFiltru,
@@ -391,7 +409,7 @@ public class OknoHlavni extends JFrame {
 								pnBoxFiltru.add(new PanelFiltrPolozkaPocatek(Konstanty.POPISY.getProperty("nazevIterace"), getProjekt().getIterace()));
 						}
 						break;
-					case 9:
+					case 3:
 						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevAktivity"), pnBoxFiltru.getComponents())) {
 							if (getProjekt().getAktivity().isEmpty())
 								JOptionPane.showMessageDialog(pnBoxFiltru,
@@ -400,7 +418,7 @@ public class OknoHlavni extends JFrame {
 								pnBoxFiltru.add(new PanelFiltrPolozkaPocatek(Konstanty.POPISY.getProperty("nazevAktivity"), getProjekt().getAktivity()));
 						}
 						break;
-					case 10:
+					case 4:
 						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevKonfigurace"), pnBoxFiltru.getComponents())) {
 							if (getProjekt().getKonfigurace().isEmpty())
 								JOptionPane.showMessageDialog(pnBoxFiltru,
@@ -410,7 +428,7 @@ public class OknoHlavni extends JFrame {
 										new PanelFiltrPolozkaVytvoreni(Konstanty.POPISY.getProperty("nazevKonfigurace"), getProjekt().getKonfigurace()));
 						}
 						break;
-					case 11:
+					case 5:
 						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevArtefakty"), pnBoxFiltru.getComponents())) {
 							if (getProjekt().getArtefakty().isEmpty())
 								JOptionPane.showMessageDialog(pnBoxFiltru,
@@ -418,6 +436,83 @@ public class OknoHlavni extends JFrame {
 							else
 								pnBoxFiltru
 										.add(new PanelFiltrPolozkaVytvoreni(Konstanty.POPISY.getProperty("nazevArtefakty"), getProjekt().getArtefakty()));
+						}
+						break;
+					default:
+						break;
+					}
+					pnBoxFiltru.revalidate();
+				} catch (Exception e1) {
+					JOptionPane.showMessageDialog(null, Konstanty.POPISY.getProperty("chybaVlozFiltr"));
+					e1.printStackTrace();
+				}
+			}
+		};
+		
+		/* akce pro tlačítko Přidej filtr */
+		ActionListener actVlozPodFiltr = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					
+					switch (cbTypPodfiltru.getSelectedIndex()) { // podle zadaného typu filtru vloží konkrétní panel filtru
+					case 0:					
+						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevPriority"), pnBoxFiltru.getComponents())) {
+							if ((new Priority(getProjekt().getID())).getSeznam().isEmpty())
+								JOptionPane.showMessageDialog(pnBoxFiltru,
+										Konstanty.POPISY.getProperty("chybaVlozPriority"));
+							else
+								pnBoxFiltru.add(new PanelFiltrCiselnik(Konstanty.POPISY.getProperty("nazevPriority"),
+										(new Priority(getProjekt().getID())).getSeznam()),polohaPaneluUkol+1);
+						}
+						break;
+					case 1:
+						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevSeverity"), pnBoxFiltru.getComponents())) {
+							if ((new Severity(getProjekt().getID())).getSeznam().isEmpty())
+								JOptionPane.showMessageDialog(pnBoxFiltru,
+										Konstanty.POPISY.getProperty("chybaVlozSeverity"));
+							else
+								pnBoxFiltru.add(new PanelFiltrCiselnik(Konstanty.POPISY.getProperty("nazevSeverity"),
+										(new Severity(getProjekt().getID())).getSeznam()),polohaPaneluUkol+1);
+						}
+						break;
+					case 2:
+						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevStatusy"), pnBoxFiltru.getComponents())) {
+							if ((new Status(getProjekt().getID())).getSeznam().isEmpty())
+								JOptionPane.showMessageDialog(pnBoxFiltru,
+										Konstanty.POPISY.getProperty("chybaVlozStatusy"));
+							else
+								pnBoxFiltru.add(new PanelFiltrCiselnik(Konstanty.POPISY.getProperty("nazevStatusy"),
+										(new Status(getProjekt().getID())).getSeznam()),polohaPaneluUkol+1);
+						}
+						break;
+					case 3:
+						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevTypy"), pnBoxFiltru.getComponents())) {
+							if ((new Typ(getProjekt().getID())).getSeznam().isEmpty())
+								JOptionPane.showMessageDialog(pnBoxFiltru,
+										Konstanty.POPISY.getProperty("chybaVlozTypy"));
+							else
+								pnBoxFiltru.add(
+										new PanelFiltrCiselnik(Konstanty.POPISY.getProperty("nazevTypy"), (new Typ(getProjekt().getID())).getSeznam()),polohaPaneluUkol+1);
+						}
+						break;
+					case 4:
+						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevResoluce"), pnBoxFiltru.getComponents())) {
+							if ((new Resoluce(getProjekt().getID())).getSeznam().isEmpty())
+								JOptionPane.showMessageDialog(pnBoxFiltru,
+										Konstanty.POPISY.getProperty("chybaVlozResoluce"));
+							else
+								pnBoxFiltru.add(new PanelFiltrCiselnik(Konstanty.POPISY.getProperty("nazevResoluce"),
+										(new Resoluce(getProjekt().getID())).getSeznam()),polohaPaneluUkol+1);
+						}
+						break;					
+					case 5:
+						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevOsoby"), pnBoxFiltru.getComponents())) {
+							if ((new Osoby(getProjekt().getID())).getSeznam().isEmpty())
+								JOptionPane.showMessageDialog(pnBoxFiltru,
+										Konstanty.POPISY.getProperty("chybaVlozOsoby"));
+							else
+								pnBoxFiltru.add(
+										new PanelFiltrCiselnik(Konstanty.POPISY.getProperty("nazevOsoby"), (new Osoby(getProjekt().getID())).getSeznam()));
 						}
 						break;
 					default:
@@ -470,7 +565,6 @@ public class OknoHlavni extends JFrame {
 
 						@Override
 						public void run() {
-							// TODO Auto-generated method stub
 							String podminkaPriority = "";
 							ArrayList<Integer> seznamIdUkolu = null;
 							ArrayList<Integer> seznamIdPriorit = null;
@@ -705,9 +799,11 @@ public class OknoHlavni extends JFrame {
 									}
 
 								} else {
+									smazTlacitkoListyFiltru(pnBoxFiltru.getComponents()[i].getName()+" X");
 									pnBoxFiltru.remove(i--); // není-li zaškrtnuto Použít filtr, filtr se z boxu smaže
 																// kontrola musí přejí o jedno míst zpět (před smazaný
 																// filtr)
+									
 								}
 							}
 							filtry.setSelected(false);
@@ -859,6 +955,7 @@ public class OknoHlavni extends JFrame {
 		/* vložení akcí k příslušným komponentám */
 		lsSeznamProjektu.addActionListener(actZmenaProjektu);
 		cbTypFiltru.addActionListener(actVlozFiltr);
+		cbTypPodfiltru.addActionListener(actVlozPodFiltr);
 		btZapniFiltr.addActionListener(actZapniFiltr);
 		exitAction.addActionListener(actZavri);
 		czech.addActionListener(actJazykCzech);

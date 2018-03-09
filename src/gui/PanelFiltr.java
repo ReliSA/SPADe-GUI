@@ -1,5 +1,7 @@
 package gui;
 
+import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -9,6 +11,7 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -91,53 +94,66 @@ public abstract class PanelFiltr extends JPanel {
 	 */
 	protected void nastavPanel(String nazev) {
 		String titulek = "";
+		ckPouzitFiltr.setOpaque(false);
 		switch (nazev) {
 		case "Tasks":
 		case "Úkoly":
 			titulek = Konstanty.POPISY.getProperty("nazevUkoly");
+			this.setBackground(Konstanty.barvaUkol);
 			break;
 		case "Priorities":
 		case "Priority":
 			titulek = Konstanty.POPISY.getProperty("nazevPriority");
+			this.setBackground(Konstanty.barvaUkol);
 			break;
 		case "Severity":
 			titulek = Konstanty.POPISY.getProperty("nazevSeverity");
+			this.setBackground(Konstanty.barvaUkol);
 			break;
 		case "Status":
 		case "Statusy":
 			titulek = Konstanty.POPISY.getProperty("nazevStatusy");
+			this.setBackground(Konstanty.barvaUkol);
 			break;
 		case "Types":
 		case "Typy":
 			titulek = Konstanty.POPISY.getProperty("nazevTypy");
+			this.setBackground(Konstanty.barvaUkol);
 			break;
 		case "Resolution":
 		case "Rezoluce":
-			titulek = Konstanty.POPISY.getProperty("nazevResoluce");
+			titulek = Konstanty.POPISY.getProperty("nazevResoluce");	
+			this.setBackground(Konstanty.barvaUkol);
 			break;
 		case "Persons":
 		case "Osoby":
 			titulek = Konstanty.POPISY.getProperty("nazevOsoby");
+			this.setBackground(Konstanty.barvaOsoby);
 			break;
 		case "Phase":
 		case "Fáze":
 			titulek = Konstanty.POPISY.getProperty("nazevFaze");
+			this.setBackground(Konstanty.barvaFaze);
 			break;
 		case "Iterations":
 		case "Iterace":
 			titulek = Konstanty.POPISY.getProperty("nazevIterace");
+			this.setBackground(Konstanty.barvaIterace);
 			break;
 		case "Activities":
 		case "Aktivity":
 			titulek = Konstanty.POPISY.getProperty("nazevAktivity");
+			this.setBackground(Konstanty.barvaAktivity);
 			break;
 		case "Configurations":
 		case "Konfigurace":
 			titulek = Konstanty.POPISY.getProperty("nazevKonfigurace");
+			this.setBackground(Konstanty.barvaKonfigurace);
 			break;
 		case "Artifacts":
 		case "Artefakty":
 			titulek = Konstanty.POPISY.getProperty("nazevArtefakty");
+			this.setBackground(Konstanty.barvaArtefakty);
 			break;
 		default:
 			break;
@@ -146,27 +162,18 @@ public abstract class PanelFiltr extends JPanel {
 
 		lsSeznamFiltr = new JList(getModel(this.seznam));
 		lsSeznamFiltr.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-
-		lsSeznamFiltr.setVisibleRowCount(3);
 		lsSeznamFiltr.setVisibleRowCount(Math.min(lsSeznamFiltr.getModel().getSize(), 3));
 		JScrollPane scScrollPane = new JScrollPane(lsSeznamFiltr, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		ckPouzitFiltr.setPreferredSize(Konstanty.VELIKOST_CELA_SIRKA);
 		scScrollPane.setPreferredSize(Konstanty.VELIKOST_SEZNAMU_CELA_SIRKA);
+		JLabel lblNazev = new JLabel(nazev+": ");
 
 		nastavAkce();
 
-		grid.fill = GridBagConstraints.HORIZONTAL;
-
-		this.setLayout(new GridBagLayout());
-		grid.insets = new Insets(5, 5, 5, 5);
-		grid.gridx = 0;
-		grid.gridy = 0;
-		grid.gridwidth = 4;
-		this.add(ckPouzitFiltr, grid);
-		grid.gridy++;
-		this.add(scScrollPane, grid);
-
+		this.setLayout(new FlowLayout(FlowLayout.CENTER, 30,0));
+		this.add(ckPouzitFiltr);
+		this.add(lblNazev);
+		this.add(scScrollPane);
 		this.setName(nazev);
 	}
 

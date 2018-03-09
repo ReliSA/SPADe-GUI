@@ -6,8 +6,10 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.Box;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -41,8 +43,23 @@ public class PanelFiltrCiselnik extends PanelFiltr{
 		nastavPanel(nazev);
 	}
 	
-	public String getLogOperand() {
-		return (String) cbLogOperace.getSelectedItem();
+	public String getLogOperand() {		
+		switch (cbLogOperace.getSelectedIndex()) {
+		case 0:		
+			return "and";
+		
+		case 1:
+			return "or";
+			
+		case 2:
+			return "xor";
+
+		case 3:
+			return "and";
+			
+		default:
+			return "and";
+		}		
 	}
 	
 	/**
@@ -73,8 +90,21 @@ public class PanelFiltrCiselnik extends PanelFiltr{
 				}				
 			}						
 		}
-		if(seznamId.isEmpty())		//pokud je seznam prázdný doplním alespoň -1 jinak by při načítání dat seznam jevil jako nepoužitý
+		if(seznamId.isEmpty()) {		//pokud je seznam prázdný doplním alespoň -1 jinak by při načítání dat seznam jevil jako nepoužitý
 			seznamId.add(-1);
+			}
+			
+		if(cbLogOperace.getSelectedIndex()==3) {											//neguje seznam
+			ArrayList<Integer> seznamIdNeg = new ArrayList<Integer>();							
+			for(int i = 0; i < this.seznam.size(); i++){
+				PolozkaCiselnik polozka = (PolozkaCiselnik)this.seznam.get(i);
+				if (!seznamId.contains(polozka.getID())) {
+					seznamIdNeg.add(polozka.getID());				
+				}							
+			}
+			return seznamIdNeg;	
+		}		
+				
 		return seznamId;
 	}
 
@@ -161,31 +191,22 @@ public class PanelFiltrCiselnik extends PanelFiltr{
 		
 		cbSpojeniTridy.setEnabled(false);
 		cbSpojeniSuperTridy.setEnabled(false);
+		
+		JLabel lbltridy = new JLabel(Konstanty.POPISY.getProperty("popisTridy")+": ");
+		JLabel lblSuperTridy = new JLabel(Konstanty.POPISY.getProperty("popisSupertridy")+": ");
 
 		nastavAkce();
-		
-		GridBagConstraints grid = this.getGrid();
-		
-		grid.gridx = 0;
-		grid.gridy = 3;
-		this.add(cbLogOperace,grid);
-		
+				
+		this.add(cbLogOperace);
+		this.setComponentZOrder(cbLogOperace,1);
 		if(!nazev.equals(Konstanty.POPISY.getProperty("nazevOsoby"))){			
-	        grid.gridx = 5;
-	        grid.gridy = 0;
-	        grid.gridwidth = 1;
-	        this.add(cbSpojeniTridy, grid);
-	        grid.gridx = 6;
-	        grid.gridwidth = 3;
-	        this.add(scScrollPaneTrid, grid);
+	        this.add(cbSpojeniTridy);
+	        this.add(lbltridy);
+	        this.add(scScrollPaneTrid);
 	        if(!nazev.equals(Konstanty.POPISY.getProperty("nazevTypy"))){
-		        grid.gridy++;
-		        grid.gridx = 5;
-		        grid.gridwidth = 1;
-		        this.add(cbSpojeniSuperTridy, grid);
-		        grid.gridx = 6;
-		        grid.gridwidth = 3;
-		        this.add(scScrollPaneSuperTrid, grid);
+		        this.add(cbSpojeniSuperTridy);
+		        this.add(lblSuperTridy);
+		        this.add(scScrollPaneSuperTrid);
 		     }
 		}
         this.setName(nazev);

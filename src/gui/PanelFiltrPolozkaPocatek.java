@@ -1,5 +1,6 @@
 package gui;
 
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -32,6 +33,7 @@ public class PanelFiltrPolozkaPocatek extends PanelFiltr{
 	private JComboBox<String> cbOperatorDatum;		//seznam operatoru pro datum				
 	private JDatePickerImpl dpDatumOD;				//datum od
     private JDatePickerImpl dpDatumDO;				//datum do
+    private JComboBox<String> cbTypPodfiltru;
 	
     /**
      * Konstruktor třídy
@@ -40,6 +42,12 @@ public class PanelFiltrPolozkaPocatek extends PanelFiltr{
      */
     public PanelFiltrPolozkaPocatek(String nazev, ArrayList seznam) {
 		super(seznam);
+		nastavPanel(nazev);
+	}
+    
+    public PanelFiltrPolozkaPocatek(String nazev, ArrayList seznam,JComboBox<String> cbTypPodfiltru) {
+		super(seznam);
+		this.cbTypPodfiltru=cbTypPodfiltru;
 		nastavPanel(nazev);
 	}
 	
@@ -256,24 +264,20 @@ public class PanelFiltrPolozkaPocatek extends PanelFiltr{
         dpDatumOD = new JDatePickerImpl(datumODPanel, new DateComponentFormatter());
         dpDatumDO = new JDatePickerImpl(datumDOPanel, new DateComponentFormatter());        
                 
-        JLabel lblDatum = new JLabel(Konstanty.POPISY.getProperty("popisDatumPocatku")+": ");        		
-        lblDatum.setPreferredSize(Konstanty.VELIKOST_POLOVICNI_SIRKA);
-        cbOperatorDatum.setPreferredSize(Konstanty.VELIKOST_POLOVICNI_SIRKA);
-        dpDatumOD.setPreferredSize(Konstanty.VELIKOST_POLOVICNI_SIRKA);
-        dpDatumDO.setPreferredSize(Konstanty.VELIKOST_POLOVICNI_SIRKA);
-		
-		GridBagConstraints grid = this.getGrid();
-		grid.gridx = 5;
-        grid.gridy = 0;
-        grid.gridwidth = 2;
-        this.add(lblDatum, grid);
-        grid.gridx = 7;
-        this.add(cbOperatorDatum, grid);
-        grid.gridx = 5;
-        grid.gridy++;
-        this.add(dpDatumOD, grid);
-        grid.gridx = 7;
-        this.add(dpDatumDO, grid);
+        JLabel lblDatum = new JLabel(Konstanty.POPISY.getProperty("popisDatumPocatku")+": ");
+        cbOperatorDatum.setPreferredSize(Konstanty.VELIKOST_CTVRTINOVA_SIRKA);
+        dpDatumOD.setPreferredSize(Konstanty.VELIKOST_CTVRTINOVA_SIRKA);
+        dpDatumDO.setPreferredSize(Konstanty.VELIKOST_CTVRTINOVA_SIRKA);
+        	
+        this.add(lblDatum);
+        this.add(cbOperatorDatum);
+        this.add(dpDatumOD);
+        this.add(dpDatumDO);
+        if(this.getName().equals(Konstanty.POPISY.getProperty("nazevUkoly"))) {
+        this.add(new JLabel(Konstanty.POPISY.getProperty("filtrovatPodle")));	
+        this.add(cbTypPodfiltru);
+        cbTypPodfiltru.setPreferredSize(Konstanty.VELIKOST_CTVRTINOVA_SIRKA);
+        }
         
 	}
 	
