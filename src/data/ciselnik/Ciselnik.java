@@ -155,12 +155,12 @@ public abstract class Ciselnik implements Serializable{
 	 */
 	public String toString(){
 		switch(this.typ){
-			case Konstanty.PRIORITY:return "Priority";
-			case Konstanty.SEVERITY:return "Severity";
-			case Konstanty.STATUS: 	return "Status";
-			case Konstanty.TYP: 	return "Typ";
-			case Konstanty.RESOLUCE:return "Resoluce";
-			case Konstanty.PRIRAZEN:return "Osoby";
+			case Konstanty.PRIORITY:return Konstanty.POPISY.getProperty("nazevPriority");
+			case Konstanty.SEVERITY:return Konstanty.POPISY.getProperty("nazevSeverity");
+			case Konstanty.STATUS: 	return Konstanty.POPISY.getProperty("nazevStatusy");
+			case Konstanty.TYP: 	return Konstanty.POPISY.getProperty("nazevTypy");
+			case Konstanty.RESOLUCE:return Konstanty.POPISY.getProperty("nazevResoluce");
+			case Konstanty.PRIRAZEN:return Konstanty.POPISY.getProperty("nazevOsoby");
 			default:return "Nedefinovaný typ";						
 		}
 	}

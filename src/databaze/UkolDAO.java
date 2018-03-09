@@ -224,7 +224,7 @@ public class UkolDAO implements IUkolDAO {
 			podminka += " and w.id in (" + Konstanty.getZnakyParametru(seznamIdUkolu) + ")"; 		
 		
 		if(seznamIdPriorit != null && !seznamIdPriorit.isEmpty()) 
-			podminka += " and w.priorityId in (" + Konstanty.getZnakyParametru(seznamIdPriorit) + ")"; 
+			podminka += " or w.priorityId in (" + Konstanty.getZnakyParametru(seznamIdPriorit) + ")"; 
 
 		if(seznamIdSeverit != null && !seznamIdSeverit.isEmpty()) 
 			podminka += " and w.severityId in (" + Konstanty.getZnakyParametru(seznamIdSeverit) + ")"; 

@@ -57,6 +57,9 @@ public class PanelFiltrPolozkaPocatek extends PanelFiltr{
 				case "mezi":if(vlozitDoSeznamuMezi(polozka))					
 								seznamId.add(polozka.getID());					//pokud metoda vrátí true, vloží se id do seznamu
 							break;
+				case "between":if(vlozitDoSeznamuMezi(polozka))					
+					seznamId.add(polozka.getID());								//pokud metoda vrátí true, vloží se id do seznamu
+				break;			
 				case ">":	if(vlozitDoSeznamuVetsi(polozka))
 								seznamId.add(polozka.getID());
 							break;

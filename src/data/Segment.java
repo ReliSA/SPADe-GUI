@@ -52,9 +52,9 @@ public class Segment extends PolozkaPocatek implements Serializable{
 	 */
 	public String getNazevTypuSegmentu(){
 		switch(this.typSegmentu){
-		case Konstanty.FAZE: return "Fáze";
-		case Konstanty.ITERACE: return "Iterace";
-		case Konstanty.AKTIVITY: return "Aktivity";
+		case Konstanty.FAZE: return Konstanty.POPISY.getProperty("nazevFaze");
+		case Konstanty.ITERACE: return Konstanty.POPISY.getProperty("nazevIterace");
+		case Konstanty.AKTIVITY: return Konstanty.POPISY.getProperty("nazevAktivity");
 		default: return "Nedefinovaný typ";
 		}
 	}

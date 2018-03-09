@@ -193,7 +193,7 @@ public class OknoHlavni extends JFrame {
 	private TlacitkoMazaniFiltru pridejTlacitkoListyFiltru (String nazev, Component comp) {
 		
 		for (int i = 0; i < listaFiltru.getComponentCount(); i++) { 
-			if(listaFiltru.getComponent(i).getName()==nazev) {
+			if(listaFiltru.getComponent(i).getName().equals(nazev)) {
 				listaFiltru.remove(i);
 			}
 		}
@@ -303,14 +303,14 @@ public class OknoHlavni extends JFrame {
 					
 					switch (cbTypFiltru.getSelectedIndex()) { // podle zadaného typu filtru vloží konkrétní panel filtru
 					case 0:
-						if (!jeZadanyFiltr("Ukol", pnBoxFiltru.getComponents())) { // pokud je panel již vložen, nelze
-																					// ho znovu dodat
+						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevUkoly"), pnBoxFiltru.getComponents())) { // pokud je panel již vložen, nelze
+																													   // ho znovu dodat
 							if (getProjekt().getUkoly().isEmpty()) // zkontroluje, zda projekt obsahuje data nutná k
 																	// filtrování v daném panelu
 								JOptionPane.showMessageDialog(pnBoxFiltru,
 										Konstanty.POPISY.getProperty("chybaVlozUkol"));
 							else
-								pnBoxFiltru.add(new PanelFiltrPolozkaPocatek("Ukol", getProjekt().getUkoly())); // do
+								pnBoxFiltru.add(new PanelFiltrPolozkaPocatek(Konstanty.POPISY.getProperty("nazevUkoly"), getProjekt().getUkoly())); // do
 																												// boxu
 																												// filtrů
 																												// vloží
@@ -320,110 +320,110 @@ public class OknoHlavni extends JFrame {
 						}
 						break;
 					case 1:
-						if (!jeZadanyFiltr("Priority", pnBoxFiltru.getComponents())) {
+						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevPriority"), pnBoxFiltru.getComponents())) {
 							if ((new Priority(getProjekt().getID())).getSeznam().isEmpty())
 								JOptionPane.showMessageDialog(pnBoxFiltru,
 										Konstanty.POPISY.getProperty("chybaVlozPriority"));
 							else
-								pnBoxFiltru.add(new PanelFiltrCiselnik("Priority",
+								pnBoxFiltru.add(new PanelFiltrCiselnik(Konstanty.POPISY.getProperty("nazevPriority"),
 										(new Priority(getProjekt().getID())).getSeznam()));
 						}
 						break;
 					case 2:
-						if (!jeZadanyFiltr("Severity", pnBoxFiltru.getComponents())) {
+						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevSeverity"), pnBoxFiltru.getComponents())) {
 							if ((new Severity(getProjekt().getID())).getSeznam().isEmpty())
 								JOptionPane.showMessageDialog(pnBoxFiltru,
 										Konstanty.POPISY.getProperty("chybaVlozSeverity"));
 							else
-								pnBoxFiltru.add(new PanelFiltrCiselnik("Severity",
+								pnBoxFiltru.add(new PanelFiltrCiselnik(Konstanty.POPISY.getProperty("nazevSeverity"),
 										(new Severity(getProjekt().getID())).getSeznam()));
 						}
 						break;
 					case 3:
-						if (!jeZadanyFiltr("Status", pnBoxFiltru.getComponents())) {
+						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevStatusy"), pnBoxFiltru.getComponents())) {
 							if ((new Status(getProjekt().getID())).getSeznam().isEmpty())
 								JOptionPane.showMessageDialog(pnBoxFiltru,
 										Konstanty.POPISY.getProperty("chybaVlozStatusy"));
 							else
-								pnBoxFiltru.add(new PanelFiltrCiselnik("Status",
+								pnBoxFiltru.add(new PanelFiltrCiselnik(Konstanty.POPISY.getProperty("nazevStatusy"),
 										(new Status(getProjekt().getID())).getSeznam()));
 						}
 						break;
 					case 4:
-						if (!jeZadanyFiltr("Typ", pnBoxFiltru.getComponents())) {
+						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevTypy"), pnBoxFiltru.getComponents())) {
 							if ((new Typ(getProjekt().getID())).getSeznam().isEmpty())
 								JOptionPane.showMessageDialog(pnBoxFiltru,
 										Konstanty.POPISY.getProperty("chybaVlozTypy"));
 							else
 								pnBoxFiltru.add(
-										new PanelFiltrCiselnik("Typ", (new Typ(getProjekt().getID())).getSeznam()));
+										new PanelFiltrCiselnik(Konstanty.POPISY.getProperty("nazevTypy"), (new Typ(getProjekt().getID())).getSeznam()));
 						}
 						break;
 					case 5:
-						if (!jeZadanyFiltr("Resoluce", pnBoxFiltru.getComponents())) {
+						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevResoluce"), pnBoxFiltru.getComponents())) {
 							if ((new Resoluce(getProjekt().getID())).getSeznam().isEmpty())
 								JOptionPane.showMessageDialog(pnBoxFiltru,
 										Konstanty.POPISY.getProperty("chybaVlozResoluce"));
 							else
-								pnBoxFiltru.add(new PanelFiltrCiselnik("Resoluce",
+								pnBoxFiltru.add(new PanelFiltrCiselnik(Konstanty.POPISY.getProperty("nazevResoluce"),
 										(new Resoluce(getProjekt().getID())).getSeznam()));
 						}
 						break;
 					case 6:
-						if (!jeZadanyFiltr("Osoby", pnBoxFiltru.getComponents())) {
+						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevOsoby"), pnBoxFiltru.getComponents())) {
 							if ((new Osoby(getProjekt().getID())).getSeznam().isEmpty())
 								JOptionPane.showMessageDialog(pnBoxFiltru,
 										Konstanty.POPISY.getProperty("chybaVlozOsoby"));
 							else
 								pnBoxFiltru.add(
-										new PanelFiltrCiselnik("Osoby", (new Osoby(getProjekt().getID())).getSeznam()));
+										new PanelFiltrCiselnik(Konstanty.POPISY.getProperty("nazevOsoby"), (new Osoby(getProjekt().getID())).getSeznam()));
 						}
 						break;
 					case 7:
-						if (!jeZadanyFiltr("Faze", pnBoxFiltru.getComponents())) {
+						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevFaze"), pnBoxFiltru.getComponents())) {
 							if (getProjekt().getFaze().isEmpty())
 								JOptionPane.showMessageDialog(pnBoxFiltru,
 										Konstanty.POPISY.getProperty("chybaVlozFaze"));
 							else
-								pnBoxFiltru.add(new PanelFiltrPolozkaPocatek("Faze", getProjekt().getFaze()));
+								pnBoxFiltru.add(new PanelFiltrPolozkaPocatek(Konstanty.POPISY.getProperty("nazevFaze"), getProjekt().getFaze()));
 						}
 						break;
 					case 8:
-						if (!jeZadanyFiltr("Iterace", pnBoxFiltru.getComponents())) {
+						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevIterace"), pnBoxFiltru.getComponents())) {
 							if (getProjekt().getIterace().isEmpty())
 								JOptionPane.showMessageDialog(pnBoxFiltru,
 										Konstanty.POPISY.getProperty("chybaVlozIterace"));
 							else
-								pnBoxFiltru.add(new PanelFiltrPolozkaPocatek("Iterace", getProjekt().getIterace()));
+								pnBoxFiltru.add(new PanelFiltrPolozkaPocatek(Konstanty.POPISY.getProperty("nazevIterace"), getProjekt().getIterace()));
 						}
 						break;
 					case 9:
-						if (!jeZadanyFiltr("Aktivity", pnBoxFiltru.getComponents())) {
+						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevAktivity"), pnBoxFiltru.getComponents())) {
 							if (getProjekt().getAktivity().isEmpty())
 								JOptionPane.showMessageDialog(pnBoxFiltru,
 										Konstanty.POPISY.getProperty("chybaVlozAktivity"));
 							else
-								pnBoxFiltru.add(new PanelFiltrPolozkaPocatek("Aktivity", getProjekt().getAktivity()));
+								pnBoxFiltru.add(new PanelFiltrPolozkaPocatek(Konstanty.POPISY.getProperty("nazevAktivity"), getProjekt().getAktivity()));
 						}
 						break;
 					case 10:
-						if (!jeZadanyFiltr("Konfigurace", pnBoxFiltru.getComponents())) {
+						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevKonfigurace"), pnBoxFiltru.getComponents())) {
 							if (getProjekt().getKonfigurace().isEmpty())
 								JOptionPane.showMessageDialog(pnBoxFiltru,
 										Konstanty.POPISY.getProperty("chybaVlozKonfigurace"));
 							else
 								pnBoxFiltru.add(
-										new PanelFiltrPolozkaVytvoreni("Konfigurace", getProjekt().getKonfigurace()));
+										new PanelFiltrPolozkaVytvoreni(Konstanty.POPISY.getProperty("nazevKonfigurace"), getProjekt().getKonfigurace()));
 						}
 						break;
 					case 11:
-						if (!jeZadanyFiltr("Artefakty", pnBoxFiltru.getComponents())) {
+						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevArtefakty"), pnBoxFiltru.getComponents())) {
 							if (getProjekt().getArtefakty().isEmpty())
 								JOptionPane.showMessageDialog(pnBoxFiltru,
 										Konstanty.POPISY.getProperty("chybaVlozArtefakty"));
 							else
 								pnBoxFiltru
-										.add(new PanelFiltrPolozkaVytvoreni("Artefakty", getProjekt().getArtefakty()));
+										.add(new PanelFiltrPolozkaVytvoreni(Konstanty.POPISY.getProperty("nazevArtefakty"), getProjekt().getArtefakty()));
 						}
 						break;
 					default:
@@ -496,7 +496,8 @@ public class OknoHlavni extends JFrame {
 								PanelFiltr pnPanelFiltr = (PanelFiltr) (pnBoxFiltru.getComponents()[i]);
 								if (pnPanelFiltr.jePouzit()) { // je-li zaškrtnuto použít, zjistí se o jaký filtr jde
 									switch (pnPanelFiltr.getName()) { // pomocí názvu se zjišťuje o jaký jde filtr
-									case "Ukol":
+									case "Tasks":
+									case "Úkoly":
 										seznamIdUkolu = ((PanelFiltrPolozkaPocatek) pnPanelFiltr).getSeznamId(); // zjistí
 																													// seznam
 																													// id
@@ -504,6 +505,7 @@ public class OknoHlavni extends JFrame {
 																													// zadaným
 																													// podmínkám
 										break;
+									case "Priorities":
 									case "Priority":
 										seznamIdPriorit = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();							
 										break;
@@ -511,29 +513,38 @@ public class OknoHlavni extends JFrame {
 										seznamIdSeverit = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
 										break;
 									case "Status":
+									case "Statusy":
 										seznamIdStatusu = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
 										break;
-									case "Typ":
+									case "Types":
+									case "Typy":
 										seznamIdTypu = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
 										break;
-									case "Resoluce":
+									case "Resolution":
+									case "Rezoluce":
 										seznamIdResoluci = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
 										break;
+									case "Persons":
 									case "Osoby":
 										seznamIdOsob = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
 										break;
-									case "Faze":
+									case "Phase":
+									case "Fáze":
 										seznamIdFazi = ((PanelFiltrPolozkaPocatek) pnPanelFiltr).getSeznamId();
 										break;
+									case "Iterations":
 									case "Iterace":
 										seznamIdIteraci = ((PanelFiltrPolozkaPocatek) pnPanelFiltr).getSeznamId();
 										break;
+									case "Activities":
 									case "Aktivity":
 										seznamIdAktivit = ((PanelFiltrPolozkaPocatek) pnPanelFiltr).getSeznamId();
 										break;
+									case "Configurations":
 									case "Konfigurace":
 										seznamIdKonfiguraci = ((PanelFiltrPolozkaVytvoreni) pnPanelFiltr).getSeznamId();
 										break;
+									case "Artifacts":
 									case "Artefakty":
 										seznamIdArtefaktu = ((PanelFiltrPolozkaVytvoreni) pnPanelFiltr).getSeznamId();
 										break;
@@ -623,53 +634,64 @@ public class OknoHlavni extends JFrame {
 								PanelFiltr pnPanelFiltr = (PanelFiltr) (pnBoxFiltru.getComponents()[i]);
 								if (pnPanelFiltr.jePouzit()) { // je-li zaškrtnuto použít, zjistí se o jaký filtr jde
 									switch (pnPanelFiltr.getName()) { // pomocí názvu se zjišťuje o jaký jde filtr
-									case "Ukol":
+									case "Tasks":
+									case "Úkoly":
 										seznamIdUkolu = ((PanelFiltrPolozkaPocatek) pnPanelFiltr).getSeznamId(); // zjistí id odpovídající zadaným podmínkám 
-										pridejTlacitkoListyFiltru("Ukol X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
+										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("nazevUkoly")+ " X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
 										break;
+									case "Priorities":
 									case "Priority":
 										seznamIdPriorit = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();		
-										pridejTlacitkoListyFiltru("Priority X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
+										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("nazevPriority") +" X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
 										break;
 									case "Severity":
 										seznamIdSeverit = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
-										pridejTlacitkoListyFiltru("Severity X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
+										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("nazevSeverity")+" X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
 										break;
 									case "Status":
+									case "Statusy":
 										seznamIdStatusu = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
-										pridejTlacitkoListyFiltru("Status X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
+										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("nazevStatusy")+" X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
 										break;
-									case "Typ":
+									case "Types":
+									case "Typy":
 										seznamIdTypu = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
-										pridejTlacitkoListyFiltru("Typ X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
+										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("nazevTypy")+" X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
 										break;
-									case "Resoluce":
+									case "Resolution":
+									case "Rezoluce":
 										seznamIdResoluci = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
-										pridejTlacitkoListyFiltru("Resoluce X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
+										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("nazevResoluce")+" X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
 										break;
+									case "Persons":
 									case "Osoby":
 										seznamIdOsob = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
-										pridejTlacitkoListyFiltru("Osoby X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
+										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("nazevOsoby")+" X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
 										break;
-									case "Faze":
+									case "Phase":
+									case "Fáze":
 										seznamIdFazi = ((PanelFiltrPolozkaPocatek) pnPanelFiltr).getSeznamId();
-										pridejTlacitkoListyFiltru("Faze X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
+										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("nazevFaze")+" X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
 										break;
+									case "Iterations":
 									case "Iterace":
 										seznamIdIteraci = ((PanelFiltrPolozkaPocatek) pnPanelFiltr).getSeznamId();
-										pridejTlacitkoListyFiltru("Iterace X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
+										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("nazevIterace")+" X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
 										break;
+									case "Activities":
 									case "Aktivity":
 										seznamIdAktivit = ((PanelFiltrPolozkaPocatek) pnPanelFiltr).getSeznamId();
-										pridejTlacitkoListyFiltru("Aktivity X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
+										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("nazevAktivity")+" X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
 										break;
+									case "Configurations":
 									case "Konfigurace":
 										seznamIdKonfiguraci = ((PanelFiltrPolozkaVytvoreni) pnPanelFiltr).getSeznamId();
-										pridejTlacitkoListyFiltru("Konfigurace X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
+										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("nazevKonfigurace")+" X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
 										break;
+										
 									case "Artefakty":
 										seznamIdArtefaktu = ((PanelFiltrPolozkaVytvoreni) pnPanelFiltr).getSeznamId();
-										pridejTlacitkoListyFiltru("Artefakty X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
+										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("nazevArtefakty")+" X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
 										break;
 									default:
 										break;
@@ -751,6 +773,8 @@ public class OknoHlavni extends JFrame {
 				try {
 					Konstanty.POPISY.load(
 							new InputStreamReader(new FileInputStream(Konstanty.NAZEV_SOUBORU_POPISU_ENGLISH), "UTF8"));
+					Konstanty.nastavPopisComboBox();
+					cbTypFiltru.setModel(new DefaultComboBoxModel(Konstanty.POLE_FILTRU));
 					restartOkna();
 
 				} catch (FileNotFoundException e1) {
@@ -777,6 +801,8 @@ public class OknoHlavni extends JFrame {
 
 					Konstanty.POPISY.load(
 							new InputStreamReader(new FileInputStream(Konstanty.NAZEV_SOUBORU_POPISU_CZECH), "UTF8"));
+					Konstanty.nastavPopisComboBox();
+					cbTypFiltru.setModel(new DefaultComboBoxModel(Konstanty.POLE_FILTRU));
 					restartOkna();
 
 				} catch (FileNotFoundException e1) {

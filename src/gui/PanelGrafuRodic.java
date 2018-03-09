@@ -243,7 +243,7 @@ public abstract class PanelGrafuRodic extends JPanel {
 	 *            sleduje (počet úkolů, konfigurací nebo artefaktů)
 	 */
 	public void vlozCheckBoxBezNulAutor(ChartPanel chartPanel, int typVypoctu) {
-		JCheckBox ckBezNul = new JCheckBox("Bez nulobých hodnot");
+		JCheckBox ckBezNul = new JCheckBox(Konstanty.POPISY.getProperty("bezNul"));
 		ckBezNul.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				if (ckBezNul.isSelected()) {

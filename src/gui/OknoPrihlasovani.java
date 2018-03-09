@@ -1,4 +1,4 @@
-package gui;
+﻿package gui;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -123,7 +123,6 @@ public class OknoPrihlasovani extends JFrame {
 		/*akce po kliknutí na tlačítko přihlásit*/
 		ActionListener actPrihlasit = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
 				try{
 					if(tfLogin.getText().equals("") || pfHeslo.getPassword().length == 0 ){
 						JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaUdaju"));	

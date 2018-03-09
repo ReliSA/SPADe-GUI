@@ -394,7 +394,7 @@ public class PanelGrafuUkol extends PanelGrafuRodic{
 	 * @param typGrafu parametr pro znovu načtení grafu, typ grafu pro vytvoření (zda je to graf pro normální hodnotu, třídu nebo supertřídu)
 	 */
 	private void vlozCheckBoxBezNulCiselnik(ChartPanel chartPanel, Ciselnik seznam, int typGrafu){
-		JCheckBox ckBezNul = new JCheckBox("Bez nulobých hodnot");
+		JCheckBox ckBezNul = new JCheckBox(Konstanty.POPISY.getProperty("bezNul"));
 			ckBezNul.addChangeListener(new ChangeListener() {
 				public void stateChanged(ChangeEvent e) {
 					if(ckBezNul.isSelected()){
@@ -417,7 +417,7 @@ public class PanelGrafuUkol extends PanelGrafuRodic{
 	 * @param typGrafu parametr pro znovu načtení grafu, typ segmentu
 	 */
 	private void vlozCheckBoxBezNulSegment(ChartPanel chartPanel, ArrayList<Segment> seznam, int typGrafu){
-		JCheckBox ckBezNul = new JCheckBox("Bez nulobých hodnot");
+		JCheckBox ckBezNul = new JCheckBox(Konstanty.POPISY.getProperty("bezNul"));
 			ckBezNul.addChangeListener(new ChangeListener() {
 				public void stateChanged(ChangeEvent e) {
 					if(ckBezNul.isSelected()){

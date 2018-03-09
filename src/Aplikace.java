@@ -22,6 +22,7 @@ public class Aplikace {
 		try {			
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			Konstanty.POPISY.load(new InputStreamReader(new FileInputStream(Konstanty.NAZEV_SOUBORU_POPISU_CZECH), "UTF8"));
+			Konstanty.nastavPopisComboBox();
 		} catch (FileNotFoundException e) {
 			JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaSoubor")+ Konstanty.NAZEV_SOUBORU_POPISU_CZECH +Konstanty.POPISY.getProperty("chybaSoubor2"));			
 			e.printStackTrace();

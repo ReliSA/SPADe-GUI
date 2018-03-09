@@ -52,14 +52,14 @@ public class PanelFiltrCiselnik extends PanelFiltr{
 				
 				/*zjišťuje, jaké hodnoty jsou vybrány v podmínkách spojení třídy a supertřídy
 				 * a podle toho kontroluje hodnoty v položce*/
-				if(cbSpojeniTridy.getSelectedItem().equals("a") && cbSpojeniSuperTridy.getSelectedItem().equals("a")){
+				if(cbSpojeniTridy.getSelectedItem().equals(Konstanty.POPISY.getProperty("a")) && cbSpojeniSuperTridy.getSelectedItem().equals(Konstanty.POPISY.getProperty("a"))){
 					if(jeVSeznamu(polozka, Konstanty.HODNOTA) && jeVSeznamu(polozka, Konstanty.TRIDA) && jeVSeznamu(polozka, Konstanty.SUPERTRIDA))
 						seznamId.add(polozka.getID());
-				} else if(cbSpojeniTridy.getSelectedItem().equals("a") && cbSpojeniSuperTridy.getSelectedItem().equals("nebo")){
+				} else if(cbSpojeniTridy.getSelectedItem().equals(Konstanty.POPISY.getProperty("a")) && cbSpojeniSuperTridy.getSelectedItem().equals(Konstanty.POPISY.getProperty("nebo"))){
 					if(jeVSeznamu(polozka, Konstanty.HODNOTA) && jeVSeznamu(polozka, Konstanty.TRIDA) || jeVSeznamu(polozka, Konstanty.SUPERTRIDA))
 						seznamId.add(polozka.getID());
 					
-				} else if(cbSpojeniTridy.getSelectedItem().equals("nebo") && cbSpojeniSuperTridy.getSelectedItem().equals("a")){
+				} else if(cbSpojeniTridy.getSelectedItem().equals(Konstanty.POPISY.getProperty("nebo")) && cbSpojeniSuperTridy.getSelectedItem().equals(Konstanty.POPISY.getProperty("a"))){
 					if(jeVSeznamu(polozka, Konstanty.HODNOTA) || jeVSeznamu(polozka, Konstanty.TRIDA) && jeVSeznamu(polozka, Konstanty.SUPERTRIDA))
 						seznamId.add(polozka.getID());
 				} else {
@@ -169,7 +169,7 @@ public class PanelFiltrCiselnik extends PanelFiltr{
 	        grid.gridx = 6;
 	        grid.gridwidth = 3;
 	        this.add(scScrollPaneTrid, grid);
-	        if(!nazev.equals("Typ")){
+	        if(!nazev.equals(Konstanty.POPISY.getProperty("nazevTypy"))){
 		        grid.gridy++;
 		        grid.gridx = 5;
 		        grid.gridwidth = 1;

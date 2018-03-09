@@ -51,12 +51,6 @@ public class Konstanty {
 	public static final Dimension VELIKOST_POLOVICNI_SIRKA = new Dimension(115, 28);
 	public static final Dimension VELIKOST_CTVRTINOVA_SIRKA = new Dimension(55, 28);
 	
-	/*---------------------------------------------------------*/
-	
-	
-	public static final String [] POLE_OPERATORU = {"mezi", ">", ">=", "=", "!=", "<=", "<"};	//hodnoty seznamů comboboxů ve filtrech
-	public static final String [] POLE_PODMINEK = {"a", "nebo"};								//hodnoty seznamů podmínkových comboboxů ve filtrech
-	public static final String [] POLE_FILTRU = {"Úkoly", "Priority", "Severity", "Statusy", "Typy", "Resoluce", "Osoby", "Fáze", "Iterace", "Aktivity", "Konfigurace", "Artefakty"}; //seznam možných filtrů	
 	/*-------------Nastavení grafů------------------*/
 	public static final FlowLayout FLOW_LAYOUT = new FlowLayout(FlowLayout.CENTER, 10, 10);
 	
@@ -125,6 +119,13 @@ public class Konstanty {
 	public static Properties POPISY = new Properties();
 	public static final int DELKA_POPISKU_OS = 20;
 	
+/*---------------------------------------------------------*/
+	
+	
+	public static String [] POLE_OPERATORU;								//hodnoty seznamů comboboxů ve filtrech
+	public static String [] POLE_PODMINEK;								//hodnoty seznamů podmínkových comboboxů ve filtrech
+	public static String [] POLE_FILTRU; 							//seznam možných filtrů	
+	
 	/**
 	 * Vrací seznam ? podle seznamu id (využívá se v DAO třídách)
 	 * @param seznamId seznam identifikátorů
@@ -135,5 +136,11 @@ public class Konstanty {
 		for(int i = 1; i < seznamId.size(); i++)
 			vystup += ", ?";
 		return vystup;
+	}
+	
+	public static void nastavPopisComboBox(){
+		POLE_PODMINEK = new String[]{POPISY.getProperty("a"), POPISY.getProperty("nebo")};
+		POLE_OPERATORU = new String[]{POPISY.getProperty("mezi"), ">", ">=", "=", "!=", "<=", "<"};
+		POLE_FILTRU = new String[]{POPISY.getProperty("nazevUkoly"), POPISY.getProperty("nazevPriority"), POPISY.getProperty("nazevSeverity"), POPISY.getProperty("nazevStatusy"), POPISY.getProperty("nazevTypy"), POPISY.getProperty("nazevResoluce"), POPISY.getProperty("nazevOsoby"), POPISY.getProperty("nazevFaze"), POPISY.getProperty("nazevIterace"), POPISY.getProperty("nazevAktivity"), POPISY.getProperty("nazevKonfigurace"), POPISY.getProperty("nazevArtefakty")};
 	}
 }
