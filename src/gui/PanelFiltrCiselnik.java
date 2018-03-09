@@ -27,6 +27,7 @@ public class PanelFiltrCiselnik extends PanelFiltr{
 	
 	private JList<String> lsSeznamTrid = new JList<String>();												//seznam tříd
 	private JList<String> lsSeznamSuperTrid = new JList<String>();											//seznam supertříd
+	private JComboBox<String> cbLogOperace = new JComboBox<>(Konstanty.POLE_LOG_OPERATORU);
 	private JComboBox<String> cbSpojeniTridy = new JComboBox<String>(Konstanty.POLE_PODMINEK);				//operátor pro spojení s podmínkou třídy (a, nebo)
 	private JComboBox<String> cbSpojeniSuperTridy = new JComboBox<String>(Konstanty.POLE_PODMINEK);			//operátor pro spojení s podmínkou supertřídy (a, nebo)	
 	
@@ -38,6 +39,10 @@ public class PanelFiltrCiselnik extends PanelFiltr{
 	public PanelFiltrCiselnik(String nazev, ArrayList<PolozkaCiselnik> seznam){
 		super(seznam);
 		nastavPanel(nazev);
+	}
+	
+	public String getLogOperand() {
+		return (String) cbLogOperace.getSelectedItem();
 	}
 	
 	/**
@@ -161,7 +166,11 @@ public class PanelFiltrCiselnik extends PanelFiltr{
 		
 		GridBagConstraints grid = this.getGrid();
 		
-		if(!nazev.equals("Osoby")){
+		grid.gridx = 0;
+		grid.gridy = 3;
+		this.add(cbLogOperace,grid);
+		
+		if(!nazev.equals(Konstanty.POPISY.getProperty("nazevOsoby"))){			
 	        grid.gridx = 5;
 	        grid.gridy = 0;
 	        grid.gridwidth = 1;

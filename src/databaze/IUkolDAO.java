@@ -65,9 +65,8 @@ public interface IUkolDAO {
 	 * @param seznamIdOsob seznam povolených osob
 	 * @return seznam úkolů
 	 */
-	public ArrayList<Ukol> getUkolProjekt(int idProjekt, ArrayList<Integer> seznamIdUkolu, ArrayList<Integer> seznamIdPriorit, ArrayList<Integer> seznamIdSeverit, ArrayList<Integer> seznamIdResoluci, 
-			 							  				 ArrayList<Integer> seznamIdStatusu, ArrayList<Integer> seznamIdTypu, ArrayList<Integer> seznamIdOsob);
-	
+	public ArrayList<Ukol> getUkolProjekt(int idProjekt, ArrayList<Integer> seznamIdUkolu, String logPriorit, ArrayList<Integer> seznamIdPriorit, String logSeverit, ArrayList<Integer> seznamIdSeverit, String logResolution, ArrayList<Integer> seznamIdResoluci, 
+			String logStatusu, ArrayList<Integer> seznamIdStatusu, String logTypu, ArrayList<Integer> seznamIdTypu, String logOsob, ArrayList<Integer> seznamIdOsob);	
 	/**
 	 * Vrací seznam úkolů patřících do fáze s id v parametru a splňující podmínky filtru výběru
 	 * @param idFaze id fáze pro výběr úkolů

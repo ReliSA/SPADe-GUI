@@ -99,11 +99,11 @@ public class UkolDAO implements IUkolDAO {
 	 * @param seznamIdOsob seznam povolených osob
 	 * @return seznam úkolů
 	 */
-	public ArrayList<Ukol> getUkolProjekt(int idProjekt, ArrayList<Integer> seznamIdUkolu, ArrayList<Integer> seznamIdPriorit, ArrayList<Integer> seznamIdSeverit, ArrayList<Integer> seznamIdResoluci, 
-			 											 ArrayList<Integer> seznamIdStatusu, ArrayList<Integer> seznamIdTypu, ArrayList<Integer> seznamIdOsob) {
+	public ArrayList<Ukol> getUkolProjekt(int idProjekt, ArrayList<Integer> seznamIdUkolu, String logPriorit, ArrayList<Integer> seznamIdPriorit, String logSeverit, ArrayList<Integer> seznamIdSeverit, String logResolution, ArrayList<Integer> seznamIdResoluci, 
+			String logStatusu, ArrayList<Integer> seznamIdStatusu, String logTypu, ArrayList<Integer> seznamIdTypu, String logOsob, ArrayList<Integer> seznamIdOsob) {
 
 		String podminka = "WHERE w.projectId = ?";				
-		return getUkol(podminka, idProjekt, seznamIdUkolu, seznamIdPriorit, seznamIdSeverit, seznamIdResoluci, seznamIdStatusu, seznamIdTypu, seznamIdOsob);
+		return getUkol(podminka, idProjekt, seznamIdUkolu,logPriorit, seznamIdPriorit,logSeverit, seznamIdSeverit,logResolution, seznamIdResoluci,logStatusu, seznamIdStatusu,logTypu, seznamIdTypu, logOsob, seznamIdOsob);
 	}
 
 	/**
@@ -224,7 +224,7 @@ public class UkolDAO implements IUkolDAO {
 			podminka += " and w.id in (" + Konstanty.getZnakyParametru(seznamIdUkolu) + ")"; 		
 		
 		if(seznamIdPriorit != null && !seznamIdPriorit.isEmpty()) 
-			podminka += " or w.priorityId in (" + Konstanty.getZnakyParametru(seznamIdPriorit) + ")"; 
+			podminka += " and w.priorityId in (" + Konstanty.getZnakyParametru(seznamIdPriorit) + ")"; 
 
 		if(seznamIdSeverit != null && !seznamIdSeverit.isEmpty()) 
 			podminka += " and w.severityId in (" + Konstanty.getZnakyParametru(seznamIdSeverit) + ")"; 
@@ -328,6 +328,131 @@ public class UkolDAO implements IUkolDAO {
 		return listUkoly;
 	}
 	
+	/**
+	 * Vytvoří a spustí skript - pokud některý seznam z parametrů není prázdný, doplní příslušnou podmínku
+	 * @param podminka podmínka pro dotaz skriptu
+	 * @param id identifikator polozky
+	 * @param seznamIdUkolu seznam id povolených ukolů
+	 * @param seznamIdPriorit seznam id povolených priorit
+	 * @param seznamIdSeverit seznam id povolených severit
+	 * @param seznamIdResoluci seznam id povolených resolucí
+	 * @param seznamIdStatusu seznam id povolených statusů
+	 * @param seznamIdTypu seznam id povolených typů
+	 * @param seznamIdOsob seznam id povolených osob
+	 * @return
+	 */
+	private ArrayList<Ukol> getUkol(String podminka, int id, ArrayList<Integer> seznamIdUkolu, String logPriorit, ArrayList<Integer> seznamIdPriorit, String logSeverit, ArrayList<Integer> seznamIdSeverit, String logResolution, ArrayList<Integer> seznamIdResoluci, 
+			String logStatusu, ArrayList<Integer> seznamIdStatusu, String logTypu, ArrayList<Integer> seznamIdTypu, String logOsob, ArrayList<Integer> seznamIdOsob) {		
+		PreparedStatement stmt = null;
+		ResultSet rs = null;		
+
+		if(seznamIdUkolu != null && !seznamIdUkolu.isEmpty())
+			podminka += " and w.id in (" + Konstanty.getZnakyParametru(seznamIdUkolu) + ")"; 		
+		
+		if(seznamIdPriorit != null && !seznamIdPriorit.isEmpty()) 
+			podminka += " "+logPriorit+" w.priorityId in (" + Konstanty.getZnakyParametru(seznamIdPriorit) + ")"; 
+
+		if(seznamIdSeverit != null && !seznamIdSeverit.isEmpty()) 
+			podminka += " "+logSeverit+" w.severityId in (" + Konstanty.getZnakyParametru(seznamIdSeverit) + ")"; 
+
+		if(seznamIdResoluci != null && !seznamIdResoluci.isEmpty()) 
+			podminka += " "+logResolution+" w.resolutionId in (" + Konstanty.getZnakyParametru(seznamIdResoluci) + ")"; 
+
+		if(seznamIdStatusu != null && !seznamIdStatusu.isEmpty()) 
+			podminka += " "+logStatusu+" w.statusId in (" + Konstanty.getZnakyParametru(seznamIdStatusu) + ")"; 
+
+		if(seznamIdTypu != null && !seznamIdTypu.isEmpty()) 
+			podminka += " "+logTypu+" w.wuTypeId in (" + Konstanty.getZnakyParametru(seznamIdTypu) + ")"; 
+		
+		if(seznamIdOsob != null && !seznamIdOsob.isEmpty()) 
+			podminka += " "+logOsob+" w.assigneeId in (" + Konstanty.getZnakyParametru(seznamIdOsob) + ")"; 
+		
+		ArrayList<Ukol> listUkoly = new ArrayList<Ukol>();
+		try {
+			String sql = "SELECT w.id, i.name, "
+					   + "coalesce(i.created, STR_TO_DATE('"+ Konstanty.DATUM_PRAZDNY + "', '%Y-%m-%d') ) as created, "
+					   + "coalesce(w.startDate, STR_TO_DATE('"+ Konstanty.DATUM_PRAZDNY + "', '%Y-%m-%d')) as startDate, "
+					   + "w.estimatedTime,  "
+					   + "w.spentTime, "
+					   + "w.priorityId, w.severityId, w.statusId, w.wuTypeId, w.resolutionId, w.assigneeId, "
+					   + "i.authorId "
+					   + "FROM work_unit w "
+					   + "left join work_item i on w.id = i.id "
+					   + podminka;
+
+			stmt = pripojeni.prepareStatement(sql);
+			
+			int i = 1;
+			stmt.setInt(i++, id);
+			if(seznamIdUkolu != null && !seznamIdUkolu.isEmpty()){ 
+				for(int x = 0; x < seznamIdUkolu.size(); x++)
+					stmt.setInt(i++, seznamIdUkolu.get(x));
+			}
+			
+			if(seznamIdPriorit != null && !seznamIdPriorit.isEmpty()){ 
+				for(int x = 0; x < seznamIdPriorit.size(); x++)
+					stmt.setInt(i++, seznamIdPriorit.get(x));
+			} 
+				
+			if(seznamIdSeverit != null && !seznamIdSeverit.isEmpty()){ 
+				for(int x = 0; x < seznamIdSeverit.size(); x++)
+					stmt.setInt(i++, seznamIdSeverit.get(x));
+			} 
+			
+			if(seznamIdResoluci != null && !seznamIdResoluci.isEmpty()){ 
+				for(int x = 0; x < seznamIdResoluci.size(); x++)
+					stmt.setInt(i++, seznamIdResoluci.get(x));
+			} 
+			
+			if(seznamIdStatusu != null && !seznamIdStatusu.isEmpty()){ 
+				for(int x = 0; x < seznamIdStatusu.size(); x++)
+					stmt.setInt(i++, seznamIdStatusu.get(x));
+			} 
+			
+			if(seznamIdTypu != null && !seznamIdTypu.isEmpty()){ 
+				for(int x = 0; x < seznamIdTypu.size(); x++)
+					stmt.setInt(i++, seznamIdTypu.get(x));
+			} 
+			
+			if(seznamIdOsob != null && !seznamIdOsob.isEmpty()){ 
+				for(int x = 0; x < seznamIdOsob.size(); x++)
+					stmt.setInt(i++, seznamIdOsob.get(x));
+			} 
+			
+			rs = stmt.executeQuery();
+			while(rs.next()){				
+				Ukol ukol = new Ukol(rs.getInt("id"),
+									 rs.getString("name"),
+									 rs.getDate("created").toLocalDate(),
+									 rs.getDate("startDate").toLocalDate(),
+									 rs.getDouble("estimatedTime"),
+									 rs.getDouble("spentTime"),
+									 rs.getInt("priorityId"),
+									 rs.getInt("severityId"),
+									 rs.getInt("statusId"),
+									 rs.getInt("wuTypeId"),
+									 rs.getInt("resolutionId"),
+									 rs.getInt("assigneeId"),
+									 rs.getInt("authorId"));				
+				listUkoly.add(ukol);
+			}
+			
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaScriptUkol"));
+			e.printStackTrace();
+		} catch (Exception e){
+			JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaDataUkol"));
+			e.printStackTrace();
+		} finally {
+			try {
+				rs.close();
+				stmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return listUkoly;
+	}
 
 }
 

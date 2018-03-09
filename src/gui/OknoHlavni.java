@@ -317,9 +317,8 @@ public class OknoHlavni extends JFrame {
 																												// panel
 																												// konkrétním
 																												// filtrem
-						}
-						break;
-					case 1:
+						}	
+						
 						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevPriority"), pnBoxFiltru.getComponents())) {
 							if ((new Priority(getProjekt().getID())).getSeznam().isEmpty())
 								JOptionPane.showMessageDialog(pnBoxFiltru,
@@ -328,8 +327,7 @@ public class OknoHlavni extends JFrame {
 								pnBoxFiltru.add(new PanelFiltrCiselnik(Konstanty.POPISY.getProperty("nazevPriority"),
 										(new Priority(getProjekt().getID())).getSeznam()));
 						}
-						break;
-					case 2:
+
 						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevSeverity"), pnBoxFiltru.getComponents())) {
 							if ((new Severity(getProjekt().getID())).getSeznam().isEmpty())
 								JOptionPane.showMessageDialog(pnBoxFiltru,
@@ -338,8 +336,7 @@ public class OknoHlavni extends JFrame {
 								pnBoxFiltru.add(new PanelFiltrCiselnik(Konstanty.POPISY.getProperty("nazevSeverity"),
 										(new Severity(getProjekt().getID())).getSeznam()));
 						}
-						break;
-					case 3:
+
 						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevStatusy"), pnBoxFiltru.getComponents())) {
 							if ((new Status(getProjekt().getID())).getSeznam().isEmpty())
 								JOptionPane.showMessageDialog(pnBoxFiltru,
@@ -348,8 +345,7 @@ public class OknoHlavni extends JFrame {
 								pnBoxFiltru.add(new PanelFiltrCiselnik(Konstanty.POPISY.getProperty("nazevStatusy"),
 										(new Status(getProjekt().getID())).getSeznam()));
 						}
-						break;
-					case 4:
+
 						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevTypy"), pnBoxFiltru.getComponents())) {
 							if ((new Typ(getProjekt().getID())).getSeznam().isEmpty())
 								JOptionPane.showMessageDialog(pnBoxFiltru,
@@ -358,8 +354,7 @@ public class OknoHlavni extends JFrame {
 								pnBoxFiltru.add(
 										new PanelFiltrCiselnik(Konstanty.POPISY.getProperty("nazevTypy"), (new Typ(getProjekt().getID())).getSeznam()));
 						}
-						break;
-					case 5:
+
 						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevResoluce"), pnBoxFiltru.getComponents())) {
 							if ((new Resoluce(getProjekt().getID())).getSeznam().isEmpty())
 								JOptionPane.showMessageDialog(pnBoxFiltru,
@@ -368,8 +363,7 @@ public class OknoHlavni extends JFrame {
 								pnBoxFiltru.add(new PanelFiltrCiselnik(Konstanty.POPISY.getProperty("nazevResoluce"),
 										(new Resoluce(getProjekt().getID())).getSeznam()));
 						}
-						break;
-					case 6:
+
 						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevOsoby"), pnBoxFiltru.getComponents())) {
 							if ((new Osoby(getProjekt().getID())).getSeznam().isEmpty())
 								JOptionPane.showMessageDialog(pnBoxFiltru,
@@ -490,6 +484,7 @@ public class OknoHlavni extends JFrame {
 							ArrayList<Integer> seznamIdAktivit = null;
 							ArrayList<Integer> seznamIdKonfiguraci = null;
 							ArrayList<Integer> seznamIdArtefaktu = null;
+							String[] operandy = new String[]{"and","and","and","and","and","and"};
 							
 							for (int i = 0; i < pnBoxFiltru.getComponentCount(); i++) { // prochází všechny vložené
 																						// filtry
@@ -507,26 +502,32 @@ public class OknoHlavni extends JFrame {
 										break;
 									case "Priorities":
 									case "Priority":
-										seznamIdPriorit = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();							
+										seznamIdPriorit = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
+										operandy[0]=((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
 										break;
 									case "Severity":
 										seznamIdSeverit = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
+										operandy[1]=((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
 										break;
 									case "Status":
 									case "Statusy":
 										seznamIdStatusu = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
+										operandy[2]=((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
 										break;
 									case "Types":
 									case "Typy":
 										seznamIdTypu = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
+										operandy[3]=((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
 										break;
 									case "Resolution":
 									case "Rezoluce":
 										seznamIdResoluci = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
+										operandy[4]=((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
 										break;
 									case "Persons":
 									case "Osoby":
 										seznamIdOsob = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
+										operandy[5]=((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
 										break;
 									case "Phase":
 									case "Fáze":
@@ -562,8 +563,8 @@ public class OknoHlavni extends JFrame {
 							panelGrafu.statistikyVisible=true;
 							pnBoxFiltru.revalidate();
 							/* spustí se nastavení podmínek a tím i nové načtení panelu grafů */
-							panelGrafu.setPodminkyProjektu(seznamIdUkolu, seznamIdPriorit, seznamIdSeverit,
-									seznamIdResoluci, seznamIdStatusu, seznamIdTypu, seznamIdOsob, seznamIdFazi,
+							panelGrafu.setPodminkyProjektu(seznamIdUkolu, operandy[0], seznamIdPriorit, operandy[1], seznamIdSeverit, operandy[2],
+									seznamIdResoluci, operandy[3], seznamIdStatusu, operandy[4] ,seznamIdTypu, operandy[5], seznamIdOsob, seznamIdFazi,
 									seznamIdIteraci, seznamIdAktivit, seznamIdKonfiguraci, seznamIdArtefaktu);
 							panelGrafu.panelFiltrySipka.add(btSipkaFiltry,BorderLayout.SOUTH);
 						}
@@ -614,7 +615,6 @@ public class OknoHlavni extends JFrame {
 
 						@Override
 						public void run() {
-							// TODO Auto-generated method stub
 							String podminkaPriority = "";
 							ArrayList<Integer> seznamIdUkolu = null;
 							ArrayList<Integer> seznamIdPriorit = null;
@@ -628,6 +628,7 @@ public class OknoHlavni extends JFrame {
 							ArrayList<Integer> seznamIdAktivit = null;
 							ArrayList<Integer> seznamIdKonfiguraci = null;
 							ArrayList<Integer> seznamIdArtefaktu = null;
+							String[] operandy = new String[]{"and","and","and","and","and","and"};
 							
 							for (int i = 0; i < pnBoxFiltru.getComponentCount(); i++) { // prochází všechny vložené
 																						// filtry
@@ -643,30 +644,36 @@ public class OknoHlavni extends JFrame {
 									case "Priority":
 										seznamIdPriorit = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();		
 										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("nazevPriority") +" X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
+										operandy[0]=((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
 										break;
 									case "Severity":
 										seznamIdSeverit = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
 										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("nazevSeverity")+" X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
+										operandy[1]=((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
 										break;
 									case "Status":
 									case "Statusy":
 										seznamIdStatusu = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
 										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("nazevStatusy")+" X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
+										operandy[2]=((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
 										break;
 									case "Types":
 									case "Typy":
 										seznamIdTypu = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
 										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("nazevTypy")+" X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
+										operandy[3]=((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
 										break;
 									case "Resolution":
 									case "Rezoluce":
 										seznamIdResoluci = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
 										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("nazevResoluce")+" X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
+										operandy[4]=((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
 										break;
 									case "Persons":
 									case "Osoby":
 										seznamIdOsob = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
 										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("nazevOsoby")+" X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
+										operandy[5]=((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
 										break;
 									case "Phase":
 									case "Fáze":
@@ -688,7 +695,7 @@ public class OknoHlavni extends JFrame {
 										seznamIdKonfiguraci = ((PanelFiltrPolozkaVytvoreni) pnPanelFiltr).getSeznamId();
 										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("nazevKonfigurace")+" X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
 										break;
-										
+									case "Artifacts":	
 									case "Artefakty":
 										seznamIdArtefaktu = ((PanelFiltrPolozkaVytvoreni) pnPanelFiltr).getSeznamId();
 										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("nazevArtefakty")+" X",pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);																																																	 
@@ -707,9 +714,9 @@ public class OknoHlavni extends JFrame {
 							panelGrafu.statistikyVisible=true;
 							pnBoxFiltru.revalidate();
 							/* spustí se nastavení podmínek a tím i nové načtení panelu grafů */
-							panelGrafu.setPodminkyProjektu(seznamIdUkolu, seznamIdPriorit, seznamIdSeverit,
-									seznamIdResoluci, seznamIdStatusu, seznamIdTypu, seznamIdOsob, seznamIdFazi,
-									seznamIdIteraci, seznamIdAktivit, seznamIdKonfiguraci, seznamIdArtefaktu);							
+							panelGrafu.setPodminkyProjektu(seznamIdUkolu, operandy[0], seznamIdPriorit, operandy[1], seznamIdSeverit, operandy[2],
+									seznamIdResoluci, operandy[3], seznamIdStatusu, operandy[4] ,seznamIdTypu, operandy[5], seznamIdOsob, seznamIdFazi,
+									seznamIdIteraci, seznamIdAktivit, seznamIdKonfiguraci, seznamIdArtefaktu);						
 							panelGrafu.panelFiltrySipka.add(btSipkaFiltry,BorderLayout.SOUTH);
 						}
 

@@ -742,15 +742,14 @@ public class Projekt implements Serializable {
 	 * @param seznamIdKonfiguraci seznam id možných konfigurací pro vložení
 	 * @param seznamIdArtefaktu seznam id možných artefaktů pro vložení
 	 */
-	public void nactiData(ArrayList<Integer> seznamIdUkolu, ArrayList<Integer> seznamIdPriorit, ArrayList<Integer> seznamIdSeverit, 
-						  ArrayList<Integer> seznamIdResoluci, ArrayList<Integer> seznamIdStatusu, ArrayList<Integer> seznamIdTypu, 
-						  ArrayList<Integer> seznamIdOsob, ArrayList<Integer> seznamIdFazi, ArrayList<Integer> seznamIdIteraci, 
+	public void nactiData(ArrayList<Integer> seznamIdUkolu,String logPriorit, ArrayList<Integer> seznamIdPriorit,String logSeverit, ArrayList<Integer> seznamIdSeverit, 
+			String logResolution, ArrayList<Integer> seznamIdResoluci, String logStatusu, ArrayList<Integer> seznamIdStatusu, String logTypu, ArrayList<Integer> seznamIdTypu, 
+			String logOsob ,ArrayList<Integer> seznamIdOsob, ArrayList<Integer> seznamIdFazi, ArrayList<Integer> seznamIdIteraci, 
 						  ArrayList<Integer> seznamIdAktivit, ArrayList<Integer> seznamIdKonfiguraci, ArrayList<Integer> seznamIdArtefaktu){
 		try{
 			Konstanty.CITAC_PROGRESU = 0;
 			IUkolDAO databazeUkoly = new UkolDAO();
-			this.ukoly = databazeUkoly.getUkolProjekt(this.id, seznamIdUkolu, seznamIdPriorit, seznamIdSeverit, 
-													  seznamIdResoluci, seznamIdStatusu, seznamIdTypu, seznamIdOsob );		
+			this.ukoly = databazeUkoly.getUkolProjekt(this.id, seznamIdUkolu,logPriorit, seznamIdPriorit,logSeverit, seznamIdSeverit,logResolution, seznamIdResoluci,logStatusu, seznamIdStatusu,logTypu, seznamIdTypu, logOsob, seznamIdOsob);		
 			Konstanty.CITAC_PROGRESU++;
 			
 			IProjektDAO databazeProjekt = new ProjektDAO();
@@ -791,5 +790,4 @@ public class Projekt implements Serializable {
 		}				
 	}
 	
-
 }

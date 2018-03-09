@@ -121,7 +121,7 @@ public class Konstanty {
 	
 /*---------------------------------------------------------*/
 	
-	
+	public static final String [] POLE_LOG_OPERATORU = {"and","or","xor","not"};
 	public static String [] POLE_OPERATORU;								//hodnoty seznamů comboboxů ve filtrech
 	public static String [] POLE_PODMINEK;								//hodnoty seznamů podmínkových comboboxů ve filtrech
 	public static String [] POLE_FILTRU; 							//seznam možných filtrů	
