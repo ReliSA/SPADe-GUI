@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
@@ -66,10 +67,9 @@ public class ArtefaktDAO implements IArtefaktDAO{
 				   + "a.mimeType, a.size "
 				   + "FROM artifact a "
 				   + "left join work_item i on a.id = i.id "
-				   + "WHERE exists(Select * "
-				   + "				from work_unit w "
-				   + "				where w.id = i.id and w.projectId = ?) ";
-
+				   + "left join person p on i.authorId = p.id "
+				   + "WHERE p.projectId = ? ";
+				
 		if(seznamIdArtefaktu != null && !seznamIdArtefaktu.isEmpty()) 
 			sql += " and a.id in ("+ Konstanty.getZnakyParametru(seznamIdArtefaktu) +")"; 
 
@@ -94,7 +94,6 @@ public class ArtefaktDAO implements IArtefaktDAO{
 
 		if(seznamIdArtefaktu != null && !seznamIdArtefaktu.isEmpty()) 
 			sql += " and a.id in ("+ Konstanty.getZnakyParametru(seznamIdArtefaktu) +")"; 
-		
 		return getArtefakty(sql, idKonfigurace, seznamIdArtefaktu);		
 	}
 
@@ -114,7 +113,7 @@ public class ArtefaktDAO implements IArtefaktDAO{
 		
 		if(seznamIdArtefaktu != null && !seznamIdArtefaktu.isEmpty()) 
 			sql += " and a.id in ("+ Konstanty.getZnakyParametru(seznamIdArtefaktu) +")"; 
-		
+
 		return getArtefakty(sql, idOsoby, seznamIdArtefaktu);
 	}
 

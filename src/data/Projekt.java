@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
+import javax.swing.SingleSelectionModel;
 
 import ostatni.Konstanty;
 import data.Segment;
@@ -780,7 +781,7 @@ public class Projekt implements Serializable {
 			Konstanty.CITAC_PROGRESU++;
 				
 			IArtefaktDAO databazeArtefakt = new ArtefaktDAO();
-			this.artefakty = databazeArtefakt.getArtefaktyProjekt(this.id, seznamIdArtefaktu);
+			this.artefakty = databazeArtefakt.getArtefaktyProjekt(this.id, seznamIdArtefaktu);			
 			for(int i = 0; i < this.artefakty.size(); i++)
 				this.artefakty.get(i).nactiData(seznamIdUkolu, seznamIdPriorit, seznamIdSeverit, seznamIdResoluci, seznamIdStatusu, seznamIdTypu, seznamIdOsob);
 			Konstanty.CITAC_PROGRESU++;

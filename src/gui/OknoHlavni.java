@@ -264,7 +264,7 @@ public class OknoHlavni extends JFrame {
 		case "Time":
 		case "Čas":
 			tlacitkoMazaniFilru.setBackground(Konstanty.barvaUkol);
-			break;			
+			break;
 		default:
 			break;
 		}
@@ -384,7 +384,13 @@ public class OknoHlavni extends JFrame {
 							btZapniFiltr.setEnabled(false);
 							filtry.setSelected(false);
 							panelGrafu.statistikyVisible = true;
-							boolean dvakrat = false;
+							boolean dvakrat;
+							if (pnBoxFiltru.getComponentCount() > 0) {
+								dvakrat = false;
+							}
+							else {
+								dvakrat = true;
+							}
 
 							OknoProgresNacitani oknoProgres = new OknoProgresNacitani(panelGrafu);
 							while (Konstanty.CITAC_PROGRESU <= Konstanty.POCET_KROKU_PROGRESU) {
@@ -590,14 +596,16 @@ public class OknoHlavni extends JFrame {
 									pnBoxFiltru.remove(i--);
 								}
 							}
+							if (pnBoxFiltru.getComponentCount() > 0) {
+								/* spustí se nastavení podmínek a tím i nové načtení panelu grafů */
+								panelGrafu.setPodminkyProjektu(seznamIdUkolu, operandy[0], seznamIdPriorit, operandy[1],
+										seznamIdSeverit, operandy[2], seznamIdResoluci, operandy[3], seznamIdStatusu,
+										operandy[4], seznamIdTypu, operandy[5], seznamIdOsob, seznamIdFazi,
+										seznamIdIteraci, seznamIdAktivit, seznamIdKonfiguraci, seznamIdArtefaktu);
+							}
 
 							filtry.setSelected(false);
 							panelGrafu.statistikyVisible = true;
-							/* spustí se nastavení podmínek a tím i nové načtení panelu grafů */
-							panelGrafu.setPodminkyProjektu(seznamIdUkolu, operandy[0], seznamIdPriorit, operandy[1],
-									seznamIdSeverit, operandy[2], seznamIdResoluci, operandy[3], seznamIdStatusu,
-									operandy[4], seznamIdTypu, operandy[5], seznamIdOsob, seznamIdFazi, seznamIdIteraci,
-									seznamIdAktivit, seznamIdKonfiguraci, seznamIdArtefaktu);
 							pnBoxFiltru.revalidate();
 							panelGrafu.panelFiltrySipka.add(btSipkaFiltry, BorderLayout.SOUTH);
 
@@ -786,13 +794,15 @@ public class OknoHlavni extends JFrame {
 										Konstanty.POPISY.getProperty("chybaVlozOsoby"));
 							else
 								pnBoxFiltru.add(new PanelFiltrCiselnik(Konstanty.POPISY.getProperty("nazevOsoby"),
-										(new Osoby(getProjekt().getID())).getSeznam()),polohaPaneluUkol + 1);
+										(new Osoby(getProjekt().getID())).getSeznam()), polohaPaneluUkol + 1);
 						}
 						break;
 
 					case 6:
 						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("cas"), pnBoxFiltru.getComponents())) {
-							pnBoxFiltru.add(new PanelFiltrCas(Konstanty.POPISY.getProperty("cas"),getProjekt().getUkoly()),polohaPaneluUkol + 1);
+							pnBoxFiltru.add(
+									new PanelFiltrCas(Konstanty.POPISY.getProperty("cas"), getProjekt().getUkoly()),
+									polohaPaneluUkol + 1);
 						}
 						break;
 					default:
@@ -935,7 +945,7 @@ public class OknoHlavni extends JFrame {
 										if (seznamIdUkolu.isEmpty()) {
 											seznamIdUkolu.add(-1);
 										}
-										break;	
+										break;
 									default:
 										break;
 									}
@@ -1106,14 +1116,14 @@ public class OknoHlavni extends JFrame {
 									case "Time":
 									case "Čas":
 										seznamIdUkolu.retainAll(((PanelFiltrCas) pnPanelFiltr).getSeznamId());
-										
+
 										if (seznamIdUkolu.isEmpty()) {
 											seznamIdUkolu.add(-1);
 										}
-										
+
 										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("cas") + " X",
 												pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);
-										break;											
+										break;
 									default:
 										break;
 									}

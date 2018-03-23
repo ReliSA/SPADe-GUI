@@ -116,7 +116,7 @@ public class Konstanty {
 	public static final Color barvaArtefakty = new Color(248,131,85);	
 	
 	public static Connection PRIPOJENI = null;														//připojení k databázi
-	public static final String CESTA_K_DATABAZI = "jdbc:mysql://127.0.0.1:3306/ppicha";				//cesta k databázi
+	public static final String CESTA_K_DATABAZI = "jdbc:mysql://127.0.0.1:3306/ppicha2";				//cesta k databázi
 	//public static final String CESTA_K_DATABAZI = "jdbc:mysql://students.kiv.zcu.cz:3306/ppicha";
 	
 	public static int CITAC_PROGRESU = 0;															//čítač progresu
