@@ -650,7 +650,7 @@ public class OknoHlavni extends JFrame {
 								JOptionPane.showMessageDialog(pnBoxFiltru,
 										Konstanty.POPISY.getProperty("chybaVlozFaze"));
 							else
-								pnBoxFiltru.add(new PanelFiltrPolozkaPocatek(Konstanty.POPISY.getProperty("nazevFaze"),
+								pnBoxFiltru.add(new PanelFiltrPolozkaPocatekSegment(Konstanty.POPISY.getProperty("nazevFaze"),
 										getProjekt().getFaze()));
 						}
 						break;
@@ -660,7 +660,7 @@ public class OknoHlavni extends JFrame {
 								JOptionPane.showMessageDialog(pnBoxFiltru,
 										Konstanty.POPISY.getProperty("chybaVlozIterace"));
 							else
-								pnBoxFiltru.add(new PanelFiltrPolozkaPocatek(
+								pnBoxFiltru.add(new PanelFiltrPolozkaPocatekSegment(
 										Konstanty.POPISY.getProperty("nazevIterace"), getProjekt().getIterace()));
 						}
 						break;
@@ -671,7 +671,7 @@ public class OknoHlavni extends JFrame {
 								JOptionPane.showMessageDialog(pnBoxFiltru,
 										Konstanty.POPISY.getProperty("chybaVlozAktivity"));
 							else
-								pnBoxFiltru.add(new PanelFiltrPolozkaPocatek(
+								pnBoxFiltru.add(new PanelFiltrPolozkaPocatekSegment(
 										Konstanty.POPISY.getProperty("nazevAktivity"), getProjekt().getAktivity()));
 						}
 						break;

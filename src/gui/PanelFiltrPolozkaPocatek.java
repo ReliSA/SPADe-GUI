@@ -234,7 +234,7 @@ public class PanelFiltrPolozkaPocatek extends PanelFiltr{
 	 * @param polozka kontrolovaná položka
 	 * @return true, pokud je položka v seznamu vybraných nebo nejsou vybrány žádné konkrétní položky
 	 */
-	private boolean jeVSeznamu(PolozkaPocatek polozka){		
+	protected boolean jeVSeznamu(PolozkaPocatek polozka){		
 		try{
 			List seznam = this.lsSeznamFiltr.getSelectedValuesList();
 			if(seznam.isEmpty() || seznam.contains(polozka))
