@@ -90,16 +90,17 @@ public class PanelFiltrPolozkaPocatekSegment extends PanelFiltrPolozkaPocatek {
 		if (cbSpojeniDatumu.getSelectedItem().equals(Konstanty.POPISY.getProperty("a"))) {
 			
 			pocatek.retainAll(konec);			
-			if (pocatek.isEmpty()) {
-				pocatek.add(-1);
-			}
-
-		}
+	}
 
 		else {
 			pocatek.removeAll(konec);
 			pocatek.addAll(konec);
 		}
+		
+		if (pocatek.isEmpty()) {
+			pocatek.add(-1);
+		}
+		
 		return pocatek;
 	}
 

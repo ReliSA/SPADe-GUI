@@ -261,6 +261,10 @@ public class OknoHlavni extends JFrame {
 		case "Artefakty":
 			tlacitkoMazaniFilru.setBackground(Konstanty.barvaArtefakty);
 			break;
+		case "Time":
+		case "Čas":
+			tlacitkoMazaniFilru.setBackground(Konstanty.barvaUkol);
+			break;			
 		default:
 			break;
 		}
@@ -650,8 +654,8 @@ public class OknoHlavni extends JFrame {
 								JOptionPane.showMessageDialog(pnBoxFiltru,
 										Konstanty.POPISY.getProperty("chybaVlozFaze"));
 							else
-								pnBoxFiltru.add(new PanelFiltrPolozkaPocatekSegment(Konstanty.POPISY.getProperty("nazevFaze"),
-										getProjekt().getFaze()));
+								pnBoxFiltru.add(new PanelFiltrPolozkaPocatekSegment(
+										Konstanty.POPISY.getProperty("nazevFaze"), getProjekt().getFaze()));
 						}
 						break;
 					case 2:
@@ -782,7 +786,13 @@ public class OknoHlavni extends JFrame {
 										Konstanty.POPISY.getProperty("chybaVlozOsoby"));
 							else
 								pnBoxFiltru.add(new PanelFiltrCiselnik(Konstanty.POPISY.getProperty("nazevOsoby"),
-										(new Osoby(getProjekt().getID())).getSeznam()));
+										(new Osoby(getProjekt().getID())).getSeznam()),polohaPaneluUkol + 1);
+						}
+						break;
+
+					case 6:
+						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("cas"), pnBoxFiltru.getComponents())) {
+							pnBoxFiltru.add(new PanelFiltrCas(Konstanty.POPISY.getProperty("cas"),getProjekt().getUkoly()),polohaPaneluUkol + 1);
 						}
 						break;
 					default:
@@ -919,6 +929,13 @@ public class OknoHlavni extends JFrame {
 									case "Artefakty":
 										seznamIdArtefaktu = ((PanelFiltrPolozkaVytvoreni) pnPanelFiltr).getSeznamId();
 										break;
+									case "Time":
+									case "Čas":
+										seznamIdUkolu.retainAll(((PanelFiltrCas) pnPanelFiltr).getSeznamId());
+										if (seznamIdUkolu.isEmpty()) {
+											seznamIdUkolu.add(-1);
+										}
+										break;	
 									default:
 										break;
 									}
@@ -1086,6 +1103,17 @@ public class OknoHlavni extends JFrame {
 										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("nazevArtefakty") + " X",
 												pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);
 										break;
+									case "Time":
+									case "Čas":
+										seznamIdUkolu.retainAll(((PanelFiltrCas) pnPanelFiltr).getSeznamId());
+										
+										if (seznamIdUkolu.isEmpty()) {
+											seznamIdUkolu.add(-1);
+										}
+										
+										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("cas") + " X",
+												pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);
+										break;											
 									default:
 										break;
 									}
