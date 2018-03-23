@@ -582,9 +582,9 @@ public class OknoHlavni extends JFrame {
 											pnBoxFiltru.remove(i--);
 										} else {
 											((PanelFiltr) pnPanelFiltr).lsSeznamFiltr.clearSelection();
-											((PanelFiltrPolozkaVytvoreni) pnPanelFiltr)
+											((PanelFiltrPolozkaVytvoreniArtefakt) pnPanelFiltr)
 													.nactiNovyProjekt(getProjekt().getArtefakty());
-											seznamIdArtefaktu = ((PanelFiltrPolozkaVytvoreni) pnPanelFiltr)
+											seznamIdArtefaktu = ((PanelFiltrPolozkaVytvoreniArtefakt) pnPanelFiltr)
 													.getSeznamId();
 										}
 										break;
@@ -706,7 +706,7 @@ public class OknoHlavni extends JFrame {
 								JOptionPane.showMessageDialog(pnBoxFiltru,
 										Konstanty.POPISY.getProperty("chybaVlozArtefakty"));
 							else
-								pnBoxFiltru.add(new PanelFiltrPolozkaVytvoreni(
+								pnBoxFiltru.add(new PanelFiltrPolozkaVytvoreniArtefakt(
 										Konstanty.POPISY.getProperty("nazevArtefakty"), getProjekt().getArtefakty()));
 						}
 						break;
@@ -937,7 +937,7 @@ public class OknoHlavni extends JFrame {
 										break;
 									case "Artifacts":
 									case "Artefakty":
-										seznamIdArtefaktu = ((PanelFiltrPolozkaVytvoreni) pnPanelFiltr).getSeznamId();
+										seznamIdArtefaktu = ((PanelFiltrPolozkaVytvoreniArtefakt) pnPanelFiltr).getSeznamId();
 										break;
 									case "Time":
 									case "Čas":
@@ -1109,7 +1109,7 @@ public class OknoHlavni extends JFrame {
 										break;
 									case "Artifacts":
 									case "Artefakty":
-										seznamIdArtefaktu = ((PanelFiltrPolozkaVytvoreni) pnPanelFiltr).getSeznamId();
+										seznamIdArtefaktu = ((PanelFiltrPolozkaVytvoreniArtefakt) pnPanelFiltr).getSeznamId();
 										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("nazevArtefakty") + " X",
 												pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);
 										break;

@@ -83,9 +83,14 @@ public class PanelFiltrPolozkaPocatekSegment extends PanelFiltrPolozkaPocatek {
 		return seznamId;
 	}
 
+	
+	
+	
+	
+	
 	public ArrayList<Integer> getSeznamId() {
-		ArrayList<Integer> pocatek = getSeznamIdKonec();
-		ArrayList<Integer> konec = super.getSeznamId();
+		ArrayList<Integer> pocatek = super.getSeznamId();
+		ArrayList<Integer> konec = getSeznamIdKonec();
 		
 		if (cbSpojeniDatumu.getSelectedItem().equals(Konstanty.POPISY.getProperty("a"))) {
 			
