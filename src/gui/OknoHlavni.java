@@ -196,7 +196,7 @@ public class OknoHlavni extends JFrame {
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setTitle("SPADe");
 	}
-	
+
 	private TlacitkoMazaniFiltru pridejTlacitkoListyFiltru(String nazev, Component comp) {
 
 		for (int i = 0; i < listaFiltru.getComponentCount(); i++) {
@@ -264,8 +264,8 @@ public class OknoHlavni extends JFrame {
 		default:
 			break;
 		}
-		
-		if(listaFiltru.getComponentCount()>1) {
+
+		if (listaFiltru.getComponentCount() > 1) {
 			if (!(listaFiltru.getComponent(0).getName().equals(Konstanty.POPISY.getProperty("smazVse")))) {
 				JButton tlacitkoMazaniVse = new JButton();
 				tlacitkoMazaniVse.setName(Konstanty.POPISY.getProperty("smazVse"));
@@ -276,7 +276,7 @@ public class OknoHlavni extends JFrame {
 				tlacitkoMazaniVse.setContentAreaFilled(false);
 				tlacitkoMazaniVse.setOpaque(true);
 				tlacitkoMazaniVse.addActionListener(actSmazVsechnyFiltry);
-			}			
+			}
 		}
 
 		return tlacitkoMazaniFilru;
@@ -289,18 +289,18 @@ public class OknoHlavni extends JFrame {
 				listaFiltru.remove(i);
 			}
 		}
-		
-		if(listaFiltru.getComponentCount()>2) {
-			listaFiltru.remove(0);		
+
+		if (listaFiltru.getComponentCount() > 2) {
+			listaFiltru.remove(0);
 		}
-		
+
 		listaFiltru.repaint();
 	}
-	
+
 	/* akce pro smazání všech filtrů */
 	ActionListener actSmazVsechnyFiltry = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-			
+
 			Konstanty.CITAC_PROGRESU = 0;
 			Thread t1 = new Thread(new Runnable() {
 				public void run() {
@@ -428,87 +428,155 @@ public class OknoHlavni extends JFrame {
 									switch (pnPanelFiltr.getName()) {
 									case "Tasks":
 									case "Úkoly":
-										((PanelFiltr) pnPanelFiltr).lsSeznamFiltr.clearSelection();
-										((PanelFiltrPolozkaPocatek) pnPanelFiltr)
-												.nactiNovyProjekt(getProjekt().getUkoly());
-										seznamIdUkolu = ((PanelFiltrPolozkaPocatek) pnPanelFiltr).getSeznamId();
+										if (getProjekt().getUkoly().isEmpty()) {
+											JOptionPane.showMessageDialog(pnBoxFiltru,
+													Konstanty.POPISY.getProperty("chybaVlozUkol"));
+											pnBoxFiltru.remove(i--);
+										} else {
+											((PanelFiltr) pnPanelFiltr).lsSeznamFiltr.clearSelection();
+											((PanelFiltrPolozkaPocatek) pnPanelFiltr)
+													.nactiNovyProjekt(getProjekt().getUkoly());
+											seznamIdUkolu = ((PanelFiltrPolozkaPocatek) pnPanelFiltr).getSeznamId();
+										}
 										break;
 									case "Priorities":
 									case "Priority":
-										seznamIdPriorit = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
-										((PanelFiltrCiselnik) pnPanelFiltr)
-												.nactiNovyProjekt((new Priority(getProjekt().getID())).getSeznam());
-										operandy[0] = ((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
+										if ((new Priority(getProjekt().getID())).getSeznam().isEmpty()) {
+											JOptionPane.showMessageDialog(pnBoxFiltru,
+													Konstanty.POPISY.getProperty("chybaVlozPriority"));
+										} else {
+											seznamIdPriorit = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
+											((PanelFiltrCiselnik) pnPanelFiltr)
+													.nactiNovyProjekt((new Priority(getProjekt().getID())).getSeznam());
+											operandy[0] = ((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
+										}
 										break;
 									case "Severity":
-										seznamIdSeverit = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
-										((PanelFiltrCiselnik) pnPanelFiltr)
-												.nactiNovyProjekt((new Severity(getProjekt().getID())).getSeznam());
-										operandy[1] = ((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
+										if ((new Severity(getProjekt().getID())).getSeznam().isEmpty()) {
+											JOptionPane.showMessageDialog(pnBoxFiltru,
+													Konstanty.POPISY.getProperty("chybaVlozSeverity"));
+										} else {
+											seznamIdSeverit = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
+											((PanelFiltrCiselnik) pnPanelFiltr)
+													.nactiNovyProjekt((new Severity(getProjekt().getID())).getSeznam());
+											operandy[1] = ((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
+										}
 										break;
 									case "Status":
 									case "Statusy":
-										seznamIdStatusu = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
-										((PanelFiltrCiselnik) pnPanelFiltr)
-												.nactiNovyProjekt((new Status(getProjekt().getID())).getSeznam());
-										operandy[2] = ((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
+										if ((new Status(getProjekt().getID())).getSeznam().isEmpty()) {
+											JOptionPane.showMessageDialog(pnBoxFiltru,
+													Konstanty.POPISY.getProperty("chybaVlozStatusy"));
+										} else {
+											seznamIdStatusu = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
+											((PanelFiltrCiselnik) pnPanelFiltr)
+													.nactiNovyProjekt((new Status(getProjekt().getID())).getSeznam());
+											operandy[2] = ((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
+										}
 										break;
 									case "Types":
 									case "Typy":
-										seznamIdTypu = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
-										((PanelFiltrCiselnik) pnPanelFiltr)
-												.nactiNovyProjekt((new Typ(getProjekt().getID())).getSeznam());
-										operandy[3] = ((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
+										if ((new Typ(getProjekt().getID())).getSeznam().isEmpty()) {
+											JOptionPane.showMessageDialog(pnBoxFiltru,
+													Konstanty.POPISY.getProperty("chybaVlozTypy"));
+										} else {
+											seznamIdTypu = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
+											((PanelFiltrCiselnik) pnPanelFiltr)
+													.nactiNovyProjekt((new Typ(getProjekt().getID())).getSeznam());
+											operandy[3] = ((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
+										}
 										break;
 									case "Resolution":
 									case "Rezoluce":
-										seznamIdResoluci = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
-										((PanelFiltrCiselnik) pnPanelFiltr)
-												.nactiNovyProjekt((new Resoluce(getProjekt().getID())).getSeznam());
-										operandy[4] = ((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
+										if ((new Resoluce(getProjekt().getID())).getSeznam().isEmpty()) {
+											JOptionPane.showMessageDialog(pnBoxFiltru,
+													Konstanty.POPISY.getProperty("chybaVlozResoluce"));
+										} else {
+											seznamIdResoluci = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
+											((PanelFiltrCiselnik) pnPanelFiltr)
+													.nactiNovyProjekt((new Resoluce(getProjekt().getID())).getSeznam());
+											operandy[4] = ((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
+										}
 										break;
 									case "Persons":
 									case "Osoby":
-										((PanelFiltr) pnPanelFiltr).lsSeznamFiltr.clearSelection();
-										seznamIdOsob = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
-										((PanelFiltrCiselnik) pnPanelFiltr)
-												.nactiNovyProjekt((new Osoby(getProjekt().getID())).getSeznam());
-										operandy[5] = ((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
+										if ((new Osoby(getProjekt().getID())).getSeznam().isEmpty()) {
+											JOptionPane.showMessageDialog(pnBoxFiltru,
+													Konstanty.POPISY.getProperty("chybaVlozOsoby"));
+										} else {
+											((PanelFiltr) pnPanelFiltr).lsSeznamFiltr.clearSelection();
+											seznamIdOsob = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
+											((PanelFiltrCiselnik) pnPanelFiltr)
+													.nactiNovyProjekt((new Osoby(getProjekt().getID())).getSeznam());
+											operandy[5] = ((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
+										}
 										break;
 									case "Phase":
 									case "Fáze":
-										((PanelFiltr) pnPanelFiltr).lsSeznamFiltr.clearSelection();
-										((PanelFiltrPolozkaPocatek) pnPanelFiltr)
-												.nactiNovyProjekt(getProjekt().getFaze());
-										seznamIdFazi = ((PanelFiltrPolozkaPocatek) pnPanelFiltr).getSeznamId();
+										if (getProjekt().getFaze().isEmpty()) {
+											JOptionPane.showMessageDialog(pnBoxFiltru,
+													Konstanty.POPISY.getProperty("chybaVlozFaze"));
+											pnBoxFiltru.remove(i--);
+										} else {
+											((PanelFiltr) pnPanelFiltr).lsSeznamFiltr.clearSelection();
+											((PanelFiltrPolozkaPocatek) pnPanelFiltr)
+													.nactiNovyProjekt(getProjekt().getFaze());
+											seznamIdFazi = ((PanelFiltrPolozkaPocatek) pnPanelFiltr).getSeznamId();
+										}
 										break;
 									case "Iterations":
 									case "Iterace":
-										((PanelFiltr) pnPanelFiltr).lsSeznamFiltr.clearSelection();
-										((PanelFiltrPolozkaPocatek) pnPanelFiltr)
-												.nactiNovyProjekt(getProjekt().getIterace());
-										seznamIdIteraci = ((PanelFiltrPolozkaPocatek) pnPanelFiltr).getSeznamId();
+										if (getProjekt().getIterace().isEmpty()) {
+											JOptionPane.showMessageDialog(pnBoxFiltru,
+													Konstanty.POPISY.getProperty("chybaVlozIterace"));
+											pnBoxFiltru.remove(i--);
+										} else {
+											((PanelFiltr) pnPanelFiltr).lsSeznamFiltr.clearSelection();
+											((PanelFiltrPolozkaPocatek) pnPanelFiltr)
+													.nactiNovyProjekt(getProjekt().getIterace());
+											seznamIdIteraci = ((PanelFiltrPolozkaPocatek) pnPanelFiltr).getSeznamId();
+										}
 										break;
 									case "Activities":
 									case "Aktivity":
-										((PanelFiltr) pnPanelFiltr).lsSeznamFiltr.clearSelection();
-										((PanelFiltrPolozkaPocatek) pnPanelFiltr)
-												.nactiNovyProjekt(getProjekt().getAktivity());
-										seznamIdAktivit = ((PanelFiltrPolozkaPocatek) pnPanelFiltr).getSeznamId();
+										if (getProjekt().getAktivity().isEmpty()) {
+											JOptionPane.showMessageDialog(pnBoxFiltru,
+													Konstanty.POPISY.getProperty("chybaVlozAktivity"));
+											pnBoxFiltru.remove(i--);
+										} else {
+											((PanelFiltr) pnPanelFiltr).lsSeznamFiltr.clearSelection();
+											((PanelFiltrPolozkaPocatek) pnPanelFiltr)
+													.nactiNovyProjekt(getProjekt().getAktivity());
+											seznamIdAktivit = ((PanelFiltrPolozkaPocatek) pnPanelFiltr).getSeznamId();
+										}
 										break;
 									case "Configurations":
 									case "Konfigurace":
-										((PanelFiltr) pnPanelFiltr).lsSeznamFiltr.clearSelection();
-										((PanelFiltrPolozkaPocatek) pnPanelFiltr)
-												.nactiNovyProjekt(getProjekt().getKonfigurace());
-										seznamIdKonfiguraci = ((PanelFiltrPolozkaVytvoreni) pnPanelFiltr).getSeznamId();
+										if (getProjekt().getKonfigurace().isEmpty()) {
+											JOptionPane.showMessageDialog(pnBoxFiltru,
+													Konstanty.POPISY.getProperty("chybaVlozKonfigurace"));
+											pnBoxFiltru.remove(i--);
+										} else {
+											((PanelFiltr) pnPanelFiltr).lsSeznamFiltr.clearSelection();
+											((PanelFiltrPolozkaVytvoreni) pnPanelFiltr)
+													.nactiNovyProjekt(getProjekt().getKonfigurace());
+											seznamIdKonfiguraci = ((PanelFiltrPolozkaVytvoreni) pnPanelFiltr)
+													.getSeznamId();
+										}
 										break;
 									case "Artifacts":
 									case "Artefakty":
-										((PanelFiltr) pnPanelFiltr).lsSeznamFiltr.clearSelection();
-										((PanelFiltrPolozkaPocatek) pnPanelFiltr)
-												.nactiNovyProjekt(getProjekt().getArtefakty());
-										seznamIdArtefaktu = ((PanelFiltrPolozkaVytvoreni) pnPanelFiltr).getSeznamId();
+										if (getProjekt().getArtefakty().isEmpty()) {
+											JOptionPane.showMessageDialog(pnBoxFiltru,
+													Konstanty.POPISY.getProperty("chybaVlozArtefakty"));
+											pnBoxFiltru.remove(i--);
+										} else {
+											((PanelFiltr) pnPanelFiltr).lsSeznamFiltr.clearSelection();
+											((PanelFiltrPolozkaVytvoreni) pnPanelFiltr)
+													.nactiNovyProjekt(getProjekt().getArtefakty());
+											seznamIdArtefaktu = ((PanelFiltrPolozkaVytvoreni) pnPanelFiltr)
+													.getSeznamId();
+										}
 										break;
 									default:
 										break;
@@ -734,11 +802,11 @@ public class OknoHlavni extends JFrame {
 				pnBoxFiltru.remove(tlacitko.getComp());
 				listaFiltru.remove(tlacitko);
 
-				/*Smaže tlačítko smazat všechny filtry pokud zbývá pouze jedno tlačítko*/
-				if(listaFiltru.getComponentCount()==2) {
-					listaFiltru.remove(0);		
+				/* Smaže tlačítko smazat všechny filtry pokud zbývá pouze jedno tlačítko */
+				if (listaFiltru.getComponentCount() == 2) {
+					listaFiltru.remove(0);
 				}
-				
+
 				listaFiltru.revalidate();
 				listaFiltru.repaint();
 
@@ -1174,7 +1242,7 @@ public class OknoHlavni extends JFrame {
 				}
 			}
 		};
-		
+
 		/* akce pro smazání všech filtrů */
 		ActionListener actSmazVsechnyFiltry = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
