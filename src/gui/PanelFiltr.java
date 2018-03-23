@@ -70,7 +70,7 @@ public abstract class PanelFiltr extends JPanel {
 	 *            seznam, ze kterého se vytvoří model
 	 * @return vytvořený model
 	 */
-	private DefaultComboBoxModel getModel(ArrayList seznam) {
+	protected DefaultComboBoxModel getModel(ArrayList seznam) {
 		DefaultComboBoxModel model = new DefaultComboBoxModel();
 		for (int i = 0; i < seznam.size(); i++)
 			model.addElement(seznam.get(i));
@@ -175,6 +175,11 @@ public abstract class PanelFiltr extends JPanel {
 		this.add(lblNazev);
 		this.add(scScrollPane);
 		this.setName(nazev);
+	}
+	
+	protected void nactiNovyProjekt(ArrayList seznam) {
+		this.seznam=seznam;
+		lsSeznamFiltr.setModel(getModel(seznam));		
 	}
 
 	/**

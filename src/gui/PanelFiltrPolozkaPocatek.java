@@ -14,6 +14,7 @@ import java.util.Properties;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.ListSelectionModel;
 
 import org.jdatepicker.impl.DateComponentFormatter;
 import org.jdatepicker.impl.JDatePanelImpl;
@@ -311,5 +312,5 @@ public class PanelFiltrPolozkaPocatek extends PanelFiltr{
 		ckPouzitFiltr.addActionListener(actZmenaPouzitFiltr);
 		cbOperatorDatum.addActionListener(actZmenaOperatoruDatum);		
 	}
-
+	
 }

@@ -40,7 +40,7 @@ import java.util.ArrayList;
  */
 public class PanelGrafu extends JPanel {
 
-	private Projekt projekt; // aktuálně vybraný projekt
+	public Projekt projekt; // aktuálně vybraný projekt
 	private JScrollPane scroll; // scroll panel
 	private JPanel panel;
 	private JPanel grafyPanel;
@@ -124,6 +124,18 @@ public class PanelGrafu extends JPanel {
 	 *            seznam id typů jež obsahují úkoly které lze vložit do seznamu
 	 * @param seznamIdOsob
 	 *            seznam id osob jež obsahují úkoly které lze vložit do seznamu
+	 * @param logPriorit
+	 * 			  logický operátor pro priority
+	 * @param logSeverit
+	 *  		  logický operátor pro severity
+	 * @param logResolution
+	 *  		  logický operátor pro resoluce
+	 * @param logStatusu
+	 *  		  logický operátor pro statusy
+	 * @param logTypu
+	 *  		  logický operátor pro typy
+	 * @param logOsob
+	 *  		  logický operátor pro osoby
 	 * @param seznamIdFazi
 	 *            seznam id možných fází pro vložení
 	 * @param seznamIdIteraci
@@ -150,8 +162,8 @@ public class PanelGrafu extends JPanel {
 		this.nastavAkce();
 		this.revalidate();
 
-	}
-
+	}	
+	
 	/**
 	 * Nastaví zobrazení panelu, vloží panel statistik a panely s grafy
 	 */
