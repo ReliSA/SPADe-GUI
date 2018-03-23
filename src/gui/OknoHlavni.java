@@ -196,7 +196,7 @@ public class OknoHlavni extends JFrame {
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setTitle("SPADe");
 	}
-
+	
 	private TlacitkoMazaniFiltru pridejTlacitkoListyFiltru(String nazev, Component comp) {
 
 		for (int i = 0; i < listaFiltru.getComponentCount(); i++) {
@@ -264,6 +264,20 @@ public class OknoHlavni extends JFrame {
 		default:
 			break;
 		}
+		
+		if(listaFiltru.getComponentCount()>1) {
+			if (!(listaFiltru.getComponent(0).getName().equals(Konstanty.POPISY.getProperty("smazVse")))) {
+				JButton tlacitkoMazaniVse = new JButton();
+				tlacitkoMazaniVse.setName(Konstanty.POPISY.getProperty("smazVse"));
+				tlacitkoMazaniVse.setText(Konstanty.POPISY.getProperty("smazVse"));
+				tlacitkoMazaniVse.setBackground(Color.WHITE);
+				listaFiltru.add(tlacitkoMazaniVse);
+				listaFiltru.setComponentZOrder(tlacitkoMazaniVse, 0);
+				tlacitkoMazaniVse.setContentAreaFilled(false);
+				tlacitkoMazaniVse.setOpaque(true);
+				tlacitkoMazaniVse.addActionListener(actSmazVsechnyFiltry);
+			}			
+		}
 
 		return tlacitkoMazaniFilru;
 	}
@@ -275,8 +289,48 @@ public class OknoHlavni extends JFrame {
 				listaFiltru.remove(i);
 			}
 		}
+		
+		if(listaFiltru.getComponentCount()>2) {
+			listaFiltru.remove(0);		
+		}
+		
 		listaFiltru.repaint();
 	}
+	
+	/* akce pro smazání všech filtrů */
+	ActionListener actSmazVsechnyFiltry = new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			
+			Konstanty.CITAC_PROGRESU = 0;
+			Thread t1 = new Thread(new Runnable() {
+				public void run() {
+					OknoProgresNacitani oknoProgres = new OknoProgresNacitani();
+					while (Konstanty.CITAC_PROGRESU <= Konstanty.POCET_KROKU_PROGRESU) {
+						oknoProgres.nastavProgres();
+						if (Konstanty.CITAC_PROGRESU >= Konstanty.POCET_KROKU_PROGRESU) {
+							break;
+						}
+						Thread.yield();
+					}
+					oknoProgres.setVisible(false);
+				}
+			});
+
+			/* vlákno spustí hlavní okno programu */
+			Thread t2 = new Thread(new Runnable() {
+				public void run() {
+					listaFiltru.removeAll();
+					pnBoxFiltru.removeAll();
+					panelGrafu.setProjekt(getProjekt());
+					panelGrafu.panelFiltrySipka.add(btSipkaFiltry, BorderLayout.SOUTH);
+					listaFiltru.revalidate();
+					listaFiltru.repaint();
+				}
+			});
+			t1.start();
+			t2.start();
+		}
+	};
 
 	/**
 	 * Metoda sloužící pro restart hlavního okna a nového načtení konfigurací.
@@ -679,6 +733,12 @@ public class OknoHlavni extends JFrame {
 				TlacitkoMazaniFiltru tlacitko = (TlacitkoMazaniFiltru) e.getSource();
 				pnBoxFiltru.remove(tlacitko.getComp());
 				listaFiltru.remove(tlacitko);
+
+				/*Smaže tlačítko smazat všechny filtry pokud zbývá pouze jedno tlačítko*/
+				if(listaFiltru.getComponentCount()==2) {
+					listaFiltru.remove(0);		
+				}
+				
 				listaFiltru.revalidate();
 				listaFiltru.repaint();
 
@@ -1112,6 +1172,15 @@ public class OknoHlavni extends JFrame {
 					btSipkaFiltry.setText("v");
 					filtry.setSelected(false);
 				}
+			}
+		};
+		
+		/* akce pro smazání všech filtrů */
+		ActionListener actSmazVsechnyFiltry = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				listaFiltru.removeAll();
+				pnBoxFiltru.removeAll();
+				panelGrafu.setProjekt(getProjekt());
 			}
 		};
 
