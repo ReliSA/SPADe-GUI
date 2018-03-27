@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * Třída konstant
@@ -51,6 +52,7 @@ public class Konstanty {
 	public static final Dimension VELIKOST_CELA_SIRKA = new Dimension(230, 28);
 	public static final Dimension VELIKOST_POLOVICNI_SIRKA = new Dimension(115, 28);
 	public static final Dimension VELIKOST_CTVRTINOVA_SIRKA = new Dimension(150, 23);
+	public static final Dimension VELIKOST_COLOR_PICKER = new Dimension(70, 23);
 	
 	/*-------------Nastavení grafů------------------*/
 	public static final FlowLayout FLOW_LAYOUT = new FlowLayout(FlowLayout.CENTER, 10, 10);
@@ -116,7 +118,7 @@ public class Konstanty {
 	public static final Color barvaArtefakty = new Color(248,131,85);	
 	
 	public static Connection PRIPOJENI = null;														//připojení k databázi
-	public static final String CESTA_K_DATABAZI = "jdbc:mysql://127.0.0.1:3306/ppicha2";				//cesta k databázi
+	public static final String CESTA_K_DATABAZI = "jdbc:mysql://127.0.0.1:3306/ppicha?allowMultiQueries=true";				//cesta k databázi
 	//public static final String CESTA_K_DATABAZI = "jdbc:mysql://students.kiv.zcu.cz:3306/ppicha";
 	
 	public static int CITAC_PROGRESU = 0;															//čítač progresu
@@ -126,7 +128,9 @@ public class Konstanty {
 
 	public static final String NAZEV_SOUBORU_POPISU_CZECH = "czech.properties";
 	public static final String NAZEV_SOUBORU_POPISU_ENGLISH = "english.properties";
+	public static final String SQLSoubor = "sql.properties";
 	public static Properties POPISY = new Properties();
+	public static Properties SQLs = new Properties();
 	public static final int DELKA_POPISKU_OS = 20;
 	
 /*---------------------------------------------------------*/
@@ -136,6 +140,7 @@ public class Konstanty {
 	public static String [] POLE_PODMINEK;								//hodnoty seznamů podmínkových comboboxů ve filtrech
 	public static String [] POLE_FILTRU; 	 							//seznam možných filtrů	
 	public static String [] POLE_PODFILTRU;
+	public static String[] TYPY_GRAFU;
 	
 	/**
 	 * Vrací seznam ? podle seznamu id (využívá se v DAO třídách)
@@ -155,5 +160,16 @@ public class Konstanty {
 		POLE_FILTRU = new String[]{POPISY.getProperty("nazevUkoly"), POPISY.getProperty("nazevFaze"), POPISY.getProperty("nazevIterace"), POPISY.getProperty("nazevAktivity"), POPISY.getProperty("nazevKonfigurace"), POPISY.getProperty("nazevArtefakty")};
 		POLE_LOG_OPERATORU = new String[]{POPISY.getProperty("and"),POPISY.getProperty("or"),POPISY.getProperty("xor"),POPISY.getProperty("not")};
 		POLE_PODFILTRU = new String[]{POPISY.getProperty("nazevPriority"), POPISY.getProperty("nazevSeverity"), POPISY.getProperty("nazevStatusy"), POPISY.getProperty("nazevTypy"), POPISY.getProperty("nazevResoluce"), POPISY.getProperty("nazevOsoby"),POPISY.getProperty("cas")};
+		TYPY_GRAFU = new String[] {POPISY.getProperty("sloupcovy"),POPISY.getProperty("spojnicovy"),POPISY.getProperty("bodovy"),POPISY.getProperty("plosny")};
 	}
+	
+	public static String [] getSQLKeys(){ 
+		ArrayList<String> list = new ArrayList<>();
+		
+        for(Object k:SQLs.keySet()){
+            list.add((String)k);
+        }     
+        return list.toArray(new String[list.size()]);
+    }
+     
 }

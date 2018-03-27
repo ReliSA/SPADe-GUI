@@ -36,6 +36,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 import com.keypoint.PngEncoder;
 
@@ -43,6 +44,7 @@ import ostatni.Konstanty;
 import data.*;
 import data.ciselnik.*;
 import data.polozky.PolozkaVytvoreni;
+import databaze.CustomGrafDAO;
 import databaze.IProjektDAO;
 import databaze.ProjektDAO;
 
@@ -70,6 +72,8 @@ public class OknoHlavni extends JFrame {
 	private JButton btSipkaFiltry;
 	private JScrollPane scScrollFiltru;
 	private JMenu fileMenu; // Tlačítko menu baru
+	private JMenu customGrafMenu; // Tlačítko menu baru
+	private JMenuItem vytvorGraf; // Tlačítko menu baru
 	private JMenu settingsMenu; // Tlačítko menu baru
 	private JMenu languageMenu; // Tlačítko menu baru
 	private JMenuItem exitAction; // Tlačítko menu baru
@@ -125,9 +129,11 @@ public class OknoHlavni extends JFrame {
 		nastavOkno(); // nastaví atributy okna
 
 		fileMenu = new JMenu(Konstanty.POPISY.getProperty("menuSoubor"));
+		customGrafMenu = new JMenu(Konstanty.POPISY.getProperty("menuCustomGraf"));
 		settingsMenu = new JMenu(Konstanty.POPISY.getProperty("menuNastaveni"));
 		languageMenu = new JMenu(Konstanty.POPISY.getProperty("menuJazyk"));
 		exitAction = new JMenuItem(Konstanty.POPISY.getProperty("menuExit"));
+		vytvorGraf = new JMenuItem(Konstanty.POPISY.getProperty("menuVytvorGraf"));
 		czech = new JMenuItem(Konstanty.POPISY.getProperty("menuCestina"));
 		english = new JMenuItem(Konstanty.POPISY.getProperty("menuAnglictina"));
 		filtry = new JCheckBoxMenuItem(Konstanty.POPISY.getProperty("filtryTrue"), false);
@@ -171,10 +177,12 @@ public class OknoHlavni extends JFrame {
 		panelProjektMenu.add(pnFiltr, BorderLayout.EAST);
 
 		menuBar.add(fileMenu);
+		menuBar.add(customGrafMenu);
 		menuBar.add(settingsMenu);
 		settingsMenu.add(languageMenu);
 		settingsMenu.add(filtry);
 		fileMenu.add(exitAction);
+		customGrafMenu.add(vytvorGraf);
 		languageMenu.add(czech);
 		languageMenu.add(english);
 
@@ -387,8 +395,7 @@ public class OknoHlavni extends JFrame {
 							boolean dvakrat;
 							if (pnBoxFiltru.getComponentCount() > 0) {
 								dvakrat = false;
-							}
-							else {
+							} else {
 								dvakrat = true;
 							}
 
@@ -937,7 +944,8 @@ public class OknoHlavni extends JFrame {
 										break;
 									case "Artifacts":
 									case "Artefakty":
-										seznamIdArtefaktu = ((PanelFiltrPolozkaVytvoreniArtefakt) pnPanelFiltr).getSeznamId();
+										seznamIdArtefaktu = ((PanelFiltrPolozkaVytvoreniArtefakt) pnPanelFiltr)
+												.getSeznamId();
 										break;
 									case "Time":
 									case "Čas":
@@ -1109,7 +1117,8 @@ public class OknoHlavni extends JFrame {
 										break;
 									case "Artifacts":
 									case "Artefakty":
-										seznamIdArtefaktu = ((PanelFiltrPolozkaVytvoreniArtefakt) pnPanelFiltr).getSeznamId();
+										seznamIdArtefaktu = ((PanelFiltrPolozkaVytvoreniArtefakt) pnPanelFiltr)
+												.getSeznamId();
 										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("nazevArtefakty") + " X",
 												pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);
 										break;
@@ -1269,6 +1278,7 @@ public class OknoHlavni extends JFrame {
 		/* akce pro schování panelu filtrů */
 		ActionListener actZobrazeniFiltruButton = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+
 				if (filtry.isSelected() == false) {
 					panelGrafu.zobrazFiltry(scScrollFiltru);
 					btSipkaFiltry.setText("^");
@@ -1290,6 +1300,20 @@ public class OknoHlavni extends JFrame {
 			}
 		};
 
+		/* akce pro otevření okna custom grafů */
+		ActionListener actCustomGraf = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				SwingUtilities.invokeLater(() -> {
+					OknoCustomGraf example = new OknoCustomGraf();
+					example.setSize(800, 400);
+					example.setLocationRelativeTo(null);
+					example.setVisible(true);
+				});
+
+			}
+		};
+
 		/* vložení akcí k příslušným komponentám */
 		lsSeznamProjektu.addActionListener(actZmenaProjektu);
 		cbTypFiltru.addActionListener(actVlozFiltr);
@@ -1300,6 +1324,7 @@ public class OknoHlavni extends JFrame {
 		english.addActionListener(actJazykEnglish);
 		filtry.addActionListener(actZobrazeniFiltruMenu);
 		btSipkaFiltry.addActionListener(actZobrazeniFiltruButton);
+		vytvorGraf.addActionListener(actCustomGraf);
 
 		this.addComponentListener(actResizePaneluGrafu);
 		this.addWindowListener(actUkonceniOkna);
