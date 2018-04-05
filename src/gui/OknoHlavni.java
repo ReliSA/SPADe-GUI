@@ -81,6 +81,8 @@ public class OknoHlavni extends JFrame {
 	private JMenu settingsMenu; // Tlačítko menu baru
 	private JMenu languageMenu; // Tlačítko menu baru
 	private JMenu removeChartMenu; // Tlačítko menu baru
+	private JMenu removeMainMenu; // Tlačítko menu baru
+	private JMenuItem removeChartProject; // Tlačítko menu baru
 	private JMenu importExportMenu; // Tlačítko menu baru
 	private JMenuItem exportAll; // Tlačítko menu baru
 	private JMenuItem exportProjekt; // Tlačítko menu baru
@@ -141,8 +143,10 @@ public class OknoHlavni extends JFrame {
 		customGrafMenu = new JMenu(Konstanty.POPISY.getProperty("menuCustomGraf"));
 		settingsMenu = new JMenu(Konstanty.POPISY.getProperty("menuNastaveni"));
 		languageMenu = new JMenu(Konstanty.POPISY.getProperty("menuJazyk"));
-		removeChartMenu = new JMenu(Konstanty.POPISY.getProperty("odstranGraf"));
+		removeChartMenu = new JMenu(Konstanty.POPISY.getProperty("odstranGrafJmeno"));
 		Ukladani.setMenu(removeChartMenu);
+		removeMainMenu = new JMenu(Konstanty.POPISY.getProperty("odstranGraf"));
+		removeChartProject = new JMenuItem(Konstanty.POPISY.getProperty("odstranGrafProjekt"));
 		exitAction = new JMenuItem(Konstanty.POPISY.getProperty("menuExit"));	
 		importExportMenu = new JMenu(Konstanty.POPISY.getProperty("importExport"));
 		exportAll = new JMenuItem(Konstanty.POPISY.getProperty("exportVse"));
@@ -201,7 +205,9 @@ public class OknoHlavni extends JFrame {
 		importExportMenu.add(exportAll);
 		importExportMenu.add(exportProjekt);
 		customGrafMenu.add(vytvorGraf);
-		customGrafMenu.add(removeChartMenu);
+		customGrafMenu.add(removeMainMenu);
+		removeMainMenu.add(removeChartMenu);
+		removeMainMenu.add(removeChartProject);
 		customGrafMenu.add(importExportMenu);
 		languageMenu.add(czech);
 		languageMenu.add(english);
@@ -1367,6 +1373,12 @@ public class OknoHlavni extends JFrame {
 				}
 			}
 		};
+		
+		ActionListener actRemoveChartProject = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Ukladani.odstranGrafyProjektu(getProjekt().getID());
+			}
+		};
 
 		
 		/* vložení akcí k příslušným komponentám */
@@ -1383,6 +1395,7 @@ public class OknoHlavni extends JFrame {
 		exportAll.addActionListener(actExportAll);
 		exportProjekt.addActionListener(actExportProjekt);
 		importGrafy.addActionListener(actImportGrafu);
+		removeChartProject.addActionListener(actRemoveChartProject);
 
 
 		this.addComponentListener(actResizePaneluGrafu);

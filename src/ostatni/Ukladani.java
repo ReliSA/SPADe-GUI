@@ -51,7 +51,7 @@ public class Ukladani {
 	public static void add(prepravkaUkladaniCustom prepravka) {
 		save.add(prepravka);
 		JMenuItem item = new JMenuItem(prepravka.getNazev());
-		item.addActionListener(actNacteniGrafuProSmazani);
+		item.addActionListener(actSmazaniGrafuJmeno);
 		menu.add(item);
 		save();
 	}
@@ -122,17 +122,17 @@ public class Ukladani {
 			ois.close();
 
 			for (int i = 0; i < nove.size(); i++) {
-				nazev=nove.get(i).getNazev();
+				nazev = nove.get(i).getNazev();
 				if (kontrolaNazvu(nazev)) {
-					nazev=nazev+" import";
+					nazev = nazev + " import";
 
-					while (kontrolaNazvu(nazev+" "+pocitadlo)) {
+					while (kontrolaNazvu(nazev + " " + pocitadlo)) {
 						pocitadlo++;
-					}					
-					
+					}
+
 					nove.get(i).setNazev(nazev + " " + pocitadlo);
 					nove.get(i).getPanel().setTitle(nove.get(i).getNazev());
-					
+
 					save.add(nove.get(i));
 				} else {
 					save.add(nove.get(i));
@@ -157,7 +157,7 @@ public class Ukladani {
 				graf = new DropChartPanel(prepravka.getPanel(), prepravka.getTypGrafu());
 				graf.setName(prepravka.getNazev());
 				JMenuItem item = new JMenuItem(prepravka.getNazev());
-				item.addActionListener(actNacteniGrafuProSmazani);
+				item.addActionListener(actSmazaniGrafuJmeno);
 				menu.add(item);
 				panel.vlozGraf(graf);
 			}
@@ -176,7 +176,24 @@ public class Ukladani {
 		return bool;
 	}
 
-	static ActionListener actNacteniGrafuProSmazani = new ActionListener() {
+	public static void odstranGrafyProjektu(int idProjektu) {
+		int dialogResult = JOptionPane.showConfirmDialog(null, Konstanty.POPISY.getProperty("mazaniOknoVseText"),
+				Konstanty.POPISY.getProperty("mazaniOknoPopisek"), JOptionPane.YES_NO_OPTION);
+		if (dialogResult == 0) {
+			ArrayList<prepravkaUkladaniCustom> smazat = new ArrayList<prepravkaUkladaniCustom>();
+			for (int i = 0; i < save.size(); i++) {
+				if (save.get(i).getProjectID() == idProjektu) {
+					smazat.add(save.get(i));
+				}
+			}
+			save.removeAll(smazat);
+			save();
+			panelGrafu.nastavDropSloty();
+			nactiGrafy(idProjektu);
+		}
+	}
+
+	static ActionListener actSmazaniGrafuJmeno = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 
 			int dialogResult = JOptionPane.showConfirmDialog(null, Konstanty.POPISY.getProperty("mazaniOknoText"),
@@ -192,6 +209,7 @@ public class Ukladani {
 						save();
 						panelGrafu.nastavDropSloty();
 						nactiGrafy(id);
+						return;
 					}
 				}
 			}
