@@ -41,6 +41,7 @@ import javax.swing.SwingUtilities;
 import com.keypoint.PngEncoder;
 
 import ostatni.Konstanty;
+import ostatni.Ukladani;
 import data.*;
 import data.ciselnik.*;
 import data.polozky.PolozkaVytvoreni;
@@ -76,6 +77,7 @@ public class OknoHlavni extends JFrame {
 	private JMenuItem vytvorGraf; // Tlačítko menu baru
 	private JMenu settingsMenu; // Tlačítko menu baru
 	private JMenu languageMenu; // Tlačítko menu baru
+	private JMenu removeChartMenu; // Tlačítko menu baru
 	private JMenuItem exitAction; // Tlačítko menu baru
 	private JMenuItem czech; // Tlačítko menu baru
 	private JMenuItem english; // Tlačítko menu baru
@@ -132,6 +134,8 @@ public class OknoHlavni extends JFrame {
 		customGrafMenu = new JMenu(Konstanty.POPISY.getProperty("menuCustomGraf"));
 		settingsMenu = new JMenu(Konstanty.POPISY.getProperty("menuNastaveni"));
 		languageMenu = new JMenu(Konstanty.POPISY.getProperty("menuJazyk"));
+		removeChartMenu = new JMenu(Konstanty.POPISY.getProperty("odstranGraf"));
+		Ukladani.setMenu(removeChartMenu);
 		exitAction = new JMenuItem(Konstanty.POPISY.getProperty("menuExit"));
 		vytvorGraf = new JMenuItem(Konstanty.POPISY.getProperty("menuVytvorGraf"));
 		czech = new JMenuItem(Konstanty.POPISY.getProperty("menuCestina"));
@@ -183,6 +187,7 @@ public class OknoHlavni extends JFrame {
 		settingsMenu.add(filtry);
 		fileMenu.add(exitAction);
 		customGrafMenu.add(vytvorGraf);
+		customGrafMenu.add(removeChartMenu);
 		languageMenu.add(czech);
 		languageMenu.add(english);
 
@@ -1300,7 +1305,6 @@ public class OknoHlavni extends JFrame {
 			}
 		};
 
-		
 		/* akce pro otevření okna custom grafů */
 		ActionListener actCustomGraf = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -1315,6 +1319,7 @@ public class OknoHlavni extends JFrame {
 			}
 		};
 
+		
 		/* vložení akcí k příslušným komponentám */
 		lsSeznamProjektu.addActionListener(actZmenaProjektu);
 		cbTypFiltru.addActionListener(actVlozFiltr);

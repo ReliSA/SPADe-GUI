@@ -2,6 +2,7 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
@@ -28,12 +29,13 @@ import ostatni.Ukladani;
 
 public class OknoCustomNahled extends JFrame {
 
-	private static final long serialVersionUID = 1L;
-
+	private static final long serialVersionUID = 8910356012762472124L;
+	
 	JFreeChart chart;
 	int projectID;
 	int typGrafu;
-	JButton save = new JButton("Ulož graf");
+	String nazev;
+	JButton save = new JButton(Konstanty.POPISY.getProperty("ulozGraf"));
 	JFrame close = this;
 
 	public OknoCustomNahled(String title, DefaultCategoryDataset bary, DefaultCategoryDataset body,
@@ -44,6 +46,7 @@ public class OknoCustomNahled extends JFrame {
 		CategoryPlot plot = new CategoryPlot();
 		this.projectID = projectID;
 		this.typGrafu = 0;
+		this.nazev = title;
 
 		CategoryItemRenderer detectRenderer = new BarRenderer();
 		detectRenderer.setSeriesPaint(0, new Color(255, 0, 0, 50));
@@ -80,9 +83,13 @@ public class OknoCustomNahled extends JFrame {
 		plot.setDataset(4, area);
 		plot.setRenderer(4, areaRenderer);
 
-		plot.setDomainAxis(new CategoryAxis("Čas"));
-		plot.setRangeAxis(new NumberAxis("Hodnoty"));
+		plot.setDomainAxis(new CategoryAxis(Konstanty.POPISY.getProperty("cas")));
+		plot.setRangeAxis(new NumberAxis(Konstanty.POPISY.getProperty("hodnoty")));
 
+		plot.setNoDataMessage(Konstanty.POPISY.getProperty("noData"));
+		plot.setNoDataMessageFont(new Font("SansSerif",Font.BOLD,24));
+		plot.setNoDataMessagePaint(Color.RED);
+		
 		CategoryAxis domainAxis = plot.getDomainAxis();
 		domainAxis.setCategoryLabelPositions(CategoryLabelPositions.createUpRotationLabelPositions(Math.PI / 2));
 
@@ -103,7 +110,6 @@ public class OknoCustomNahled extends JFrame {
 		this.typGrafu = Konstanty.PIE;
 		chart = ChartFactory.createPieChart(title, dataset, true, true, false);
 		chart.removeLegend();
-		
 
 		ChartPanel panel = new ChartPanel(chart);
 		JPanel vysledek = new JPanel(new BorderLayout());
@@ -118,7 +124,8 @@ public class OknoCustomNahled extends JFrame {
 		ActionListener actSaveButton = new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
-				prepravkaUkladaniCustom prepravka = new prepravkaUkladaniCustom(chart, projectID, typGrafu);
+
+				prepravkaUkladaniCustom prepravka = new prepravkaUkladaniCustom(chart, projectID, typGrafu, nazev);
 				Ukladani.add(prepravka);
 				Ukladani.getPanel().vlozGraf(new DropChartPanel(chart, typGrafu));
 				close.dispose();
