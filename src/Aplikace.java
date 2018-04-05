@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import ostatni.Konstanty;
+import ostatni.Ukladani;
 
 /**
  * Spuštění aplikace
@@ -21,6 +22,7 @@ public class Aplikace {
 			Konstanty.POPISY.load(new InputStreamReader(new FileInputStream(Konstanty.NAZEV_SOUBORU_POPISU_CZECH), "UTF8"));
 			Konstanty.SQLs.load(new InputStreamReader(new FileInputStream(Konstanty.SQLSoubor), "UTF8"));			
 			Konstanty.nastavPopisComboBox();
+			Ukladani.load();
 		} catch (FileNotFoundException e) {
 			JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaSoubor")+ Konstanty.NAZEV_SOUBORU_POPISU_CZECH +Konstanty.POPISY.getProperty("chybaSoubor2"));			
 			e.printStackTrace();

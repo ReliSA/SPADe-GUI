@@ -23,13 +23,12 @@ import javax.swing.JComboBox;
 public class OknoCustomGraf extends JFrame {
 	JLabel lbLabelNazevOkna;
 
+	int idProjekt;
 	JButton nacti = new JButton("Načti data");
 	JButton nakresli = new JButton(Konstanty.POPISY.getProperty("vytvorGraf"));
 	JPanel dataPanel;
 	JPanel westPanel;
-	JTextField tfFieldProjekt;
 	JTextField tfFieldIterace;
-	JLabel lbLblProjekt;
 	JLabel lbLblIterace;
 	JComboBox<String> cmbCombo0;
 	JLabel lbLblSql;
@@ -37,8 +36,9 @@ public class OknoCustomGraf extends JFrame {
 
 	CustomGraf data;
 
-	public OknoCustomGraf() {
+	public OknoCustomGraf(int idProjekt) {
 		super(Konstanty.POPISY.getProperty("menuVytvorGraf"));
+		this.idProjekt=idProjekt;
 		nastavZobrazení();
 		nastavAkce();
 
@@ -50,28 +50,22 @@ public class OknoCustomGraf extends JFrame {
 		dataPanel = new JPanel(new GridLayout(0, 1));
 		JScrollPane scpPanel9 = new JScrollPane(dataPanel);
 		westPanel = new JPanel(new GridLayout(1, 0));
-		tfFieldProjekt = new JTextField();
 		tfFieldIterace = new JTextField();
-		lbLblProjekt = new JLabel(Konstanty.POPISY.getProperty("nazevProjekt"));
 		lbLblIterace = new JLabel(Konstanty.POPISY.getProperty("nazevIterace"));
 		cmbCombo0 = new JComboBox<String>(Konstanty.getSQLKeys());
 		lbLblSql = new JLabel("SQL:");
 
 		cmbCombo0.setPreferredSize(Konstanty.VELIKOST_CTVRTINOVA_SIRKA);
-		tfFieldProjekt.setPreferredSize(Konstanty.VELIKOST_CTVRTINOVA_SIRKA);
 		tfFieldIterace.setPreferredSize(Konstanty.VELIKOST_CTVRTINOVA_SIRKA);
 
 		this.setBackground(Color.white);
 		dataPanel.setBackground(Color.white);
 
 		lbLblIterace.setHorizontalAlignment(JLabel.CENTER);
-		lbLblProjekt.setHorizontalAlignment(JLabel.CENTER);
 		lbLblSql.setHorizontalAlignment(JLabel.CENTER);
 
 		westPanel.add(lbLblSql);
 		westPanel.add(cmbCombo0);
-		westPanel.add(lbLblProjekt);
-		westPanel.add(tfFieldProjekt);
 		westPanel.add(lbLblIterace);
 		westPanel.add(tfFieldIterace);
 		westPanel.add(nacti);
@@ -95,7 +89,7 @@ public class OknoCustomGraf extends JFrame {
 
 				CustomGrafDAO dao = new CustomGrafDAO();
 				data = dao.getCustomGrafData((String) cmbCombo0.getSelectedItem(),
-						Integer.parseInt(tfFieldProjekt.getText()), Integer.parseInt(tfFieldIterace.getText()));
+						idProjekt, Integer.parseInt(tfFieldIterace.getText()));
 
 				dataPanel.removeAll();
 
@@ -164,8 +158,8 @@ public class OknoCustomGraf extends JFrame {
 								}
 
 								SwingUtilities.invokeLater(() -> {
-									PanelGrafuCustom example = new PanelGrafuCustom(
-											(String) cmbCombo0.getSelectedItem(), pie);
+									OknoCustomNahled example = new OknoCustomNahled(
+											(String) cmbCombo0.getSelectedItem(), pie,idProjekt);
 									example.setSize(800, 400);
 									example.setLocationRelativeTo(null);
 									example.setVisible(true);
@@ -184,8 +178,8 @@ public class OknoCustomGraf extends JFrame {
 				}
 
 				SwingUtilities.invokeLater(() -> {
-					PanelGrafuCustom example = new PanelGrafuCustom((String) cmbCombo0.getSelectedItem(), bary, body,
-							spojnice, area, detected, hmap);
+					OknoCustomNahled example = new OknoCustomNahled((String) cmbCombo0.getSelectedItem(), bary, body,
+							spojnice, area, detected, hmap, idProjekt);
 					example.setSize(800, 400);
 					example.setLocationRelativeTo(null);
 					example.setVisible(true);

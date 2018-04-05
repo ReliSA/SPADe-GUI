@@ -1300,12 +1300,13 @@ public class OknoHlavni extends JFrame {
 			}
 		};
 
+		
 		/* akce pro otevření okna custom grafů */
 		ActionListener actCustomGraf = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
 				SwingUtilities.invokeLater(() -> {
-					OknoCustomGraf example = new OknoCustomGraf();
+					OknoCustomGraf example = new OknoCustomGraf(getProjekt().getID());
 					example.setSize(800, 400);
 					example.setLocationRelativeTo(null);
 					example.setVisible(true);

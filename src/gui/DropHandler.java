@@ -26,13 +26,15 @@ public class DropHandler implements DropTargetListener {
 	PanelGrafuUkol panelUkol;
 	PanelGrafuKonfigurace panelKonfigurace;
 	PanelGrafuArtefakt panelArtefakt;
+	PanelGrafuCustom panelCustom;
 
 	public DropHandler(PanelGrafuSegment panelSegment, PanelGrafuUkol panelUkol, PanelGrafuKonfigurace panelKonfigurace,
-			PanelGrafuArtefakt panelArtefakt) {
+			PanelGrafuArtefakt panelArtefakt, PanelGrafuCustom panelCustom) {
 		this.panelSegment = panelSegment;
 		this.panelUkol = panelUkol;
 		this.panelKonfigurace = panelKonfigurace;
 		this.panelArtefakt = panelArtefakt;
+		this.panelCustom = panelCustom;
 	}
 
 	/**
@@ -151,8 +153,12 @@ public class DropHandler implements DropTargetListener {
 			case Konstanty.SEGMENT:
 				panelSegment.vratGrafMiniatura(panel);
 				break;
+			case Konstanty.CUSTOM:
+				panelCustom.vratGrafMiniatura(panel);
+				break;
 			}
 		}
+
 	}
 
 	@Override

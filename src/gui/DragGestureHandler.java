@@ -10,6 +10,8 @@ import java.awt.dnd.DragSourceDragEvent;
 import java.awt.dnd.DragSourceDropEvent;
 import java.awt.dnd.DragSourceEvent;
 import java.awt.dnd.DragSourceListener;
+import java.io.Serializable;
+
 import javax.swing.JPanel;
 
 /**
@@ -20,7 +22,7 @@ import javax.swing.JPanel;
  *
  */
 
-public class DragGestureHandler implements DragGestureListener, DragSourceListener {
+public class DragGestureHandler implements DragGestureListener, DragSourceListener{
 
 	private Container parent;
 	private JPanel child;

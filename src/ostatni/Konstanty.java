@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Properties;
 import java.util.Set;
 
+import data.prepravkaUkladaniCustom;
+
 /**
  * Třída konstant
  * @author michalvselko
@@ -89,6 +91,7 @@ public class Konstanty {
 	public static final int KONFIGURACE = 11;
 	public static final int ARTEFAKT = 12;
 	public static final int SEGMENT = 13;
+	public static final int CUSTOM = 14;
 
 	
 	public static final int HODNOTA = 0;
@@ -100,6 +103,7 @@ public class Konstanty {
 	public static final int HISTOGRAM = 1;
 	public static final int SPOJNICOVY = 2;
 	public static final int GANTT = 3;
+	public static final int PIE = 4;
 	/*-----------------------------------------------*/
 	
 	/*--------------Typy supertříd--------------------*/

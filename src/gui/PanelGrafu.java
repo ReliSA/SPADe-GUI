@@ -28,6 +28,7 @@ import javax.swing.JTextArea;
 import javax.swing.border.Border;
 
 import ostatni.Konstanty;
+import ostatni.Ukladani;
 import data.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -71,6 +72,7 @@ public class PanelGrafu extends JPanel {
 		this.projekt.nactiData();
 		this.nastavZobrazeni();
 		this.nastavAkce();
+		Ukladani.nactiGrafy(projekt.getID());
 	}
 
 	/**
@@ -92,7 +94,8 @@ public class PanelGrafu extends JPanel {
 		this.projekt.nactiData();
 
 		this.nastavZobrazeni();
-		this.nastavAkce();
+		this.nastavAkce();		
+		Ukladani.nactiGrafy(projekt.getID());
 		this.revalidate();
 
 	}
@@ -160,6 +163,7 @@ public class PanelGrafu extends JPanel {
 
 		this.nastavZobrazeni();
 		this.nastavAkce();
+		Ukladani.nactiGrafy(projekt.getID());
 		this.revalidate();
 
 	}	
@@ -186,6 +190,7 @@ public class PanelGrafu extends JPanel {
 		PanelGrafuUkol panelUkol = new PanelGrafuUkol(this.projekt);
 		PanelGrafuKonfigurace panelKonfigurace = new PanelGrafuKonfigurace(this.projekt);
 		PanelGrafuArtefakt panelArtefakt = new PanelGrafuArtefakt(this.projekt);
+		PanelGrafuCustom panelCustom = new PanelGrafuCustom(this.projekt);
 
 		JScrollPane scrollUkoly = new JScrollPane(panelUkol);
 		scrollUkoly.getVerticalScrollBar().setUnitIncrement(15);
@@ -198,6 +203,8 @@ public class PanelGrafu extends JPanel {
 		tabbedPanelGrafu.add(Konstanty.POPISY.getProperty("segment"), panelSegment);
 		tabbedPanelGrafu.add(Konstanty.POPISY.getProperty("konfigurace"), panelKonfigurace);
 		tabbedPanelGrafu.add(Konstanty.POPISY.getProperty("artefakty"), panelArtefakt);
+		tabbedPanelGrafu.add("Custom", panelCustom);
+		Ukladani.setPanel(panelCustom);
 
 		JPanel dropSloty = new JPanel(new BorderLayout());
 		JPanel grafy = new JPanel(new BorderLayout());
@@ -210,9 +217,9 @@ public class PanelGrafu extends JPanel {
 		dropSlot2.setBackground(Color.WHITE);
 		dropSlot2.setPreferredSize(Konstanty.VELIKOST_GRAFU_VELKY);
 
-		dropHandler = new DropHandler(panelSegment, panelUkol, panelKonfigurace, panelArtefakt);
+		dropHandler = new DropHandler(panelSegment, panelUkol, panelKonfigurace, panelArtefakt,panelCustom);
 		dropTarget = new DropTarget(dropSlot, DnDConstants.ACTION_MOVE, dropHandler, true);
-		dropHandler2 = new DropHandler(panelSegment, panelUkol, panelKonfigurace, panelArtefakt);
+		dropHandler2 = new DropHandler(panelSegment, panelUkol, panelKonfigurace, panelArtefakt,panelCustom);
 		dropTarget2 = new DropTarget(dropSlot2, DnDConstants.ACTION_MOVE, dropHandler2, true);
 
 		JLabel label = new JLabel(Konstanty.POPISY.getProperty("grafTady"));

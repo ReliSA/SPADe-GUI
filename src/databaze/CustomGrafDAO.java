@@ -5,13 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-
 import javax.swing.JOptionPane;
-
-import data.Artefakt;
 import data.CustomGraf;
 import ostatni.Konstanty;
 
@@ -48,7 +42,7 @@ public class CustomGrafDAO {
 					for (int i = 1; i <= columnsNumber; i++) {
 						data.addNazvySloupcu(rs.getString(i));
 					}
-					
+
 					while (rs.next()) {
 						data.addDatum(rs.getString(1));
 						for (int i = 2; i <= columnsNumber; i++) {
@@ -77,9 +71,6 @@ public class CustomGrafDAO {
 				e.printStackTrace();
 			}
 		}
-		
-		//System.out.println(data.data.get(2).get(2));
-		//System.out.println(data.nazvySloupcu.get(1));
 		return data;
 	}
 
