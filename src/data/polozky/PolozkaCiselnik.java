@@ -4,8 +4,6 @@ package data.polozky;
  * Třída položek zděděná ze třídy Polozka, k původním atributům id a nazev 
  * navíc přidává atributy idTrida, trida a supertrida.
  * Využívá se pro položky číselníků (priority, severity, resoluce, osoby, status, typ)
- * @author michalvselko
- *
  */
 public class PolozkaCiselnik extends Polozka {
 

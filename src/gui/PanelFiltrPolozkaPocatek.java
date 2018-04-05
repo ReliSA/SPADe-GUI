@@ -1,7 +1,6 @@
 package gui;
 
-import java.awt.Color;
-import java.awt.GridBagConstraints;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.LocalDate;
@@ -10,31 +9,26 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
-
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.ListSelectionModel;
-
 import org.jdatepicker.impl.DateComponentFormatter;
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
-
 import ostatni.Konstanty;
 import data.polozky.PolozkaPocatek;
 
 /**
  * Panel filtrů pro úkoly a segmenty zděděný z PanelFiltr
- * @author michalvselko
- *
  */
 public class PanelFiltrPolozkaPocatek extends PanelFiltr{
 
+	private static final long serialVersionUID = 6176391306912186950L;
 	private JComboBox<String> cbOperatorDatum;		//seznam operatoru pro datum				
 	private JDatePickerImpl dpDatumOD;				//datum od
     private JDatePickerImpl dpDatumDO;				//datum do
-    private JComboBox<String> cbTypPodfiltru;
+    private JComboBox<String> cbTypPodfiltru;		//typ podfiltru
 	
     /**
      * Konstruktor třídy
@@ -46,6 +40,12 @@ public class PanelFiltrPolozkaPocatek extends PanelFiltr{
 		nastavPanel(nazev);
 	}
     
+    /**
+     * Konstruktor třídy
+     * @param nazev název panelu filtru
+     * @param seznam seznam položek
+     * @param seznam cbTypPodfiltru typ pod filtru
+     */
     public PanelFiltrPolozkaPocatek(String nazev, ArrayList seznam,JComboBox<String> cbTypPodfiltru) {
 		super(seznam);
 		this.cbTypPodfiltru=cbTypPodfiltru;
@@ -63,12 +63,10 @@ public class PanelFiltrPolozkaPocatek extends PanelFiltr{
 			for(int i = 0; i < this.seznam.size(); i++){						//projde všechny položky seznamu
 				PolozkaPocatek polozka = (PolozkaPocatek)this.seznam.get(i);
 				switch(cbOperatorDatum.getSelectedItem().toString()){			//podle zadaného typu operátoru volá konkrétní kontrolní metodu
+				case "between":
 				case "mezi":if(vlozitDoSeznamuMezi(polozka))					
 								seznamId.add(polozka.getID());					//pokud metoda vrátí true, vloží se id do seznamu
 							break;
-				case "between":if(vlozitDoSeznamuMezi(polozka))					
-					seznamId.add(polozka.getID());								//pokud metoda vrátí true, vloží se id do seznamu
-				break;			
 				case ">":	if(vlozitDoSeznamuVetsi(polozka))
 								seznamId.add(polozka.getID());
 							break;

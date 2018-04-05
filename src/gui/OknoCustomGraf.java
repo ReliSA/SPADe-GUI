@@ -29,31 +29,35 @@ import ostatni.Ukladani;
 
 import javax.swing.JComboBox;
 
+/**
+ * Okno pro nastavení vlastností custom grafu
+ */
 public class OknoCustomGraf extends JFrame {
 
 	private static final long serialVersionUID = -2359690226410306884L;
+	private int parametryZvolenehoSql; // udává parametry potřebné pro zvolené SQL
+	private Projekt projekt; // zvolený projekt
+	private JButton nakresli; // tlačítko pro vykreslení grafu
+	private JPanel dataPanel; // panel s načtenými daty
+	private JPanel controlPanel; // panel s ovládácími componentami
+	private JTextField tfNazev; // textové pole pro zadání názvu
+	private JLabel lblNazevGrafu; // popisek název grafu
+	private JLabel lblIterace; // popisek iterace
+	private JLabel lblOsoba; // popisek osoby
+	private JLabel lblSql; // popisek SQL
+	private JComboBox<String> cbSql; // combobox pro volbu SQL
+	private JComboBox<?> cbIterace; // combobox pro volbu iterace
+	private JComboBox<?> cbOsoby; // combobox pro volbu osoby
+	private HashMap<String, Color> hmap = new HashMap<String, Color>(); // hashmapa pro uchování zvolených barev pro graf
+	private ArrayList<PolozkaCiselnik> osoby; // arraylist osob zvoleného projektu
+	private ArrayList<Segment> iterace; // arraylist iterací zvoleného projektu
+	private CustomGraf data; // objekt s načtenými daty pro vykreslení grafu
 
-	JLabel lbLabelNazevOkna;
-
-	int var;
-	Projekt projekt;
-	JButton nakresli = new JButton(Konstanty.POPISY.getProperty("vytvorGraf"));
-	JPanel dataPanel;
-	JPanel westPanel;
-	JTextField tfNazev;
-	JLabel lblNazev;
-	JLabel lblIterace;
-	JLabel lblOsoba;
-	JComboBox<String> cbSql;
-	JComboBox<?> cbIterace;
-	JComboBox<?> cbOsoby;
-	JLabel lbLblSql;
-	HashMap<String, Color> hmap = new HashMap<String, Color>();
-	ArrayList<PolozkaCiselnik> osoby;
-	ArrayList<Segment> iterace;
-
-	CustomGraf data;
-
+	/**
+	 * Kontruktor okna
+	 * 
+	 * @param projekt zvolený projekt
+	 */
 	public OknoCustomGraf(Projekt projekt) {
 		super(Konstanty.POPISY.getProperty("menuVytvorGraf"));
 
@@ -65,20 +69,24 @@ public class OknoCustomGraf extends JFrame {
 		nastavAkce();
 	}
 
-	public void nastavZobrazení() {
+	/**
+	 * Nastaví componenty a zobrazení okna
+	 */
+	private void nastavZobrazení() {
 		this.setLayout(new BorderLayout());
 
 		dataPanel = new JPanel(new GridLayout(0, 1));
 		JScrollPane scrollDataPanel = new JScrollPane(dataPanel);
-		westPanel = new JPanel(new GridLayout(1, 0));
+		controlPanel = new JPanel(new GridLayout(1, 0));
 		tfNazev = new JTextField();
 		lblIterace = new JLabel(Konstanty.POPISY.getProperty("nazevIterace"));
 		lblOsoba = new JLabel(Konstanty.POPISY.getProperty("osoba"));
-		lblNazev = new JLabel(Konstanty.POPISY.getProperty("nazevGrafu"));
+		lblNazevGrafu = new JLabel(Konstanty.POPISY.getProperty("nazevGrafu"));
 		cbSql = new JComboBox<String>(Konstanty.getSQLKeys());
 		cbIterace = new JComboBox(getModel(iterace));
 		cbOsoby = new JComboBox(getModel(osoby));
-		lbLblSql = new JLabel("SQL:");
+		lblSql = new JLabel("SQL:");
+		nakresli = new JButton(Konstanty.POPISY.getProperty("vytvorGraf"));
 
 		cbSql.setPreferredSize(Konstanty.VELIKOST_CTVRTINOVA_SIRKA);
 		tfNazev.setPreferredSize(Konstanty.VELIKOST_CTVRTINOVA_SIRKA);
@@ -87,17 +95,16 @@ public class OknoCustomGraf extends JFrame {
 		dataPanel.setBackground(Color.white);
 
 		lblIterace.setHorizontalAlignment(JLabel.CENTER);
-		lblNazev.setHorizontalAlignment(JLabel.CENTER);
+		lblNazevGrafu.setHorizontalAlignment(JLabel.CENTER);
 		lblOsoba.setHorizontalAlignment(JLabel.CENTER);
-		lbLblSql.setHorizontalAlignment(JLabel.CENTER);
+		lblSql.setHorizontalAlignment(JLabel.CENTER);
 
 		this.add(scrollDataPanel, BorderLayout.CENTER);
-		this.add(westPanel, BorderLayout.NORTH);
+		this.add(controlPanel, BorderLayout.NORTH);
 
 		nastavMenu();
 
 		this.setVisible(true);
-
 	}
 
 	/**
@@ -114,6 +121,11 @@ public class OknoCustomGraf extends JFrame {
 		return model;
 	}
 
+	/**
+	 * Metoda vrací ID iterace zvolené v comboboxu
+	 * 
+	 * @return ID iterace
+	 */
 	private int getIdIterace() {
 		String nazev = iterace.get(cbIterace.getSelectedIndex()).getNazev();
 		for (int i = 0; i < iterace.size(); i++) {
@@ -125,6 +137,11 @@ public class OknoCustomGraf extends JFrame {
 		return -1;
 	}
 
+	/**
+	 * Metoda vrací ID osoby zvolené v comboboxu
+	 * 
+	 * @return ID osoby
+	 */
 	private int getIdOsoby() {
 		String nazev = osoby.get(cbOsoby.getSelectedIndex()).getNazev();
 		for (int i = 0; i < osoby.size(); i++) {
@@ -136,11 +153,15 @@ public class OknoCustomGraf extends JFrame {
 		return -1;
 	}
 
+	/**
+	 * Metoda pro kontrolu zda jsou zvoleny nějaká data pro vykreslení grafu
+	 * 
+	 * @return true pokud jsou zvoleny nějaká data, jinak false
+	 */
 	private boolean dataCheck() {
 
 		boolean bool = true;
 		for (int i = 0; i < dataPanel.getComponentCount(); i++) {
-
 			if (((panelDatCustomGrafu) dataPanel.getComponent(i)).getPouzit()) {
 				bool = false;
 			}
@@ -148,46 +169,51 @@ public class OknoCustomGraf extends JFrame {
 		return bool;
 	}
 
+	/**
+	 * Metoda nastaví componenty ovládacího panelu okna
+	 */
 	private void nastavMenu() {
 
 		String sql = (String) cbSql.getSelectedItem();
-		var = Integer.parseInt(Konstanty.SQLsVar.getProperty(sql));
+		parametryZvolenehoSql = Integer.parseInt(Konstanty.SQLsVar.getProperty(sql));
 
-		westPanel.removeAll();
+		controlPanel.removeAll();
 
-		westPanel.add(lbLblSql);
-		westPanel.add(cbSql);
+		controlPanel.add(lblSql);
+		controlPanel.add(cbSql);
 
-		if (var == 3) {
-			westPanel.add(lblIterace);
-			westPanel.add(cbIterace);
-			westPanel.add(lblOsoba);
-			westPanel.add(cbOsoby);
-		} else if (var == 2) {
-			westPanel.add(lblOsoba);
-			westPanel.add(cbOsoby);
-		} else if (var == 1) {
-			westPanel.add(lblIterace);
-			westPanel.add(cbIterace);
+		if (parametryZvolenehoSql == 3) {
+			controlPanel.add(lblIterace);
+			controlPanel.add(cbIterace);
+			controlPanel.add(lblOsoba);
+			controlPanel.add(cbOsoby);
+		} else if (parametryZvolenehoSql == 2) {
+			controlPanel.add(lblOsoba);
+			controlPanel.add(cbOsoby);
+		} else if (parametryZvolenehoSql == 1) {
+			controlPanel.add(lblIterace);
+			controlPanel.add(cbIterace);
 		}
 
-		westPanel.add(lblNazev);
-		westPanel.add(tfNazev);
-		westPanel.add(nakresli);
+		controlPanel.add(lblNazevGrafu);
+		controlPanel.add(tfNazev);
+		controlPanel.add(nakresli);
 
 		nactiData();
 	}
 
+	/**
+	 * Metoda dle údajů zvolených v ovládacím menu načte data pro vykreslení grafu
+	 */
 	private void nactiData() {
 		CustomGrafDAO dao = new CustomGrafDAO();
-		int iteraceID = getIdIterace();
 
 		data = dao.getCustomGrafData((String) cbSql.getSelectedItem(), projekt.getID(), getIdIterace(), getIdOsoby(),
-				var);
+				parametryZvolenehoSql);
 
 		dataPanel.removeAll();
 		for (int i = 1; i < data.pocetSloupcu(); i++) {
-			dataPanel.add(new panelDatCustomGrafu(data.getNazvySloupcu(i), i - 1));
+			dataPanel.add(new panelDatCustomGrafu(data.getNazevSloupce(i), i - 1));
 		}
 
 		getContentPane().revalidate();
@@ -199,6 +225,7 @@ public class OknoCustomGraf extends JFrame {
 	 */
 	protected void nastavAkce() {
 
+		// Akce pro načtení dat
 		ActionListener actNactiData = new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
@@ -208,6 +235,7 @@ public class OknoCustomGraf extends JFrame {
 			}
 		};
 
+		// Akce pro nastavení ovládacího menu
 		ActionListener actNastavMenu = new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
@@ -216,22 +244,23 @@ public class OknoCustomGraf extends JFrame {
 			}
 		};
 
+		// Akce pro vykreslení grafu
 		ActionListener actNakresliGraf = new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
 
-				if (tfNazev.getText().equals("")) {
+				if (tfNazev.getText().equals("")) { // Kontrola zda název není prázdný
 					JOptionPane.showMessageDialog(null, Konstanty.POPISY.getProperty("prazdnyNazev"),
 							Konstanty.POPISY.getProperty("chyba"), JOptionPane.ERROR_MESSAGE);
 				}
 
-				else if (Ukladani.kontrolaNazvu(tfNazev.getText())) {
-					JOptionPane.showMessageDialog(null, Konstanty.POPISY.getProperty("duplicitaNazev"),
+				else if (dataCheck()) { // Kontrola zda název není prázdný
+					JOptionPane.showMessageDialog(null, Konstanty.POPISY.getProperty("nevybranyData"),
 							Konstanty.POPISY.getProperty("chyba"), JOptionPane.ERROR_MESSAGE);
 				}
-				
-				else if (dataCheck()) {
-					JOptionPane.showMessageDialog(null, Konstanty.POPISY.getProperty("nevybranyData"),
+
+				else if (Ukladani.kontrolaNazvu(tfNazev.getText())) { // Kontrola jedinečnosti zadaného názvu
+					JOptionPane.showMessageDialog(null, Konstanty.POPISY.getProperty("duplicitaNazev"),
 							Konstanty.POPISY.getProperty("chyba"), JOptionPane.ERROR_MESSAGE);
 				}
 
@@ -246,47 +275,55 @@ public class OknoCustomGraf extends JFrame {
 
 					for (int i = 1; i < data.pocetSloupcu(); i++) {
 
-						if (((panelDatCustomGrafu) dataPanel.getComponent(i - 1)).getPouzit()) {
+						if (((panelDatCustomGrafu) dataPanel.getComponent(i - 1)).getPouzit()) { // Kontrola zda mají být data z tohoto panelu použita
 
-							if (!((panelDatCustomGrafu) dataPanel.getComponent(i - 1)).getNazev().equals("detected")) {
+							if (((panelDatCustomGrafu) dataPanel.getComponent(i - 1)).getNazev().equals("detected")) { // Vykreslení detekcí
 
-								if (((panelDatCustomGrafu) dataPanel.getComponent(i - 1)).getTyp() == 0) {
-									hmap.put(data.getNazvySloupcu(i),
+								for (int j = 0; j < data.pocetRadku(); j++) {
+									double max = data.getMaxData();
+									detected.addValue(data.getData(i - 1, j) * max, data.getNazevSloupce(i),
+											data.getDatumy(j));
+								}
+
+							} else {
+
+								if (((panelDatCustomGrafu) dataPanel.getComponent(i - 1)).getTyp() == Konstanty.CUSTOM_SLOUPCOVY) { // Vykreslení sloupců
+									hmap.put(data.getNazevSloupce(i),
 											((panelDatCustomGrafu) dataPanel.getComponent(i - 1)).getColor());
 									for (int j = 0; j < data.pocetRadku(); j++) {
-										bary.addValue(data.getData(i - 1, j), data.getNazvySloupcu(i),
+										bary.addValue(data.getData(i - 1, j), data.getNazevSloupce(i),
 												data.getDatumy(j));
 									}
 								}
 
-								if (((panelDatCustomGrafu) dataPanel.getComponent(i - 1)).getTyp() == 1) {
-									hmap.put(data.getNazvySloupcu(i),
+								if (((panelDatCustomGrafu) dataPanel.getComponent(i - 1)).getTyp() == Konstanty.CUSTOM_SPOJNICOVY) { // Vykreslení spojnic
+									hmap.put(data.getNazevSloupce(i),
 											((panelDatCustomGrafu) dataPanel.getComponent(i - 1)).getColor());
 									for (int j = 0; j < data.pocetRadku(); j++) {
-										spojnice.addValue(data.getData(i - 1, j), data.getNazvySloupcu(i),
+										spojnice.addValue(data.getData(i - 1, j), data.getNazevSloupce(i),
 												data.getDatumy(j));
 									}
 								}
 
-								if (((panelDatCustomGrafu) dataPanel.getComponent(i - 1)).getTyp() == 2) {
-									hmap.put(data.getNazvySloupcu(i),
+								if (((panelDatCustomGrafu) dataPanel.getComponent(i - 1)).getTyp() == Konstanty.CUSTOM_BODOVY) { // Vykreslení bodů
+									hmap.put(data.getNazevSloupce(i),
 											((panelDatCustomGrafu) dataPanel.getComponent(i - 1)).getColor());
 									for (int j = 0; j < data.pocetRadku(); j++) {
-										body.addValue(data.getData(i - 1, j), data.getNazvySloupcu(i),
+										body.addValue(data.getData(i - 1, j), data.getNazevSloupce(i),
 												data.getDatumy(j));
 									}
 								}
 
-								if (((panelDatCustomGrafu) dataPanel.getComponent(i - 1)).getTyp() == 3) {
-									hmap.put(data.getNazvySloupcu(i),
+								if (((panelDatCustomGrafu) dataPanel.getComponent(i - 1)).getTyp() == Konstanty.CUSTOM_PLOSNY) { // Vykreslení plošných
+									hmap.put(data.getNazevSloupce(i),
 											((panelDatCustomGrafu) dataPanel.getComponent(i - 1)).getColor());
 									for (int j = 0; j < data.pocetRadku(); j++) {
-										area.addValue(data.getData(i - 1, j), data.getNazvySloupcu(i),
+										area.addValue(data.getData(i - 1, j), data.getNazevSloupce(i),
 												data.getDatumy(j));
 									}
 								}
 
-								if (((panelDatCustomGrafu) dataPanel.getComponent(i - 1)).getTyp() == 4) {
+								if (((panelDatCustomGrafu) dataPanel.getComponent(i - 1)).getTyp() == Konstanty.CUSTOM_PIE) { // Vykreslení koláčů
 									for (int j = 0; j < data.pocetRadku(); j++) {
 										pie.setValue(data.getDatumy(j), data.getData(i - 1, j));
 									}
@@ -299,13 +336,6 @@ public class OknoCustomGraf extends JFrame {
 										example.setVisible(true);
 									});
 									return;
-								}
-
-							} else {
-								for (int j = 0; j < data.pocetRadku(); j++) {
-									double max = data.getMaxData();
-									detected.addValue(data.getData(i - 1, j) * max, data.getNazvySloupcu(i),
-											data.getDatumy(j));
 								}
 							}
 						}
@@ -321,7 +351,8 @@ public class OknoCustomGraf extends JFrame {
 				}
 			}
 		};
-
+		
+		// Přiřazení akcí komponentám
 		cbIterace.addActionListener(actNactiData);
 		cbOsoby.addActionListener(actNactiData);
 		cbSql.addActionListener(actNastavMenu);

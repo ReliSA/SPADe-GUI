@@ -1,6 +1,5 @@
 package gui;
 
-import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.LocalDate;
@@ -9,28 +8,22 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
-
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-
 import org.jdatepicker.impl.DateComponentFormatter;
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
-
 import ostatni.Konstanty;
-import data.polozky.PolozkaCiselnik;
-import data.polozky.PolozkaPocatek;
 import data.polozky.PolozkaVytvoreni;
 
 /**
  * Panel filtrů pro artefakty a konfigurace zděděný z PanelFiltr
- * @author michalvselko
- *
  */
 public class PanelFiltrPolozkaVytvoreni extends PanelFiltr{
 
+	private static final long serialVersionUID = 5506838208795160323L;
 	private JComboBox<String> cbOperatorDatum;	//seznam operatoru pro datum					
 	private JDatePickerImpl dpDatumOD;			//datum od
     private JDatePickerImpl dpDatumDO;			//datum do
@@ -57,12 +50,10 @@ public class PanelFiltrPolozkaVytvoreni extends PanelFiltr{
 				PolozkaVytvoreni polozka = (PolozkaVytvoreni)this.seznam.get(i);
 				
 				switch(cbOperatorDatum.getSelectedItem().toString()){				//podle zadaného typu operátoru volá konkrétní kontrolní metodu
+				case "between":
 				case "mezi":if(vlozitDoSeznamuMezi(polozka))
 								seznamId.add(polozka.getID());						//pokud metoda vrátí true, vloží se id do seznamu
 							break;
-				case "between":if(vlozitDoSeznamuMezi(polozka))
-					seznamId.add(polozka.getID());									
-				break;
 				case ">":	if(vlozitDoSeznamuVetsi(polozka))
 								seznamId.add(polozka.getID());
 							break;

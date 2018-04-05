@@ -11,8 +11,6 @@ import ostatni.Ukladani;
 
 /**
  * Spuštění aplikace
- * @author michalvselko
- *
  */
 public class Aplikace {
 

@@ -17,9 +17,6 @@ import ostatni.Ukladani;
 
 /**
  * Třída sloužící jako handler pro zpracování dropu drag and drop gesta.
- * 
- * @author LukasHaringer
- *
  */
 public class DropHandler implements DropTargetListener {
 
@@ -138,6 +135,10 @@ public class DropHandler implements DropTargetListener {
 
 	}
 
+	/**
+	 * Vrati miniaturu grafu do příslušného panelu miniatur
+	 * @param component graf ke vrácení
+	 */
 	public void vratMiniaturu(Component component) {
 		if (component instanceof DropChartPanel) {
 			DropChartPanel panel = (DropChartPanel) component;

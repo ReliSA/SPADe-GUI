@@ -11,10 +11,10 @@ import databaze.ICiselnikyDAO;
 
 /**
  * Třída typů zděděná z třídy Ciselnik
- * @author michalvselko
- *
  */
 public class Typ extends Ciselnik{
+
+	private static final long serialVersionUID = 3373892790520954706L;
 
 	/**
 	 * Konstruktor číselníku

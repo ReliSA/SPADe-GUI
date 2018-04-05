@@ -10,10 +10,10 @@ import databaze.ICiselnikyDAO;
 
 /**
  * Třída statusů zděděná z třídy Ciselnik
- * @author michalvselko
- *
  */
 public class Status extends Ciselnik{
+
+	private static final long serialVersionUID = -5769562217709388959L;
 
 	/**
 	 * Konstruktor číselníku

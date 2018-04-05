@@ -7,8 +7,6 @@ import data.polozky.Polozka;
 
 /**
  * Rozhraní pro výběr konfigurací z databáze
- * @author michalvselko
- *
  */
 public interface IKonfiguraceDAO {
 

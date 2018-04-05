@@ -16,8 +16,6 @@ import data.Segment;
 
 /**
  * Třída zajišťující výběr dat projektů z databáze implementující rozhraní IProjektDAO
- * @author michalvselko
- *
  */
 public class ProjektDAO implements IProjektDAO {
 

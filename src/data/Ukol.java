@@ -7,8 +7,6 @@ import data.polozky.PolozkaPocatek;
 
 /**
  * Datová třída work_unitu zděděná ze třídy PolozkaPocatek
- * @author michalvselko
- *
  */
 public class Ukol extends PolozkaPocatek implements Serializable{
 

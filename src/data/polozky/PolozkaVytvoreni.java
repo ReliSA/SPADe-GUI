@@ -7,8 +7,6 @@ import java.time.LocalDate;
  * Třída položek zděděná ze třídy Polozka, k původním atributům id a nazev
  * navíc přidává atribut datumVytvoreni.
  * Používá se pro položky, které mají datum vytvoření ale nemají datum počátku (artefakt, konfigurace).
- * @author michalvselko
- *
  */
 public class PolozkaVytvoreni extends Polozka implements Serializable{
 	

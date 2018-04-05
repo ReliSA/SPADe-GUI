@@ -9,17 +9,29 @@ import javax.swing.JOptionPane;
 import data.CustomGraf;
 import ostatni.Konstanty;
 
+/**
+ * Třída zajišťující výběr dat pro custom grafy z databáze
+ */
 public class CustomGrafDAO {
 	private Connection pripojeni; // připojení k databázi
 
+	/**
+	 * Konstruktor třídy
+	 */
 	public CustomGrafDAO() {
 		this.pripojeni = Konstanty.PRIPOJENI; // nastaví připojení uložené ve třídě Konstanty
 	}
 
 	/**
-	 * Spustí zadaný skript
+	 * Nastaví parametry sql a spustí zadaný script
+	 * @param sql sql pro spuštění
+	 * @param idProjektu id projektu
+	 * @param idIterace id iterace
+	 * @param idOsoba id osoby
+	 * @param parametrySQL parametry potřebné pro SQL
+	 * @return CustomGraf data pro custom graf
 	 */
-	public CustomGraf getCustomGrafData(String sql, int idProjektu, int idIterace, int idOsoba, int var) {
+	public CustomGraf getCustomGrafData(String sql, int idProjektu, int idIterace, int idOsoba, int parametrySQL) {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		CustomGraf data = null;
@@ -29,14 +41,14 @@ public class CustomGrafDAO {
 
 			stmt = pripojeni.prepareStatement(dotaz);
 
-			if (var == 3) {
+			if (parametrySQL == 3) {
 				stmt.setInt(1, idProjektu);
 				stmt.setInt(2, idIterace);
 				stmt.setInt(3, idOsoba);
-			} else if (var == 2) {
+			} else if (parametrySQL == 2) {
 				stmt.setInt(1, idProjektu);
 				stmt.setInt(2, idOsoba);
-			} else if (var == 1) {
+			} else if (parametrySQL == 1) {
 				stmt.setInt(1, idProjektu);
 				stmt.setInt(2, idIterace);
 			} else {
@@ -71,10 +83,10 @@ public class CustomGrafDAO {
 			}
 
 		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(null, Konstanty.POPISY.getProperty("chybaScriptArtefakt"));
+			JOptionPane.showMessageDialog(null, Konstanty.POPISY.getProperty("chybaScriptCustom"));
 			e.printStackTrace();
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, Konstanty.POPISY.getProperty("chybaDataArtefakt"));
+			JOptionPane.showMessageDialog(null, Konstanty.POPISY.getProperty("chybaScriptCustom"));
 			e.printStackTrace();
 		} finally {
 			try {

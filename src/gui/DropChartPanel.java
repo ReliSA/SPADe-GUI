@@ -1,31 +1,21 @@
 package gui;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragGestureRecognizer;
 import java.awt.dnd.DragSource;
-import java.text.SimpleDateFormat;
-
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
-
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAxis;
-import org.jfree.chart.axis.CategoryLabelPositions;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.XYPlot;
-
 import ostatni.Konstanty;
 
 /**
  * Třída zděděná od ChartPanel. Přidává podporu drag and drop.
- * 
- * @author Lukas Haringer
- *
  */
 public class DropChartPanel extends ChartPanel {
 
@@ -43,8 +33,7 @@ public class DropChartPanel extends ChartPanel {
 	/**
 	 * Kontruktor DropChartPanelu. Vytvoří panel a zakáže zoomování grafu.
 	 * 
-	 * @param chart
-	 *            JFreeChart graf
+	 * @param chart JFreeChart graf
 	 */
 	public DropChartPanel(JFreeChart chart, int typGrafu, int typPanelu) {
 		super(chart);
@@ -118,10 +107,6 @@ public class DropChartPanel extends ChartPanel {
 	public void setDragable(boolean dragable) {
 		this.dragable = dragable;
 	}
-
-	
-	
-	
 	
 	/**
 	 * Metoda pro zobrazení/skrytí legendy grafu

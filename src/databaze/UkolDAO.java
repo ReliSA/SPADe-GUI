@@ -13,8 +13,6 @@ import data.Ukol;
 
 /**
  * Třída zajišťující výběr dat úkolů z databáze implementující rozhraní IUkolDAO
- * @author michalvselko
- *
  */
 public class UkolDAO implements IUkolDAO {
 

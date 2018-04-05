@@ -10,10 +10,10 @@ import databaze.ICiselnikyDAO;
 
 /**
  * Třída priorit zděděná z třídy Ciselnik
- * @author michalvselko
- *
  */
 public class Priority extends Ciselnik{
+
+	private static final long serialVersionUID = -3576657021794701207L;
 
 	/**
 	 * Konstruktor číselníku

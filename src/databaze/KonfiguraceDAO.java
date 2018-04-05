@@ -14,8 +14,6 @@ import data.polozky.Polozka;
 
 /**
  * Třída zajišťující výběr dat konfigurací z databáze implementující rozhraní IKonfiguraceDAO
- * @author michalvselko
- *
  */
 public class KonfiguraceDAO implements IKonfiguraceDAO{
 

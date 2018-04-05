@@ -3,10 +3,7 @@ package data;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
-
 import javax.swing.JOptionPane;
-import javax.swing.SingleSelectionModel;
-
 import ostatni.Konstanty;
 import data.Segment;
 import data.Ukol;
@@ -21,8 +18,6 @@ import databaze.UkolDAO;
 
 /**
  * Datová třída pro informace o projektu
- * @author michalvselko
- *
  */
 public class Projekt implements Serializable {
 

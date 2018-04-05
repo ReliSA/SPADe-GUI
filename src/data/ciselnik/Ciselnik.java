@@ -9,8 +9,6 @@ import data.polozky.PolozkaCiselnik;
 
 /**
  * Abstraktní třída pro naplnění číselníků (priority, severity, statusů, resolucí, typů a osob)
- * @author michalvselko
- *
  */
 public abstract class Ciselnik implements Serializable{
 

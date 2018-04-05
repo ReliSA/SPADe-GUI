@@ -16,8 +16,6 @@ import databaze.UkolDAO;
 
 /**
  * Datová třída seznamu osob zděděná ze třídy Polozka
- * @author michalvselko
- *
  */
 public class Osoba extends Polozka implements Serializable{
 

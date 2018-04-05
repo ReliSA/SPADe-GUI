@@ -1,22 +1,16 @@
 package databaze;
 
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.ArrayList;
-
 import javax.swing.JOptionPane;
-
 import ostatni.Konstanty;
 import data.Artefakt;
 
 /**
  * Třída zajišťující výběr dat artefaktů z databáze implementující rozhraní IArtefaktDAO
- * @author michalvselko
- *
  */
 public class ArtefaktDAO implements IArtefaktDAO{
 	private Connection pripojeni;				//připojení k databázi

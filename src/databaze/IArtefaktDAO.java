@@ -6,8 +6,6 @@ import data.Artefakt;
 
 /**
  * Rozhraní pro výběr artefaktů z databáze
- * @author michalvselko
- *
  */
 public interface IArtefaktDAO {
 	

@@ -1,35 +1,26 @@
 package gui;
 
 import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Paint;
 import java.time.LocalDate;
 import java.util.ArrayList;
-
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.DatasetRenderingOrder;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.category.AreaRenderer;
-import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.category.CategoryItemRenderer;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.chart.renderer.xy.XYLine3DRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
-import org.jfree.chart.renderer.xy.XYShapeRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.time.Month;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
-
 import ostatni.Konstanty;
 import data.Projekt;
 import data.Segment;
@@ -44,11 +35,10 @@ import data.ciselnik.Typ;
 
 /**
  * Panel zobrazující grafy týkající se úkolů, zděděný ze třídy PanelGrafuRodic
- * @author michalvselko
- *
  */
 public class PanelGrafuUkol extends PanelGrafuRodic{	
 	
+	private static final long serialVersionUID = 6249210922576432865L;
 	private Priority priority = new Priority(projekt.getID());	//vytvoří číselník priorit
 	private Severity severity = new Severity(projekt.getID());	//vytvoří číselník severit
 	private Status statusy = new Status(projekt.getID());		//vytvoří číselník statusů

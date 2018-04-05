@@ -10,16 +10,11 @@ import java.awt.dnd.DragSourceDragEvent;
 import java.awt.dnd.DragSourceDropEvent;
 import java.awt.dnd.DragSourceEvent;
 import java.awt.dnd.DragSourceListener;
-import java.io.Serializable;
-
 import javax.swing.JPanel;
 
 /**
  * Třída sloužící jako handler pro gesto přetažení. Implementuje
  * {@link DragGestureListener} a {@link DragSourceListener}
- * 
- * @author LukasHaringer
- *
  */
 
 public class DragGestureHandler implements DragGestureListener, DragSourceListener{

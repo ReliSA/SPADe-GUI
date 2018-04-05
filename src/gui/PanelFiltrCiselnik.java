@@ -1,12 +1,9 @@
 package gui;
 
-import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.Box;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -16,20 +13,18 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-
 import ostatni.Konstanty;
 import data.polozky.PolozkaCiselnik;
 
 /**
  * Panel filtrů pro číselníky (priority, severity ...) zděděný z PanelFiltr
- * @author michalvselko
- *
  */
 public class PanelFiltrCiselnik extends PanelFiltr{
 	
+	private static final long serialVersionUID = -810618543304196785L;
 	private JList<String> lsSeznamTrid = new JList<String>();												//seznam tříd
 	private JList<String> lsSeznamSuperTrid = new JList<String>();											//seznam supertříd
-	private JComboBox<String> cbLogOperace = new JComboBox<>(Konstanty.POLE_LOG_OPERATORU);
+	private JComboBox<String> cbLogOperace = new JComboBox<>(Konstanty.POLE_LOG_OPERATORU);					//operátor pro spojení panelů podmínkou třídy (a, nebo, xor, not)
 	private JComboBox<String> cbSpojeniTridy = new JComboBox<String>(Konstanty.POLE_PODMINEK);				//operátor pro spojení s podmínkou třídy (a, nebo)
 	private JComboBox<String> cbSpojeniSuperTridy = new JComboBox<String>(Konstanty.POLE_PODMINEK);			//operátor pro spojení s podmínkou supertřídy (a, nebo)	
 	
@@ -43,6 +38,11 @@ public class PanelFiltrCiselnik extends PanelFiltr{
 		nastavPanel(nazev);
 	}
 	
+	
+	/**
+	 * Metoda pro zjištění logického operátoru pro spojení panelů
+	 * @return Logická operace
+	 */
 	public String getLogOperand() {		
 		switch (cbLogOperace.getSelectedIndex()) {
 		case 0:		

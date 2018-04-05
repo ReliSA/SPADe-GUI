@@ -10,11 +10,11 @@ import databaze.ICiselnikyDAO;
 
 /**
  * Třída osob zděděná z třídy Ciselnik
- * @author michalvselko
- *
  */
 public class Osoby extends Ciselnik{
 	
+	private static final long serialVersionUID = -6288320387652282637L;
+
 	/**
 	 * Konstruktor číselníku
 	 * @param idProjekt id projektu pro výběr osob

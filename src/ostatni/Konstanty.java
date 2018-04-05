@@ -8,13 +8,10 @@ import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Properties;
-import java.util.Set;
 
-import data.prepravkaUkladaniCustom;
 
 /**
  * Třída konstant
- * @author michalvselko
  *
  */
 public class Konstanty {
@@ -55,6 +52,7 @@ public class Konstanty {
 	public static final Font FONT_NADPIS = new Font("TimesRoman", Font.BOLD, 25);
 	public static final Font FONT_POPISKY_GRAFU = new Font("TimesRoman", Font.PLAIN, 10);
 	public static final Font FONT_NAZEV_GRAFU = new Font("TimesRoman", Font.PLAIN, 20);
+	public static final Font FONT_SIPKA = new Font("Arial", Font.PLAIN, 15);
 	/*-----------------------------------------------*/
 	
 	/*--------Nastavení panelu statistik-------------*/
@@ -99,6 +97,14 @@ public class Konstanty {
 	public static final int PIE = 4;
 	/*-----------------------------------------------*/
 	
+	/*-------------Typy custom grafů------------------------*/
+	public static final int CUSTOM_SLOUPCOVY = 0;
+	public static final int CUSTOM_SPOJNICOVY = 1;
+	public static final int CUSTOM_BODOVY = 2;
+	public static final int CUSTOM_PLOSNY = 3;
+	public static final int CUSTOM_PIE = 4;
+	/*-----------------------------------------------*/
+	
 	/*--------------Typy supertříd--------------------*/
 	public static final String[] NIZKASUPERTRIDA = {"LOW", "MINOR", "OPEN", "FINISHED"};
 	public static final String[] STREDNISUPERTRIDA = {"NORMAL", "CLOSED", "UNFINISHED"};
@@ -112,7 +118,8 @@ public class Konstanty {
 	public static final Color barvaIterace = new Color(255, 153, 153);
 	public static final Color barvaAktivity= new Color(190, 158, 217);
 	public static final Color barvaKonfigurace = new Color(236,186,147);
-	public static final Color barvaArtefakty = new Color(248,131,85);	
+	public static final Color barvaArtefakty = new Color(248,131,85);
+	/*-----------------------------------------------*/
 	
 	public static Connection PRIPOJENI = null;														//připojení k databázi
 	public static final String CESTA_K_DATABAZI = "jdbc:mysql://127.0.0.1:3306/ppicha?allowMultiQueries=true";				//cesta k databázi
@@ -154,6 +161,9 @@ public class Konstanty {
 		return vystup;
 	}
 	
+	/**
+	 * Nastaví popisky comboboxu
+	 */
 	public static void nastavPopisComboBox(){
 		POLE_PODMINEK = new String[]{POPISY.getProperty("a"), POPISY.getProperty("nebo")};
 		POLE_OPERATORU = new String[]{POPISY.getProperty("mezi"), ">", ">=", "=", "!=", "<=", "<"};
@@ -163,6 +173,10 @@ public class Konstanty {
 		TYPY_GRAFU = new String[] {POPISY.getProperty("sloupcovy"),POPISY.getProperty("spojnicovy"),POPISY.getProperty("bodovy"),POPISY.getProperty("plosny"),POPISY.getProperty("kolacovy")};
 	}
 	
+	/**
+	 * Vrací pole názvů SQL dotazů pro custom grafy
+	 * @return pole názvů SQL dotazů
+	 */
 	public static String [] getSQLKeys(){ 
 		ArrayList<String> list = new ArrayList<>();
 		

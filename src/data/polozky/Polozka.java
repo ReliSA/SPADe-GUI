@@ -4,8 +4,6 @@ import java.io.Serializable;
 
 /**
  * Základní třída položek dat obsahující id a název
- * @author michalvselko
- *
  */
 public class Polozka implements Serializable{
 

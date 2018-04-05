@@ -21,8 +21,6 @@ import data.Projekt;
 
 /**
  * Panel zobrazující grafy týkající se artefaktů, zděděná ze třídy PanelGrafuRodic
- * @author michalvselko
- *
  */
 public class PanelGrafuArtefakt extends PanelGrafuRodic {
 

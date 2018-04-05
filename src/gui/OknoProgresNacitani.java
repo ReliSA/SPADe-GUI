@@ -12,8 +12,6 @@ import javax.swing.SwingUtilities;
 import ostatni.Konstanty;
 /**
  * Dialogové okno zobrazující progres načítání dat
- * @author michalvselko
- *
  */
 public class OknoProgresNacitani extends JDialog{
 	private JProgressBar pbProgres = new JProgressBar(0, Konstanty.POCET_KROKU_PROGRESU); 	//progres načítání

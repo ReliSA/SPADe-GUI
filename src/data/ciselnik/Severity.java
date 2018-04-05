@@ -11,10 +11,10 @@ import databaze.ICiselnikyDAO;
 
 /**
  * Třída severit zděděná z třídy Ciselnik
- * @author michalvselko
- *
  */
 public class Severity extends Ciselnik{
+
+	private static final long serialVersionUID = 7708464117458493929L;
 
 	/**
 	 * Konstruktor číselníku

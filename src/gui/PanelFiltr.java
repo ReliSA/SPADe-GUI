@@ -17,24 +17,19 @@ import ostatni.Konstanty;
 /**
  * Abstraktní třída, počáteční panel filtrů ze kterého ostatní panely filtru
  * dědí, nastavuje checkbox Použít filtr a seznam výběru daného typu
- * 
- * @author michalvselko
- *
  */
 public abstract class PanelFiltr extends JPanel {
 
+	private static final long serialVersionUID = 6333285605158443235L;
 	protected ArrayList<?> seznam; // seznam možného výběru
-	protected JCheckBox ckPouzitFiltr = new JCheckBox(Konstanty.POPISY.getProperty("checkBoxPouzitFiltr"), true); // zaškrtávátko
-																													// Použít
-																													// filtr
+	protected JCheckBox ckPouzitFiltr = new JCheckBox(Konstanty.POPISY.getProperty("checkBoxPouzitFiltr"), true); // zaškrtávátko Použít filtr
 	protected JList<?> lsSeznamFiltr; // zobrazený seznam
 	private GridBagConstraints grid = new GridBagConstraints(); // grid pro nastavení pozic komponent
 
 	/**
 	 * Konstruktor třídy, nastaví seznam výběru
 	 * 
-	 * @param seznam
-	 *            seznam výběru
+	 * @param seznam seznam výběru
 	 */
 	public PanelFiltr(ArrayList seznam) {
 		this.seznam = seznam;
@@ -61,15 +56,13 @@ public abstract class PanelFiltr extends JPanel {
 	/**
 	 * Vrací model ze seznamu z parametru
 	 * 
-	 * @param seznam
-	 *            seznam, ze kterého se vytvoří model
+	 * @param seznam seznam, ze kterého se vytvoří model
 	 * @return vytvořený model
 	 */
 	protected DefaultComboBoxModel getModel(ArrayList seznam) {
 		DefaultComboBoxModel model = new DefaultComboBoxModel();
 		for (int i = 0; i < seznam.size(); i++) {
 			if (seznam.get(i).toString()!=null) {
-				System.out.println(seznam.get(i));
 				model.addElement(seznam.get(i));
 			}
 		}
@@ -88,8 +81,7 @@ public abstract class PanelFiltr extends JPanel {
 	/**
 	 * Nastaví panel filtrů
 	 * 
-	 * @param nazev
-	 *            název panelu filtrů
+	 * @param nazev název panelu filtrů
 	 */
 	protected void nastavPanel(String nazev) {
 		String titulek = "";

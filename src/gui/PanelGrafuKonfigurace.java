@@ -2,28 +2,24 @@ package gui;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-
 import javax.swing.BorderFactory;
 import javax.swing.JOptionPane;
-
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.time.Month;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
-
 import ostatni.Konstanty;
 import data.Konfigurace;
 import data.Projekt;
 
 /**
  * Panel zobrazující grafy týkající se konfigurací, zděděná ze třídy PanelGrafuRodic
- * @author michalvselko
- *
  */
 public class PanelGrafuKonfigurace extends PanelGrafuRodic{
+
+	private static final long serialVersionUID = -7192735188487952687L;
 
 	/**
 	 * Konstruktor třídy, nastaví projekt a spustí vložení grafů

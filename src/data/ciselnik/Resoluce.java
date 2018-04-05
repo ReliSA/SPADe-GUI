@@ -10,10 +10,10 @@ import databaze.ICiselnikyDAO;
 
 /**
  * Třída resolucí zděděná z třídy Ciselnik
- * @author michalvselko
- *
  */
 public class Resoluce extends Ciselnik{
+
+	private static final long serialVersionUID = -9053050661284648953L;
 
 	/**
 	 * Konstruktor číselníku

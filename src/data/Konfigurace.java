@@ -16,8 +16,6 @@ import ostatni.Konstanty;
 
 /**
  * Datová třída konfigurace zděděná ze třídy PolozkaVytvoreni
- * @author michalvselko
- *
  */
 public class Konfigurace extends PolozkaVytvoreni implements Serializable{
 

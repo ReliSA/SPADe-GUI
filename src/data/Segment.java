@@ -13,8 +13,6 @@ import databaze.UkolDAO;
 
 /**
  * Datová třída pro uložení segmentů (fází, iterací a aktivit) zděděná ze třídy PolozkaPocatek
- * @author michalvselko
- *
  */
 public class Segment extends PolozkaPocatek implements Serializable{
 

@@ -23,7 +23,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -40,65 +39,58 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
-
-import com.keypoint.PngEncoder;
-
 import ostatni.Konstanty;
 import ostatni.Ukladani;
 import data.*;
 import data.ciselnik.*;
-import data.polozky.PolozkaVytvoreni;
-import databaze.CustomGrafDAO;
 import databaze.IProjektDAO;
 import databaze.ProjektDAO;
 
 /**
  * Hlavní okno na které se dodávají jednotlivé panely, dědí ze třídy JFrame
- * 
- * @author michalvselko
  */
 public class OknoHlavni extends JFrame {
 
-	private JPanel panelMenu; // levý panel pro výběr projektu a dodání filtrů
-	private JPanel listaFiltru;
-	private JPanel panelProjektMenu;
-	private PanelGrafu panelGrafu; // centrální panel zobrazující statistiky a grafy
-	private JMenuBar menuBar; // horní ovládací bar
+	private static final long serialVersionUID = 7642444463088891084L;
+	private JPanel panelMenu; // levý panel pro výběr projektu a přidání filtrů
+	private JPanel listaTlacitekSmazaniFiltru; //panel pro tlačítka pro smazání aktivních filtrů
+	private JPanel panelProjektMenu; // panel pro výběr projektu
+	private PanelProjektu panelGrafu; // centrální panel zobrazující statistiky a grafy
 
-	private DefaultComboBoxModel<Projekt> modelProjekt = new DefaultComboBoxModel<Projekt>(); // model pro seznam
-																								// projektů
+	private DefaultComboBoxModel<Projekt> modelProjekt = new DefaultComboBoxModel<Projekt>(); // model pro seznam projektů
 	private ComboBoxDynamicky lsSeznamProjektu = new ComboBoxDynamicky(modelProjekt); // seznam projektů
 	private JComboBox<String> cbTypFiltru = new JComboBox<String>(Konstanty.POLE_FILTRU); // seznam možných filtrů
-	private JComboBox<String> cbTypPodfiltru = new JComboBox<String>(Konstanty.POLE_PODFILTRU);
+	private JComboBox<String> cbTypPodfiltru = new JComboBox<String>(Konstanty.POLE_PODFILTRU); // seznam možných podfiltrů úkolu
 	private JPanel pnBoxFiltru = new JPanel(); // box s vybranými filtry
-	private JButton btZapniFiltr = new JButton(Konstanty.POPISY.getProperty("tlacitkoZapniFiltr")); // tlačítko pro
-																									// spuštění podmínek
-	private JButton btSipkaFiltry;
-	private JScrollPane scScrollFiltru;
-	private JMenu fileMenu; // Tlačítko menu baru
-	private JMenu customGrafMenu; // Tlačítko menu baru
-	private JMenuItem vytvorGraf; // Tlačítko menu baru
-	private JMenu settingsMenu; // Tlačítko menu baru
-	private JMenu languageMenu; // Tlačítko menu baru
-	private JMenu removeChartMenu; // Tlačítko menu baru
-	private JMenu removeMainMenu; // Tlačítko menu baru
-	private JMenuItem removeChartProject; // Tlačítko menu baru
-	private JMenu importExportMenu; // Tlačítko menu baru
-	private JMenuItem exportAll; // Tlačítko menu baru
-	private JMenuItem exportProjekt; // Tlačítko menu baru
-	private JMenuItem importGrafy; // Tlačítko menu baru
-	private JMenuItem exitAction; // Tlačítko menu baru
-	private JMenuItem czech; // Tlačítko menu baru
-	private JMenuItem english; // Tlačítko menu baru
-	private JCheckBoxMenuItem filtry; // Tlačítko menu baru
-	private int polohaPaneluUkol;
+	private JButton btZapniFiltr = new JButton(Konstanty.POPISY.getProperty("tlacitkoZapniFiltr")); // tlačítko pro načtení filtrů
+	private JButton btSipkaFiltry; // tlačítko pro schování panelu filtrů
+	private JScrollPane scScrollFiltru; // scrollpanel pro filtry
+	
+	private JMenuBar menuBar; // horní ovládací bar
+	private JMenu fileMenu; // Menu horního baru "Soubor"
+	private JMenu customGrafMenu; // Menu horního baru "Vlastní graf"
+	private JMenuItem vytvorGraf; // Tlačítko horního menu pro vytvoření custom grafu
+	private JMenu settingsMenu; // Menu horního baru "Nastavení"
+	private JMenu languageMenu; // Menu horního baru pro nastavení jazyka programu
+	private JMenu removeChartMenu; // Menu horního baru pro odstranění custom grafu podle jména
+	private JMenu removeMainMenu; // Menu horního baru pro odstranění custom grafu
+	private JMenuItem removeChartProject; // Tlačítko horního menu pro odstranění custom grafu
+	private JMenu importExportMenu; // Menu horního baru pro import/export grafů
+	private JMenuItem exportAll; // Tlačítko horního menu pro exportování všech grafů
+	private JMenuItem exportProjekt; // Tlačítko horního menu pro exportování grafů projektu
+	private JMenuItem importGrafy; // Tlačítko horního menu pro import grafů
+	private JMenuItem exitAction; // // Tlačítko horního menu pro ukončení programu
+	private JMenuItem czech; // Tlačítko horního menu pro přepnutí programu do češtiny
+	private JMenuItem english; // Tlačítko horního menu pro přepnutí programu do angličtiny
+	private JCheckBoxMenuItem filtry; // Checkbox pro nastavení zda se má zobrazovat
+	
+	private int polohaPaneluUkol; // poloha panelu filtru úkol v panelu filtrů
 
 	/**
 	 * Konstruktor třídy, naplní ve třídě konstant připojení, načte projekty a
 	 * nastaví zobrazení a akce
 	 * 
-	 * @param pripojeni
-	 *            připojení k databázi
+	 * @param pripojeni připojení k databázi
 	 */
 	public OknoHlavni(Connection pripojeni) {
 		Konstanty.PRIPOJENI = pripojeni;
@@ -137,7 +129,7 @@ public class OknoHlavni extends JFrame {
 	 * Nastaví zobrazení okna
 	 */
 	private void nastavZobrazeni() {
-		nastavOkno(); // nastaví atributy okna
+		nastavOkno();
 
 		fileMenu = new JMenu(Konstanty.POPISY.getProperty("menuSoubor"));
 		customGrafMenu = new JMenu(Konstanty.POPISY.getProperty("menuCustomGraf"));
@@ -158,20 +150,22 @@ public class OknoHlavni extends JFrame {
 		filtry = new JCheckBoxMenuItem(Konstanty.POPISY.getProperty("filtryTrue"), false);
 
 		JLabel nadpis = new JLabel(Konstanty.POPISY.getProperty("nadpisFiltru"));
-		panelGrafu = new PanelGrafu(this.getProjekt());
+		panelGrafu = new PanelProjektu(this.getProjekt());
 		panelMenu = new JPanel();
 		panelProjektMenu = new JPanel(new BorderLayout());
-		menuBar = new JMenuBar();
-		setJMenuBar(menuBar);
+		panelMenu.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
 		JPanel pnFiltr = new JPanel();
+		
+		menuBar = new JMenuBar();
 		scScrollFiltru = new JScrollPane(pnBoxFiltru, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		pnBoxFiltru.setLayout(new BoxLayout(pnBoxFiltru, BoxLayout.PAGE_AXIS));
-
+		
+		pnBoxFiltru.setBorder(BorderFactory.createTitledBorder(Konstanty.POPISY.getProperty("titleFiltrVyberu")));
 		panelProjektMenu.add(panelMenu, BorderLayout.WEST);
-		listaFiltru = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
-		panelProjektMenu.add(listaFiltru, BorderLayout.CENTER);
-		panelMenu.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
+		listaTlacitekSmazaniFiltru = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
+		panelProjektMenu.add(listaTlacitekSmazaniFiltru, BorderLayout.CENTER);
+		
 		nadpis.setFont(Konstanty.FONT_NADPIS);
 
 		btSipkaFiltry = new JButton("v");
@@ -183,17 +177,16 @@ public class OknoHlavni extends JFrame {
 		pnFiltr.setLayout(new FlowLayout(FlowLayout.CENTER, 15, 15));
 		pnFiltr.add(cbTypFiltru);
 		pnFiltr.add(btZapniFiltr);
-		pnBoxFiltru.setBorder(BorderFactory.createTitledBorder(Konstanty.POPISY.getProperty("titleFiltrVyberu")));
 
 		lsSeznamProjektu.setPreferredSize(Konstanty.VELIKOST_CELA_SIRKA);
 
 		scScrollFiltru.setPreferredSize(new Dimension(270, 225));
 		scScrollFiltru.getVerticalScrollBar().setUnitIncrement(15);
 
+		setJMenuBar(menuBar);
 		panelMenu.add(nadpis);
 		panelMenu.add(lsSeznamProjektu);
 		panelProjektMenu.add(pnFiltr, BorderLayout.EAST);
-
 		menuBar.add(fileMenu);
 		menuBar.add(customGrafMenu);
 		menuBar.add(settingsMenu);
@@ -216,7 +209,7 @@ public class OknoHlavni extends JFrame {
 		this.add(panelProjektMenu, BorderLayout.NORTH);
 		this.add(panelGrafu, BorderLayout.CENTER);
 
-		nastavAkce(); // nastaví akce k jednotlivým komponentám
+		nastavAkce();
 	}
 
 	/**
@@ -229,176 +222,6 @@ public class OknoHlavni extends JFrame {
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setTitle("SPADe");
-	}
-
-	private TlacitkoMazaniFiltru pridejTlacitkoListyFiltru(String nazev, Component comp) {
-
-		for (int i = 0; i < listaFiltru.getComponentCount(); i++) {
-			if (listaFiltru.getComponent(i).getName().equals(nazev)) {
-				listaFiltru.remove(i);
-			}
-		}
-
-		TlacitkoMazaniFiltru tlacitkoMazaniFilru = new TlacitkoMazaniFiltru(comp);
-		tlacitkoMazaniFilru.setName(nazev);
-		tlacitkoMazaniFilru.setText(nazev);
-		listaFiltru.add(tlacitkoMazaniFilru);
-		tlacitkoMazaniFilru.setContentAreaFilled(false);
-		tlacitkoMazaniFilru.setOpaque(true);
-
-		nazev = nazev.substring(0, nazev.length() - 2);
-		switch (nazev) {
-		case "Tasks":
-		case "Úkoly":
-			tlacitkoMazaniFilru.setBackground(Konstanty.barvaUkol);
-			break;
-		case "Priorities":
-		case "Priority":
-			tlacitkoMazaniFilru.setBackground(Konstanty.barvaUkol);
-			break;
-		case "Severity":
-			tlacitkoMazaniFilru.setBackground(Konstanty.barvaUkol);
-			break;
-		case "Status":
-		case "Statusy":
-			tlacitkoMazaniFilru.setBackground(Konstanty.barvaUkol);
-			break;
-		case "Types":
-		case "Typy":
-			tlacitkoMazaniFilru.setBackground(Konstanty.barvaUkol);
-			break;
-		case "Resolution":
-		case "Rezoluce":
-			tlacitkoMazaniFilru.setBackground(Konstanty.barvaUkol);
-			break;
-		case "Persons":
-		case "Osoby":
-			tlacitkoMazaniFilru.setBackground(Konstanty.barvaOsoby);
-			break;
-		case "Phase":
-		case "Fáze":
-			tlacitkoMazaniFilru.setBackground(Konstanty.barvaFaze);
-			break;
-		case "Iterations":
-		case "Iterace":
-			tlacitkoMazaniFilru.setBackground(Konstanty.barvaIterace);
-			break;
-		case "Activities":
-		case "Aktivity":
-			tlacitkoMazaniFilru.setBackground(Konstanty.barvaAktivity);
-			break;
-		case "Configurations":
-		case "Konfigurace":
-			tlacitkoMazaniFilru.setBackground(Konstanty.barvaKonfigurace);
-			break;
-		case "Artifacts":
-		case "Artefakty":
-			tlacitkoMazaniFilru.setBackground(Konstanty.barvaArtefakty);
-			break;
-		case "Time":
-		case "Čas":
-			tlacitkoMazaniFilru.setBackground(Konstanty.barvaUkol);
-			break;
-		default:
-			break;
-		}
-
-		if (listaFiltru.getComponentCount() > 1) {
-			if (!(listaFiltru.getComponent(0).getName().equals(Konstanty.POPISY.getProperty("smazVse")))) {
-				JButton tlacitkoMazaniVse = new JButton();
-				tlacitkoMazaniVse.setName(Konstanty.POPISY.getProperty("smazVse"));
-				tlacitkoMazaniVse.setText(Konstanty.POPISY.getProperty("smazVse"));
-				tlacitkoMazaniVse.setBackground(Color.WHITE);
-				listaFiltru.add(tlacitkoMazaniVse);
-				listaFiltru.setComponentZOrder(tlacitkoMazaniVse, 0);
-				tlacitkoMazaniVse.setContentAreaFilled(false);
-				tlacitkoMazaniVse.setOpaque(true);
-				tlacitkoMazaniVse.addActionListener(actSmazVsechnyFiltry);
-			}
-		}
-
-		return tlacitkoMazaniFilru;
-	}
-
-	private void smazTlacitkoListyFiltru(String nazev) {
-
-		for (int i = 0; i < listaFiltru.getComponentCount(); i++) {
-			if (listaFiltru.getComponent(i).getName().equals(nazev)) {
-				listaFiltru.remove(i);
-			}
-		}
-
-		if (listaFiltru.getComponentCount() > 2) {
-			listaFiltru.remove(0);
-		}
-
-		listaFiltru.repaint();
-	}
-
-	/* akce pro smazání všech filtrů */
-	ActionListener actSmazVsechnyFiltry = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-
-			Konstanty.CITAC_PROGRESU = 0;
-			Thread t1 = new Thread(new Runnable() {
-				public void run() {
-					OknoProgresNacitani oknoProgres = new OknoProgresNacitani();
-					while (Konstanty.CITAC_PROGRESU <= Konstanty.POCET_KROKU_PROGRESU) {
-						oknoProgres.nastavProgres();
-						if (Konstanty.CITAC_PROGRESU >= Konstanty.POCET_KROKU_PROGRESU) {
-							break;
-						}
-						Thread.yield();
-					}
-					oknoProgres.setVisible(false);
-				}
-			});
-
-			/* vlákno spustí hlavní okno programu */
-			Thread t2 = new Thread(new Runnable() {
-				public void run() {
-					listaFiltru.removeAll();
-					pnBoxFiltru.removeAll();
-					panelGrafu.setProjekt(getProjekt());
-					panelGrafu.panelFiltrySipka.add(btSipkaFiltry, BorderLayout.SOUTH);
-					listaFiltru.revalidate();
-					listaFiltru.repaint();
-				}
-			});
-			t1.start();
-			t2.start();
-		}
-	};
-
-	/**
-	 * Metoda sloužící pro restart hlavního okna a nového načtení konfigurací.
-	 */
-	private void restartOkna() {
-		setVisible(false);
-		Konstanty.CITAC_PROGRESU = 0;
-		Thread t1 = new Thread(new Runnable() {
-			public void run() {
-				OknoProgresNacitani oknoProgres = new OknoProgresNacitani();
-				while (Konstanty.CITAC_PROGRESU <= Konstanty.POCET_KROKU_PROGRESU) {
-					oknoProgres.nastavProgres();
-					if (Konstanty.CITAC_PROGRESU >= Konstanty.POCET_KROKU_PROGRESU) {
-						break;
-					}
-					Thread.yield();
-				}
-				oknoProgres.setVisible(false);
-			}
-		});
-
-		/* vlákno spustí hlavní okno programu */
-		Thread t2 = new Thread(new Runnable() {
-			public void run() {
-				new OknoHlavni(Konstanty.PRIPOJENI);
-			}
-		});
-		t1.start();
-		t2.start();
-		dispose();
 	}
 
 	/**
@@ -668,15 +491,8 @@ public class OknoHlavni extends JFrame {
 
 					switch (cbTypFiltru.getSelectedIndex()) { // podle zadaného typu filtru vloží konkrétní panel filtru
 					case 0:
-						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevUkoly"), pnBoxFiltru.getComponents())) { // pokud
-																														// je
-																														// panel
-																														// již
-																														// vložen,
-																														// nelze
-																														// ho
-																														// znovu
-																														// dodat
+						/* pokud je panel již vložen, nelze ho znovu dodat*/
+						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevUkoly"), pnBoxFiltru.getComponents())) { 
 							if (getProjekt().getUkoly().isEmpty()) // zkontroluje, zda projekt obsahuje data nutná k
 																	// filtrování v daném panelu
 								JOptionPane.showMessageDialog(pnBoxFiltru,
@@ -754,13 +570,12 @@ public class OknoHlavni extends JFrame {
 			}
 		};
 
-		/* akce pro tlačítko Přidej filtr */
+		/* akce pro combobox přidání podlfiltru pro úkoly */
 		ActionListener actVlozPodFiltr = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
 
-					switch (cbTypPodfiltru.getSelectedIndex()) { // podle zadaného typu filtru vloží konkrétní panel
-																	// filtru
+					switch (cbTypPodfiltru.getSelectedIndex()) { 
 					case 0:
 						if (!jeZadanyFiltr(Konstanty.POPISY.getProperty("nazevPriority"),
 								pnBoxFiltru.getComponents())) {
@@ -849,19 +664,20 @@ public class OknoHlavni extends JFrame {
 			}
 		};
 
+		// Akce pro tlačítka pro smazání filtru
 		ActionListener actSmazaniFiltru = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				TlacitkoMazaniFiltru tlacitko = (TlacitkoMazaniFiltru) e.getSource();
 				pnBoxFiltru.remove(tlacitko.getComp());
-				listaFiltru.remove(tlacitko);
+				listaTlacitekSmazaniFiltru.remove(tlacitko);
 
 				/* Smaže tlačítko smazat všechny filtry pokud zbývá pouze jedno tlačítko */
-				if (listaFiltru.getComponentCount() == 2) {
-					listaFiltru.remove(0);
+				if (listaTlacitekSmazaniFiltru.getComponentCount() == 2) {
+					listaTlacitekSmazaniFiltru.remove(0);
 				}
 
-				listaFiltru.revalidate();
-				listaFiltru.repaint();
+				listaTlacitekSmazaniFiltru.revalidate();
+				listaTlacitekSmazaniFiltru.repaint();
 
 				try {
 					/* vlákno zobrazuje okno s progresem načítání */
@@ -909,19 +725,13 @@ public class OknoHlavni extends JFrame {
 							ArrayList<Integer> seznamIdArtefaktu = null;
 							String[] operandy = new String[] { "and", "and", "and", "and", "and", "and" };
 
-							for (int i = 0; i < pnBoxFiltru.getComponentCount(); i++) { // prochází všechny vložené
-																						// filtry
+							for (int i = 0; i < pnBoxFiltru.getComponentCount(); i++) { // prochází všechny vložené filtry
 								PanelFiltr pnPanelFiltr = (PanelFiltr) (pnBoxFiltru.getComponents()[i]);
 								if (pnPanelFiltr.jePouzit()) { // je-li zaškrtnuto použít, zjistí se o jaký filtr jde
 									switch (pnPanelFiltr.getName()) { // pomocí názvu se zjišťuje o jaký jde filtr
 									case "Tasks":
 									case "Úkoly":
-										seznamIdUkolu = ((PanelFiltrPolozkaPocatek) pnPanelFiltr).getSeznamId(); // zjistí
-																													// seznam
-																													// id
-																													// odpovídající
-																													// zadaným
-																													// podmínkám
+										seznamIdUkolu = ((PanelFiltrPolozkaPocatek) pnPanelFiltr).getSeznamId(); 
 										break;
 									case "Priorities":
 									case "Priority":
@@ -1011,7 +821,7 @@ public class OknoHlavni extends JFrame {
 			}
 		};
 
-		/* akce pro spuštění zadaných filtrů */
+		/* akce pro zapnutí vybraných filtrů */
 		ActionListener actZapniFiltr = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
@@ -1060,84 +870,79 @@ public class OknoHlavni extends JFrame {
 							ArrayList<Integer> seznamIdArtefaktu = null;
 							String[] operandy = new String[] { "and", "and", "and", "and", "and", "and" };
 
-							for (int i = 0; i < pnBoxFiltru.getComponentCount(); i++) { // prochází všechny vložené
-																						// filtry
+							for (int i = 0; i < pnBoxFiltru.getComponentCount(); i++) { // prochází všechny vložené filtry
 								PanelFiltr pnPanelFiltr = (PanelFiltr) (pnBoxFiltru.getComponents()[i]);
 								if (pnPanelFiltr.jePouzit()) { // je-li zaškrtnuto použít, zjistí se o jaký filtr jde
 									switch (pnPanelFiltr.getName()) { // pomocí názvu se zjišťuje o jaký jde filtr
 									case "Tasks":
 									case "Úkoly":
-										seznamIdUkolu = ((PanelFiltrPolozkaPocatek) pnPanelFiltr).getSeznamId(); // zjistí
-																													// id
-																													// odpovídající
-																													// zadaným
-																													// podmínkám
-										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("nazevUkoly") + " X",
+										seznamIdUkolu = ((PanelFiltrPolozkaPocatek) pnPanelFiltr).getSeznamId();
+										vytvorTlacitkoMazaniFiltru(Konstanty.POPISY.getProperty("nazevUkoly") + " X",
 												pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);
 										break;
 									case "Priorities":
 									case "Priority":
 										seznamIdPriorit = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
-										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("nazevPriority") + " X",
+										vytvorTlacitkoMazaniFiltru(Konstanty.POPISY.getProperty("nazevPriority") + " X",
 												pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);
 										operandy[0] = ((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
 										break;
 									case "Severity":
 										seznamIdSeverit = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
-										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("nazevSeverity") + " X",
+										vytvorTlacitkoMazaniFiltru(Konstanty.POPISY.getProperty("nazevSeverity") + " X",
 												pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);
 										operandy[1] = ((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
 										break;
 									case "Status":
 									case "Statusy":
 										seznamIdStatusu = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
-										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("nazevStatusy") + " X",
+										vytvorTlacitkoMazaniFiltru(Konstanty.POPISY.getProperty("nazevStatusy") + " X",
 												pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);
 										operandy[2] = ((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
 										break;
 									case "Types":
 									case "Typy":
 										seznamIdTypu = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
-										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("nazevTypy") + " X",
+										vytvorTlacitkoMazaniFiltru(Konstanty.POPISY.getProperty("nazevTypy") + " X",
 												pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);
 										operandy[3] = ((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
 										break;
 									case "Resolution":
 									case "Rezoluce":
 										seznamIdResoluci = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
-										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("nazevResoluce") + " X",
+										vytvorTlacitkoMazaniFiltru(Konstanty.POPISY.getProperty("nazevResoluce") + " X",
 												pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);
 										operandy[4] = ((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
 										break;
 									case "Persons":
 									case "Osoby":
 										seznamIdOsob = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
-										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("nazevOsoby") + " X",
+										vytvorTlacitkoMazaniFiltru(Konstanty.POPISY.getProperty("nazevOsoby") + " X",
 												pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);
 										operandy[5] = ((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
 										break;
 									case "Phase":
 									case "Fáze":
 										seznamIdFazi = ((PanelFiltrPolozkaPocatek) pnPanelFiltr).getSeznamId();
-										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("nazevFaze") + " X",
+										vytvorTlacitkoMazaniFiltru(Konstanty.POPISY.getProperty("nazevFaze") + " X",
 												pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);
 										break;
 									case "Iterations":
 									case "Iterace":
 										seznamIdIteraci = ((PanelFiltrPolozkaPocatek) pnPanelFiltr).getSeznamId();
-										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("nazevIterace") + " X",
+										vytvorTlacitkoMazaniFiltru(Konstanty.POPISY.getProperty("nazevIterace") + " X",
 												pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);
 										break;
 									case "Activities":
 									case "Aktivity":
 										seznamIdAktivit = ((PanelFiltrPolozkaPocatek) pnPanelFiltr).getSeznamId();
-										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("nazevAktivity") + " X",
+										vytvorTlacitkoMazaniFiltru(Konstanty.POPISY.getProperty("nazevAktivity") + " X",
 												pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);
 										break;
 									case "Configurations":
 									case "Konfigurace":
 										seznamIdKonfiguraci = ((PanelFiltrPolozkaVytvoreni) pnPanelFiltr).getSeznamId();
-										pridejTlacitkoListyFiltru(
+										vytvorTlacitkoMazaniFiltru(
 												Konstanty.POPISY.getProperty("nazevKonfigurace") + " X",
 												pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);
 										break;
@@ -1145,7 +950,7 @@ public class OknoHlavni extends JFrame {
 									case "Artefakty":
 										seznamIdArtefaktu = ((PanelFiltrPolozkaVytvoreniArtefakt) pnPanelFiltr)
 												.getSeznamId();
-										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("nazevArtefakty") + " X",
+										vytvorTlacitkoMazaniFiltru(Konstanty.POPISY.getProperty("nazevArtefakty") + " X",
 												pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);
 										break;
 									case "Time":
@@ -1156,7 +961,7 @@ public class OknoHlavni extends JFrame {
 											seznamIdUkolu.add(-1);
 										}
 
-										pridejTlacitkoListyFiltru(Konstanty.POPISY.getProperty("cas") + " X",
+										vytvorTlacitkoMazaniFiltru(Konstanty.POPISY.getProperty("cas") + " X",
 												pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);
 										break;
 									default:
@@ -1290,7 +1095,7 @@ public class OknoHlavni extends JFrame {
 			}
 		};
 
-		/* akce pro schování panelu filtrů */
+		/* akce pro schování panelu filtrů z horního menu */
 		ActionListener actZobrazeniFiltruMenu = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (filtry.isSelected() == true) {
@@ -1301,7 +1106,7 @@ public class OknoHlavni extends JFrame {
 			}
 		};
 
-		/* akce pro schování panelu filtrů */
+		/* akce pro schování panelu filtrů pomocí tlačítka šipky*/
 		ActionListener actZobrazeniFiltruButton = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
@@ -1314,15 +1119,6 @@ public class OknoHlavni extends JFrame {
 					btSipkaFiltry.setText("v");
 					filtry.setSelected(false);
 				}
-			}
-		};
-
-		/* akce pro smazání všech filtrů */
-		ActionListener actSmazVsechnyFiltry = new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				listaFiltru.removeAll();
-				pnBoxFiltru.removeAll();
-				panelGrafu.setProjekt(getProjekt());
 			}
 		};
 
@@ -1340,7 +1136,7 @@ public class OknoHlavni extends JFrame {
 			}
 		};
 		
-		/* akce pro otevření okna custom grafů */
+		/* akce pro export všech custom grafů */
 		ActionListener actExportAll = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser fileChooser = new JFileChooser();
@@ -1352,7 +1148,7 @@ public class OknoHlavni extends JFrame {
 			}
 		};
 		
-		/* akce pro otevření okna custom grafů */
+		/* akce pro export custom grafů projektu */
 		ActionListener actExportProjekt = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser fileChooser = new JFileChooser();
@@ -1364,6 +1160,7 @@ public class OknoHlavni extends JFrame {
 			}
 		};
 		
+		/* akce pro import custom grafů */
 		ActionListener actImportGrafu = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser fileChooser = new JFileChooser();
@@ -1374,6 +1171,7 @@ public class OknoHlavni extends JFrame {
 			}
 		};
 		
+		/* akce pro smazání grafů projektu */
 		ActionListener actRemoveChartProject = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Ukladani.odstranGrafyProjektu(getProjekt().getID());
@@ -1397,19 +1195,198 @@ public class OknoHlavni extends JFrame {
 		importGrafy.addActionListener(actImportGrafu);
 		removeChartProject.addActionListener(actRemoveChartProject);
 
-
 		this.addComponentListener(actResizePaneluGrafu);
 		this.addWindowListener(actUkonceniOkna);
 
 	}
 
 	/**
+	 * Vytvoří tlačítko pro smazání filtru
+	 * @param nazev název tlačítka
+	 * @param comp odkaz na filtr, který má tlačítko odstranit
+	 * @return tlačítko pro smazání filtru
+	 */
+	private TlacitkoMazaniFiltru vytvorTlacitkoMazaniFiltru(String nazev, Component comp) {
+
+		for (int i = 0; i < listaTlacitekSmazaniFiltru.getComponentCount(); i++) {	//vymaže duplicitní tlačítka
+			if (listaTlacitekSmazaniFiltru.getComponent(i).getName().equals(nazev)) {
+				listaTlacitekSmazaniFiltru.remove(i);
+			}
+		}
+
+		TlacitkoMazaniFiltru tlacitkoMazaniFilru = new TlacitkoMazaniFiltru(comp);
+		tlacitkoMazaniFilru.setName(nazev);
+		tlacitkoMazaniFilru.setText(nazev);
+		listaTlacitekSmazaniFiltru.add(tlacitkoMazaniFilru);
+		tlacitkoMazaniFilru.setContentAreaFilled(false);
+		tlacitkoMazaniFilru.setOpaque(true);
+
+		nazev = nazev.substring(0, nazev.length() - 2);
+		switch (nazev) {	//nastaví barvu tlačítka filtru podle typu filtru
+		case "Tasks":
+		case "Úkoly":
+			tlacitkoMazaniFilru.setBackground(Konstanty.barvaUkol);
+			break;
+		case "Priorities":
+		case "Priority":
+			tlacitkoMazaniFilru.setBackground(Konstanty.barvaUkol);
+			break;
+		case "Severity":
+			tlacitkoMazaniFilru.setBackground(Konstanty.barvaUkol);
+			break;
+		case "Status":
+		case "Statusy":
+			tlacitkoMazaniFilru.setBackground(Konstanty.barvaUkol);
+			break;
+		case "Types":
+		case "Typy":
+			tlacitkoMazaniFilru.setBackground(Konstanty.barvaUkol);
+			break;
+		case "Resolution":
+		case "Rezoluce":
+			tlacitkoMazaniFilru.setBackground(Konstanty.barvaUkol);
+			break;
+		case "Persons":
+		case "Osoby":
+			tlacitkoMazaniFilru.setBackground(Konstanty.barvaOsoby);
+			break;
+		case "Phase":
+		case "Fáze":
+			tlacitkoMazaniFilru.setBackground(Konstanty.barvaFaze);
+			break;
+		case "Iterations":
+		case "Iterace":
+			tlacitkoMazaniFilru.setBackground(Konstanty.barvaIterace);
+			break;
+		case "Activities":
+		case "Aktivity":
+			tlacitkoMazaniFilru.setBackground(Konstanty.barvaAktivity);
+			break;
+		case "Configurations":
+		case "Konfigurace":
+			tlacitkoMazaniFilru.setBackground(Konstanty.barvaKonfigurace);
+			break;
+		case "Artifacts":
+		case "Artefakty":
+			tlacitkoMazaniFilru.setBackground(Konstanty.barvaArtefakty);
+			break;
+		case "Time":
+		case "Čas":
+			tlacitkoMazaniFilru.setBackground(Konstanty.barvaUkol);
+			break;
+		default:
+			break;
+		}
+
+		if (listaTlacitekSmazaniFiltru.getComponentCount() > 1) {	//pokud jsou zapnuty více než dva filtry, přidá tlačítko pro odstranění všech filtrů
+			if (!(listaTlacitekSmazaniFiltru.getComponent(0).getName().equals(Konstanty.POPISY.getProperty("smazVse")))) {
+				JButton tlacitkoMazaniVse = new JButton();
+				tlacitkoMazaniVse.setName(Konstanty.POPISY.getProperty("smazVse"));
+				tlacitkoMazaniVse.setText(Konstanty.POPISY.getProperty("smazVse"));
+				tlacitkoMazaniVse.setBackground(Color.WHITE);
+				listaTlacitekSmazaniFiltru.add(tlacitkoMazaniVse);
+				listaTlacitekSmazaniFiltru.setComponentZOrder(tlacitkoMazaniVse, 0);
+				tlacitkoMazaniVse.setContentAreaFilled(false);
+				tlacitkoMazaniVse.setOpaque(true);
+				tlacitkoMazaniVse.addActionListener(actSmazVsechnyFiltry);
+			}
+		}
+
+		return tlacitkoMazaniFilru;
+	}
+
+	/**
+	 * Metoda odebe tlačítko pro smazání filtru z panelu pro tlačítka
+	 * @param nazev název filtru
+	 */
+	private void smazTlacitkoListyFiltru(String nazev) {
+
+		for (int i = 0; i < listaTlacitekSmazaniFiltru.getComponentCount(); i++) {
+			if (listaTlacitekSmazaniFiltru.getComponent(i).getName().equals(nazev)) {
+				listaTlacitekSmazaniFiltru.remove(i);
+			}
+		}
+
+		if (listaTlacitekSmazaniFiltru.getComponentCount() > 2) {
+			listaTlacitekSmazaniFiltru.remove(0);
+		}
+
+		listaTlacitekSmazaniFiltru.repaint();
+	}
+
+	/**
+	 * Akce pro odstranění všech filtrů
+	 */
+	ActionListener actSmazVsechnyFiltry = new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+
+			Konstanty.CITAC_PROGRESU = 0;
+			Thread t1 = new Thread(new Runnable() {
+				public void run() {
+					OknoProgresNacitani oknoProgres = new OknoProgresNacitani();
+					while (Konstanty.CITAC_PROGRESU <= Konstanty.POCET_KROKU_PROGRESU) {
+						oknoProgres.nastavProgres();
+						if (Konstanty.CITAC_PROGRESU >= Konstanty.POCET_KROKU_PROGRESU) {
+							break;
+						}
+						Thread.yield();
+					}
+					oknoProgres.setVisible(false);
+				}
+			});
+
+			Thread t2 = new Thread(new Runnable() {
+				public void run() {
+					listaTlacitekSmazaniFiltru.removeAll();
+					pnBoxFiltru.removeAll();
+					panelGrafu.setProjekt(getProjekt());
+					panelGrafu.panelFiltrySipka.add(btSipkaFiltry, BorderLayout.SOUTH);
+					listaTlacitekSmazaniFiltru.revalidate();
+					listaTlacitekSmazaniFiltru.repaint();
+				}
+			});
+			t1.start();
+			t2.start();
+		}
+	};
+
+	/**
+	 * Metoda sloužící pro restart hlavního okna a nového načtení konfigurací.
+	 */
+	private void restartOkna() {
+		setVisible(false);
+		Konstanty.CITAC_PROGRESU = 0;
+		Thread t1 = new Thread(new Runnable() {
+			public void run() {
+				OknoProgresNacitani oknoProgres = new OknoProgresNacitani();
+				while (Konstanty.CITAC_PROGRESU <= Konstanty.POCET_KROKU_PROGRESU) {
+					oknoProgres.nastavProgres();
+					if (Konstanty.CITAC_PROGRESU >= Konstanty.POCET_KROKU_PROGRESU) {
+						break;
+					}
+					Thread.yield();
+				}
+				oknoProgres.setVisible(false);
+			}
+		});
+
+		/* vlákno spustí hlavní okno programu */
+		Thread t2 = new Thread(new Runnable() {
+			public void run() {
+				new OknoHlavni(Konstanty.PRIPOJENI);
+			}
+		});
+		t1.start();
+		t2.start();
+		dispose();
+	}
+
+	
+	/**
 	 * Zjistí podle názvu filtru, zda je filtr již zadaný
 	 * 
-	 * @param nazevFiltru
-	 *            název filtru který se hledá
-	 * @param ulozeneKomponenty
-	 *            seznam zadaných filtrů
+	 * @param nazevFiltru název filtru který se hledá
+	 * @param ulozeneKomponenty seznam zadaných filtrů
 	 * @return true pokud je filtr již v box filtrů
 	 */
 	private boolean jeZadanyFiltr(String nazevFiltru, Component[] ulozeneKomponenty) {

@@ -18,21 +18,30 @@ import data.Segment;
 import data.polozky.PolozkaPocatek;
 import ostatni.Konstanty;
 
+/**
+ * Panel filtrů pro segmenty zděděný z PanelFiltrPolozkaPocatek. Přidává filtrování podle datumu konce segmentu.
+ */
 public class PanelFiltrPolozkaPocatekSegment extends PanelFiltrPolozkaPocatek {
 
-	private JComboBox<String> cbOperatorDatumKonec;
-	private JDatePickerImpl dpDatumODKonec;
-	private JDatePickerImpl dpDatumDOKonec;
-	private JComboBox<String> cbSpojeniDatumu;
+	private static final long serialVersionUID = -2890817459770089245L;
+	private JComboBox<String> cbOperatorDatumKonec; // combobox podminky datumu konce
+	private JDatePickerImpl dpDatumODKonec; // datum konce segmentu od
+	private JDatePickerImpl dpDatumDOKonec; // datum konce segmentu od
+	private JComboBox<String> cbSpojeniDatumu; // logická operace pro spojení datumu začátku a konce segmentu
 
+	/**
+	 * Konstruktor panelu
+	 * @param nazev název panelu filtru
+	 * @param seznam seznam položek
+	 */
 	public PanelFiltrPolozkaPocatekSegment(String nazev, ArrayList seznam) {
 		super(nazev, seznam);
 	}
 
 	/**
-	 * Vrací seznam id odpovídajících zadaným podmínkám
+	 * Vrací seznam id odpovídajících zadaným podmínkám datumu konce segmentu
 	 * 
-	 * @return seznam id odpovídajících zadaným podmínkám
+	 * @return seznam id odpovídajících zadaným podmínkám datumu konce segmentu
 	 */
 	public ArrayList<Integer> getSeznamIdKonec() {
 		ArrayList<Integer> seznamId = new ArrayList<Integer>();
@@ -43,10 +52,7 @@ public class PanelFiltrPolozkaPocatekSegment extends PanelFiltrPolozkaPocatek {
 				switch (cbOperatorDatumKonec.getSelectedItem().toString()) { // podle zadaného typu operátoru volá
 																				// konkrétní kontrolní metodu
 				case "mezi":
-					if (vlozitDoSeznamuMeziKonec(polozka))
-						seznamId.add(polozka.getID()); // pokud metoda vrátí true, vloží se id do seznamu
-					break;
-				case "between":
+				case "between":	
 					if (vlozitDoSeznamuMeziKonec(polozka))
 						seznamId.add(polozka.getID()); // pokud metoda vrátí true, vloží se id do seznamu
 					break;
@@ -83,11 +89,11 @@ public class PanelFiltrPolozkaPocatekSegment extends PanelFiltrPolozkaPocatek {
 		return seznamId;
 	}
 
-	
-	
-	
-	
-	
+	/**
+	 * Vrací seznam id odpovídajících zadaným podmínkám
+	 * 
+	 * @return seznam id odpovídajících zadaným podmínkám
+	 */
 	public ArrayList<Integer> getSeznamId() {
 		ArrayList<Integer> pocatek = super.getSeznamId();
 		ArrayList<Integer> konec = getSeznamIdKonec();
@@ -113,8 +119,7 @@ public class PanelFiltrPolozkaPocatekSegment extends PanelFiltrPolozkaPocatek {
 	 * Zkontroluje, zda položka odpovídá zadaným podmínkám při výběru operatoru
 	 * "mezi"
 	 * 
-	 * @param polozka
-	 *            kontrolovaná položka
+	 * @param polozka kontrolovaná položka
 	 * @return true pokud položka odpovídá parametrům
 	 */
 	private boolean vlozitDoSeznamuMeziKonec(PolozkaPocatek polozka) {
@@ -150,10 +155,9 @@ public class PanelFiltrPolozkaPocatekSegment extends PanelFiltrPolozkaPocatek {
 	}
 
 	/**
-	 * Zkontroluje, zda položka odpovídá zadaným podmínkám při výběru operatoru ">"
+	 * Zkontroluje, zda položka odpovídá zadaným podmínkám při výběru operátoru ">"
 	 * 
-	 * @param polozka
-	 *            kontrolovaná položka
+	 * @param polozka kontrolovaná položka
 	 * @return true pokud položka odpovídá parametrům
 	 */
 	private boolean vlozitDoSeznamuVetsiKonec(PolozkaPocatek polozka) {
@@ -174,8 +178,7 @@ public class PanelFiltrPolozkaPocatekSegment extends PanelFiltrPolozkaPocatek {
 	/**
 	 * Zkontroluje, zda položka odpovídá zadaným podmínkám při výběru operatoru ">="
 	 * 
-	 * @param polozka
-	 *            kontrolovaná položka
+	 * @param polozka kontrolovaná položka
 	 * @return true pokud položka odpovídá parametrům
 	 */
 	private boolean vlozitDoSeznamuVetsiRovnoKonec(PolozkaPocatek polozka) {
@@ -195,8 +198,7 @@ public class PanelFiltrPolozkaPocatekSegment extends PanelFiltrPolozkaPocatek {
 	/**
 	 * Zkontroluje, zda položka odpovídá zadaným podmínkám při výběru operatoru "="
 	 * 
-	 * @param polozka
-	 *            kontrolovaná položka
+	 * @param polozka kontrolovaná položka
 	 * @return true pokud položka odpovídá parametrům
 	 */
 	private boolean vlozitDoSeznamuRovnoKonec(PolozkaPocatek polozka) {
@@ -215,8 +217,7 @@ public class PanelFiltrPolozkaPocatekSegment extends PanelFiltrPolozkaPocatek {
 	/**
 	 * Zkontroluje, zda položka odpovídá zadaným podmínkám při výběru operatoru "!="
 	 * 
-	 * @param polozka
-	 *            kontrolovaná položka
+	 * @param polozka kontrolovaná položka
 	 * @return true pokud položka odpovídá parametrům
 	 */
 	private boolean vlozitDoSeznamuNerovnoKonec(PolozkaPocatek polozka) {
@@ -235,8 +236,7 @@ public class PanelFiltrPolozkaPocatekSegment extends PanelFiltrPolozkaPocatek {
 	/**
 	 * Zkontroluje, zda položka odpovídá zadaným podmínkám při výběru operatoru "<="
 	 * 
-	 * @param polozka
-	 *            kontrolovaná položka
+	 * @param polozka kontrolovaná položka
 	 * @return true pokud položka odpovídá parametrům
 	 */
 	private boolean vlozitDoSeznamuMensiRovnoKonec(PolozkaPocatek polozka) {
@@ -256,8 +256,7 @@ public class PanelFiltrPolozkaPocatekSegment extends PanelFiltrPolozkaPocatek {
 	/**
 	 * Zkontroluje, zda položka odpovídá zadaným podmínkám při výběru operatoru "<"
 	 * 
-	 * @param polozka
-	 *            kontrolovaná položka
+	 * @param polozka kontrolovaná položka
 	 * @return true pokud položka odpovídá parametrům
 	 */
 	private boolean vlozitDoSeznamuMensiKonec(PolozkaPocatek polozka) {
@@ -275,6 +274,9 @@ public class PanelFiltrPolozkaPocatekSegment extends PanelFiltrPolozkaPocatek {
 		return false;
 	}
 
+	/**
+	 * Nastaví komponenty a zobrazení panelu
+	 */
 	protected void nastavPanel(String nazev) {
 		super.nastavPanel(nazev);
 

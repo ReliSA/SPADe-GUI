@@ -14,48 +14,37 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import data.prepravkaUkladaniCustom;
 import gui.DropChartPanel;
-import gui.PanelGrafu;
+import gui.PanelProjektu;
 import gui.PanelGrafuCustom;
 
+/**
+ * Třída pro ukládání custom grafů.
+ */
 public class Ukladani {
 
-	private static ArrayList<prepravkaUkladaniCustom> save = new ArrayList<prepravkaUkladaniCustom>();
-	private static PanelGrafuCustom panel;
-	private static JMenu menu;
-	private static PanelGrafu panelGrafu;
+	private static ArrayList<prepravkaUkladaniCustom> save = new ArrayList<prepravkaUkladaniCustom>(); // Arraylist všech custom grafů
+	private static PanelGrafuCustom panelMiniatur; // odkaz na panel miniatur custom grafů
+	private static JMenu menu; // odkaz na položku JMenu smaž graf
+	private static PanelProjektu panelProjektu; //odkaz na panel projektu
 
-	public static PanelGrafu getPanelGrafu() {
-		return panelGrafu;
-	}
-
-	public static void setPanelGrafu(PanelGrafu panelGrafu) {
-		Ukladani.panelGrafu = panelGrafu;
-	}
-
-	public static JMenu getMenu() {
-		return menu;
-	}
-
-	public static void setMenu(JMenu menu) {
-		Ukladani.menu = menu;
-	}
-
-	public static PanelGrafuCustom getPanel() {
-		return panel;
-	}
-
-	public static void setPanel(PanelGrafuCustom panel) {
-		Ukladani.panel = panel;
-	}
-
+	/**
+	 * Přidá přepravku s custom grafem do arraylistu a miniaturu do panelu miniatur
+	 * @param prepravka pro přidání
+	 */
 	public static void add(prepravkaUkladaniCustom prepravka) {
 		save.add(prepravka);
 		JMenuItem item = new JMenuItem(prepravka.getNazev());
 		item.addActionListener(actSmazaniGrafuJmeno);
 		menu.add(item);
+		DropChartPanel graf = new DropChartPanel(prepravka.getPanel(), prepravka.getTypGrafu());
+		graf.setName(prepravka.getNazev());			
+		panelMiniatur.vlozGraf(graf);
 		save();
 	}
 
+	/**
+	 * Uloží arraylist custom grafů do souboru
+	 */
 	public static void save() {
 		try {
 			FileOutputStream fos = new FileOutputStream(Konstanty.GRAFY_SOUBOR);
@@ -67,6 +56,10 @@ public class Ukladani {
 		}
 	}
 
+	/**
+	 * Uloží arraylist custom grafů do souboru specifikovaným parametrem
+	 * @param file souboru pro uložení
+	 */
 	public static void save(File file) {
 		try {
 			FileOutputStream fos = new FileOutputStream(file + ".dat");
@@ -78,6 +71,11 @@ public class Ukladani {
 		}
 	}
 
+	/**
+	 * Uloží arraylist custom grafů určitého projektu do souboru specifikovaným parametrem
+	 * @param file souboru pro uložení
+	 * @param id projektu grafů
+	 */
 	public static void save(File file, int id) {
 
 		ArrayList<prepravkaUkladaniCustom> export = new ArrayList<prepravkaUkladaniCustom>();
@@ -98,6 +96,9 @@ public class Ukladani {
 		}
 	}
 
+	/**
+	 * Načte custom grafy ze souboru do arraylistu
+	 */
 	public static void load() {
 		try {
 			FileInputStream fis = new FileInputStream(Konstanty.GRAFY_SOUBOR);
@@ -109,6 +110,11 @@ public class Ukladani {
 		}
 	}
 
+	/**
+	 * Importuje grafy ze souboru specifikovaného parametrem
+	 * @param file souboru pro načtení
+	 * @param id aktuálně zvoleného projektu
+	 */
 	public static void importGrafu(File file, int id) {
 
 		ArrayList<prepravkaUkladaniCustom> nove = new ArrayList<prepravkaUkladaniCustom>();
@@ -147,9 +153,13 @@ public class Ukladani {
 		}
 	}
 
+	/**
+	 * Načte grafy daného projektu do panelu miniatur a Jmenu pro smazání
+	 * @param projektID id projektu
+	 */
 	public static void nactiGrafy(int projektID) {
 		DropChartPanel graf = null;
-		panel.removeAll();
+		panelMiniatur.removeAll();
 		menu.removeAll();
 		for (Iterator<prepravkaUkladaniCustom> iterator = save.iterator(); iterator.hasNext();) {
 			prepravkaUkladaniCustom prepravka = (prepravkaUkladaniCustom) iterator.next();
@@ -159,13 +169,18 @@ public class Ukladani {
 				JMenuItem item = new JMenuItem(prepravka.getNazev());
 				item.addActionListener(actSmazaniGrafuJmeno);
 				menu.add(item);
-				panel.vlozGraf(graf);
+				panelMiniatur.vlozGraf(graf);
 			}
 		}
-		panel.revalidate();
-		panel.repaint();
+		panelMiniatur.revalidate();
+		panelMiniatur.repaint();
 	}
 
+	/**
+	 * Zkontroluje zda se název v arraylistu již nachází
+	 * @param title název ke kontrole
+	 * @return true/false
+	 */
 	public static boolean kontrolaNazvu(String title) {
 		boolean bool = false;
 		for (int i = 0; i < save.size(); i++) {
@@ -176,6 +191,10 @@ public class Ukladani {
 		return bool;
 	}
 
+	/**
+	 * Odstraní z arraylistu grafy daného projektu, uloží arraylist na disk a znovu načte grafy
+	 * @param idProjektu id projektu
+	 */
 	public static void odstranGrafyProjektu(int idProjektu) {
 		int dialogResult = JOptionPane.showConfirmDialog(null, Konstanty.POPISY.getProperty("mazaniOknoVseText"),
 				Konstanty.POPISY.getProperty("mazaniOknoPopisek"), JOptionPane.YES_NO_OPTION);
@@ -188,12 +207,63 @@ public class Ukladani {
 			}
 			save.removeAll(smazat);
 			save();
-			panelGrafu.nastavDropSloty();
+			panelProjektu.nastavDropSloty();
 			nactiGrafy(idProjektu);
 		}
 	}
 
-	static ActionListener actSmazaniGrafuJmeno = new ActionListener() {
+	/**
+	 * Vrací panel projektu
+	 * @return panel projektu
+	 */
+	public static PanelProjektu getPanelProjektu() {
+		return panelProjektu;
+	}
+
+	/**
+	 * Nastaví panel projektu
+	 * @return panel projektu
+	 */
+	public static void setPanelProjektu(PanelProjektu panelGrafu) {
+		Ukladani.panelProjektu = panelGrafu;
+	}
+
+	/**
+	 * Vrací položku JMenu pro smazání grafů
+	 * @return položka JMenu
+	 */
+	public static JMenu getMenu() {
+		return menu;
+	}
+
+	/**
+	 * Nastaví položku JMenu pro smazání grafů
+	 * @return položka JMenu
+	 */
+	public static void setMenu(JMenu menu) {
+		Ukladani.menu = menu;
+	}
+
+	/**
+	 * Vrací panel miniatur custom grafů
+	 * @return panel miniatur custom grafů
+	 */
+	public static PanelGrafuCustom getPanel() {
+		return panelMiniatur;
+	}
+
+	/**
+	 * Nastaví panel miniatur custom grafů
+	 * @return panel miniatur custom grafů
+	 */
+	public static void setPanel(PanelGrafuCustom panel) {
+		Ukladani.panelMiniatur = panel;
+	}
+	
+	/**
+	 * Akce pro smazání grafu dle jeho jména
+	 */
+	private static ActionListener actSmazaniGrafuJmeno = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 
 			int dialogResult = JOptionPane.showConfirmDialog(null, Konstanty.POPISY.getProperty("mazaniOknoText"),
@@ -207,7 +277,7 @@ public class Ukladani {
 						id = save.get(i).getProjectID();
 						save.remove(save.get(i));
 						save();
-						panelGrafu.nastavDropSloty();
+						panelProjektu.nastavDropSloty();
 						nactiGrafy(id);
 						return;
 					}

@@ -13,8 +13,6 @@ import ostatni.Konstanty;
 
 /**
  * Datová třída artefaktů zděděná ze třídy PolozkaVytvoreni
- * @author michalvselko
- *
  */
 public class Artefakt extends PolozkaVytvoreni implements Serializable{
 

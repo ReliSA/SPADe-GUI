@@ -6,8 +6,6 @@ import data.polozky.PolozkaCiselnik;
 
 /**
  * Rozhraní pro výběr priorit, severit, statusů, resolucí a osob z databáze
- * @author michalvselko
- *
  */
 public interface ICiselnikyDAO {
 

@@ -7,8 +7,6 @@ import java.time.LocalDate;
  * Třída položek zděděná ze třídy PolozkaVytvoreni, k původním atributům id, název a 
  * datumVytvoreni přidává navíc atribut datumPocatku
  * Používá se pro položky, které obsahují datum vytvoření i počátku (Ukol, Segment)
- * @author michalvselko
- *
  */
 public class PolozkaPocatek extends PolozkaVytvoreni implements Serializable{
 

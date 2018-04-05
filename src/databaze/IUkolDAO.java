@@ -6,8 +6,6 @@ import data.Ukol;
 
 /**
  * Rozhraní pro výběr úkolů z databáze
- * @author michalvselko
- *
  */
 public interface IUkolDAO {
 	

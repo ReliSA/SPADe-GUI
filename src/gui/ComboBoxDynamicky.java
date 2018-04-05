@@ -8,18 +8,17 @@ import javax.swing.JComboBox;
 
 /**
  * ComboBox pro zobrazení seznamu projektů
- * @author michalvselko
- *
  */
 public class ComboBoxDynamicky extends JComboBox{
 
+	private static final long serialVersionUID = -732731792227789797L;
 	private boolean layingOut = false; 
 	
 	/**
 	 * Konstruktor třídy
 	 * @param model datový model
 	 */
-	public ComboBoxDynamicky(ComboBoxModel model) { 
+	public ComboBoxDynamicky(ComboBoxModel<?> model) { 
         super(model); 
     } 
     
@@ -60,6 +59,5 @@ public class ComboBoxDynamicky extends JComboBox{
         }        
         return maxSirka + 30;
     }
-
 
 }

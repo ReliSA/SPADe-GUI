@@ -8,8 +8,6 @@ import data.Segment;
 
 /**
  * Rozhraní pro výběr dat podle projektu (projekty, segmenty a osoby)
- * @author michalvselko
- *
  */
 public interface IProjektDAO {
 	

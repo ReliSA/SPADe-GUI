@@ -13,8 +13,6 @@ import data.polozky.PolozkaCiselnik;
 
 /**
  * Třída zajišťující výběr priorit, severit, statusu, resoluci a osob z databáze implementující rozhraní ICiselnikyDAO
- * @author michalvselko
- *
  */
 public class CiselnikyDAO implements ICiselnikyDAO {
 	private Connection pripojeni;				//připojení k databázi

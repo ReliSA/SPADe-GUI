@@ -6,12 +6,12 @@ import ostatni.Ukladani;
 import data.Projekt;
 
 /**
- * Panel zobrazující grafy týkající se artefaktů, zděděná ze třídy
- * PanelGrafuRodic
+ * Panel zobrazující custom grafy, zděděná ze třídy PanelGrafuRodic
  */
 public class PanelGrafuCustom extends PanelGrafuRodic {
 
-	Projekt projekt;
+	private static final long serialVersionUID = -2917129457265732546L;
+	Projekt projekt; //aktuálně vybraný projekt
 
 	/**
 	 * Konstruktor třídy, nastaví projekt a spustí vložení grafů
@@ -22,9 +22,12 @@ public class PanelGrafuCustom extends PanelGrafuRodic {
 	public PanelGrafuCustom(Projekt projekt) {
 		super(projekt);
 		this.projekt = projekt;
-		this.setBorder(BorderFactory.createTitledBorder(Konstanty.POPISY.getProperty("nazevArtefakty")));
+		this.setBorder(BorderFactory.createTitledBorder(Konstanty.POPISY.getProperty("nazevCustom")));
 	}
 
+	/**
+	 * Načte grafy do panelu
+	 */
 	protected void vlozGrafy() {
 
 		Ukladani.nactiGrafy(projekt.getID());
@@ -33,7 +36,7 @@ public class PanelGrafuCustom extends PanelGrafuRodic {
 	}
 
 	/**
-	 * Vytvoří grafy, vloží je do panelu a spustí nastavení zobrazení
+	 * Vloží grafy do panelu a nastaví zobrazení
 	 */
 	public void vlozGraf(DropChartPanel panel) {
 

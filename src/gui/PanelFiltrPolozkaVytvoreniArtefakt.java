@@ -12,24 +12,32 @@ import javax.swing.text.NumberFormatter;
 import data.Artefakt;
 import data.polozky.PolozkaVytvoreni;
 import ostatni.Konstanty;
-
+/**
+ * Panel filtrů pro artefakty a konfigurace zděděný z PanelFiltrPolozkaVytvoreni. Přidává možnost filtrování artefaktů podle velikosti.s
+ */
 public class PanelFiltrPolozkaVytvoreniArtefakt extends PanelFiltrPolozkaVytvoreni {
+
+	private static final long serialVersionUID = 1533287073732672810L;
 	private JComboBox<String> cbOperatorVelikost; // seznam operatoru
-	private JComboBox<String> cbSpojeni;
+	private JComboBox<String> cbSpojeni; // combobox pro výběr logické operace pro spojení
+	private JFormattedTextField min; // pole pro udání minimální velikosti
+	private JFormattedTextField max; // pole pro udání maximální velikosti
 	private NumberFormat format;
 	private NumberFormatter formatter;
-	private JFormattedTextField min;
-	private JFormattedTextField max;
-
 	
+	/**
+	 * Konstruktor panelu
+	 * @param nazev název panelu
+	 * @param seznam seznam položek
+	 */
 	public PanelFiltrPolozkaVytvoreniArtefakt(String nazev, ArrayList seznam) {
 		super(nazev, seznam);
 	}
 	
 	/**
-	 * Vrací seznam id odpovídajících zadaným podmínkám
+	 * Vrací seznam id odpovídajících zadaným podmínkám velikosti artefaktu
 	 * 
-	 * @return seznam id odpovídajících zadaným podmínkám
+	 * @return seznam id odpovídajících zadaným podmínkám velikosti artefaktu
 	 */
 	public ArrayList<Integer> getSeznamIdVelikost() {
 		ArrayList<Integer> seznamId = new ArrayList<Integer>();
@@ -39,9 +47,6 @@ public class PanelFiltrPolozkaVytvoreniArtefakt extends PanelFiltrPolozkaVytvore
 				switch (cbOperatorVelikost.getSelectedItem().toString()) { // podle zadaného typu operátoru volá
 																			// konkrétní kontrolní metodu
 				case "mezi":
-					if (vlozitDoSeznamuMeziVelikost(polozka))
-						seznamId.add(polozka.getID()); // pokud metoda vrátí true, vloží se id do seznamu
-					break;
 				case "between":
 					if (vlozitDoSeznamuMeziVelikost(polozka))
 						seznamId.add(polozka.getID()); // pokud metoda vrátí true, vloží se id do seznamu
@@ -79,10 +84,11 @@ public class PanelFiltrPolozkaVytvoreniArtefakt extends PanelFiltrPolozkaVytvore
 		return seznamId;
 	}
 	
-	
-	
-	
-	
+	/**
+	 * Vrací seznam id odpovídajících zadaným podmínkám
+	 * 
+	 * @return seznam id odpovídajících zadaným podmínkám
+	 */
 	public ArrayList<Integer> getSeznamId() {
 		ArrayList<Integer> datum = getSeznamIdVelikost();
 		ArrayList<Integer> velikost = super.getSeznamId();
@@ -109,13 +115,11 @@ public class PanelFiltrPolozkaVytvoreniArtefakt extends PanelFiltrPolozkaVytvore
 	 * Zkontroluje, zda položka odpovídá zadaným podmínkám při výběru operatoru
 	 * "mezi"
 	 * 
-	 * @param polozka
-	 *            kontrolovaná položka
+	 * @param polozka kontrolovaná položka
 	 * @return true pokud položka odpovídá parametrům
 	 */
 	private boolean vlozitDoSeznamuMeziVelikost(PolozkaVytvoreni polozka) {
 		try {
-			/* Zkontroluje zda není datum od a do prázdné */
 			if (min.getValue() != null && max.getValue() != null) {
 
 				double minVal = (double) min.getValue();
@@ -139,8 +143,7 @@ public class PanelFiltrPolozkaVytvoreniArtefakt extends PanelFiltrPolozkaVytvore
 	/**
 	 * Zkontroluje, zda položka odpovídá zadaným podmínkám při výběru operatoru ">"
 	 * 
-	 * @param polozka
-	 *            kontrolovaná položka
+	 * @param polozka kontrolovaná položka
 	 * @return true pokud položka odpovídá parametrům
 	 */
 	private boolean vlozitDoSeznamuVetsiVelikost(PolozkaVytvoreni polozka) {
@@ -159,8 +162,7 @@ public class PanelFiltrPolozkaVytvoreniArtefakt extends PanelFiltrPolozkaVytvore
 	/**
 	 * Zkontroluje, zda položka odpovídá zadaným podmínkám při výběru operatoru ">="
 	 * 
-	 * @param polozka
-	 *            kontrolovaná položka
+	 * @param polozka kontrolovaná položka
 	 * @return true pokud položka odpovídá parametrům
 	 */
 	private boolean vlozitDoSeznamuVetsiRovnoVelikost(PolozkaVytvoreni polozka) {
@@ -179,8 +181,7 @@ public class PanelFiltrPolozkaVytvoreniArtefakt extends PanelFiltrPolozkaVytvore
 	/**
 	 * Zkontroluje, zda položka odpovídá zadaným podmínkám při výběru operatoru "="
 	 * 
-	 * @param polozka
-	 *            kontrolovaná položka
+	 * @param polozka kontrolovaná položka
 	 * @return true pokud položka odpovídá parametrům
 	 */
 	private boolean vlozitDoSeznamuRovnoVelikost(PolozkaVytvoreni polozka) {
@@ -199,8 +200,7 @@ public class PanelFiltrPolozkaVytvoreniArtefakt extends PanelFiltrPolozkaVytvore
 	/**
 	 * Zkontroluje, zda položka odpovídá zadaným podmínkám při výběru operatoru "!="
 	 * 
-	 * @param polozka
-	 *            kontrolovaná položka
+	 * @param polozka kontrolovaná položka
 	 * @return true pokud položka odpovídá parametrům
 	 */
 	private boolean vlozitDoSeznamuNerovnoVelikost(PolozkaVytvoreni polozka) {
@@ -219,8 +219,7 @@ public class PanelFiltrPolozkaVytvoreniArtefakt extends PanelFiltrPolozkaVytvore
 	/**
 	 * Zkontroluje, zda položka odpovídá zadaným podmínkám při výběru operatoru "<="
 	 * 
-	 * @param polozka
-	 *            kontrolovaná položka
+	 * @param polozka kontrolovaná položka
 	 * @return true pokud položka odpovídá parametrům
 	 */
 	private boolean vlozitDoSeznamuMensiRovnoVelikost(PolozkaVytvoreni polozka) {
@@ -239,8 +238,7 @@ public class PanelFiltrPolozkaVytvoreniArtefakt extends PanelFiltrPolozkaVytvore
 	/**
 	 * Zkontroluje, zda položka odpovídá zadaným podmínkám při výběru operatoru "<"
 	 * 
-	 * @param polozka
-	 *            kontrolovaná položka
+	 * @param polozka kontrolovaná položka
 	 * @return true pokud položka odpovídá parametrům
 	 */
 	private boolean vlozitDoSeznamuMensiVelikost(PolozkaVytvoreni polozka) {
@@ -256,10 +254,8 @@ public class PanelFiltrPolozkaVytvoreniArtefakt extends PanelFiltrPolozkaVytvore
 		return false;
 	}
 	
-		
-	
 	/**
-	 * Nastavení panelu, spustí se nastavení z předka a poté se do gridu přidávají nové komponenty
+	 * Nastavení panelu, spustí se nastavení z předka a poté se přidávají nové komponenty
 	 * @param nazev název filtru
 	 */
 	protected void nastavPanel(String nazev){

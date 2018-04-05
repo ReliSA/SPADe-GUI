@@ -35,12 +35,11 @@ import data.polozky.PolozkaVytvoreni;
 
 /**
  * Abstraktní třída, předek panelů s grafy ze kterého ostatní panely dědí
- * 
- * @author michalvselko
- *
  */
 public abstract class PanelGrafuRodic extends JPanel {
 
+	private static final long serialVersionUID = -3293103160690992576L;
+	
 	protected Projekt projekt; // vybraný projekt
 
 	/**

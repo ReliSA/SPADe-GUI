@@ -1,50 +1,38 @@
 package gui;
 
-import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
-
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
 import javax.swing.text.NumberFormatter;
-
-import org.jdatepicker.impl.DateComponentFormatter;
-import org.jdatepicker.impl.JDatePanelImpl;
-import org.jdatepicker.impl.JDatePickerImpl;
-import org.jdatepicker.impl.UtilDateModel;
-
 import data.Ukol;
 import data.polozky.PolozkaPocatek;
 import ostatni.Konstanty;
 
+/**
+ * Panel filtrů pro strávený a předpokládaný čas zděděný z PanelFiltr
+ */
+
 public class PanelFiltrCas extends PanelFiltr {
 
-	private JCheckBox ckPouzitFiltr = new JCheckBox(Konstanty.POPISY.getProperty("checkBoxPouzitFiltr"), true); 
+	private static final long serialVersionUID = 750037095334073721L;
+	private JCheckBox ckPouzitFiltr = new JCheckBox(Konstanty.POPISY.getProperty("checkBoxPouzitFiltr"), true); //check box určující zda se má použít tento filtr
 	private JComboBox<String> cbOperatorStraveny; // seznam operatoru
 	private JComboBox<String> cbOperatorPredpokladany; // seznam operatoru
-	private JComboBox<String> cbSpojeni;
+	private JComboBox<String> cbSpojeni; //operátor pro spojení podmínek (a, nebo)
+	private JFormattedTextField stravenyOD; // textové pole pro vyplnění minima stráveného času
+	private JFormattedTextField stravenyDO; // textové pole pro vyplnění maxima stráveného času
+	private JFormattedTextField predpokladanyOD; // textové pole pro vyplnění minima předpokládaného času
+	private JFormattedTextField predpokladanyDO; // textové pole pro vyplnění maxima předpokládaného času
 	private NumberFormat format;
 	private NumberFormatter formatter;
-	private JFormattedTextField stravenyOD;
-	private JFormattedTextField stravenyDO;
-	private JFormattedTextField predpokladanyOD;
-	private JFormattedTextField predpokladanyDO;
 
 	/**
 	 * Konstruktor třídy, nastaví seznam výběru
@@ -65,18 +53,6 @@ public class PanelFiltrCas extends PanelFiltr {
 	public boolean jePouzit() {
 		return this.ckPouzitFiltr.isSelected();
 	}
-
-	public ArrayList<Integer> getSeznamId(ArrayList<Integer> seznamIdUkolu) {
-		this.seznam = seznam;
-		ArrayList<Integer> vysledek = new ArrayList<Integer>();
-		
-		vysledek=getSeznamId();
-		
-		if (vysledek.isEmpty())
-			vysledek.add(-1);
-		return vysledek;
-	}
-
 	
 	/**
 	 * Vrací seznam id odpovídajících zadaným podmínkám
@@ -101,11 +77,11 @@ public class PanelFiltrCas extends PanelFiltr {
 		}
 		return straveny;
 	}
-	
+		
 	/**
-	 * Vrací seznam id odpovídajících zadaným podmínkám
+	 * Vrací seznam id odpovídajících zadanému strávenému času 
 	 * 
-	 * @return seznam id odpovídajících zadaným podmínkám
+	 * @return seznam id odpovídajících zadanému strávenému času 
 	 */
 	public ArrayList<Integer> getSeznamIdStraveny() {
 		ArrayList<Integer> seznamId = new ArrayList<Integer>();
@@ -160,23 +136,17 @@ public class PanelFiltrCas extends PanelFiltr {
 	 * Zkontroluje, zda položka odpovídá zadaným podmínkám při výběru operatoru
 	 * "mezi"
 	 * 
-	 * @param polozka
-	 *            kontrolovaná položka
+	 * @param polozka kontrolovaná položka
 	 * @return true pokud položka odpovídá parametrům
 	 */
 	private boolean vlozitDoSeznamuMeziStraveny(PolozkaPocatek polozka) {
 		try {
-			/* Zkontroluje zda není datum od a do prázdné */
 			if (stravenyOD.getValue() != null && stravenyDO.getValue() != null) {
 
 				double stravenyMin = (double) stravenyOD.getValue();
 				double stravenyMax = (double) stravenyDO.getValue();
 				Ukol ukol = (Ukol) polozka;
 
-				/*
-				 * zkontroluje se zda je položka v seznamu a zároveň je datum počátku mezi
-				 * vybranými
-				 */
 				if ((ukol.getStravenyCas() > stravenyMin || ukol.getStravenyCas() == stravenyMin)
 						&& (ukol.getStravenyCas() < stravenyMax || ukol.getStravenyCas() == stravenyMax)) {
 					return true;
@@ -194,8 +164,7 @@ public class PanelFiltrCas extends PanelFiltr {
 	/**
 	 * Zkontroluje, zda položka odpovídá zadaným podmínkám při výběru operatoru ">"
 	 * 
-	 * @param polozka
-	 *            kontrolovaná položka
+	 * @param polozka kontrolovaná položka
 	 * @return true pokud položka odpovídá parametrům
 	 */
 	private boolean vlozitDoSeznamuVetsiStraveny(PolozkaPocatek polozka) {
@@ -214,8 +183,7 @@ public class PanelFiltrCas extends PanelFiltr {
 	/**
 	 * Zkontroluje, zda položka odpovídá zadaným podmínkám při výběru operatoru ">="
 	 * 
-	 * @param polozka
-	 *            kontrolovaná položka
+	 * @param polozka kontrolovaná položka
 	 * @return true pokud položka odpovídá parametrům
 	 */
 	private boolean vlozitDoSeznamuVetsiRovnoStraveny(PolozkaPocatek polozka) {
@@ -234,8 +202,7 @@ public class PanelFiltrCas extends PanelFiltr {
 	/**
 	 * Zkontroluje, zda položka odpovídá zadaným podmínkám při výběru operatoru "="
 	 * 
-	 * @param polozka
-	 *            kontrolovaná položka
+	 * @param polozka kontrolovaná položka
 	 * @return true pokud položka odpovídá parametrům
 	 */
 	private boolean vlozitDoSeznamuRovnoStraveny(PolozkaPocatek polozka) {
@@ -254,8 +221,7 @@ public class PanelFiltrCas extends PanelFiltr {
 	/**
 	 * Zkontroluje, zda položka odpovídá zadaným podmínkám při výběru operatoru "!="
 	 * 
-	 * @param polozka
-	 *            kontrolovaná položka
+	 * @param polozka kontrolovaná položka
 	 * @return true pokud položka odpovídá parametrům
 	 */
 	private boolean vlozitDoSeznamuNerovnoStraveny(PolozkaPocatek polozka) {
@@ -274,8 +240,7 @@ public class PanelFiltrCas extends PanelFiltr {
 	/**
 	 * Zkontroluje, zda položka odpovídá zadaným podmínkám při výběru operatoru "<="
 	 * 
-	 * @param polozka
-	 *            kontrolovaná položka
+	 * @param polozka kontrolovaná položka
 	 * @return true pokud položka odpovídá parametrům
 	 */
 	private boolean vlozitDoSeznamuMensiRovnoStraveny(PolozkaPocatek polozka) {
@@ -294,8 +259,7 @@ public class PanelFiltrCas extends PanelFiltr {
 	/**
 	 * Zkontroluje, zda položka odpovídá zadaným podmínkám při výběru operatoru "<"
 	 * 
-	 * @param polozka
-	 *            kontrolovaná položka
+	 * @param polozka kontrolovaná položka
 	 * @return true pokud položka odpovídá parametrům
 	 */
 	private boolean vlozitDoSeznamuMensiStraveny(PolozkaPocatek polozka) {
@@ -313,24 +277,23 @@ public class PanelFiltrCas extends PanelFiltr {
 
 	
 	/**
-	 * Vrací seznam id odpovídajících zadaným podmínkám
+	 * Vrací seznam id odpovídajících zadanému strávenému času
 	 * 
-	 * @return seznam id odpovídajících zadaným podmínkám
+	 * @return seznam id odpovídajících zadanému strávenému času
 	 */
 	public ArrayList<Integer> getSeznamIdPredpokladany() {
 		ArrayList<Integer> seznamId = new ArrayList<Integer>();
 		if (jePouzit()) { // musí být zaškrtnuto Použít filtr
-			for (int i = 0; i < this.seznam.size(); i++) { // projde všechny položky seznamu
+			for (int i = 0; i < this.seznam.size(); i++) {
 				PolozkaPocatek polozka = (PolozkaPocatek) this.seznam.get(i);
-				switch (cbOperatorStraveny.getSelectedItem().toString()) { // podle zadaného typu operátoru volá
-																			// konkrétní kontrolní metodu
+				switch (cbOperatorStraveny.getSelectedItem().toString()) { // podle zadaného typu operátoru volá konkrétní kontrolní metodu
 				case "mezi":
 					if (vlozitDoSeznamuMeziPredpokladany(polozka))
 						seznamId.add(polozka.getID()); // pokud metoda vrátí true, vloží se id do seznamu
 					break;
 				case "between":
 					if (vlozitDoSeznamuMeziPredpokladany(polozka))
-						seznamId.add(polozka.getID()); // pokud metoda vrátí true, vloží se id do seznamu
+						seznamId.add(polozka.getID());
 					break;
 				case ">":
 					if (vlozitDoSeznamuVetsiPredpokladany(polozka))
@@ -359,9 +322,8 @@ public class PanelFiltrCas extends PanelFiltr {
 				}
 			}
 		}
-		if (seznamId.isEmpty()) // pokud je seznam prázdný doplním alespoň -1 jinak by při načítání dat seznam
-								// jevil jako nepoužitý
-			seznamId.add(-1);
+		if (seznamId.isEmpty()) { // pokud je seznam prázdný doplním alespoň -1 jinak by při načítání dat seznam jevil jako nepoužitý
+			seznamId.add(-1);}
 		return seznamId;
 	}
 
@@ -370,8 +332,7 @@ public class PanelFiltrCas extends PanelFiltr {
 	 * Zkontroluje, zda položka odpovídá zadaným podmínkám při výběru operatoru
 	 * "mezi"
 	 * 
-	 * @param polozka
-	 *            kontrolovaná položka
+	 * @param polozka kontrolovaná položka
 	 * @return true pokud položka odpovídá parametrům
 	 */
 	private boolean vlozitDoSeznamuMeziPredpokladany(PolozkaPocatek polozka) {
@@ -400,8 +361,7 @@ public class PanelFiltrCas extends PanelFiltr {
 	/**
 	 * Zkontroluje, zda položka odpovídá zadaným podmínkám při výběru operatoru ">"
 	 * 
-	 * @param polozka
-	 *            kontrolovaná položka
+	 * @param polozka kontrolovaná položka
 	 * @return true pokud položka odpovídá parametrům
 	 */
 	private boolean vlozitDoSeznamuVetsiPredpokladany(PolozkaPocatek polozka) {
@@ -420,8 +380,7 @@ public class PanelFiltrCas extends PanelFiltr {
 	/**
 	 * Zkontroluje, zda položka odpovídá zadaným podmínkám při výběru operatoru ">="
 	 * 
-	 * @param polozka
-	 *            kontrolovaná položka
+	 * @param polozka kontrolovaná položka
 	 * @return true pokud položka odpovídá parametrům
 	 */
 	private boolean vlozitDoSeznamuVetsiRovnoPredpokladany(PolozkaPocatek polozka) {
@@ -440,8 +399,7 @@ public class PanelFiltrCas extends PanelFiltr {
 	/**
 	 * Zkontroluje, zda položka odpovídá zadaným podmínkám při výběru operatoru "="
 	 * 
-	 * @param polozka
-	 *            kontrolovaná položka
+	 * @param polozka kontrolovaná položka
 	 * @return true pokud položka odpovídá parametrům
 	 */
 	private boolean vlozitDoSeznamuRovnoPredpokladany(PolozkaPocatek polozka) {
@@ -460,8 +418,7 @@ public class PanelFiltrCas extends PanelFiltr {
 	/**
 	 * Zkontroluje, zda položka odpovídá zadaným podmínkám při výběru operatoru "!="
 	 * 
-	 * @param polozka
-	 *            kontrolovaná položka
+	 * @param polozka kontrolovaná položka
 	 * @return true pokud položka odpovídá parametrům
 	 */
 	private boolean vlozitDoSeznamuNerovnoPredpokladany(PolozkaPocatek polozka) {
@@ -480,8 +437,7 @@ public class PanelFiltrCas extends PanelFiltr {
 	/**
 	 * Zkontroluje, zda položka odpovídá zadaným podmínkám při výběru operatoru "<="
 	 * 
-	 * @param polozka
-	 *            kontrolovaná položka
+	 * @param polozka kontrolovaná položka
 	 * @return true pokud položka odpovídá parametrům
 	 */
 	private boolean vlozitDoSeznamuMensiRovnoPredpokladany(PolozkaPocatek polozka) {
@@ -500,8 +456,7 @@ public class PanelFiltrCas extends PanelFiltr {
 	/**
 	 * Zkontroluje, zda položka odpovídá zadaným podmínkám při výběru operatoru "<"
 	 * 
-	 * @param polozka
-	 *            kontrolovaná položka
+	 * @param polozka kontrolovaná položka
 	 * @return true pokud položka odpovídá parametrům
 	 */
 	private boolean vlozitDoSeznamuMensiPredpokladany(PolozkaPocatek polozka) {
@@ -517,6 +472,11 @@ public class PanelFiltrCas extends PanelFiltr {
 		return false;
 	}
 	
+	/**
+	 * Nastavení zobrazení panelu
+	 *
+	 * @param nazev Název panelu
+	 */
 	protected void nastavPanel(String nazev) {
 		String titulek = "";
 		ckPouzitFiltr.setOpaque(false);
@@ -569,7 +529,7 @@ public class PanelFiltrCas extends PanelFiltr {
 		cbOperatorStraveny = new JComboBox<String>(Konstanty.POLE_OPERATORU);
 		cbOperatorPredpokladany = new JComboBox<String>(Konstanty.POLE_OPERATORU);
 
-		/* Akce pro změně operatoru předpokládaného času */
+		/* Akce pro změnu operátoru předpokládaného času */
 		ActionListener actZmenaOperatoruPredpokladany = new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
@@ -580,7 +540,7 @@ public class PanelFiltrCas extends PanelFiltr {
 			}
 		};
 
-		/* Akce pro změně operatoru stráveného času */
+		/* Akce pro změnu operátoru stráveného času */
 		ActionListener actZmenaOperatoruStraveny = new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {

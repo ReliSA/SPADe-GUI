@@ -1,43 +1,26 @@
 package gui;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Label;
-import java.sql.DriverPropertyInfo;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
-
 import javax.swing.BorderFactory;
 import javax.swing.JOptionPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextPane;
-import javax.swing.border.EmptyBorder;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
-
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.NumberAxis;
 import org.jfree.data.gantt.Task;
 import org.jfree.data.gantt.TaskSeries;
 import org.jfree.data.gantt.TaskSeriesCollection;
-
 import ostatni.Konstanty;
 import data.Projekt;
 import data.Segment;
 
 /**
  * Panel zobrazující grafy týkající se segmentů (fází, iterací a aktivit), zděděná ze třídy PanelGrafuRodic
- * @author michalvselko
- *
  */
 public class PanelGrafuSegment extends PanelGrafuRodic{
 	
+	private static final long serialVersionUID = 6478867166531575827L;
+
 	/**
 	 * Konstruktor třídy, nastaví projekt a spustí vložení grafů
 	 * @param projekt aktuálně vybraný projekt

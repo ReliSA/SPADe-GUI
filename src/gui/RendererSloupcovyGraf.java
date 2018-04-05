@@ -1,11 +1,10 @@
 package gui;
+
 import java.awt.Color; 
 import java.awt.Paint;
 import java.util.Arrays;
-
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.data.general.DatasetUtilities;
-
 import ostatni.Konstanty;
 import data.ciselnik.Ciselnik;
 import data.ciselnik.Osoby;
@@ -13,11 +12,10 @@ import data.ciselnik.Typ;
 
 /**
  * Render pro barevné zobrazení sloupcových grafů
- * @author michalvselko
- *
  */
 public class RendererSloupcovyGraf extends BarRenderer {
 	
+	private static final long serialVersionUID = -3672703362374480604L;
 	private Ciselnik seznam;		//seznam položek číselníku
 	private int typGrafu;			// typ grafu (hodnota, třída, supertřída)
 	private Color[] barvy = {new Color(145, 0, 145), new Color(0, 150, 0), new Color(160, 160, 0), new Color(150, 0, 0), new Color(0, 0, 150)};	//pole barev

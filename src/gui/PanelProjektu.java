@@ -27,45 +27,43 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 /**
- * Centrální panel zobrazující statistický panel a panely s grafy
- * 
- * @author michalvselko
- *
+ * Centrální panel zobrazující statistický panel, dropsloty, panel miniatur a filtry
  */
-public class PanelGrafu extends JPanel {
 
+public class PanelProjektu extends JPanel {
+
+	private static final long serialVersionUID = -8756957474284941689L;
 	public Projekt projekt; // aktuálně vybraný projekt
 	private JScrollPane scroll; // scroll panel
-	private JPanel panel;
-	private JPanel grafyPanel;
-	private JPanel panelStatistikSipka;
-	protected JPanel panelFiltrySipka;
-	private JPanel panelStatistik;
-	public boolean statistikyVisible = true;
-	private JButton btSipkaStatistiky;
+	private JPanel panel; //hlavní panel
+	private JPanel grafy; // panel pro zobrazení miniatur grafů
+	private JPanel panelStatistikSipka; // panel pro zobrazení statistik a šipky pro odebrání statistik
+	protected JPanel panelFiltrySipka; // panel pro zobrazení filtrů a šipky pro schování filtrů
+	private JPanel panelStatistik; // panel pro zobrazení statistik
+	public boolean statistikyVisible = true; // udává zda jsou statistik zobrazené nebo ne
+	private JButton btSipkaStatistiky; // tlačítko pro schování statistik
 
-	private JPanel dropSloty;
-	private JPanel dropSlot;
-	private JPanel dropSlot2;
-	private DropTarget dropTarget;
-	private DropHandler dropHandler;
-	private DropTarget dropTarget2;
-	private DropHandler dropHandler2;
+	private JPanel dropSloty; // panel dropslotů
+	private JPanel dropSlot; // dropslot pro přetažení miniatur
+	private JPanel dropSlot2; // dropslot pro přetažení miniatur
+	private DropTarget dropTarget; // drop target pro miniatury
+	private DropHandler dropHandler; // drop handler pro přetažení miniatur
+	private DropTarget dropTarget2; // drop target pro miniatury
+	private DropHandler dropHandler2; // drop handler pro přetažení miniatur
 
-	private PanelGrafuSegment panelSegment;
-	private PanelGrafuUkol panelUkol;
-	private PanelGrafuKonfigurace panelKonfigurace;
-	private PanelGrafuArtefakt panelArtefakt;
-	private PanelGrafuCustom panelCustom;
+	private PanelGrafuSegment panelSegment; // panel pro zobrazení miniatur segmentů
+	private PanelGrafuUkol panelUkol; // panel pro zobrazení miniatur úkolů
+	private PanelGrafuKonfigurace panelKonfigurace; // panel pro zobrazení miniatur konfigurací
+	private PanelGrafuArtefakt panelArtefakt; // panel pro zobrazení miniatur artefaktů
+	private PanelGrafuCustom panelCustom; // panel pro zobrazení miniatur custom grafů
 
 	/**
 	 * Konstruktor třídy, nastaví projekt, spustí načtení dat projektu a nastaví
 	 * zobrazení okna
 	 * 
-	 * @param projekt
-	 *            aktuálně vybraný projekt
+	 * @param projekt aktuálně vybraný projekt
 	 */
-	public PanelGrafu(Projekt projekt) {
+	public PanelProjektu(Projekt projekt) {
 		super();
 		this.setBackground(Color.WHITE);
 
@@ -73,7 +71,7 @@ public class PanelGrafu extends JPanel {
 		this.projekt.nactiData();
 		this.nastavZobrazeni();
 		this.nastavAkce();
-		Ukladani.setPanelGrafu(this);
+		Ukladani.setPanelProjektu(this);
 		Ukladani.nactiGrafy(projekt.getID());
 	}
 
@@ -100,16 +98,6 @@ public class PanelGrafu extends JPanel {
 		Ukladani.nactiGrafy(projekt.getID());
 		this.revalidate();
 
-	}
-
-	public void zobrazFiltry(JScrollPane panel) {
-		this.panelFiltrySipka.add(panel, BorderLayout.NORTH);
-		this.revalidate();
-	}
-
-	public void schovejFiltry(JScrollPane panel) {
-		this.panelFiltrySipka.remove(panel);
-		this.revalidate();
 	}
 
 	/**
@@ -167,7 +155,6 @@ public class PanelGrafu extends JPanel {
 		this.nastavAkce();
 		Ukladani.nactiGrafy(projekt.getID());
 		this.revalidate();
-
 	}
 
 	/**
@@ -175,9 +162,7 @@ public class PanelGrafu extends JPanel {
 	 */
 	private void nastavZobrazeni() {
 		this.removeAll();
-		panel = new JPanel();
-		panel.setLayout(new BorderLayout());
-
+		panel = new JPanel(new BorderLayout());
 		scroll = new JScrollPane(panel);
 		scroll.getVerticalScrollBar().setUnitIncrement(15);
 		panel.setPreferredSize(Konstanty.VELIKOST_PANELU);
@@ -185,7 +170,7 @@ public class PanelGrafu extends JPanel {
 
 		btSipkaStatistiky = new JButton("<");
 		btSipkaStatistiky.setPreferredSize(Konstanty.VELIKOST_SIPKY_STATISTIKY);
-		btSipkaStatistiky.setFont(new Font("Arial", Font.PLAIN, 15));
+		btSipkaStatistiky.setFont(Konstanty.FONT_SIPKA);
 		btSipkaStatistiky.setMargin(new Insets(0, 0, 0, 0));
 
 		panelSegment = new PanelGrafuSegment(this.projekt);
@@ -213,18 +198,15 @@ public class PanelGrafu extends JPanel {
 		tabbedPanelGrafu.add(Konstanty.POPISY.getProperty("segment"), panelSegment);
 		tabbedPanelGrafu.add(Konstanty.POPISY.getProperty("konfigurace"), panelKonfigurace);
 		tabbedPanelGrafu.add(Konstanty.POPISY.getProperty("artefakty"), panelArtefakt);
-		tabbedPanelGrafu.add("Custom", scrollCustom);
+		tabbedPanelGrafu.add(Konstanty.POPISY.getProperty("nazevCustom"), scrollCustom);
 		Ukladani.setPanel(panelCustom);
 
-		JPanel grafy = new JPanel(new BorderLayout());
-		grafyPanel = new JPanel(new BorderLayout());
+		grafy = new JPanel(new BorderLayout());
 		dropSloty = new JPanel(new BorderLayout());
 
 		nastavDropSloty();
 		
-		grafyPanel.add(tabbedPanelGrafu, BorderLayout.CENTER);
-
-		grafy.add(grafyPanel, BorderLayout.NORTH);
+		grafy.add(tabbedPanelGrafu, BorderLayout.NORTH);
 		grafy.add(dropSloty, BorderLayout.CENTER);
 
 		panelStatistik = this.getPopisProjektu();
@@ -242,6 +224,9 @@ public class PanelGrafu extends JPanel {
 
 	}
 
+	/**
+	 * Nastaví komponenty a zobrazení dropslotů pro miniatury grafů
+	 */
 	public void nastavDropSloty() {
 		dropSloty.removeAll();
 		dropSlot = new JPanel(new BorderLayout());
@@ -328,8 +313,7 @@ public class PanelGrafu extends JPanel {
 	 * Vytvoří panel statistik projektu s počty nebo s minimem, maximem a průměrem
 	 * hodnot (dle zadaného parametru)
 	 * 
-	 * @param panelPocet
-	 *            určuje, zda se bude tvořit panel s počtem hodnot (true) nebo s
+	 * @param panelPocet určuje, zda se bude tvořit panel s počtem hodnot (true) nebo s
 	 *            maximem, minimem a průměrem (false)
 	 * @return panel statistik
 	 */
@@ -565,7 +549,28 @@ public class PanelGrafu extends JPanel {
 		}
 		return panelStatistik;
 	}
+	
+	/**
+	 * Metoda pro zobrazení panelu filtrů
+	 * @param panel panel filtrů
+	 */
+	public void zobrazFiltry(JScrollPane panel) {
+		this.panelFiltrySipka.add(panel, BorderLayout.NORTH);
+		this.revalidate();
+	}
 
+	/**
+	 * Metoda pro schování panelu filtrů
+	 * @param panel panel filtrů
+	 */
+	public void schovejFiltry(JScrollPane panel) {
+		this.panelFiltrySipka.remove(panel);
+		this.revalidate();
+	}
+
+	/**
+	 * Nastaví akce komponentám panelu
+	 */
 	public void nastavAkce() {
 
 		/* akce pro schovani panelu statistik */
