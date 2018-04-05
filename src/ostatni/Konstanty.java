@@ -134,7 +134,7 @@ public class Konstanty {
 	public static final String NAZEV_SOUBORU_POPISU_ENGLISH = "english.properties";
 	public static final String SQLSoubor = "sql.properties";
 	public static final String SQLVarSoubor = "sqlVar.properties";
-	public static final String GRAFY_SOUBOR = "CustomCharts.sav";
+	public static final String GRAFY_SOUBOR = "CustomCharts.dat";
 	public static Properties POPISY = new Properties();
 	public static Properties SQLs = new Properties();
 	public static Properties SQLsVar = new Properties();

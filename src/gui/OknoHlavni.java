@@ -14,6 +14,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -28,6 +29,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -36,6 +38,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
 
 import com.keypoint.PngEncoder;
@@ -78,6 +81,10 @@ public class OknoHlavni extends JFrame {
 	private JMenu settingsMenu; // Tlačítko menu baru
 	private JMenu languageMenu; // Tlačítko menu baru
 	private JMenu removeChartMenu; // Tlačítko menu baru
+	private JMenu importExportMenu; // Tlačítko menu baru
+	private JMenuItem exportAll; // Tlačítko menu baru
+	private JMenuItem exportProjekt; // Tlačítko menu baru
+	private JMenuItem importGrafy; // Tlačítko menu baru
 	private JMenuItem exitAction; // Tlačítko menu baru
 	private JMenuItem czech; // Tlačítko menu baru
 	private JMenuItem english; // Tlačítko menu baru
@@ -136,7 +143,11 @@ public class OknoHlavni extends JFrame {
 		languageMenu = new JMenu(Konstanty.POPISY.getProperty("menuJazyk"));
 		removeChartMenu = new JMenu(Konstanty.POPISY.getProperty("odstranGraf"));
 		Ukladani.setMenu(removeChartMenu);
-		exitAction = new JMenuItem(Konstanty.POPISY.getProperty("menuExit"));
+		exitAction = new JMenuItem(Konstanty.POPISY.getProperty("menuExit"));	
+		importExportMenu = new JMenu(Konstanty.POPISY.getProperty("importExport"));
+		exportAll = new JMenuItem(Konstanty.POPISY.getProperty("exportVse"));
+		exportProjekt = new JMenuItem(Konstanty.POPISY.getProperty("exportProjekt"));
+		importGrafy = new JMenuItem(Konstanty.POPISY.getProperty("importGrafu"));
 		vytvorGraf = new JMenuItem(Konstanty.POPISY.getProperty("menuVytvorGraf"));
 		czech = new JMenuItem(Konstanty.POPISY.getProperty("menuCestina"));
 		english = new JMenuItem(Konstanty.POPISY.getProperty("menuAnglictina"));
@@ -186,8 +197,13 @@ public class OknoHlavni extends JFrame {
 		settingsMenu.add(languageMenu);
 		settingsMenu.add(filtry);
 		fileMenu.add(exitAction);
+		importExportMenu.add(importGrafy);
+		importExportMenu.add(new JSeparator());
+		importExportMenu.add(exportAll);
+		importExportMenu.add(exportProjekt);
 		customGrafMenu.add(vytvorGraf);
 		customGrafMenu.add(removeChartMenu);
+		customGrafMenu.add(importExportMenu);
 		languageMenu.add(czech);
 		languageMenu.add(english);
 
@@ -1318,6 +1334,40 @@ public class OknoHlavni extends JFrame {
 
 			}
 		};
+		
+		/* akce pro otevření okna custom grafů */
+		ActionListener actExportAll = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser fileChooser = new JFileChooser();
+				if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+				  File file = fileChooser.getSelectedFile();
+				  Ukladani.save(file);
+				}
+
+			}
+		};
+		
+		/* akce pro otevření okna custom grafů */
+		ActionListener actExportProjekt = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser fileChooser = new JFileChooser();
+				if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+				  File file = fileChooser.getSelectedFile();
+				  Ukladani.save(file,getProjekt().getID());
+				}
+
+			}
+		};
+		
+		ActionListener actImportGrafu = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser fileChooser = new JFileChooser();
+				if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+				  File file = fileChooser.getSelectedFile();
+				  Ukladani.importGrafu(file,getProjekt().getID());
+				}
+			}
+		};
 
 		
 		/* vložení akcí k příslušným komponentám */
@@ -1331,6 +1381,10 @@ public class OknoHlavni extends JFrame {
 		filtry.addActionListener(actZobrazeniFiltruMenu);
 		btSipkaFiltry.addActionListener(actZobrazeniFiltruButton);
 		vytvorGraf.addActionListener(actCustomGraf);
+		exportAll.addActionListener(actExportAll);
+		exportProjekt.addActionListener(actExportProjekt);
+		importGrafy.addActionListener(actImportGrafu);
+
 
 		this.addComponentListener(actResizePaneluGrafu);
 		this.addWindowListener(actUkonceniOkna);

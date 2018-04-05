@@ -2,6 +2,7 @@ package ostatni;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
@@ -58,12 +59,80 @@ public class Ukladani {
 		}
 	}
 
+	public static void save(File file) {
+		try {
+			FileOutputStream fos = new FileOutputStream(file + ".dat");
+			ObjectOutputStream oos = new ObjectOutputStream(fos);
+			oos.writeObject(save);
+			oos.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	public static void save(File file, int id) {
+
+		ArrayList<prepravkaUkladaniCustom> export = new ArrayList<prepravkaUkladaniCustom>();
+
+		for (int i = 0; i < save.size(); i++) {
+			if (save.get(i).getProjectID() == id) {
+				export.add(save.get(i));
+			}
+		}
+
+		try {
+			FileOutputStream fos = new FileOutputStream(file + ".dat");
+			ObjectOutputStream oos = new ObjectOutputStream(fos);
+			oos.writeObject(export);
+			oos.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
 	public static void load() {
 		try {
 			FileInputStream fis = new FileInputStream(Konstanty.GRAFY_SOUBOR);
 			ObjectInputStream ois = new ObjectInputStream(fis);
 			save = (ArrayList<prepravkaUkladaniCustom>) ois.readObject();
 			ois.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	public static void importGrafu(File file, int id) {
+
+		ArrayList<prepravkaUkladaniCustom> nove = new ArrayList<prepravkaUkladaniCustom>();
+		int pocitadlo = 2;
+
+		try {
+			FileInputStream fis = new FileInputStream(file);
+			ObjectInputStream ois = new ObjectInputStream(fis);
+			nove = (ArrayList<prepravkaUkladaniCustom>) ois.readObject();
+			ois.close();
+
+			for (int i = 0; i < nove.size(); i++) {
+				if (kontrolaNazvu(nove.get(i).getNazev())) {
+					nove.get(i).setNazev(nove.get(i).getNazev() + " import");
+					nove.get(i).getPanel().setTitle(nove.get(i).getNazev());
+
+					while (kontrolaNazvu(nove.get(i).getNazev())) {
+						
+						nove.get(i).setNazev(nove.get(i).getNazev() + " " + pocitadlo);
+						nove.get(i).getPanel().setTitle(nove.get(i).getNazev());
+						
+						pocitadlo++;
+					}					
+					save.add(nove.get(i));
+				} else {
+					save.add(nove.get(i));
+				}
+			}
+
+			save();
+			nactiGrafy(id);
+
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -101,8 +170,8 @@ public class Ukladani {
 	static ActionListener actNacteniGrafuProSmazani = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 
-			int dialogResult = JOptionPane.showConfirmDialog(null, Konstanty.POPISY.getProperty("mazaniOknoText"), Konstanty.POPISY.getProperty("mazaniOknoPopisek"),
-					JOptionPane.YES_NO_OPTION);
+			int dialogResult = JOptionPane.showConfirmDialog(null, Konstanty.POPISY.getProperty("mazaniOknoText"),
+					Konstanty.POPISY.getProperty("mazaniOknoPopisek"), JOptionPane.YES_NO_OPTION);
 			if (dialogResult == 0) {
 				String smazat = ((JMenuItem) e.getSource()).getText();
 				int id;
