@@ -13,6 +13,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import ostatni.Konstanty;
+import ostatni.Ukladani;
 
 /**
  * Třída sloužící jako handler pro zpracování dropu drag and drop gesta.
@@ -154,7 +155,9 @@ public class DropHandler implements DropTargetListener {
 				panelSegment.vratGrafMiniatura(panel);
 				break;
 			case Konstanty.CUSTOM:
-				panelCustom.vratGrafMiniatura(panel);
+				if (Ukladani.kontrolaNazvu(panel.getName())) {
+					panelCustom.vratGrafMiniatura(panel);
+				}
 				break;
 			}
 		}

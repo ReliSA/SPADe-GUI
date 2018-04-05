@@ -18,7 +18,6 @@ public class TlacitkoMazaniFiltru extends JButton {
 		super();
 		this.comp = comp;
 		this.setMargin(new Insets(1, 1, 1, 1));
-		//this.setPreferredSize(new Dimension(70, 30));
 	}
 
 }

@@ -164,7 +164,6 @@ public class OknoHlavni extends JFrame {
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		pnBoxFiltru.setLayout(new BoxLayout(pnBoxFiltru, BoxLayout.PAGE_AXIS));
 
-		panelMenu.setPreferredSize(Konstanty.VELIKOST_PANELU_MENU);
 		panelProjektMenu.add(panelMenu, BorderLayout.WEST);
 		listaFiltru = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
 		panelProjektMenu.add(listaFiltru, BorderLayout.CENTER);

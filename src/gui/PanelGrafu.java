@@ -3,7 +3,6 @@ package gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -12,10 +11,6 @@ import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.sql.SQLException;
-
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -25,8 +20,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
-import javax.swing.border.Border;
-
 import ostatni.Konstanty;
 import ostatni.Ukladani;
 import data.*;
@@ -45,17 +38,25 @@ public class PanelGrafu extends JPanel {
 	private JScrollPane scroll; // scroll panel
 	private JPanel panel;
 	private JPanel grafyPanel;
-	private DropTarget dropTarget;
-	private DropHandler dropHandler;
-	private DropTarget dropTarget2;
-	private DropHandler dropHandler2;
 	private JPanel panelStatistikSipka;
 	protected JPanel panelFiltrySipka;
 	private JPanel panelStatistik;
 	public boolean statistikyVisible = true;
 	private JButton btSipkaStatistiky;
+
+	private JPanel dropSloty;
 	private JPanel dropSlot;
 	private JPanel dropSlot2;
+	private DropTarget dropTarget;
+	private DropHandler dropHandler;
+	private DropTarget dropTarget2;
+	private DropHandler dropHandler2;
+
+	private PanelGrafuSegment panelSegment;
+	private PanelGrafuUkol panelUkol;
+	private PanelGrafuKonfigurace panelKonfigurace;
+	private PanelGrafuArtefakt panelArtefakt;
+	private PanelGrafuCustom panelCustom;
 
 	/**
 	 * Konstruktor třídy, nastaví projekt, spustí načtení dat projektu a nastaví
@@ -72,6 +73,7 @@ public class PanelGrafu extends JPanel {
 		this.projekt.nactiData();
 		this.nastavZobrazeni();
 		this.nastavAkce();
+		Ukladani.setPanelGrafu(this);
 		Ukladani.nactiGrafy(projekt.getID());
 	}
 
@@ -94,7 +96,7 @@ public class PanelGrafu extends JPanel {
 		this.projekt.nactiData();
 
 		this.nastavZobrazeni();
-		this.nastavAkce();		
+		this.nastavAkce();
 		Ukladani.nactiGrafy(projekt.getID());
 		this.revalidate();
 
@@ -128,17 +130,17 @@ public class PanelGrafu extends JPanel {
 	 * @param seznamIdOsob
 	 *            seznam id osob jež obsahují úkoly které lze vložit do seznamu
 	 * @param logPriorit
-	 * 			  logický operátor pro priority
+	 *            logický operátor pro priority
 	 * @param logSeverit
-	 *  		  logický operátor pro severity
+	 *            logický operátor pro severity
 	 * @param logResolution
-	 *  		  logický operátor pro resoluce
+	 *            logický operátor pro resoluce
 	 * @param logStatusu
-	 *  		  logický operátor pro statusy
+	 *            logický operátor pro statusy
 	 * @param logTypu
-	 *  		  logický operátor pro typy
+	 *            logický operátor pro typy
 	 * @param logOsob
-	 *  		  logický operátor pro osoby
+	 *            logický operátor pro osoby
 	 * @param seznamIdFazi
 	 *            seznam id možných fází pro vložení
 	 * @param seznamIdIteraci
@@ -166,8 +168,8 @@ public class PanelGrafu extends JPanel {
 		Ukladani.nactiGrafy(projekt.getID());
 		this.revalidate();
 
-	}	
-	
+	}
+
 	/**
 	 * Nastaví zobrazení panelu, vloží panel statistik a panely s grafy
 	 */
@@ -186,11 +188,11 @@ public class PanelGrafu extends JPanel {
 		btSipkaStatistiky.setFont(new Font("Arial", Font.PLAIN, 15));
 		btSipkaStatistiky.setMargin(new Insets(0, 0, 0, 0));
 
-		PanelGrafuSegment panelSegment = new PanelGrafuSegment(this.projekt);
-		PanelGrafuUkol panelUkol = new PanelGrafuUkol(this.projekt);
-		PanelGrafuKonfigurace panelKonfigurace = new PanelGrafuKonfigurace(this.projekt);
-		PanelGrafuArtefakt panelArtefakt = new PanelGrafuArtefakt(this.projekt);
-		PanelGrafuCustom panelCustom = new PanelGrafuCustom(this.projekt);
+		panelSegment = new PanelGrafuSegment(this.projekt);
+		panelUkol = new PanelGrafuUkol(this.projekt);
+		panelKonfigurace = new PanelGrafuKonfigurace(this.projekt);
+		panelArtefakt = new PanelGrafuArtefakt(this.projekt);
+		panelCustom = new PanelGrafuCustom(this.projekt);
 
 		JScrollPane scrollUkoly = new JScrollPane(panelUkol);
 		scrollUkoly.getHorizontalScrollBar().setUnitIncrement(25);
@@ -198,7 +200,7 @@ public class PanelGrafu extends JPanel {
 		scrollUkoly.setPreferredSize(
 				new Dimension(Konstanty.SIRKA_PANELU_GRAFU + 40, Konstanty.VYSKA_PANELU_GRAFU_STANDART + 40));
 		scrollUkoly.revalidate();
-		
+
 		JScrollPane scrollCustom = new JScrollPane(panelCustom);
 		scrollCustom.getHorizontalScrollBar().setUnitIncrement(25);
 		scrollCustom.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
@@ -214,37 +216,12 @@ public class PanelGrafu extends JPanel {
 		tabbedPanelGrafu.add("Custom", scrollCustom);
 		Ukladani.setPanel(panelCustom);
 
-		JPanel dropSloty = new JPanel(new BorderLayout());
 		JPanel grafy = new JPanel(new BorderLayout());
 		grafyPanel = new JPanel(new BorderLayout());
+		dropSloty = new JPanel(new BorderLayout());
 
-		dropSlot = new JPanel(new BorderLayout());
-		dropSlot.setBackground(Color.WHITE);
-		dropSlot.setPreferredSize(Konstanty.VELIKOST_GRAFU_VELKY);
-		dropSlot2 = new JPanel(new BorderLayout());
-		dropSlot2.setBackground(Color.WHITE);
-		dropSlot2.setPreferredSize(Konstanty.VELIKOST_GRAFU_VELKY);
-
-		dropHandler = new DropHandler(panelSegment, panelUkol, panelKonfigurace, panelArtefakt,panelCustom);
-		dropTarget = new DropTarget(dropSlot, DnDConstants.ACTION_MOVE, dropHandler, true);
-		dropHandler2 = new DropHandler(panelSegment, panelUkol, panelKonfigurace, panelArtefakt,panelCustom);
-		dropTarget2 = new DropTarget(dropSlot2, DnDConstants.ACTION_MOVE, dropHandler2, true);
-
-		JLabel label = new JLabel(Konstanty.POPISY.getProperty("grafTady"));
-		JLabel label2 = new JLabel(Konstanty.POPISY.getProperty("grafTady"));
-		label.setFont(new Font("Arial", Font.PLAIN, 40));
-		label2.setFont(new Font("Arial", Font.PLAIN, 40));
-		label.setHorizontalAlignment(JLabel.CENTER);
-		label.setVerticalAlignment(JLabel.CENTER);
-		label2.setHorizontalAlignment(JLabel.CENTER);
-		label2.setVerticalAlignment(JLabel.CENTER);
-
-		dropSlot.add(label);
-		dropSlot2.add(label2);
-
-		dropSloty.add(dropSlot, BorderLayout.WEST);
-		dropSloty.add(dropSlot2, BorderLayout.EAST);
-
+		nastavDropSloty();
+		
 		grafyPanel.add(tabbedPanelGrafu, BorderLayout.CENTER);
 
 		grafy.add(grafyPanel, BorderLayout.NORTH);
@@ -263,6 +240,38 @@ public class PanelGrafu extends JPanel {
 
 		this.add(scroll);
 
+	}
+
+	public void nastavDropSloty() {
+		dropSloty.removeAll();
+		dropSlot = new JPanel(new BorderLayout());
+		dropSlot.setBackground(Color.WHITE);
+		dropSlot.setPreferredSize(Konstanty.VELIKOST_GRAFU_VELKY);
+		dropSlot2 = new JPanel(new BorderLayout());
+		dropSlot2.setBackground(Color.WHITE);
+		dropSlot2.setPreferredSize(Konstanty.VELIKOST_GRAFU_VELKY);
+
+		dropHandler = new DropHandler(panelSegment, panelUkol, panelKonfigurace, panelArtefakt, panelCustom);
+		dropTarget = new DropTarget(dropSlot, DnDConstants.ACTION_MOVE, dropHandler, true);
+		dropHandler2 = new DropHandler(panelSegment, panelUkol, panelKonfigurace, panelArtefakt, panelCustom);
+		dropTarget2 = new DropTarget(dropSlot2, DnDConstants.ACTION_MOVE, dropHandler2, true);
+
+		JLabel label = new JLabel(Konstanty.POPISY.getProperty("grafTady"));
+		JLabel label2 = new JLabel(Konstanty.POPISY.getProperty("grafTady"));
+		label.setFont(new Font("Arial", Font.PLAIN, 40));
+		label2.setFont(new Font("Arial", Font.PLAIN, 40));
+		label.setHorizontalAlignment(JLabel.CENTER);
+		label.setVerticalAlignment(JLabel.CENTER);
+		label2.setHorizontalAlignment(JLabel.CENTER);
+		label2.setVerticalAlignment(JLabel.CENTER);
+
+		dropSlot.add(label);
+		dropSlot2.add(label2);
+
+		dropSloty.add(dropSlot, BorderLayout.WEST);
+		dropSloty.add(dropSlot2, BorderLayout.EAST);
+		dropSloty.revalidate();
+		dropSloty.repaint();
 	}
 
 	/**

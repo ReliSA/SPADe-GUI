@@ -12,9 +12,9 @@ import java.util.Iterator;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JTabbedPane;
 import data.prepravkaUkladaniCustom;
 import gui.DropChartPanel;
+import gui.PanelGrafu;
 import gui.PanelGrafuCustom;
 
 public class Ukladani {
@@ -22,6 +22,15 @@ public class Ukladani {
 	private static ArrayList<prepravkaUkladaniCustom> save = new ArrayList<prepravkaUkladaniCustom>();
 	private static PanelGrafuCustom panel;
 	private static JMenu menu;
+	private static PanelGrafu panelGrafu;
+
+	public static PanelGrafu getPanelGrafu() {
+		return panelGrafu;
+	}
+
+	public static void setPanelGrafu(PanelGrafu panelGrafu) {
+		Ukladani.panelGrafu = panelGrafu;
+	}
 
 	public static JMenu getMenu() {
 		return menu;
@@ -44,7 +53,6 @@ public class Ukladani {
 		JMenuItem item = new JMenuItem(prepravka.getNazev());
 		item.addActionListener(actNacteniGrafuProSmazani);
 		menu.add(item);
-		((JTabbedPane) panel.getParent()).setSelectedIndex(4);
 		save();
 	}
 
@@ -105,6 +113,7 @@ public class Ukladani {
 
 		ArrayList<prepravkaUkladaniCustom> nove = new ArrayList<prepravkaUkladaniCustom>();
 		int pocitadlo = 2;
+		String nazev;
 
 		try {
 			FileInputStream fis = new FileInputStream(file);
@@ -113,17 +122,17 @@ public class Ukladani {
 			ois.close();
 
 			for (int i = 0; i < nove.size(); i++) {
-				if (kontrolaNazvu(nove.get(i).getNazev())) {
-					nove.get(i).setNazev(nove.get(i).getNazev() + " import");
-					nove.get(i).getPanel().setTitle(nove.get(i).getNazev());
+				nazev=nove.get(i).getNazev();
+				if (kontrolaNazvu(nazev)) {
+					nazev=nazev+" import";
 
-					while (kontrolaNazvu(nove.get(i).getNazev())) {
-						
-						nove.get(i).setNazev(nove.get(i).getNazev() + " " + pocitadlo);
-						nove.get(i).getPanel().setTitle(nove.get(i).getNazev());
-						
+					while (kontrolaNazvu(nazev+" "+pocitadlo)) {
 						pocitadlo++;
 					}					
+					
+					nove.get(i).setNazev(nazev + " " + pocitadlo);
+					nove.get(i).getPanel().setTitle(nove.get(i).getNazev());
+					
 					save.add(nove.get(i));
 				} else {
 					save.add(nove.get(i));
@@ -181,6 +190,7 @@ public class Ukladani {
 						id = save.get(i).getProjectID();
 						save.remove(save.get(i));
 						save();
+						panelGrafu.nastavDropSloty();
 						nactiGrafy(id);
 					}
 				}
