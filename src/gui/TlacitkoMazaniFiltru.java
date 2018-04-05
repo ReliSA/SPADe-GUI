@@ -1,8 +1,8 @@
 package gui;
 
 import java.awt.Component;
-import java.awt.Insets;
 import javax.swing.JButton;
+import ostatni.Konstanty;
 
 /**
  * Tlačítko pro mázání filtrů grafů. Uchovává odkaz na panel filtru, který má odstranit
@@ -22,12 +22,12 @@ public class TlacitkoMazaniFiltru extends JButton {
 
 	/**
 	 * Konstruktor tlačítka
-	 * @param comp odkaz na panel, které má po stisku odstranit
+	 * @param comp odkaz na panel, který má po stisku odstranit
 	 */
 	public TlacitkoMazaniFiltru(Component comp) {
 		super();
+		this.setFont(Konstanty.FONT_TLACITKA);
 		this.comp = comp;
-		this.setMargin(new Insets(1, 1, 1, 1));
 	}
 
 }

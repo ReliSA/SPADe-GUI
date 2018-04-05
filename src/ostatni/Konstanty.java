@@ -53,6 +53,7 @@ public class Konstanty {
 	public static final Font FONT_POPISKY_GRAFU = new Font("TimesRoman", Font.PLAIN, 10);
 	public static final Font FONT_NAZEV_GRAFU = new Font("TimesRoman", Font.PLAIN, 20);
 	public static final Font FONT_SIPKA = new Font("Arial", Font.PLAIN, 15);
+	public static final Font FONT_TLACITKA = new Font("TimesRoman", Font.BOLD, 12);
 	/*-----------------------------------------------*/
 	
 	/*--------Nastavení panelu statistik-------------*/
