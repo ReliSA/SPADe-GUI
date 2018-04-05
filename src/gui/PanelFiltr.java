@@ -1,13 +1,9 @@
 package gui;
 
-import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
@@ -16,7 +12,6 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
-
 import ostatni.Konstanty;
 
 /**
@@ -72,8 +67,12 @@ public abstract class PanelFiltr extends JPanel {
 	 */
 	protected DefaultComboBoxModel getModel(ArrayList seznam) {
 		DefaultComboBoxModel model = new DefaultComboBoxModel();
-		for (int i = 0; i < seznam.size(); i++)
-			model.addElement(seznam.get(i));
+		for (int i = 0; i < seznam.size(); i++) {
+			if (seznam.get(i).toString()!=null) {
+				System.out.println(seznam.get(i));
+				model.addElement(seznam.get(i));
+			}
+		}
 		return model;
 	}
 
@@ -122,7 +121,7 @@ public abstract class PanelFiltr extends JPanel {
 			break;
 		case "Resolution":
 		case "Rezoluce":
-			titulek = Konstanty.POPISY.getProperty("nazevResoluce");	
+			titulek = Konstanty.POPISY.getProperty("nazevResoluce");
 			this.setBackground(Konstanty.barvaUkol);
 			break;
 		case "Persons":
@@ -166,20 +165,20 @@ public abstract class PanelFiltr extends JPanel {
 		JScrollPane scScrollPane = new JScrollPane(lsSeznamFiltr, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scScrollPane.setPreferredSize(Konstanty.VELIKOST_SEZNAMU_CELA_SIRKA);
-		JLabel lblNazev = new JLabel(nazev+": ");
+		JLabel lblNazev = new JLabel(nazev + ": ");
 
 		nastavAkce();
 
-		this.setLayout(new FlowLayout(FlowLayout.CENTER, 30,0));
+		this.setLayout(new FlowLayout(FlowLayout.CENTER, 30, 0));
 		this.add(ckPouzitFiltr);
 		this.add(lblNazev);
 		this.add(scScrollPane);
 		this.setName(nazev);
 	}
-	
+
 	protected void nactiNovyProjekt(ArrayList seznam) {
-		this.seznam=seznam;
-		lsSeznamFiltr.setModel(getModel(seznam));		
+		this.seznam = seznam;
+		lsSeznamFiltr.setModel(getModel(seznam));
 	}
 
 	/**

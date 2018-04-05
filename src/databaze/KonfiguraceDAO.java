@@ -172,7 +172,7 @@ public class KonfiguraceDAO implements IKonfiguraceDAO{
 				listKonfigurace.add(new Konfigurace(rs.getInt("id"), 
 													rs.getString("name"), 
 													rs.getDate("committed").toLocalDate()) );
-			}
+				}
 			
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaScriptKonfigurace"));
@@ -188,6 +188,7 @@ public class KonfiguraceDAO implements IKonfiguraceDAO{
 				e.printStackTrace();
 			}
 		}
+		
 		return listKonfigurace;
 		
 	}

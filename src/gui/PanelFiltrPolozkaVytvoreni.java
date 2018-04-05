@@ -61,7 +61,7 @@ public class PanelFiltrPolozkaVytvoreni extends PanelFiltr{
 								seznamId.add(polozka.getID());						//pokud metoda vrátí true, vloží se id do seznamu
 							break;
 				case "between":if(vlozitDoSeznamuMezi(polozka))
-					seznamId.add(polozka.getID());									//pokud metoda vrátí true, vloží se id do seznamu
+					seznamId.add(polozka.getID());									
 				break;
 				case ">":	if(vlozitDoSeznamuVetsi(polozka))
 								seznamId.add(polozka.getID());
