@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
@@ -48,7 +50,7 @@ public class CustomGrafDAO {
 					}
 					
 					while (rs.next()) {
-						data.addDatum(rs.getDate(1).toLocalDate());
+						data.addDatum(rs.getString(1));
 						for (int i = 2; i <= columnsNumber; i++) {
 							data.addData(i, rs.getDouble(i));
 						}
