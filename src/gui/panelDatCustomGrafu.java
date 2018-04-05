@@ -1,6 +1,7 @@
 package gui;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -37,6 +38,7 @@ public class panelDatCustomGrafu extends JPanel {
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.insets = new Insets(10, 20, 10, 20);
 		this.nazev.setText(nazev);
+		this.nazev.setPreferredSize(new Dimension(100, 40));
 		Font font = new Font("Courier", Font.BOLD, 12);
 		this.nazev.setFont(font);
 		this.add(this.nazev, gbc);

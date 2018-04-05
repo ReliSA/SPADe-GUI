@@ -2,20 +2,28 @@ package gui;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
 import data.CustomGraf;
+import data.Projekt;
+import data.Segment;
+import data.ciselnik.Osoby;
+import data.ciselnik.Typ;
+import data.polozky.PolozkaCiselnik;
 import databaze.CustomGrafDAO;
 import ostatni.Konstanty;
 import javax.swing.JComboBox;
@@ -23,61 +31,152 @@ import javax.swing.JComboBox;
 public class OknoCustomGraf extends JFrame {
 	JLabel lbLabelNazevOkna;
 
-	int idProjekt;
-	JButton nacti = new JButton("Načti data");
+	int var;
+	Projekt projekt;
 	JButton nakresli = new JButton(Konstanty.POPISY.getProperty("vytvorGraf"));
 	JPanel dataPanel;
 	JPanel westPanel;
 	JTextField tfFieldIterace;
-	JLabel lbLblIterace;
-	JComboBox<String> cmbCombo0;
+	JLabel lblIterace;
+	JLabel lblOsoba;
+	JComboBox<String> cbSql;
+	JComboBox<?> cbIterace;
+	JComboBox<?> cbOsoby;
 	JLabel lbLblSql;
 	HashMap<String, Color> hmap = new HashMap<String, Color>();
+	ArrayList<PolozkaCiselnik> osoby;
+	ArrayList<Segment> iterace;
+	
 
 	CustomGraf data;
 
-	public OknoCustomGraf(int idProjekt) {
+	public OknoCustomGraf(Projekt projekt) {
 		super(Konstanty.POPISY.getProperty("menuVytvorGraf"));
-		this.idProjekt=idProjekt;
+		
+		this.projekt=projekt;
+		osoby=(new Osoby(projekt.getID())).getSeznam();
+		iterace=projekt.getIterace();
+		
 		nastavZobrazení();
 		nastavAkce();
-
 	}
 
 	public void nastavZobrazení() {
 		this.setLayout(new BorderLayout());
 
 		dataPanel = new JPanel(new GridLayout(0, 1));
-		JScrollPane scpPanel9 = new JScrollPane(dataPanel);
+		JScrollPane scrollDataPanel = new JScrollPane(dataPanel);
 		westPanel = new JPanel(new GridLayout(1, 0));
 		tfFieldIterace = new JTextField();
-		lbLblIterace = new JLabel(Konstanty.POPISY.getProperty("nazevIterace"));
-		cmbCombo0 = new JComboBox<String>(Konstanty.getSQLKeys());
+		lblIterace = new JLabel(Konstanty.POPISY.getProperty("nazevIterace"));
+		lblOsoba = new JLabel("Osoba:");
+		cbSql = new JComboBox<String>(Konstanty.getSQLKeys());
+		cbIterace = new JComboBox(getModel(iterace));
+		cbOsoby = new JComboBox(getModel(osoby));
 		lbLblSql = new JLabel("SQL:");
-
-		cmbCombo0.setPreferredSize(Konstanty.VELIKOST_CTVRTINOVA_SIRKA);
+		
+		cbSql.setPreferredSize(Konstanty.VELIKOST_CTVRTINOVA_SIRKA);
 		tfFieldIterace.setPreferredSize(Konstanty.VELIKOST_CTVRTINOVA_SIRKA);
 
 		this.setBackground(Color.white);
 		dataPanel.setBackground(Color.white);
 
-		lbLblIterace.setHorizontalAlignment(JLabel.CENTER);
+		lblIterace.setHorizontalAlignment(JLabel.CENTER);
+		lblOsoba.setHorizontalAlignment(JLabel.CENTER);
 		lbLblSql.setHorizontalAlignment(JLabel.CENTER);
 
-		westPanel.add(lbLblSql);
-		westPanel.add(cmbCombo0);
-		westPanel.add(lbLblIterace);
-		westPanel.add(tfFieldIterace);
-		westPanel.add(nacti);
-		westPanel.add(nakresli);
-
-		this.add(scpPanel9, BorderLayout.CENTER);
+		this.add(scrollDataPanel, BorderLayout.CENTER);
 		this.add(westPanel, BorderLayout.NORTH);
-
+		
+		nastavMenu();
+		
 		this.setVisible(true);
 
 	}
 
+	/**
+	 * Vrací model ze seznamu z parametru
+	 * 
+	 * @param seznam
+	 *            seznam, ze kterého se vytvoří model
+	 * @return vytvořený model
+	 */
+	private DefaultComboBoxModel getModel(ArrayList seznam) {
+		DefaultComboBoxModel model = new DefaultComboBoxModel();
+		for (int i = 0; i < seznam.size(); i++)
+			model.addElement(seznam.get(i));
+		return model;
+	}
+	
+	private int getIdIterace() {
+		String nazev = iterace.get(cbIterace.getSelectedIndex()).getNazev();
+		for (int i = 0; i < iterace.size(); i++) {
+			Segment iter = iterace.get(i);
+			if(iter.getNazev().equals(nazev)) {
+				return iter.getID();
+			}
+		}
+		return -1;
+	}
+	
+	private int getIdOsoby() {
+		String nazev = osoby.get(cbOsoby.getSelectedIndex()).getNazev();
+		for (int i = 0; i < osoby.size(); i++) {
+			PolozkaCiselnik osob = osoby.get(i);
+			if(osob.getNazev().equals(nazev)) {
+				return osob.getID();
+			}
+		}
+		return -1;
+	}
+	
+	private void nastavMenu() {
+		
+		String sql = (String) cbSql.getSelectedItem();
+		var = Integer.parseInt(Konstanty.SQLsVar.getProperty(sql));
+		
+		westPanel.removeAll();
+		
+		westPanel.add(lbLblSql);
+		westPanel.add(cbSql);		
+		
+		if(var==3) {
+			westPanel.add(lblIterace);
+			westPanel.add(cbIterace);
+			westPanel.add(lblOsoba);
+			westPanel.add(cbOsoby);			
+		}
+		else if(var==2) {
+			westPanel.add(lblOsoba);
+			westPanel.add(cbOsoby);			
+		}
+		else if(var==1) {
+			westPanel.add(lblIterace);
+			westPanel.add(cbIterace);		
+		}
+		
+		westPanel.add(nakresli);
+		
+		nactiData();
+	}
+	
+	
+	private void nactiData() {
+		CustomGrafDAO dao = new CustomGrafDAO();
+		int iteraceID = getIdIterace();
+		
+		data = dao.getCustomGrafData((String) cbSql.getSelectedItem(),
+				projekt.getID(), getIdIterace(), getIdOsoby(),var);
+
+		dataPanel.removeAll();
+		for (int i = 1; i < data.pocetSloupcu(); i++) {
+			dataPanel.add(new panelDatCustomGrafu(data.getNazvySloupcu(i), i - 1));
+		}
+
+		getContentPane().revalidate();
+		getContentPane().repaint();
+	}
+	
 	/**
 	 * Nastavení akcí jednotlivých komponent
 	 */
@@ -87,18 +186,16 @@ public class OknoCustomGraf extends JFrame {
 
 			public void actionPerformed(ActionEvent e) {
 
-				CustomGrafDAO dao = new CustomGrafDAO();
-				data = dao.getCustomGrafData((String) cmbCombo0.getSelectedItem(),
-						idProjekt, Integer.parseInt(tfFieldIterace.getText()));
+				nactiData();
+				
+			}
+		};
+		
+		ActionListener actNastavMenu = new ActionListener() {
 
-				dataPanel.removeAll();
+			public void actionPerformed(ActionEvent e) {
 
-				for (int i = 1; i < data.pocetSloupcu(); i++) {
-					dataPanel.add(new panelDatCustomGrafu(data.getNazvySloupcu(i), i - 1));
-				}
-
-				getContentPane().revalidate();
-				getContentPane().repaint();
+				nastavMenu();			
 			}
 		};
 
@@ -159,7 +256,7 @@ public class OknoCustomGraf extends JFrame {
 
 								SwingUtilities.invokeLater(() -> {
 									OknoCustomNahled example = new OknoCustomNahled(
-											(String) cmbCombo0.getSelectedItem(), pie,idProjekt);
+											(String) cbSql.getSelectedItem(), pie, projekt.getID());
 									example.setSize(800, 400);
 									example.setLocationRelativeTo(null);
 									example.setVisible(true);
@@ -178,8 +275,8 @@ public class OknoCustomGraf extends JFrame {
 				}
 
 				SwingUtilities.invokeLater(() -> {
-					OknoCustomNahled example = new OknoCustomNahled((String) cmbCombo0.getSelectedItem(), bary, body,
-							spojnice, area, detected, hmap, idProjekt);
+					OknoCustomNahled example = new OknoCustomNahled((String) cbSql.getSelectedItem(), bary, body,
+							spojnice, area, detected, hmap, projekt.getID());
 					example.setSize(800, 400);
 					example.setLocationRelativeTo(null);
 					example.setVisible(true);
@@ -187,7 +284,9 @@ public class OknoCustomGraf extends JFrame {
 			}
 		};
 
-		nacti.addActionListener(actNactiData);
+		cbIterace.addActionListener(actNactiData);
+		cbOsoby.addActionListener(actNactiData);
+		cbSql.addActionListener(actNastavMenu);
 		nakresli.addActionListener(actNakresliGraf);
 	}
 }

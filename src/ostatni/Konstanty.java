@@ -133,8 +133,10 @@ public class Konstanty {
 	public static final String NAZEV_SOUBORU_POPISU_CZECH = "czech.properties";
 	public static final String NAZEV_SOUBORU_POPISU_ENGLISH = "english.properties";
 	public static final String SQLSoubor = "sql.properties";
+	public static final String SQLVarSoubor = "sqlVar.properties";
 	public static Properties POPISY = new Properties();
 	public static Properties SQLs = new Properties();
+	public static Properties SQLsVar = new Properties();
 	public static final int DELKA_POPISKU_OS = 20;
 	
 /*---------------------------------------------------------*/

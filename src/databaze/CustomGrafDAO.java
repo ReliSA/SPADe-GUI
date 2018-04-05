@@ -19,17 +19,29 @@ public class CustomGrafDAO {
 	/**
 	 * Spustí zadaný skript
 	 */
-	public CustomGraf getCustomGrafData(String sql, int idProjektu, int idIterace) {
+	public CustomGraf getCustomGrafData(String sql, int idProjektu, int idIterace, int idOsoba, int var) {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		CustomGraf data = null;
 		String dotaz = Konstanty.SQLs.getProperty(sql);
 
 		try {
+
 			stmt = pripojeni.prepareStatement(dotaz);
 
-			stmt.setInt(1, idProjektu);
-			stmt.setInt(2, idIterace);
+			if (var == 3) {
+				stmt.setInt(1, idProjektu);
+				stmt.setInt(2, idIterace);
+				stmt.setInt(3, idOsoba);
+			} else if (var == 2) {
+				stmt.setInt(1, idProjektu);
+				stmt.setInt(2, idOsoba);
+			} else if (var == 1) {
+				stmt.setInt(1, idProjektu);
+				stmt.setInt(2, idIterace);
+			} else {
+				stmt.setInt(1, idProjektu);
+			}
 
 			boolean isResultSet = stmt.execute();
 			while (true) {
