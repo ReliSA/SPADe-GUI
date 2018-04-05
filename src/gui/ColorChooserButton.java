@@ -24,8 +24,7 @@ public class ColorChooserButton extends JButton {
 	/**
 	 * Konstruktor třídy
 	 * 
-	 * @param c
-	 *            zvolená barva
+	 * @param c zvolená barva
 	 */
 	public ColorChooserButton(Color c) {
 
@@ -53,8 +52,7 @@ public class ColorChooserButton extends JButton {
 	/**
 	 * Nastaví novou barvu colorpickeru
 	 * 
-	 * @param newColor
-	 *            nová barva
+	 * @param newColor nová barva
 	 */
 	public void setSelectedColor(Color newColor) {
 		setSelectedColor(newColor, true);
@@ -63,10 +61,8 @@ public class ColorChooserButton extends JButton {
 	/**
 	 * Nastaví novou barvu colorpickeru
 	 * 
-	 * @param newColor
-	 *            nová barva
-	 * @param notify
-	 *            určuje zda mají být notifikováni registrovaní listeners
+	 * @param newColor nová barva
+	 * @param notify určuje zda mají být notifikováni registrovaní listeners
 	 */
 	public void setSelectedColor(Color newColor, boolean notify) {
 
@@ -96,8 +92,7 @@ public class ColorChooserButton extends JButton {
 	/**
 	 * Přidá nový ColorChangedListener
 	 * 
-	 * @param toAdd
-	 *            ColorChangedListener pro přidání
+	 * @param toAdd ColorChangedListener pro přidání
 	 */
 	public void addColorChangedListener(ColorChangedListener toAdd) {
 		listeners.add(toAdd);
@@ -106,12 +101,9 @@ public class ColorChooserButton extends JButton {
 	/**
 	 * Metoda vykreslí ikonu na tlačítko v aktuálně vybrané barvě
 	 * 
-	 * @param main
-	 *            barva ikony
-	 * @param width
-	 *            šířka ikony
-	 * @param height
-	 *            výška ikony
+	 * @param main barva ikony
+	 * @param width šířka ikony
+	 * @param height výška ikony
 	 * @return ImageIcon ikona
 	 */
 	private static ImageIcon createIcon(Color main, int width, int height) {
