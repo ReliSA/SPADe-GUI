@@ -5,6 +5,9 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -16,6 +19,7 @@ public class panelDatCustomGrafu extends JPanel {
 
 	private JComboBox typGrafu = new JComboBox(Konstanty.TYPY_GRAFU);
 	private JLabel nazev = new JLabel();
+	private JLabel lblBarva = new JLabel(Konstanty.POPISY.getProperty("barvaGrafu"));
 	private ColorPicker colorPicker = new ColorPicker();
 	private JCheckBox pouzit = new JCheckBox(Konstanty.POPISY.getProperty("pouzitData"));
 
@@ -37,10 +41,11 @@ public class panelDatCustomGrafu extends JPanel {
 		this.add(this.nazev, gbc);
 		this.add(pouzit, gbc);
 		if (!nazev.equals("detected")) {
-			this.add(new JLabel(Konstanty.POPISY.getProperty("typGrafu")), gbc);
+			this.add(lblBarva, gbc);
 			this.add(typGrafu, gbc);
-			this.add(new JLabel(Konstanty.POPISY.getProperty("barvaGrafu")), gbc);
+			this.add(new JLabel(), gbc);
 			this.add(colorPicker, gbc);
+			nastavAkce();
 		}
 	}
 
@@ -56,8 +61,51 @@ public class panelDatCustomGrafu extends JPanel {
 		return colorPicker.getColor();
 	}
 
-	public boolean pouzit() {
+	public boolean getPouzit() {
 		return pouzit.isSelected();
+	}
+	
+	public void setPouzit(boolean bool) {
+		pouzit.setSelected(bool);
+	}
+
+	protected void nastavAkce() {
+
+		ActionListener actZmenaOperatoru = new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+
+				JComboBox cbBox = (JComboBox) e.getSource();
+				JPanel panel = (JPanel) cbBox.getParent();
+				JPanel container = (JPanel) panel.getParent();
+
+				if (typGrafu.getSelectedIndex() == 4) {
+					lblBarva.setVisible(false);
+					colorPicker.setVisible(false);
+
+					for (int i = 0; i < container.getComponentCount(); i++) {
+						container.getComponent(i).setVisible(false);
+						((panelDatCustomGrafu)container.getComponent(i)).setPouzit(false);
+					}
+
+					container.setComponentZOrder(panel, 0);
+					panel.setVisible(true);
+					((panelDatCustomGrafu)panel).setPouzit(true);
+
+					container.revalidate();
+					container.repaint();
+
+				} else {
+					lblBarva.setVisible(true);
+					colorPicker.setVisible(true);
+					for (int i = 0; i < container.getComponentCount(); i++) {
+						container.getComponent(i).setVisible(true);
+					}
+				}
+			}
+		};
+
+		typGrafu.addActionListener(actZmenaOperatoru);
 	}
 
 }

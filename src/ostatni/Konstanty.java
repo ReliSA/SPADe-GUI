@@ -160,7 +160,7 @@ public class Konstanty {
 		POLE_FILTRU = new String[]{POPISY.getProperty("nazevUkoly"), POPISY.getProperty("nazevFaze"), POPISY.getProperty("nazevIterace"), POPISY.getProperty("nazevAktivity"), POPISY.getProperty("nazevKonfigurace"), POPISY.getProperty("nazevArtefakty")};
 		POLE_LOG_OPERATORU = new String[]{POPISY.getProperty("and"),POPISY.getProperty("or"),POPISY.getProperty("xor"),POPISY.getProperty("not")};
 		POLE_PODFILTRU = new String[]{POPISY.getProperty("nazevPriority"), POPISY.getProperty("nazevSeverity"), POPISY.getProperty("nazevStatusy"), POPISY.getProperty("nazevTypy"), POPISY.getProperty("nazevResoluce"), POPISY.getProperty("nazevOsoby"),POPISY.getProperty("cas")};
-		TYPY_GRAFU = new String[] {POPISY.getProperty("sloupcovy"),POPISY.getProperty("spojnicovy"),POPISY.getProperty("bodovy"),POPISY.getProperty("plosny")};
+		TYPY_GRAFU = new String[] {POPISY.getProperty("sloupcovy"),POPISY.getProperty("spojnicovy"),POPISY.getProperty("bodovy"),POPISY.getProperty("plosny"),POPISY.getProperty("kolacovy")};
 	}
 	
 	public static String [] getSQLKeys(){ 

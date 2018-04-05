@@ -5,24 +5,19 @@ import javax.swing.JPanel;
 import javax.swing.JButton;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
-
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-
 import org.jfree.data.category.DefaultCategoryDataset;
-
+import org.jfree.data.general.DefaultPieDataset;
 import data.CustomGraf;
 import databaze.CustomGrafDAO;
 import ostatni.Konstanty;
-
 import javax.swing.JComboBox;
 
 public class OknoCustomGraf extends JFrame {
@@ -36,7 +31,7 @@ public class OknoCustomGraf extends JFrame {
 	JTextField tfFieldIterace;
 	JLabel lbLblProjekt;
 	JLabel lbLblIterace;
-	JComboBox cmbCombo0;
+	JComboBox<String> cmbCombo0;
 	JLabel lbLblSql;
 	HashMap<String, Color> hmap = new HashMap<String, Color>();
 
@@ -59,7 +54,7 @@ public class OknoCustomGraf extends JFrame {
 		tfFieldIterace = new JTextField();
 		lbLblProjekt = new JLabel(Konstanty.POPISY.getProperty("nazevProjekt"));
 		lbLblIterace = new JLabel(Konstanty.POPISY.getProperty("nazevIterace"));
-		cmbCombo0 = new JComboBox(Konstanty.getSQLKeys());
+		cmbCombo0 = new JComboBox<String>(Konstanty.getSQLKeys());
 		lbLblSql = new JLabel("SQL:");
 
 		cmbCombo0.setPreferredSize(Konstanty.VELIKOST_CTVRTINOVA_SIRKA);
@@ -122,10 +117,11 @@ public class OknoCustomGraf extends JFrame {
 				DefaultCategoryDataset spojnice = new DefaultCategoryDataset();
 				DefaultCategoryDataset area = new DefaultCategoryDataset();
 				DefaultCategoryDataset detected = new DefaultCategoryDataset();
+				DefaultPieDataset pie = new DefaultPieDataset();
 
 				for (int i = 1; i < data.pocetSloupcu(); i++) {
 
-					if (((panelDatCustomGrafu) dataPanel.getComponent(i - 1)).pouzit()) {
+					if (((panelDatCustomGrafu) dataPanel.getComponent(i - 1)).getPouzit()) {
 
 						if (!((panelDatCustomGrafu) dataPanel.getComponent(i - 1)).getNazev().equals("detected")) {
 
@@ -162,11 +158,27 @@ public class OknoCustomGraf extends JFrame {
 								}
 							}
 
+							if (((panelDatCustomGrafu) dataPanel.getComponent(i - 1)).getTyp() == 4) {
+								for (int j = 0; j < data.pocetRadku(); j++) {
+									pie.setValue(data.getDatumy(j), data.getData(i - 1, j));
+								}
+
+								SwingUtilities.invokeLater(() -> {
+									PanelGrafuCustom example = new PanelGrafuCustom(
+											(String) cmbCombo0.getSelectedItem(), pie);
+									example.setSize(800, 400);
+									example.setLocationRelativeTo(null);
+									example.setVisible(true);
+								});
+								return;
+							}
+
 						} else {
 							for (int j = 0; j < data.pocetRadku(); j++) {
 								double max = data.getMaxData();
-								detected.addValue(data.getData(i - 1, j)*max, data.getNazvySloupcu(i), data.getDatumy(j));
-							}							
+								detected.addValue(data.getData(i - 1, j) * max, data.getNazvySloupcu(i),
+										data.getDatumy(j));
+							}
 						}
 					}
 				}

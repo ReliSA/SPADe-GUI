@@ -1,10 +1,13 @@
 package gui;
 
 import java.awt.Color;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 import java.util.HashMap;
 
 import javax.swing.JFrame;
 
+import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAxis;
@@ -15,18 +18,17 @@ import org.jfree.chart.renderer.category.AreaRenderer;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.category.CategoryItemRenderer;
 import org.jfree.chart.renderer.category.LineAndShapeRenderer;
-import org.jfree.chart.renderer.category.ScatterRenderer;
 import org.jfree.chart.renderer.category.StandardBarPainter;
 import org.jfree.data.category.DefaultCategoryDataset;
-
-import data.CustomGraf;
+import org.jfree.data.general.DefaultPieDataset;
 
 public class PanelGrafuCustom extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 
 	public PanelGrafuCustom(String title, DefaultCategoryDataset bary, DefaultCategoryDataset body,
-			DefaultCategoryDataset spojnice, DefaultCategoryDataset area,DefaultCategoryDataset detected, HashMap<String, Color> hmap) {
+			DefaultCategoryDataset spojnice, DefaultCategoryDataset area, DefaultCategoryDataset detected,
+			HashMap<String, Color> hmap) {
 		super(title);
 
 		CategoryPlot plot = new CategoryPlot();
@@ -37,7 +39,7 @@ public class PanelGrafuCustom extends JFrame {
 		((BarRenderer) detectRenderer).setBarPainter(new StandardBarPainter());
 		plot.setDataset(0, detected);
 		plot.setRenderer(0, detectRenderer);
-		
+
 		CategoryItemRenderer lineRenderer = new LineAndShapeRenderer(true, false);
 		for (int j = 0; j < spojnice.getRowKeys().size(); j++) {
 			lineRenderer.setSeriesPaint(j, hmap.get(spojnice.getRowKey(j)));
@@ -71,10 +73,29 @@ public class PanelGrafuCustom extends JFrame {
 
 		CategoryAxis domainAxis = plot.getDomainAxis();
 		domainAxis.setCategoryLabelPositions(CategoryLabelPositions.createUpRotationLabelPositions(Math.PI / 2));
-		
+		/*
+		 * try { FileOutputStream fos = new FileOutputStream("output.out");
+		 * ObjectOutputStream oos = new ObjectOutputStream(fos); oos.writeObject(plot);
+		 * oos.close(); } catch (Exception ex) { ex.printStackTrace(); }
+		 */
+
 		JFreeChart chart = new JFreeChart(plot);
 		chart.setTitle(title);
 
+		ChartPanel panel = new ChartPanel(chart);
+		setContentPane(panel);
+	}
+
+	public PanelGrafuCustom(String title,DefaultPieDataset dataset) {
+		super(title);
+		
+		JFreeChart chart = ChartFactory.createPieChart(      
+		         title,  		   // chart title 
+		         dataset,          // data    
+		         true,             // include legend   
+		         true, 
+		         false);
+		
 		ChartPanel panel = new ChartPanel(chart);
 		setContentPane(panel);
 	}
