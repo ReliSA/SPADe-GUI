@@ -193,17 +193,25 @@ public class PanelGrafu extends JPanel {
 		PanelGrafuCustom panelCustom = new PanelGrafuCustom(this.projekt);
 
 		JScrollPane scrollUkoly = new JScrollPane(panelUkol);
-		scrollUkoly.getVerticalScrollBar().setUnitIncrement(15);
+		scrollUkoly.getHorizontalScrollBar().setUnitIncrement(25);
+		scrollUkoly.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
 		scrollUkoly.setPreferredSize(
-				new Dimension(Konstanty.SIRKA_PANELU_GRAFU + 20, Konstanty.VYSKA_PANELU_GRAFU_STANDART + 20));
+				new Dimension(Konstanty.SIRKA_PANELU_GRAFU + 40, Konstanty.VYSKA_PANELU_GRAFU_STANDART + 40));
 		scrollUkoly.revalidate();
+		
+		JScrollPane scrollCustom = new JScrollPane(panelCustom);
+		scrollCustom.getHorizontalScrollBar().setUnitIncrement(25);
+		scrollCustom.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+		scrollCustom.setPreferredSize(
+				new Dimension(Konstanty.SIRKA_PANELU_GRAFU + 40, Konstanty.VYSKA_PANELU_GRAFU_STANDART + 40));
+		scrollCustom.revalidate();
 
 		JTabbedPane tabbedPanelGrafu = new JTabbedPane();
 		tabbedPanelGrafu.add(Konstanty.POPISY.getProperty("ukoly"), scrollUkoly);
 		tabbedPanelGrafu.add(Konstanty.POPISY.getProperty("segment"), panelSegment);
 		tabbedPanelGrafu.add(Konstanty.POPISY.getProperty("konfigurace"), panelKonfigurace);
 		tabbedPanelGrafu.add(Konstanty.POPISY.getProperty("artefakty"), panelArtefakt);
-		tabbedPanelGrafu.add("Custom", panelCustom);
+		tabbedPanelGrafu.add("Custom", scrollCustom);
 		Ukladani.setPanel(panelCustom);
 
 		JPanel dropSloty = new JPanel(new BorderLayout());

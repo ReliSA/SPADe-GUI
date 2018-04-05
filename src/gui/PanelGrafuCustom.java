@@ -1,5 +1,9 @@
 package gui;
 
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import javax.swing.BorderFactory;
@@ -28,7 +32,7 @@ import data.Projekt;
 public class PanelGrafuCustom extends PanelGrafuRodic {
 
 	Projekt projekt;
-	
+
 	/**
 	 * Konstruktor třídy, nastaví projekt a spustí vložení grafů
 	 * 
@@ -37,16 +41,35 @@ public class PanelGrafuCustom extends PanelGrafuRodic {
 	 */
 	public PanelGrafuCustom(Projekt projekt) {
 		super(projekt);
-		this.projekt=projekt;
-		this.setPreferredSize(Konstanty.VELIKOST_PANELU_STANDARD);
+		this.projekt = projekt;
 		this.setBorder(BorderFactory.createTitledBorder(Konstanty.POPISY.getProperty("nazevArtefakty")));
+		//setsize();
 	}
+/*
+	private void setsize() {
+
+		int sirkaPanelu = this.getWidth();
+
+		if (this.getWidth() == 0) {
+			sirkaPanelu = 1656;
+		}
+
+		int pocet = this.getComponentCount();
+		double radkaDouble = sirkaPanelu / 280;
+		int radka = (int) Math.floor(radkaDouble);
+		int radek = (int) Math.ceil(pocet / (double) radka);
+
+		System.out.println(radek);
+		int vyska = 210 * (radek);
+		this.setPreferredSize(new Dimension(0, vyska));
+
+	}*/
 
 	protected void vlozGrafy() {
 
-		Ukladani.nactiGrafy(projekt.getID());		
+		Ukladani.nactiGrafy(projekt.getID());
 		odstranMenu();
-		nastavZobrazeni();	
+		nastavZobrazeni();
 	}
 
 	/**
@@ -59,8 +82,9 @@ public class PanelGrafuCustom extends PanelGrafuRodic {
 		panel.setRangeZoomable(false);
 		panel.zobrazLegendu(false);
 		panel.setPreferredSize(Konstanty.VELIKOST_GRAFU);
-		panel.setPopupMenu(null);		
+		panel.setPopupMenu(null);
 		this.add(panel);
+		//setsize();
 		this.revalidate();
 		this.repaint();
 	}

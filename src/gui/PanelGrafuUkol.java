@@ -69,7 +69,7 @@ public class PanelGrafuUkol extends PanelGrafuRodic{
 	 * Vytvoří grafy, přidá do popupmenu checkbox, vloží je do panelu a spustí nastavení zobrazení
 	 */
 	protected void vlozGrafy(){
-		this.setPreferredSize(Konstanty.VELIKOST_PANELU_UKOL);		
+		//this.setPreferredSize(Konstanty.VELIKOST_PANELU_UKOL);		
 		this.setBorder(BorderFactory.createTitledBorder(Konstanty.POPISY.getProperty("nazevUkoly")));
 		this.removeAll();
 
