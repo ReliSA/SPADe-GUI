@@ -17,19 +17,20 @@ import ostatni.Konstanty;
 
 public class panelDatCustomGrafu extends JPanel {
 
+	private Color[] colors = {Color.red, Color.blue, Color.green, Color.BLACK, Color.ORANGE, Color.YELLOW, Color.PINK, Color.magenta,Color.CYAN,Color.lightGray};
 	private JComboBox typGrafu = new JComboBox(Konstanty.TYPY_GRAFU);
 	private JLabel nazev = new JLabel();
 	private JLabel lblBarva = new JLabel(Konstanty.POPISY.getProperty("barvaGrafu"));
-	private ColorPicker colorPicker = new ColorPicker();
+	private JLabel lblTyp = new JLabel(Konstanty.POPISY.getProperty("typGrafu"));
+	private ColorChooserButton colorPick;
 	private JCheckBox pouzit = new JCheckBox(Konstanty.POPISY.getProperty("pouzitData"));
 
 	public panelDatCustomGrafu(String nazev, int index) {
 		this.setBorder(BorderFactory.createTitledBorder(""));
-		colorPicker.setPreferredSize(Konstanty.VELIKOST_COLOR_PICKER);
 		if (index >= 10) {
 			index = 0;
 		}
-		colorPicker.setSelectedIndex(index);
+		colorPick= new ColorChooserButton(colors[index]);
 		this.setBackground(Color.white);
 		pouzit.setBackground(Color.white);
 		this.setLayout(new GridBagLayout());
@@ -41,10 +42,10 @@ public class panelDatCustomGrafu extends JPanel {
 		this.add(this.nazev, gbc);
 		this.add(pouzit, gbc);
 		if (!nazev.equals("detected")) {
-			this.add(lblBarva, gbc);
+			this.add(lblTyp, gbc);
 			this.add(typGrafu, gbc);
-			this.add(new JLabel(), gbc);
-			this.add(colorPicker, gbc);
+			this.add(lblBarva, gbc);
+			this.add(colorPick, gbc);
 			nastavAkce();
 		}
 	}
@@ -58,7 +59,7 @@ public class panelDatCustomGrafu extends JPanel {
 	}
 
 	public Color getColor() {
-		return colorPicker.getColor();
+		return colorPick.getSelectedColor();
 	}
 
 	public boolean getPouzit() {
@@ -81,7 +82,7 @@ public class panelDatCustomGrafu extends JPanel {
 
 				if (typGrafu.getSelectedIndex() == 4) {
 					lblBarva.setVisible(false);
-					colorPicker.setVisible(false);
+					colorPick.setVisible(false);
 
 					for (int i = 0; i < container.getComponentCount(); i++) {
 						container.getComponent(i).setVisible(false);
@@ -97,7 +98,7 @@ public class panelDatCustomGrafu extends JPanel {
 
 				} else {
 					lblBarva.setVisible(true);
-					colorPicker.setVisible(true);
+					colorPick.setVisible(true);
 					for (int i = 0; i < container.getComponentCount(); i++) {
 						container.getComponent(i).setVisible(true);
 					}
