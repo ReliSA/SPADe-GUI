@@ -39,7 +39,7 @@ public class panelDatCustomGrafu extends JPanel {
 	 * @param index
 	 *            udává pozici, na které je tento panel zobrazen
 	 */
-	public panelDatCustomGrafu(String nazev, ArrayList<Double> data, int index) {
+	public panelDatCustomGrafu(String nazev, ArrayList<Double> data, int index, ActionListener listener) {
 		if (index >= 10) {
 			index = 0;
 		}
@@ -77,6 +77,10 @@ public class panelDatCustomGrafu extends JPanel {
 			lblHodnota.setHorizontalAlignment(SwingConstants.CENTER);
 			this.add(lblHodnota);
 		} 
+		
+		pouzit.addActionListener(listener);
+		typGrafu.addActionListener(listener);
+		colorPicker.addColorChangedListener(listener);
 	}
 	
 	/**
@@ -120,9 +124,7 @@ public class panelDatCustomGrafu extends JPanel {
 	 * @param listener
 	 */
 	public void nastavListeneryPreview(ActionListener listener) {
-		pouzit.addActionListener(listener);
-		typGrafu.addActionListener(listener);
-		colorPicker.addColorChangedListener(listener);
+		
 	}
 	
 	/**
@@ -131,10 +133,13 @@ public class panelDatCustomGrafu extends JPanel {
 	 * @return typ grafu
 	 */
 	public int getTyp() {
-		System.out.println(this.typGrafu.getSelectedIndex());
 		return this.typGrafu.getSelectedIndex();
 	}
 
+	public void setTyp(int index) {
+			this.typGrafu.setSelectedIndex(index);
+	}
+	
 	/**
 	 * Vrací název dat
 	 * 
@@ -153,6 +158,10 @@ public class panelDatCustomGrafu extends JPanel {
 		return colorPicker.getSelectedColor();
 	}
 
+	public void setColor(Color color) {
+		colorPicker.setSelectedColor(color);
+	}
+	
 	/**
 	 * Vrací boolean zda se mají tyto data použít
 	 * 
@@ -196,9 +205,9 @@ public class panelDatCustomGrafu extends JPanel {
 						((panelDatCustomGrafu) container.getComponent(i)).setPouzit(false);
 					}
 
-					container.setComponentZOrder(panel, 1);
-					panel.setVisible(true);
-					((panelDatCustomGrafu) panel).setPouzit(true);
+					//container.setComponentZOrder(panel, 1);
+					//((panelDatCustomGrafu) panel).setPouzit(true);
+					panel.setVisible(true);					
 
 					container.revalidate();
 					container.repaint();

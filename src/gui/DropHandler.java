@@ -11,7 +11,6 @@ import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-
 import ostatni.Konstanty;
 import ostatni.Ukladani;
 
@@ -90,8 +89,8 @@ public class DropHandler implements DropTargetListener {
 						panel.setDomainZoomable(true);
 						panel.setRangeZoomable(true);
 						panel.zobrazLegendu(true);
-						panel.setPopupMenu(panel.menu);
-
+						panel.setPopupMenu(panel.getMenu());
+								
 						vratMiniaturu((((JComponent) component).getComponent(0)));
 
 						((JComponent) component).removeAll();
@@ -137,7 +136,9 @@ public class DropHandler implements DropTargetListener {
 
 	/**
 	 * Vrati miniaturu grafu do příslušného panelu miniatur
-	 * @param component graf ke vrácení
+	 * 
+	 * @param component
+	 *            graf ke vrácení
 	 */
 	public void vratMiniaturu(Component component) {
 		if (component instanceof DropChartPanel) {

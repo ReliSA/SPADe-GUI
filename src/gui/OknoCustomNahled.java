@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.jfree.chart.ChartFactory;
@@ -41,6 +42,7 @@ public class OknoCustomNahled extends JPanel {
 	private int typGrafu; // typ grafu
 	private String nazev; // nazev grafu
 	private JButton save; // tlačítko pro uložení vytvořeného grafu
+	private OknoCustomGraf okno;
 
 	/**
 	 * Konstruktor okna pro všechny grafy kromě koláčových
@@ -64,12 +66,13 @@ public class OknoCustomNahled extends JPanel {
 	 */
 	public OknoCustomNahled(String title, DefaultCategoryDataset bary, DefaultCategoryDataset body,
 			DefaultCategoryDataset spojnice, DefaultCategoryDataset area, DefaultCategoryDataset detected,
-			HashMap<String, Color> colors, int projectID) {
+			HashMap<String, Color> colors, int projectID,OknoCustomGraf okno) {
 
 		CategoryPlot plot = new CategoryPlot();
 		this.projectID = projectID;
 		this.typGrafu = 0;
 		this.nazev = title;
+		this.okno=okno;
 
 		// Vykreslení detekcí
 		CategoryItemRenderer detectRenderer = new BarRenderer();
@@ -143,10 +146,11 @@ public class OknoCustomNahled extends JPanel {
 	 * @param projectID
 	 *            ID projektu
 	 */
-	public OknoCustomNahled(String title, DefaultPieDataset dataset, int projectID) {
+	public OknoCustomNahled(String title, DefaultPieDataset dataset, int projectID,OknoCustomGraf okno) {
 		this.projectID = projectID;
 		this.typGrafu = Konstanty.PIE;
 		this.nazev = title;
+		this.okno=okno;
 		chart = ChartFactory.createPieChart(title, dataset, true, true, false);
 		chart.removeLegend();		
 		ChartPanel panel = new ChartPanel(chart);
@@ -184,7 +188,7 @@ public class OknoCustomNahled extends JPanel {
 
 				else {
 
-					prepravkaUkladaniCustom prepravka = new prepravkaUkladaniCustom(chart, projectID, typGrafu, nazev);
+					prepravkaUkladaniCustom prepravka = new prepravkaUkladaniCustom(chart, projectID, typGrafu, nazev, okno.ulozNastaveni());
 					Ukladani.add(prepravka);
 				}
 

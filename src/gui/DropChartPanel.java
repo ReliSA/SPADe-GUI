@@ -28,7 +28,16 @@ public class DropChartPanel extends ChartPanel {
 
 	private int typGrafu;
 	protected int typPanelu;
-	protected JPopupMenu menu;
+	private JPopupMenu menu;
+
+
+	public JPopupMenu getMenu() {
+		return menu;
+	}
+
+	public void setMenu(JPopupMenu menu) {
+		this.menu = menu;
+	}
 
 	/**
 	 * Kontruktor DropChartPanelu. Vytvoří panel a zakáže zoomování grafu.

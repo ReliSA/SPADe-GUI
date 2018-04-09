@@ -4,10 +4,7 @@ import java.awt.BasicStroke;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import javax.swing.BorderFactory;
-import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -384,20 +381,9 @@ public class PanelGrafuUkol extends PanelGrafuRodic{
 	 * @param typGrafu parametr pro znovu načtení grafu, typ grafu pro vytvoření (zda je to graf pro normální hodnotu, třídu nebo supertřídu)
 	 */
 	private void vlozCheckBoxBezNulCiselnik(ChartPanel chartPanel, Ciselnik seznam, int typGrafu){
-		JCheckBox ckBezNul = new JCheckBox(Konstanty.POPISY.getProperty("bezNul"));
-			ckBezNul.addChangeListener(new ChangeListener() {
-				public void stateChanged(ChangeEvent e) {
-					if(ckBezNul.isSelected()){
-						chartPanel.setChart(getCiselnikGraf(seznam, typGrafu, true));
-						chartPanel.repaint();						
-					}
-					else{
-						chartPanel.setChart(getCiselnikGraf(seznam, typGrafu, false));
-						chartPanel.repaint();						
-					}
-				}
-			});
-	        chartPanel.getPopupMenu().add(ckBezNul);	    
+			CheckBoxbezNul ckBezNul =  new CheckBoxbezNul(projekt, chartPanel, seznam, typGrafu,Konstanty.BEZ_CISELNIKY);
+			ckBezNul.setText(Konstanty.POPISY.getProperty("bezNul"));
+			chartPanel.getPopupMenu().add(ckBezNul);        
 	}
 
 	/**
@@ -407,22 +393,10 @@ public class PanelGrafuUkol extends PanelGrafuRodic{
 	 * @param typGrafu parametr pro znovu načtení grafu, typ segmentu
 	 */
 	private void vlozCheckBoxBezNulSegment(ChartPanel chartPanel, ArrayList<Segment> seznam, int typGrafu){
-		JCheckBox ckBezNul = new JCheckBox(Konstanty.POPISY.getProperty("bezNul"));
-			ckBezNul.addChangeListener(new ChangeListener() {
-				public void stateChanged(ChangeEvent e) {
-					if(ckBezNul.isSelected()){
-						chartPanel.setChart(getSegmentGraf(seznam, typGrafu, true));
-						chartPanel.repaint();						
-					}
-					else{
-						chartPanel.setChart(getSegmentGraf(seznam, typGrafu, false));
-						chartPanel.repaint();						
-					}
-				}
-			});
-	        chartPanel.getPopupMenu().add(ckBezNul);	    
+			CheckBoxbezNul ckBezNul =  new CheckBoxbezNul(projekt, chartPanel, seznam, typGrafu,Konstanty.BEZ_SEGMENTY);
+			ckBezNul.setText(Konstanty.POPISY.getProperty("bezNul"));
+			chartPanel.getPopupMenu().add(ckBezNul);    
 	}
 
-
-
 }
+

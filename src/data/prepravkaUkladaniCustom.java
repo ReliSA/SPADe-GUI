@@ -10,10 +10,11 @@ public class prepravkaUkladaniCustom implements Serializable{
 	
 	private static final long serialVersionUID = 4881143472479215994L;
 	
-	JFreeChart panel; // panel grafu
-	String Nazev; // název grafu
-	int projectID; // id projektu, kterému graf patří
-	int typGrafu; // typ grafu
+	private JFreeChart panel; // panel grafu
+	private String Nazev; // název grafu
+	private int projectID; // id projektu, kterému graf patří
+	private int typGrafu; // typ grafu
+	private sablonaCustomGrafu nastaveni;
 	
 	/**
 	 * Konstuktor třídy
@@ -22,13 +23,22 @@ public class prepravkaUkladaniCustom implements Serializable{
 	 * @param typGrafu
 	 * @param Nazev
 	 */
-	public prepravkaUkladaniCustom(JFreeChart panel, int projectID, int typGrafu,String Nazev) {
+	public prepravkaUkladaniCustom(JFreeChart panel, int projectID, int typGrafu,String Nazev, sablonaCustomGrafu nastaveni) {
 		this.panel = panel;
 		this.Nazev=Nazev;
 		this.projectID = projectID;
 		this.typGrafu = typGrafu;
+		this.nastaveni=nastaveni;
 	}
 	
+	public sablonaCustomGrafu getNastaveni() {
+		return nastaveni;
+	}
+
+	public void setNastaveni(sablonaCustomGrafu nastaveni) {
+		this.nastaveni = nastaveni;
+	}
+
 	/**
 	 * Vrací typ grafu
 	 * @return typ grafu

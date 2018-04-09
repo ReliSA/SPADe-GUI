@@ -20,7 +20,7 @@ public class CustomGraf {
 			data.add(new ArrayList<Double>());
 		}
 	}
-
+	
 	/**
 	 * Vrací název sloupce
 	 * @param sloupec id požadovaného sloupce

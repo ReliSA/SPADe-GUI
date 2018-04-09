@@ -5,12 +5,8 @@ import java.awt.Color;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
-
-import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -27,7 +23,6 @@ import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.time.Day;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
-
 import ostatni.Konstanty;
 import data.Osoba;
 import data.Projekt;
@@ -36,7 +31,7 @@ import data.polozky.PolozkaVytvoreni;
 /**
  * Abstraktní třída, předek panelů s grafy ze kterého ostatní panely dědí
  */
-public abstract class PanelGrafuRodic extends JPanel {
+public abstract  class PanelGrafuRodic extends JPanel {
 
 	private static final long serialVersionUID = -3293103160690992576L;
 	
@@ -169,7 +164,7 @@ public abstract class PanelGrafuRodic extends JPanel {
 	 *            true, pokud se mají do datasetu vložit i nulové sloupce
 	 * @return sloupcový graf počtu podle autorů
 	 */
-	protected JFreeChart getAutorGraf(int typVypoctu, boolean bezNul) {
+	protected  JFreeChart getAutorGraf(int typVypoctu, boolean bezNul) {
 		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 		String nazevGrafu = "";
 		try {
@@ -242,18 +237,8 @@ public abstract class PanelGrafuRodic extends JPanel {
 	 *            sleduje (počet úkolů, konfigurací nebo artefaktů)
 	 */
 	public void vlozCheckBoxBezNulAutor(ChartPanel chartPanel, int typVypoctu) {
-		JCheckBox ckBezNul = new JCheckBox(Konstanty.POPISY.getProperty("bezNul"));
-		ckBezNul.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				if (ckBezNul.isSelected()) {
-					chartPanel.setChart(getAutorGraf(typVypoctu, true));
-					chartPanel.repaint();
-				} else {
-					chartPanel.setChart(getAutorGraf(typVypoctu, false));
-					chartPanel.repaint();
-				}
-			}
-		});
+		CheckBoxbezNul ckBezNul =  new CheckBoxbezNul(projekt, chartPanel, typVypoctu,Konstanty.BEZ_AUTOR);
+		ckBezNul.setText(Konstanty.POPISY.getProperty("bezNul"));
 		chartPanel.getPopupMenu().add(ckBezNul);
 	}
 

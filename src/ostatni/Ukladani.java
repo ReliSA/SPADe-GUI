@@ -15,6 +15,7 @@ import javax.swing.JOptionPane;
 import data.prepravkaUkladaniCustom;
 import gui.DropChartPanel;
 import gui.PanelProjektu;
+import gui.tlacitkoEditaceGrafu;
 import gui.PanelGrafuCustom;
 
 /**
@@ -22,14 +23,18 @@ import gui.PanelGrafuCustom;
  */
 public class Ukladani {
 
-	private static ArrayList<prepravkaUkladaniCustom> save = new ArrayList<prepravkaUkladaniCustom>(); // Arraylist všech custom grafů
+	private static ArrayList<prepravkaUkladaniCustom> save = new ArrayList<prepravkaUkladaniCustom>(); // Arraylist
+																										// všech custom
+																										// grafů
 	private static PanelGrafuCustom panelMiniatur; // odkaz na panel miniatur custom grafů
 	private static JMenu menu; // odkaz na položku JMenu smaž graf
-	private static PanelProjektu panelProjektu; //odkaz na panel projektu
+	private static PanelProjektu panelProjektu; // odkaz na panel projektu
 
 	/**
 	 * Přidá přepravku s custom grafem do arraylistu a miniaturu do panelu miniatur
-	 * @param prepravka pro přidání
+	 * 
+	 * @param prepravka
+	 *            pro přidání
 	 */
 	public static void add(prepravkaUkladaniCustom prepravka) {
 		save.add(prepravka);
@@ -37,7 +42,10 @@ public class Ukladani {
 		item.addActionListener(actSmazaniGrafuJmeno);
 		menu.add(item);
 		DropChartPanel graf = new DropChartPanel(prepravka.getPanel(), prepravka.getTypGrafu());
-		graf.setName(prepravka.getNazev());			
+		graf.setName(prepravka.getNazev());
+
+		graf.getMenu().add(new tlacitkoEditaceGrafu(prepravka.getNastaveni()));
+		
 		panelMiniatur.vlozGraf(graf);
 		save();
 	}
@@ -58,7 +66,9 @@ public class Ukladani {
 
 	/**
 	 * Uloží arraylist custom grafů do souboru specifikovaným parametrem
-	 * @param file souboru pro uložení
+	 * 
+	 * @param file
+	 *            souboru pro uložení
 	 */
 	public static void save(File file) {
 		try {
@@ -72,9 +82,13 @@ public class Ukladani {
 	}
 
 	/**
-	 * Uloží arraylist custom grafů určitého projektu do souboru specifikovaným parametrem
-	 * @param file souboru pro uložení
-	 * @param id projektu grafů
+	 * Uloží arraylist custom grafů určitého projektu do souboru specifikovaným
+	 * parametrem
+	 * 
+	 * @param file
+	 *            souboru pro uložení
+	 * @param id
+	 *            projektu grafů
 	 */
 	public static void save(File file, int id) {
 
@@ -112,8 +126,11 @@ public class Ukladani {
 
 	/**
 	 * Importuje grafy ze souboru specifikovaného parametrem
-	 * @param file souboru pro načtení
-	 * @param id aktuálně zvoleného projektu
+	 * 
+	 * @param file
+	 *            souboru pro načtení
+	 * @param id
+	 *            aktuálně zvoleného projektu
 	 */
 	public static void importGrafu(File file, int id) {
 
@@ -155,7 +172,9 @@ public class Ukladani {
 
 	/**
 	 * Načte grafy daného projektu do panelu miniatur a Jmenu pro smazání
-	 * @param projektID id projektu
+	 * 
+	 * @param projektID
+	 *            id projektu
 	 */
 	public static void nactiGrafy(int projektID) {
 		DropChartPanel graf = null;
@@ -166,6 +185,9 @@ public class Ukladani {
 			if (prepravka.getProjectID() == projektID) {
 				graf = new DropChartPanel(prepravka.getPanel(), prepravka.getTypGrafu());
 				graf.setName(prepravka.getNazev());
+
+				graf.getMenu().add(new tlacitkoEditaceGrafu(prepravka.getNastaveni()));
+
 				JMenuItem item = new JMenuItem(prepravka.getNazev());
 				item.addActionListener(actSmazaniGrafuJmeno);
 				menu.add(item);
@@ -178,7 +200,9 @@ public class Ukladani {
 
 	/**
 	 * Zkontroluje zda se název v arraylistu již nachází
-	 * @param title název ke kontrole
+	 * 
+	 * @param title
+	 *            název ke kontrole
 	 * @return true/false
 	 */
 	public static boolean kontrolaNazvu(String title) {
@@ -192,8 +216,11 @@ public class Ukladani {
 	}
 
 	/**
-	 * Odstraní z arraylistu grafy daného projektu, uloží arraylist na disk a znovu načte grafy
-	 * @param idProjektu id projektu
+	 * Odstraní z arraylistu grafy daného projektu, uloží arraylist na disk a znovu
+	 * načte grafy
+	 * 
+	 * @param idProjektu
+	 *            id projektu
 	 */
 	public static void odstranGrafyProjektu(int idProjektu) {
 		int dialogResult = JOptionPane.showConfirmDialog(null, Konstanty.POPISY.getProperty("mazaniOknoVseText"),
@@ -214,6 +241,7 @@ public class Ukladani {
 
 	/**
 	 * Vrací panel projektu
+	 * 
 	 * @return panel projektu
 	 */
 	public static PanelProjektu getPanelProjektu() {
@@ -222,6 +250,7 @@ public class Ukladani {
 
 	/**
 	 * Nastaví panel projektu
+	 * 
 	 * @return panel projektu
 	 */
 	public static void setPanelProjektu(PanelProjektu panelGrafu) {
@@ -230,6 +259,7 @@ public class Ukladani {
 
 	/**
 	 * Vrací položku JMenu pro smazání grafů
+	 * 
 	 * @return položka JMenu
 	 */
 	public static JMenu getMenu() {
@@ -238,6 +268,7 @@ public class Ukladani {
 
 	/**
 	 * Nastaví položku JMenu pro smazání grafů
+	 * 
 	 * @return položka JMenu
 	 */
 	public static void setMenu(JMenu menu) {
@@ -246,6 +277,7 @@ public class Ukladani {
 
 	/**
 	 * Vrací panel miniatur custom grafů
+	 * 
 	 * @return panel miniatur custom grafů
 	 */
 	public static PanelGrafuCustom getPanel() {
@@ -254,12 +286,13 @@ public class Ukladani {
 
 	/**
 	 * Nastaví panel miniatur custom grafů
+	 * 
 	 * @return panel miniatur custom grafů
 	 */
 	public static void setPanel(PanelGrafuCustom panel) {
 		Ukladani.panelMiniatur = panel;
 	}
-	
+
 	/**
 	 * Akce pro smazání grafu dle jeho jména
 	 */
