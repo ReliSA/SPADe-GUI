@@ -152,7 +152,7 @@ public class OknoCustomNahled extends JPanel {
 		this.nazev = title;
 		this.okno=okno;
 		chart = ChartFactory.createPieChart(title, dataset, true, true, false);
-		chart.removeLegend();		
+		chart.removeLegend();	
 		ChartPanel panel = new ChartPanel(chart);
 		this.setLayout(new BorderLayout());
 		save = new JButton(Konstanty.POPISY.getProperty("ulozGraf"));

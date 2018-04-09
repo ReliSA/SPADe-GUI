@@ -36,9 +36,6 @@ public class Konstanty {
 	public static final Dimension VELIKOST_PANELU_UKOL = new Dimension(SIRKA_PANELU_GRAFU, VYSKA_PANELU_GRAFU_UKOL);
 		
 	public static final Dimension VELIKOST_GRAFU = new Dimension(280, 200);
-	public static final Dimension VELIKOST_GRAFU_VELKY = new Dimension(835, 415);
-	public static final Dimension VELIKOST_GRAFU_NEJVETSI = new Dimension(945, 415);
-
 	
 	public static final Dimension VELIKOST_SEZNAMU_CELA_SIRKA = new Dimension(230, 80);
 	public static final Dimension VELIKOST_CELA_SIRKA = new Dimension(230, 28);

@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
@@ -202,7 +203,7 @@ public class PanelProjektu extends JPanel {
 		Ukladani.setPanel(panelCustom);
 
 		grafy = new JPanel(new BorderLayout());
-		dropSloty = new JPanel(new BorderLayout());
+		dropSloty = new JPanel(new GridLayout(1,0));
 
 		nastavDropSloty();
 		
@@ -231,10 +232,8 @@ public class PanelProjektu extends JPanel {
 		dropSloty.removeAll();
 		dropSlot = new JPanel(new BorderLayout());
 		dropSlot.setBackground(Color.WHITE);
-		dropSlot.setPreferredSize(Konstanty.VELIKOST_GRAFU_VELKY);
 		dropSlot2 = new JPanel(new BorderLayout());
 		dropSlot2.setBackground(Color.WHITE);
-		dropSlot2.setPreferredSize(Konstanty.VELIKOST_GRAFU_VELKY);
 
 		dropHandler = new DropHandler(panelSegment, panelUkol, panelKonfigurace, panelArtefakt, panelCustom);
 		dropTarget = new DropTarget(dropSlot, DnDConstants.ACTION_MOVE, dropHandler, true);
@@ -253,8 +252,8 @@ public class PanelProjektu extends JPanel {
 		dropSlot.add(label);
 		dropSlot2.add(label2);
 
-		dropSloty.add(dropSlot, BorderLayout.WEST);
-		dropSloty.add(dropSlot2, BorderLayout.EAST);
+		dropSloty.add(dropSlot);
+		dropSloty.add(dropSlot2);
 		dropSloty.revalidate();
 		dropSloty.repaint();
 	}
@@ -579,15 +578,11 @@ public class PanelProjektu extends JPanel {
 				if (statistikyVisible == false) {
 					panelStatistikSipka.add(panelStatistik);
 					statistikyVisible = true;
-					dropSlot.setPreferredSize(Konstanty.VELIKOST_GRAFU_VELKY);
-					dropSlot2.setPreferredSize(Konstanty.VELIKOST_GRAFU_VELKY);
 					btSipkaStatistiky.setText("<");
 					panelStatistikSipka.revalidate();
 				} else {
 					panelStatistikSipka.remove(panelStatistik);
 					statistikyVisible = false;
-					dropSlot.setPreferredSize(Konstanty.VELIKOST_GRAFU_NEJVETSI);
-					dropSlot2.setPreferredSize(Konstanty.VELIKOST_GRAFU_NEJVETSI);
 					btSipkaStatistiky.setText(">");
 					panelStatistikSipka.revalidate();
 				}

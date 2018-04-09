@@ -84,7 +84,6 @@ public class DropHandler implements DropTargetListener {
 
 						}
 
-						panel.setPreferredSize(Konstanty.VELIKOST_GRAFU_VELKY);
 						panel.setDragable(false);
 						panel.setDomainZoomable(true);
 						panel.setRangeZoomable(true);
