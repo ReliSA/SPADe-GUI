@@ -51,9 +51,18 @@ public class CustomGraf {
 	 * @param radek id radku
 	 * @return datum
 	 */
-	public String getDatumy(int radek) {
+	public String getDatum(int radek) {
 		return datumy.get(radek);
 	}
+	
+	/**
+	 * Vrací uložené datumy
+	 * @return datum
+	 */
+	public ArrayList<String> getDatumy() {
+		return datumy;
+	}
+	
 
 	/**
 	 * Vrací data uložené na požadovaném řádku a sloupci
@@ -65,6 +74,15 @@ public class CustomGraf {
 		return data.get(sloupec).get(radek);
 	}
 
+	/**
+	 * Vrací data uložené na požadovaném sloupci
+	 * @param sloupec
+	 * @return požadované hodnoty
+	 */
+	public ArrayList<Double> getDataSloupec(int sloupec) {
+		return data.get(sloupec);
+	}
+	
 	/**
 	 * Přidá název sloupce
 	 * @param nazev

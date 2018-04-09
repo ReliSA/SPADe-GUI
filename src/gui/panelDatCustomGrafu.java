@@ -1,18 +1,19 @@
 package gui;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.border.MatteBorder;
+
 import ostatni.Konstanty;
 
 /**
@@ -30,40 +31,90 @@ public class panelDatCustomGrafu extends JPanel {
 	private JCheckBox pouzit = new JCheckBox(Konstanty.POPISY.getProperty("pouzitData")); // checkbox pro výběr zda použít data tohoto panelu pro graf
 	private ColorChooserButton colorPicker; // colorchooser pro výběr barvy grafu
 
-
 	/**
 	 * Konstruktor panelu
-	 * @param nazev název dat
-	 * @param index udává pozici, na které je tento panel zobrazen
+	 * 
+	 * @param nazev
+	 *            název dat
+	 * @param index
+	 *            udává pozici, na které je tento panel zobrazen
 	 */
-	public panelDatCustomGrafu(String nazev, int index) {
-		this.setBorder(BorderFactory.createTitledBorder(""));
+	public panelDatCustomGrafu(String nazev, ArrayList<Double> data, int index) {
 		if (index >= 10) {
 			index = 0;
 		}
 		colorPicker = new ColorChooserButton(colors[index]);
 		this.setBackground(Color.white);
 		pouzit.setBackground(Color.white);
-		this.setLayout(new GridBagLayout());
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.insets = new Insets(10, 20, 10, 20);
+		this.setLayout(new GridLayout(0, 1));
 		this.nazev.setText(nazev);
-		this.nazev.setPreferredSize(new Dimension(100, 40));
 		Font font = new Font("Courier", Font.BOLD, 12);
 		this.nazev.setFont(font);
-		this.add(this.nazev, gbc);
-		this.add(pouzit, gbc);
+		this.nazev.setHorizontalAlignment(SwingConstants.CENTER);
+		this.add(this.nazev);		
 		if (!nazev.equals("detected")) {
-			this.add(lblTyp, gbc);
-			this.add(typGrafu, gbc);
-			this.add(lblBarva, gbc);
-			this.add(colorPicker, gbc);
+			this.add(pouzit);
+			 this.add(typGrafu);
+			 this.add(colorPicker);
 			nastavAkce();
 		}
+		else {
+			this.add(new JLabel());
+			this.add(pouzit);
+			this.add(new JLabel());
+		}
+		this.nazev.setBorder(new MatteBorder(1,0,1,0, Color.BLACK));
+		typGrafu.setBorder(new MatteBorder(1,0,1,0, Color.BLACK));
+		pouzit.setBorder(new MatteBorder(1,0,1,0, Color.BLACK));
+		colorPicker.setBorder(new MatteBorder(1,0,1,0, Color.BLACK));
+		this.setBorder(BorderFactory.createLineBorder(Color.BLACK,1));
+		
+		JLabel lblHodnota;
+		for (Double hodnota : data) {
+			lblHodnota=new JLabel(hodnota.toString());
+			lblHodnota.setBorder(new MatteBorder(1,0,1,0, Color.BLACK));
+			lblHodnota.setHorizontalAlignment(SwingConstants.CENTER);
+			this.add(lblHodnota);
+		} 
+	}
+	
+	/**
+	 * Konstruktor panelu pro první sloupec s časovou osou
+	 * 
+	 * @param nazev název dat
+	 * @param data datumy k zobrazení
+	 */
+	public panelDatCustomGrafu(String nazev, ArrayList<String> data) {
+		
+		this.setBackground(Color.white);
+		pouzit.setBackground(Color.white);
+		
+		this.setLayout(new GridLayout(0, 1));
+		this.nazev.setText(nazev);
+		Font font = new Font("Courier", Font.BOLD, 12);
+		this.nazev.setFont(font);
+		this.nazev.setHorizontalAlignment(SwingConstants.CENTER);
+		this.add(this.nazev);		
+		
+		this.add(new JLabel());
+		this.add(new JLabel());
+		this.add(new JLabel());
+		
+		this.nazev.setBorder(new MatteBorder(1,0,1,0, Color.BLACK));
+		this.setBorder(BorderFactory.createLineBorder(Color.BLACK,1));
+		
+		JLabel lblHodnota;
+		for (String hodnota : data) {
+			lblHodnota=new JLabel(hodnota);
+			lblHodnota.setBorder(new MatteBorder(1,0,1,0, Color.BLACK));
+			lblHodnota.setHorizontalAlignment(SwingConstants.CENTER);
+			this.add(lblHodnota);
+		} 
 	}
 
 	/**
 	 * Vrací zvolený typ grafu
+	 * 
 	 * @return typ grafu
 	 */
 	public int getTyp() {
@@ -72,6 +123,7 @@ public class panelDatCustomGrafu extends JPanel {
 
 	/**
 	 * Vrací název dat
+	 * 
 	 * @return název dat
 	 */
 	public String getNazev() {
@@ -80,6 +132,7 @@ public class panelDatCustomGrafu extends JPanel {
 
 	/**
 	 * Vrací zvolenou barvu pro graf
+	 * 
 	 * @return barva pro graf
 	 */
 	public Color getColor() {
@@ -88,6 +141,7 @@ public class panelDatCustomGrafu extends JPanel {
 
 	/**
 	 * Vrací boolean zda se mají tyto data použít
+	 * 
 	 * @return true/false
 	 */
 	public boolean getPouzit() {
@@ -96,7 +150,9 @@ public class panelDatCustomGrafu extends JPanel {
 
 	/**
 	 * Nastaví zda se mají tyto data použít
-	 * @param bool true/false
+	 * 
+	 * @param bool
+	 *            true/false
 	 */
 	public void setPouzit(boolean bool) {
 		pouzit.setSelected(bool);
@@ -107,7 +163,7 @@ public class panelDatCustomGrafu extends JPanel {
 	 */
 	protected void nastavAkce() {
 
-		//Akce pro combobox typGrafu
+		// Akce pro combobox typGrafu
 		ActionListener actZmenaOperatoru = new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
