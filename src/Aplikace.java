@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Locale;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import ostatni.Konstanty;
@@ -16,10 +17,11 @@ public class Aplikace {
 
 	public static void main(String[] args) {
 		try {			
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());		
 			Konstanty.POPISY.load(new InputStreamReader(new FileInputStream(Konstanty.NAZEV_SOUBORU_POPISU_ENGLISH), "UTF8"));
 			Konstanty.SQLs.load(new InputStreamReader(new FileInputStream(Konstanty.SQLSoubor), "UTF8"));
 			Konstanty.SQLsVar.load(new InputStreamReader(new FileInputStream(Konstanty.SQLVarSoubor), "UTF8"));
+			Locale.setDefault(new Locale ("en", "US"));
 			Konstanty.nastavPopisComboBox();
 			Ukladani.load();
 		} catch (FileNotFoundException e) {

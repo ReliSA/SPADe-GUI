@@ -69,13 +69,13 @@ public class OknoCustomNahled extends JPanel {
 	 */
 	public OknoCustomNahled(String title, DefaultCategoryDataset bary, DefaultCategoryDataset body,
 			DefaultCategoryDataset spojnice, DefaultCategoryDataset area, DefaultCategoryDataset detected,
-			HashMap<String, Color> colors, int projectID,OknoCustomGraf okno) {
+			HashMap<String, Color> colors, int projectID, OknoCustomGraf okno) {
 
 		CategoryPlot plot = new CategoryPlot();
 		this.projectID = projectID;
 		this.typGrafu = 0;
 		this.nazev = title;
-		this.okno=okno;
+		this.okno = okno;
 
 		// Vykreslení detekcí
 		CategoryItemRenderer detectRenderer = new BarRenderer();
@@ -130,13 +130,12 @@ public class OknoCustomNahled extends JPanel {
 		chart = new JFreeChart(plot);
 		chart.setTitle(title);
 
-		
 		JPanel tlacitka = new JPanel(new GridLayout(1, 0));
 		save = new JButton(Konstanty.POPISY.getProperty("ulozGraf"));
 		saveTemplate = new JButton(Konstanty.POPISY.getProperty("ulozSablonu"));
 		tlacitka.add(save);
 		tlacitka.add(saveTemplate);
-		
+
 		ChartPanel panel = new ChartPanel(chart);
 		this.setLayout(new BorderLayout());
 		this.add(panel, BorderLayout.CENTER);
@@ -155,13 +154,13 @@ public class OknoCustomNahled extends JPanel {
 	 * @param projectID
 	 *            ID projektu
 	 */
-	public OknoCustomNahled(String title, DefaultPieDataset dataset, int projectID,OknoCustomGraf okno) {
+	public OknoCustomNahled(String title, DefaultPieDataset dataset, int projectID, OknoCustomGraf okno) {
 		this.projectID = projectID;
 		this.typGrafu = Konstanty.PIE;
 		this.nazev = title;
-		this.okno=okno;
+		this.okno = okno;
 		chart = ChartFactory.createPieChart(title, dataset, true, true, false);
-		chart.removeLegend();	
+		chart.removeLegend();
 		ChartPanel panel = new ChartPanel(chart);
 		this.setLayout(new BorderLayout());
 		JPanel tlacitka = new JPanel(new GridLayout(1, 0));
@@ -181,65 +180,74 @@ public class OknoCustomNahled extends JPanel {
 
 		// Akce pro uložení grafu
 		ActionListener actSaveButton = new ActionListener() {
-			
+
 			public void actionPerformed(ActionEvent e) {
+
 				
-				nazev=okno.getNazev();
+				nazev = okno.getNazev();
 				chart.setTitle(nazev);
 
 				if (nazev.equals("")) { // Kontrola zda název není prázdný
 					JOptionPane.showMessageDialog(null, Konstanty.POPISY.getProperty("prazdnyNazev"),
 							Konstanty.POPISY.getProperty("chyba"), JOptionPane.ERROR_MESSAGE);
 				}
-/*
-				else if (dataCheck()) { // Kontrola zda název není prázdný
-					JOptionPane.showMessageDialog(null, Konstanty.POPISY.getProperty("nevybranyData"),
-							Konstanty.POPISY.getProperty("chyba"), JOptionPane.ERROR_MESSAGE);
-				}*/
-
-				else if (Ukladani.kontrolaNazvu(nazev)) { // Kontrola jedinečnosti zadaného názvu
-					JOptionPane.showMessageDialog(null, Konstanty.POPISY.getProperty("duplicitaNazev"),
-							Konstanty.POPISY.getProperty("chyba"), JOptionPane.ERROR_MESSAGE);
-				}
 
 				else {
+					if (Ukladani.kontrolaNazvu(nazev)) { // Kontrola jedinečnosti zadaného názvu
+						int dialogResult = JOptionPane.showConfirmDialog(null,
+								Konstanty.POPISY.getProperty("duplicitaNazev"),
+								Konstanty.POPISY.getProperty("chyba"), JOptionPane.YES_NO_OPTION);
+						if (dialogResult == 0) {
+							prepravkaUkladaniCustom prepravka = new prepravkaUkladaniCustom(chart, projectID, typGrafu, nazev,
+									okno.ulozNastaveni());
+							Ukladani.smazGraf(nazev);
+							Ukladani.add(prepravka);
+							okno.nakresliGraf();
+						}
+					} else {
 
-					prepravkaUkladaniCustom prepravka = new prepravkaUkladaniCustom(chart, projectID, typGrafu, nazev, okno.ulozNastaveni());
-					Ukladani.add(prepravka);
-					okno.nakresliGraf();
-				}			
+						prepravkaUkladaniCustom prepravka = new prepravkaUkladaniCustom(chart, projectID, typGrafu, nazev,
+								okno.ulozNastaveni());
+						Ukladani.add(prepravka);
+						okno.nakresliGraf();
+					}
+				}
 			}
 		};
-		
-ActionListener actSaveSablona = new ActionListener() {
-			
+
+		ActionListener actSaveSablona = new ActionListener() {
+
 			public void actionPerformed(ActionEvent e) {
-				
-				nazev=okno.getNazev();
+
+				nazev = okno.getNazev();
 				chart.setTitle(nazev);
 
 				if (nazev.equals("")) { // Kontrola zda název není prázdný
 					JOptionPane.showMessageDialog(null, Konstanty.POPISY.getProperty("prazdnyNazev"),
 							Konstanty.POPISY.getProperty("chyba"), JOptionPane.ERROR_MESSAGE);
 				}
-/*
-				else if (dataCheck()) { // Kontrola zda název není prázdný
-					JOptionPane.showMessageDialog(null, Konstanty.POPISY.getProperty("nevybranyData"),
-							Konstanty.POPISY.getProperty("chyba"), JOptionPane.ERROR_MESSAGE);
-				}*/
-
-				else if (Ukladani.kontrolaNazvu(nazev)) { // Kontrola jedinečnosti zadaného názvu
-					JOptionPane.showMessageDialog(null, Konstanty.POPISY.getProperty("duplicitaNazev"),
-							Konstanty.POPISY.getProperty("chyba"), JOptionPane.ERROR_MESSAGE);
-				}
 
 				else {
-					sablonaCustomGrafu sablona = okno.ulozNastaveni();
-					sablona.setIterace(-1);
-					sablona.setOsoby(-1);
-					
-					Ukladani.add(sablona);
-				}			
+					if (Ukladani.kontrolaNazvuSablon(nazev)) { // Kontrola jedinečnosti zadaného názvu
+						int dialogResult = JOptionPane.showConfirmDialog(null,
+								Konstanty.POPISY.getProperty("duplicitaSablonaText"),
+								Konstanty.POPISY.getProperty("chyba"), JOptionPane.YES_NO_OPTION);
+						if (dialogResult == 0) {
+							sablonaCustomGrafu sablona = okno.ulozNastaveni();
+							sablona.setIterace(-1);
+							sablona.setOsoby(-1);
+							Ukladani.smazSablonu(nazev);
+							Ukladani.add(sablona);
+						}
+					} else {
+
+						sablonaCustomGrafu sablona = okno.ulozNastaveni();
+						sablona.setIterace(-1);
+						sablona.setOsoby(-1);
+
+						Ukladani.add(sablona);
+					}
+				}
 			}
 		};
 

@@ -278,6 +278,23 @@ public class Ukladani {
 		}
 		return bool;
 	}
+	
+	/**
+	 * Zkontroluje zda se název v arraylistu šablon již nachází
+	 * 
+	 * @param title
+	 *            název ke kontrole
+	 * @return true/false
+	 */
+	public static boolean kontrolaNazvuSablon(String title) {
+		boolean bool = false;
+		for (int i = 0; i < sablony.size(); i++) {
+			if (sablony.get(i).getNazev().equals(title)) {
+				bool = true;
+			}
+		}
+		return bool;
+	}
 
 	/**
 	 * Odstraní z arraylistu grafy daného projektu, uloží arraylist na disk a znovu
@@ -373,21 +390,24 @@ public class Ukladani {
 					Konstanty.POPISY.getProperty("mazaniOknoPopisek"), JOptionPane.YES_NO_OPTION);
 			if (dialogResult == 0) {
 				String smazat = ((JMenuItem) e.getSource()).getText();
-				int id;
-
-				for (int i = 0; i < save.size(); i++) {
-					if (save.get(i).getNazev().equals(smazat)) {
-						id = save.get(i).getProjectID();
-						save.remove(save.get(i));
-						save();
-						panelProjektu.nastavDropSloty();
-						nactiGrafy(id);
-						return;
-					}
-				}
+				smazGraf(smazat);
 			}
 		}
 	};
+	
+	public static void smazGraf(String nazev) {
+		int id;
+		for (int i = 0; i < save.size(); i++) {
+			if (save.get(i).getNazev().equals(nazev)) {
+				id = save.get(i).getProjectID();
+				save.remove(save.get(i));
+				save();
+				panelProjektu.nastavDropSloty();
+				nactiGrafy(id);
+				return;
+			}
+		}
+	}
 
 	/**
 	 * Akce pro vytvoření grafu ze sablony
@@ -425,17 +445,20 @@ public class Ukladani {
 					Konstanty.POPISY.getProperty("mazaniSablonaPopisek"), JOptionPane.YES_NO_OPTION);
 			if (dialogResult == 0) {
 				String smazat = ((JMenuItem) e.getSource()).getText();
-
-				for (int i = 0; i < sablony.size(); i++) {
-					if (sablony.get(i).getNazev().equals(smazat)) {
-						sablony.remove(i);
-						saveSablony();
-						loadSablony();
-						break;
-					}
-				}
+				smazSablonu(smazat);
 			}
 		}
 	};
 
+	public static void smazSablonu(String nazev) {
+		for (int i = 0; i < sablony.size(); i++) {
+			if (sablony.get(i).getNazev().equals(nazev)) {
+				sablony.remove(i);
+				saveSablony();
+				loadSablony();
+				break;
+			}
+		}
+	}
+	
 }

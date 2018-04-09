@@ -22,6 +22,8 @@ import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Locale;
+
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
@@ -1111,10 +1113,10 @@ public class OknoHlavni extends JFrame {
 		/* akce pro změnu jazyka na angličtinu */
 		ActionListener actJazykEnglish = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				try {
+				try {				
 					Konstanty.POPISY.load(
 							new InputStreamReader(new FileInputStream(Konstanty.NAZEV_SOUBORU_POPISU_ENGLISH), "UTF8"));
-					Konstanty.nastavPopisComboBox();
+					Konstanty.nastavPopisComboBox();				
 					cbTypFiltru.setModel(new DefaultComboBoxModel(Konstanty.POLE_FILTRU));
 					okno.setVisible(false);
 					getContentPane().removeAll();
