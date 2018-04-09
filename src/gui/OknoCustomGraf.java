@@ -348,8 +348,11 @@ public class OknoCustomGraf extends JFrame {
 
 			public void actionPerformed(ActionEvent e) {
 
+				sablonaCustomGrafu ulozeni = ulozNastaveni();
+				
 				nactiData();
 
+				nactiNastaveni(ulozeni.getSloupce());
 			}
 		};
 
