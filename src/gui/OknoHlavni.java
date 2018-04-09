@@ -76,6 +76,8 @@ public class OknoHlavni extends JFrame {
 	private JMenu settingsMenu; // Menu horního baru "Nastavení"
 	private JMenu languageMenu; // Menu horního baru pro nastavení jazyka programu
 	private JMenu removeChartMenu; // Menu horního baru pro odstranění custom grafu podle jména
+	private JMenu vytvorSablonaMenu; // Menu horního baru pro vytvoreni grafu ze sablony
+	private JMenu removeSablonaMenu; // Menu horního baru pro odstranění sablony grafu
 	private JMenu removeMainMenu; // Menu horního baru pro odstranění custom grafu
 	private JMenuItem removeChartProject; // Tlačítko horního menu pro odstranění custom grafu
 	private JMenu importExportMenu; // Menu horního baru pro import/export grafů
@@ -144,7 +146,11 @@ public class OknoHlavni extends JFrame {
 		settingsMenu = new JMenu(Konstanty.POPISY.getProperty("menuNastaveni"));
 		languageMenu = new JMenu(Konstanty.POPISY.getProperty("menuJazyk"));
 		removeChartMenu = new JMenu(Konstanty.POPISY.getProperty("odstranGrafJmeno"));
-		Ukladani.setMenu(removeChartMenu);
+		vytvorSablonaMenu = new JMenu(Konstanty.POPISY.getProperty("vytvorSablona"));
+		removeSablonaMenu = new JMenu(Konstanty.POPISY.getProperty("odstranSablona"));
+		Ukladani.setMenuMazaniGrafu(removeChartMenu);
+		Ukladani.setMenuVytvoreniSablona(vytvorSablonaMenu);
+		Ukladani.setMenuSmazaniSablona(removeSablonaMenu);
 		removeMainMenu = new JMenu(Konstanty.POPISY.getProperty("odstranGraf"));
 		removeChartProject = new JMenuItem(Konstanty.POPISY.getProperty("odstranGrafProjekt"));
 		exitAction = new JMenuItem(Konstanty.POPISY.getProperty("menuExit"));
@@ -207,6 +213,8 @@ public class OknoHlavni extends JFrame {
 		importExportMenu.add(exportAll);
 		importExportMenu.add(exportProjekt);
 		customGrafMenu.add(vytvorGraf);
+		customGrafMenu.add(vytvorSablonaMenu);
+		customGrafMenu.add(removeSablonaMenu);
 		customGrafMenu.add(removeMainMenu);
 		removeMainMenu.add(removeChartMenu);
 		removeMainMenu.add(removeChartProject);

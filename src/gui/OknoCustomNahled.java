@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
@@ -26,6 +27,7 @@ import org.jfree.chart.renderer.category.StandardBarPainter;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
 import data.prepravkaUkladaniCustom;
+import data.sablonaCustomGrafu;
 import ostatni.Konstanty;
 import ostatni.Ukladani;
 
@@ -42,6 +44,7 @@ public class OknoCustomNahled extends JPanel {
 	private int typGrafu; // typ grafu
 	private String nazev; // nazev grafu
 	private JButton save; // tlačítko pro uložení vytvořeného grafu
+	private JButton saveTemplate; // tlačítko pro uložení vytvořeného grafu
 	private OknoCustomGraf okno;
 
 	/**
@@ -127,11 +130,17 @@ public class OknoCustomNahled extends JPanel {
 		chart = new JFreeChart(plot);
 		chart.setTitle(title);
 
+		
+		JPanel tlacitka = new JPanel(new GridLayout(1, 0));
 		save = new JButton(Konstanty.POPISY.getProperty("ulozGraf"));
+		saveTemplate = new JButton(Konstanty.POPISY.getProperty("ulozSablonu"));
+		tlacitka.add(save);
+		tlacitka.add(saveTemplate);
+		
 		ChartPanel panel = new ChartPanel(chart);
 		this.setLayout(new BorderLayout());
 		this.add(panel, BorderLayout.CENTER);
-		this.add(save, BorderLayout.SOUTH);
+		this.add(tlacitka, BorderLayout.SOUTH);
 		this.setPreferredSize(new Dimension(700, 400));
 		nastavAkce();
 	}
@@ -155,9 +164,13 @@ public class OknoCustomNahled extends JPanel {
 		chart.removeLegend();	
 		ChartPanel panel = new ChartPanel(chart);
 		this.setLayout(new BorderLayout());
+		JPanel tlacitka = new JPanel(new GridLayout(1, 0));
 		save = new JButton(Konstanty.POPISY.getProperty("ulozGraf"));
+		saveTemplate = new JButton(Konstanty.POPISY.getProperty("ulozSablonu"));
+		tlacitka.add(save);
+		tlacitka.add(saveTemplate);
 		this.add(panel, BorderLayout.CENTER);
-		this.add(save, BorderLayout.SOUTH);
+		this.add(tlacitka, BorderLayout.SOUTH);
 		nastavAkce();
 	}
 
@@ -197,8 +210,41 @@ public class OknoCustomNahled extends JPanel {
 				}			
 			}
 		};
+		
+ActionListener actSaveSablona = new ActionListener() {
+			
+			public void actionPerformed(ActionEvent e) {
+				
+				nazev=okno.getNazev();
+				chart.setTitle(nazev);
+
+				if (nazev.equals("")) { // Kontrola zda název není prázdný
+					JOptionPane.showMessageDialog(null, Konstanty.POPISY.getProperty("prazdnyNazev"),
+							Konstanty.POPISY.getProperty("chyba"), JOptionPane.ERROR_MESSAGE);
+				}
+/*
+				else if (dataCheck()) { // Kontrola zda název není prázdný
+					JOptionPane.showMessageDialog(null, Konstanty.POPISY.getProperty("nevybranyData"),
+							Konstanty.POPISY.getProperty("chyba"), JOptionPane.ERROR_MESSAGE);
+				}*/
+
+				else if (Ukladani.kontrolaNazvu(nazev)) { // Kontrola jedinečnosti zadaného názvu
+					JOptionPane.showMessageDialog(null, Konstanty.POPISY.getProperty("duplicitaNazev"),
+							Konstanty.POPISY.getProperty("chyba"), JOptionPane.ERROR_MESSAGE);
+				}
+
+				else {
+					sablonaCustomGrafu sablona = okno.ulozNastaveni();
+					sablona.setIterace(-1);
+					sablona.setOsoby(-1);
+					
+					Ukladani.add(sablona);
+				}			
+			}
+		};
 
 		save.addActionListener(actSaveButton);
+		saveTemplate.addActionListener(actSaveSablona);
 	}
 
 }

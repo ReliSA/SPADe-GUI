@@ -76,6 +76,7 @@ public class PanelProjektu extends JPanel {
 		this.nastavAkce();
 		Ukladani.setPanelProjektu(this);
 		Ukladani.nactiGrafy(projekt.getID());
+		Ukladani.loadSablony();
 	}
 
 	/**

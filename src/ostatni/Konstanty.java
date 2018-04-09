@@ -135,7 +135,7 @@ public class Konstanty {
 	
 	public static Connection PRIPOJENI = null;														//připojení k databázi
 	public static final String CESTA_K_DATABAZI = "jdbc:mysql://127.0.0.1:3306/ppicha?allowMultiQueries=true";				//cesta k databázi
-	//public static final String CESTA_K_DATABAZI = "jdbc:mysql://students.kiv.zcu.cz:3306/ppicha";
+	//public static final String CESTA_K_DATABAZI = "jdbc:mysql://students.kiv.zcu.cz:3306/ppicha?allowMultiQueries=true";
 	
 	public static int CITAC_PROGRESU = 0;															//čítač progresu
 	public static final int POCET_KROKU_PROGRESU = 7;												//počet načítaných skupin dat
@@ -147,6 +147,7 @@ public class Konstanty {
 	public static final String SQLSoubor = "sql.properties";
 	public static final String SQLVarSoubor = "sqlVar.properties";
 	public static final String GRAFY_SOUBOR = "CustomCharts.dat";
+	public static final String SABLONY_SOUBOR = "Templates.dat";
 	public static Properties POPISY = new Properties();
 	public static Properties SQLs = new Properties();
 	public static Properties SQLsVar = new Properties();

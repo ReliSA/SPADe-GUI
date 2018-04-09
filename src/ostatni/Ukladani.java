@@ -12,8 +12,13 @@ import java.util.Iterator;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
+import data.Projekt;
 import data.prepravkaUkladaniCustom;
+import data.sablonaCustomGrafu;
 import gui.DropChartPanel;
+import gui.OknoCustomGraf;
 import gui.PanelProjektu;
 import gui.tlacitkoEditaceGrafu;
 import gui.PanelGrafuCustom;
@@ -26,8 +31,11 @@ public class Ukladani {
 	private static ArrayList<prepravkaUkladaniCustom> save = new ArrayList<prepravkaUkladaniCustom>(); // Arraylist
 																										// všech custom
 																										// grafů
+	private static ArrayList<sablonaCustomGrafu> sablony = new ArrayList<sablonaCustomGrafu>();
 	private static PanelGrafuCustom panelMiniatur; // odkaz na panel miniatur custom grafů
-	private static JMenu menu; // odkaz na položku JMenu smaž graf
+	private static JMenu menuMazaniGrafu; // odkaz na položku JMenu smaž graf
+	private static JMenu menuVytvoreniSablona; // odkaz na položku JMenu smaž graf
+	private static JMenu menuSmazaniSablona; // odkaz na položku JMenu smaž graf
 	private static PanelProjektu panelProjektu; // odkaz na panel projektu
 
 	/**
@@ -40,28 +48,25 @@ public class Ukladani {
 		save.add(prepravka);
 		JMenuItem item = new JMenuItem(prepravka.getNazev());
 		item.addActionListener(actSmazaniGrafuJmeno);
-		menu.add(item);
+		menuMazaniGrafu.add(item);
 		DropChartPanel graf = new DropChartPanel(prepravka.getPanel(), prepravka.getTypGrafu());
 		graf.setName(prepravka.getNazev());
 
 		graf.getMenu().add(new tlacitkoEditaceGrafu(prepravka.getNastaveni()));
-		
+
 		panelMiniatur.vlozGraf(graf);
 		save();
 	}
 
 	/**
-	 * Uloží arraylist custom grafů do souboru
+	 * Přidá sablonu do arraylistu
+	 * 
+	 * @param sablonaCustomGrafu
 	 */
-	public static void save() {
-		try {
-			FileOutputStream fos = new FileOutputStream(Konstanty.GRAFY_SOUBOR);
-			ObjectOutputStream oos = new ObjectOutputStream(fos);
-			oos.writeObject(save);
-			oos.close();
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+	public static void add(sablonaCustomGrafu sablona) {
+		sablony.add(sablona);
+		saveSablony();
+		loadSablony();
 	}
 
 	/**
@@ -111,6 +116,20 @@ public class Ukladani {
 	}
 
 	/**
+	 * Uloží arraylist custom grafů do souboru
+	 */
+	public static void save() {
+		try {
+			FileOutputStream fos = new FileOutputStream(Konstanty.GRAFY_SOUBOR);
+			ObjectOutputStream oos = new ObjectOutputStream(fos);
+			oos.writeObject(save);
+			oos.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	/**
 	 * Načte custom grafy ze souboru do arraylistu
 	 */
 	public static void load() {
@@ -123,6 +142,51 @@ public class Ukladani {
 			ex.printStackTrace();
 		}
 	}
+
+	/**
+	 * Uloží arraylist sablon do souboru
+	 */
+	public static void saveSablony() {
+		try {
+			FileOutputStream fos = new FileOutputStream(Konstanty.SABLONY_SOUBOR);
+			ObjectOutputStream oos = new ObjectOutputStream(fos);
+			oos.writeObject(sablony);
+			oos.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	/**
+	 * Načte sablony ze souboru do arraylistu
+	 */
+	public static void loadSablony() {
+		menuSmazaniSablona.removeAll();
+		menuVytvoreniSablona.removeAll();
+		try {
+			FileInputStream fis = new FileInputStream(Konstanty.SABLONY_SOUBOR);
+			ObjectInputStream ois = new ObjectInputStream(fis);
+			sablony = (ArrayList<sablonaCustomGrafu>) ois.readObject();
+			ois.close();
+
+			for (Iterator<sablonaCustomGrafu> iterator = sablony.iterator(); iterator.hasNext();) {
+				sablonaCustomGrafu sablona = (sablonaCustomGrafu) iterator.next();
+
+				JMenuItem itemVytvoreni = new JMenuItem(sablona.getNazev());
+				itemVytvoreni.addActionListener(actVytvorZeSablony);
+				menuVytvoreniSablona.add(itemVytvoreni);
+
+				JMenuItem itemMazani = new JMenuItem(sablona.getNazev());
+				itemMazani.addActionListener(actSmazSablonu);
+				menuSmazaniSablona.add(itemMazani);
+			}
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	
 
 	/**
 	 * Importuje grafy ze souboru specifikovaného parametrem
@@ -179,7 +243,7 @@ public class Ukladani {
 	public static void nactiGrafy(int projektID) {
 		DropChartPanel graf = null;
 		panelMiniatur.removeAll();
-		menu.removeAll();
+		menuMazaniGrafu.removeAll();
 		for (Iterator<prepravkaUkladaniCustom> iterator = save.iterator(); iterator.hasNext();) {
 			prepravkaUkladaniCustom prepravka = (prepravkaUkladaniCustom) iterator.next();
 			if (prepravka.getProjectID() == projektID) {
@@ -190,7 +254,7 @@ public class Ukladani {
 
 				JMenuItem item = new JMenuItem(prepravka.getNazev());
 				item.addActionListener(actSmazaniGrafuJmeno);
-				menu.add(item);
+				menuMazaniGrafu.add(item);
 				panelMiniatur.vlozGraf(graf);
 			}
 		}
@@ -257,22 +321,28 @@ public class Ukladani {
 		Ukladani.panelProjektu = panelGrafu;
 	}
 
-	/**
-	 * Vrací položku JMenu pro smazání grafů
-	 * 
-	 * @return položka JMenu
-	 */
-	public static JMenu getMenu() {
-		return menu;
+	public static JMenu getMenuMazaniGrafu() {
+		return menuMazaniGrafu;
 	}
 
-	/**
-	 * Nastaví položku JMenu pro smazání grafů
-	 * 
-	 * @return položka JMenu
-	 */
-	public static void setMenu(JMenu menu) {
-		Ukladani.menu = menu;
+	public static void setMenuMazaniGrafu(JMenu menuMazaniGrafu) {
+		Ukladani.menuMazaniGrafu = menuMazaniGrafu;
+	}
+
+	public static JMenu getMenuVytvoreniSablona() {
+		return menuVytvoreniSablona;
+	}
+
+	public static void setMenuVytvoreniSablona(JMenu menuVytvoreniSablona) {
+		Ukladani.menuVytvoreniSablona = menuVytvoreniSablona;
+	}
+
+	public static JMenu getMenuSmazaniSablona() {
+		return menuSmazaniSablona;
+	}
+
+	public static void setMenuSmazaniSablona(JMenu menuSmazaniSablona) {
+		Ukladani.menuSmazaniSablona = menuSmazaniSablona;
 	}
 
 	/**
@@ -313,6 +383,55 @@ public class Ukladani {
 						panelProjektu.nastavDropSloty();
 						nactiGrafy(id);
 						return;
+					}
+				}
+			}
+		}
+	};
+
+	/**
+	 * Akce pro vytvoření grafu ze sablony
+	 */
+	private static ActionListener actVytvorZeSablony = new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+
+				String sablonaNazev = ((JMenuItem) e.getSource()).getText();
+				sablonaCustomGrafu sablona;
+
+				for (int i = 0; i < sablony.size(); i++) {
+					if (sablony.get(i).getNazev().equals(sablonaNazev)) {
+						sablona = sablony.get(i);
+
+						SwingUtilities.invokeLater(() -> {
+							OknoCustomGraf example = new OknoCustomGraf(sablona,
+									(Projekt) Konstanty.projektVyber.getSelectedItem());
+							example.setLocationRelativeTo(null);
+							example.setVisible(true);
+						});
+						break;
+					}
+				}
+			
+		}
+	};
+
+	/**
+	 * Akce pro smazání sablony
+	 */
+	private static ActionListener actSmazSablonu = new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+
+			int dialogResult = JOptionPane.showConfirmDialog(null, Konstanty.POPISY.getProperty("mazaniSablonaText"),
+					Konstanty.POPISY.getProperty("mazaniSablonaPopisek"), JOptionPane.YES_NO_OPTION);
+			if (dialogResult == 0) {
+				String smazat = ((JMenuItem) e.getSource()).getText();
+
+				for (int i = 0; i < sablony.size(); i++) {
+					if (sablony.get(i).getNazev().equals(smazat)) {
+						sablony.remove(i);
+						saveSablony();
+						loadSablony();
+						break;
 					}
 				}
 			}
