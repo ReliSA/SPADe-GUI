@@ -242,6 +242,7 @@ public class OknoHlavni extends JFrame {
 							btZapniFiltr.setEnabled(false);
 							filtry.setSelected(false);
 							panelGrafu.statistikyVisible = true;
+							zakazTlacitka();
 							boolean dvakrat;
 							if (pnBoxFiltru.getComponentCount() > 0) {
 								dvakrat = false;
@@ -264,6 +265,7 @@ public class OknoHlavni extends JFrame {
 							}
 							cbTypFiltru.setEnabled(true);
 							btZapniFiltr.setEnabled(true);
+							povolTlacitka();
 							oknoProgres.setVisible(false);
 						}
 					});
@@ -686,6 +688,7 @@ public class OknoHlavni extends JFrame {
 						public void run() {
 							cbTypFiltru.setEnabled(false);
 							btZapniFiltr.setEnabled(false);
+							zakazTlacitka();
 
 							OknoProgresNacitani oknoProgres = new OknoProgresNacitani(panelGrafu);
 							while (Konstanty.CITAC_PROGRESU <= Konstanty.POCET_KROKU_PROGRESU) {
@@ -695,6 +698,7 @@ public class OknoHlavni extends JFrame {
 								}
 								Thread.yield();
 							}
+							povolTlacitka();
 							cbTypFiltru.setEnabled(true);
 							btZapniFiltr.setEnabled(true);
 							oknoProgres.setVisible(false);
@@ -839,6 +843,7 @@ public class OknoHlavni extends JFrame {
 							public void run() {
 								cbTypFiltru.setEnabled(false);
 								btZapniFiltr.setEnabled(false);
+								zakazTlacitka();
 
 								OknoProgresNacitani oknoProgres = new OknoProgresNacitani(panelGrafu);
 								while (Konstanty.CITAC_PROGRESU <= Konstanty.POCET_KROKU_PROGRESU) {
@@ -848,6 +853,7 @@ public class OknoHlavni extends JFrame {
 									}
 									Thread.yield();
 								}
+								povolTlacitka();
 								cbTypFiltru.setEnabled(true);
 								btZapniFiltr.setEnabled(true);
 								oknoProgres.setVisible(false);
@@ -1441,6 +1447,18 @@ public class OknoHlavni extends JFrame {
 			}
 		}
 		return vystup;
+	}
+	
+	private void zakazTlacitka() {	
+		for (int i = 0; i < listaTlacitekSmazaniFiltru.getComponentCount(); i++) {
+			listaTlacitekSmazaniFiltru.getComponent(i).setEnabled(false);			
+		}
+	}
+	
+	private void povolTlacitka() {	
+		for (int i = 0; i < listaTlacitekSmazaniFiltru.getComponentCount(); i++) {
+			listaTlacitekSmazaniFiltru.getComponent(i).setEnabled(true);			
+		}
 	}
 
 }
