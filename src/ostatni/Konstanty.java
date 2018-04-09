@@ -9,6 +9,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Properties;
 
+import gui.ComboBoxDynamicky;
+
 /**
  * Třída konstant
  *
@@ -149,6 +151,7 @@ public class Konstanty {
 	public static Properties SQLs = new Properties();
 	public static Properties SQLsVar = new Properties();
 	public static final int DELKA_POPISKU_OS = 20;
+	public static ComboBoxDynamicky projektVyber;
 	
 /*---------------------------------------------------------*/
 	

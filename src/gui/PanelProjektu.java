@@ -34,7 +34,7 @@ import java.util.ArrayList;
 public class PanelProjektu extends JPanel {
 
 	private static final long serialVersionUID = -8756957474284941689L;
-	public Projekt projekt; // aktuálně vybraný projekt
+	private Projekt projekt; // aktuálně vybraný projekt
 	private JScrollPane scroll; // scroll panel
 	private JPanel panel; //hlavní panel
 	private JPanel grafy; // panel pro zobrazení miniatur grafů

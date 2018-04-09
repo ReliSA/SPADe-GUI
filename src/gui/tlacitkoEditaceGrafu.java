@@ -9,8 +9,7 @@ import data.sablonaCustomGrafu;
 public class tlacitkoEditaceGrafu extends JMenuItem implements ActionListener {
 
 	private static final long serialVersionUID = -1349817940520879175L;
-	sablonaCustomGrafu sablona;
-
+	sablonaCustomGrafu sablona;	
 	public tlacitkoEditaceGrafu(sablonaCustomGrafu sablona) {
 		super();
 		this.sablona=sablona;
@@ -20,8 +19,8 @@ public class tlacitkoEditaceGrafu extends JMenuItem implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		SwingUtilities.invokeLater(() -> {
-			OknoCustomGraf example = new OknoCustomGraf(sablona);
+		SwingUtilities.invokeLater(() -> {		
+			OknoCustomGraf example = new OknoCustomGraf(sablona,sablona.getProjekt());
 			example.setLocationRelativeTo(null);
 			example.setVisible(true);
 		});

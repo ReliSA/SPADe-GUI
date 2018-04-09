@@ -57,12 +57,15 @@ public class OknoHlavni extends JFrame {
 	private JPanel panelProjektMenu; // panel pro výběr projektu
 	private PanelProjektu panelGrafu; // centrální panel zobrazující statistiky a grafy
 
-	private DefaultComboBoxModel<Projekt> modelProjekt = new DefaultComboBoxModel<Projekt>(); // model pro seznam projektů
+	private DefaultComboBoxModel<Projekt> modelProjekt = new DefaultComboBoxModel<Projekt>(); // model pro seznam
+																								// projektů
 	private ComboBoxDynamicky lsSeznamProjektu = new ComboBoxDynamicky(modelProjekt); // seznam projektů
 	private JComboBox<String> cbTypFiltru = new JComboBox<String>(Konstanty.POLE_FILTRU); // seznam možných filtrů
-	private JComboBox<String> cbTypPodfiltru = new JComboBox<String>(Konstanty.POLE_PODFILTRU); // seznam možných podfiltrů úkolu
+	private JComboBox<String> cbTypPodfiltru = new JComboBox<String>(Konstanty.POLE_PODFILTRU); // seznam možných
+																								// podfiltrů úkolu
 	private JPanel pnBoxFiltru = new JPanel(); // box s vybranými filtry
-	private JButton btZapniFiltr = new JButton(Konstanty.POPISY.getProperty("tlacitkoZapniFiltr")); // tlačítko pro načtení filtrů
+	private JButton btZapniFiltr = new JButton(Konstanty.POPISY.getProperty("tlacitkoZapniFiltr")); // tlačítko pro
+																									// načtení filtrů
 	private JButton btSipkaFiltry; // tlačítko pro schování panelu filtrů
 	private JScrollPane scScrollFiltru; // scrollpanel pro filtry
 
@@ -83,8 +86,10 @@ public class OknoHlavni extends JFrame {
 	private JMenuItem czech; // Tlačítko horního menu pro přepnutí programu do češtiny
 	private JMenuItem english; // Tlačítko horního menu pro přepnutí programu do angličtiny
 	private JCheckBoxMenuItem filtry; // Checkbox pro nastavení zda se má zobrazovat
-
+	// private JFrame frameCustomGrafu = new JFrame(); //odkaz na frame vytvoreni
+	// custom grafu
 	private int polohaPaneluUkol; // poloha panelu filtru úkol v panelu filtrů
+	sablonaCustomGrafu ulozeni = null;
 
 	/**
 	 * Konstruktor třídy, naplní ve třídě konstant připojení, načte projekty a
@@ -95,6 +100,7 @@ public class OknoHlavni extends JFrame {
 	 */
 	public OknoHlavni(Connection pripojeni) {
 		Konstanty.PRIPOJENI = pripojeni;
+		Konstanty.projektVyber = lsSeznamProjektu;
 		nactiProjekty();
 		nastavZobrazeni();
 		this.setVisible(true);
@@ -243,6 +249,18 @@ public class OknoHlavni extends JFrame {
 							filtry.setSelected(false);
 							panelGrafu.statistikyVisible = true;
 							zakazTlacitka();
+							boolean ulozeniCustomGrafu = false;
+							
+							if (OknoCustomGraf.instance != null) {								//Uloží data pro vytvoření custom grafu
+								if (OknoCustomGraf.instance.isVisible()) {
+									ulozeni = OknoCustomGraf.instance.ulozNastaveni();
+									ulozeni.setIterace(-1);
+									ulozeni.setOsoby(-1);
+									ulozeniCustomGrafu = true;
+									OknoCustomGraf.instance.dispose();
+								}
+							}
+
 							boolean dvakrat;
 							if (pnBoxFiltru.getComponentCount() > 0) {
 								dvakrat = false;
@@ -267,6 +285,14 @@ public class OknoHlavni extends JFrame {
 							btZapniFiltr.setEnabled(true);
 							povolTlacitka();
 							oknoProgres.setVisible(false);
+							
+							if (ulozeniCustomGrafu) {											//Otevře okno pro vytvoření custom grafu
+								SwingUtilities.invokeLater(() -> {
+									OknoCustomGraf example = new OknoCustomGraf(ulozeni, getProjekt());
+									example.setLocationRelativeTo(null);
+									example.setVisible(true);
+								});
+							}
 						}
 					});
 					/* vlákno načítá data do panelu grafů */
@@ -1448,16 +1474,16 @@ public class OknoHlavni extends JFrame {
 		}
 		return vystup;
 	}
-	
-	private void zakazTlacitka() {	
+
+	private void zakazTlacitka() {
 		for (int i = 0; i < listaTlacitekSmazaniFiltru.getComponentCount(); i++) {
-			listaTlacitekSmazaniFiltru.getComponent(i).setEnabled(false);			
+			listaTlacitekSmazaniFiltru.getComponent(i).setEnabled(false);
 		}
 	}
-	
-	private void povolTlacitka() {	
+
+	private void povolTlacitka() {
 		for (int i = 0; i < listaTlacitekSmazaniFiltru.getComponentCount(); i++) {
-			listaTlacitekSmazaniFiltru.getComponent(i).setEnabled(true);			
+			listaTlacitekSmazaniFiltru.getComponent(i).setEnabled(true);
 		}
 	}
 

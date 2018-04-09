@@ -14,6 +14,8 @@ import java.util.HashMap;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
 import data.CustomGraf;
@@ -32,6 +34,7 @@ import javax.swing.JComboBox;
  */
 public class OknoCustomGraf extends JFrame {
 
+	public static OknoCustomGraf instance;
 	private static final long serialVersionUID = -2359690226410306884L;
 	private int parametryZvolenehoSql; // udává parametry potřebné pro zvolené SQL
 	private Projekt projekt; // zvolený projekt
@@ -62,37 +65,52 @@ public class OknoCustomGraf extends JFrame {
 	public OknoCustomGraf(Projekt projekt) {
 		super(Konstanty.POPISY.getProperty("menuVytvorGraf"));
 
+		if (instance != null)
+			instance.dispose();
+		instance = this;
 		this.projekt = projekt;
 		osoby = (new Osoby(projekt.getID())).getSeznam();
 		iterace = projekt.getIterace();
-
+		
 		nastavZobrazení();
+		nastavMenu();
+		nactiData();
 		nastavAkce();
 	}
 
 	/**
 	 * Kontruktor okna pro editaci grafu
 	 * 
-	 * @param sablonaCustomGrafu sablona pro nacteni nastaveni
+	 * @param sablonaCustomGrafu
+	 *            sablona pro nacteni nastaveni
 	 */
-	public OknoCustomGraf(sablonaCustomGrafu sablona) {
+	public OknoCustomGraf(sablonaCustomGrafu sablona,Projekt projekt) {
 		super(Konstanty.POPISY.getProperty("menuVytvorGraf"));
 
-		this.projekt = sablona.getProjekt();
+		if (instance != null)
+			instance.dispose();
+		instance = this;
+
+		this.projekt = projekt;
 		osoby = (new Osoby(projekt.getID())).getSeznam();
 		iterace = projekt.getIterace();
 
 		nastavZobrazení();
-
-		this.cbSql.setSelectedIndex(sablona.getSql());
-		this.nastavMenu();
+		
+		this.cbSql.setSelectedIndex(sablona.getSql());		
 		if (sablona.getIterace() != -1)
 			this.cbIterace.setSelectedIndex(sablona.getIterace());
+		else
+			this.cbIterace.setSelectedIndex(0);
 		if (sablona.getOsoby() != -1)
 			this.cbOsoby.setSelectedIndex(sablona.getOsoby());
+		else
+			this.cbOsoby.setSelectedIndex(0);
 		this.tfNazev.setText(sablona.getNazev());
+		
+		nastavMenu();
+		nactiData();
 		this.nactiNastaveni(sablona.getSloupce());
-
 		this.nastavAkce();
 	}
 
@@ -124,11 +142,7 @@ public class OknoCustomGraf extends JFrame {
 		lblSql.setHorizontalAlignment(JLabel.CENTER);
 
 		this.add(controlPanel, BorderLayout.NORTH);
-		this.add(scrollDataPanel, BorderLayout.CENTER);
-
-		tfNazev.setText("ahoj");
-
-		nastavMenu();
+		this.add(scrollDataPanel, BorderLayout.CENTER);	
 
 		this.add(nahled, BorderLayout.SOUTH);
 		this.setMinimumSize(new Dimension(850, 700));
@@ -226,7 +240,6 @@ public class OknoCustomGraf extends JFrame {
 		controlPanel.add(lblNazevGrafu);
 		controlPanel.add(tfNazev);
 
-		nactiData();
 	}
 
 	/**
@@ -349,7 +362,7 @@ public class OknoCustomGraf extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 
 				sablonaCustomGrafu ulozeni = ulozNastaveni();
-				
+
 				nactiData();
 
 				nactiNastaveni(ulozeni.getSloupce());
@@ -360,8 +373,8 @@ public class OknoCustomGraf extends JFrame {
 		ActionListener actNastavMenu = new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
-
 				nastavMenu();
+				nactiData();
 			}
 		};
 
@@ -380,8 +393,19 @@ public class OknoCustomGraf extends JFrame {
 			nakresliGraf();
 		}
 	};
+	
+		ActionListener actUlozSablonu = new ActionListener() {
 
-	public void nactiNastaveni(ArrayList<nastaveniCustomSloupec> seznam) {
+			public void actionPerformed(ActionEvent e) {
+
+				sablonaCustomGrafu ulozeni = ulozNastaveni();
+				ulozeni.setOsoby(-1);
+				ulozeni.setIterace(-1);
+					
+			}
+		};	
+
+	protected void nactiNastaveni(ArrayList<nastaveniCustomSloupec> seznam) {
 		panelDatCustomGrafu panel;
 		for (int i = 0; i < seznam.size(); i++) {
 			nastaveniCustomSloupec sloupec = seznam.get(i);
@@ -393,7 +417,7 @@ public class OknoCustomGraf extends JFrame {
 
 	}
 
-	public sablonaCustomGrafu ulozNastaveni() {
+	protected sablonaCustomGrafu ulozNastaveni() {
 		ArrayList<nastaveniCustomSloupec> seznam = new ArrayList<nastaveniCustomSloupec>();
 		panelDatCustomGrafu panel;
 		for (int i = 1; i < dataPanel.getComponentCount(); i++) {
