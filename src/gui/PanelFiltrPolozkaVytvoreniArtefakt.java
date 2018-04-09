@@ -266,7 +266,7 @@ public class PanelFiltrPolozkaVytvoreniArtefakt extends PanelFiltrPolozkaVytvore
 		formatter.setValueClass(Integer.class);
 		formatter.setMinimum(0);
 		formatter.setMaximum(Integer.MAX_VALUE);
-		formatter.setAllowsInvalid(false);
+		formatter.setAllowsInvalid(true);
 		min = new JFormattedTextField(formatter);
 		max = new JFormattedTextField(formatter);
 		JLabel lblVelikost = new JLabel(Konstanty.POPISY.getProperty("velikostArtefakt") + ": ");
@@ -284,6 +284,7 @@ public class PanelFiltrPolozkaVytvoreniArtefakt extends PanelFiltrPolozkaVytvore
 		this.add(max);      
 	}
 	
+		
 	/**
 	 * Nastavení akcí jednotlivých komponent
 	 */
@@ -293,6 +294,16 @@ public class PanelFiltrPolozkaVytvoreniArtefakt extends PanelFiltrPolozkaVytvore
 		
 		cbOperatorVelikost = new JComboBox<String>(Konstanty.POLE_OPERATORU);
 
+		/*Akce pro změně zaškrtávátka Použít filtr*/
+		ActionListener actPouzitFiltr = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(!ckPouzitFiltr.isSelected()){ 
+					min.setText(null);
+					max.setText(null); 
+				}
+			}
+		};
+		
 		ActionListener actZmenaOperatoruDatum = new ActionListener() {
 			
 			public void actionPerformed(ActionEvent e) {
@@ -303,7 +314,8 @@ public class PanelFiltrPolozkaVytvoreniArtefakt extends PanelFiltrPolozkaVytvore
 			}
 		};
 				
-		cbOperatorVelikost.addActionListener(actZmenaOperatoruDatum);		
+		cbOperatorVelikost.addActionListener(actZmenaOperatoruDatum);	
+		ckPouzitFiltr.addActionListener(actPouzitFiltr);
 	}
 	
 }

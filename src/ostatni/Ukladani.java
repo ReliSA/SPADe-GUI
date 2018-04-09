@@ -168,7 +168,7 @@ public class Ukladani {
 			ObjectInputStream ois = new ObjectInputStream(fis);
 			sablony = (ArrayList<sablonaCustomGrafu>) ois.readObject();
 			ois.close();
-
+			
 			for (Iterator<sablonaCustomGrafu> iterator = sablony.iterator(); iterator.hasNext();) {
 				sablonaCustomGrafu sablona = (sablonaCustomGrafu) iterator.next();
 
@@ -338,26 +338,50 @@ public class Ukladani {
 		Ukladani.panelProjektu = panelGrafu;
 	}
 
+	/**
+	 * Vrací odkaz na položku menu pro smazání grafu
+	 * @return JMenu pro smazání grafu
+	 */
 	public static JMenu getMenuMazaniGrafu() {
 		return menuMazaniGrafu;
 	}
 
+	/**
+	 * Nastaví odkaz na položku menu pro smazání grafu
+	 * @param menuMazaniGrafu JMenu pro smazání grafu
+	 */
 	public static void setMenuMazaniGrafu(JMenu menuMazaniGrafu) {
 		Ukladani.menuMazaniGrafu = menuMazaniGrafu;
 	}
 
+	/**
+	 * Vrací odkaz na položku menu pro vytvoření grafu ze šablony
+	 * @return JMenu pro smazání grafu
+	 */
 	public static JMenu getMenuVytvoreniSablona() {
 		return menuVytvoreniSablona;
 	}
 
+	/**
+	 * Nastaví odkaz na položku menu pro vytvoření grafu ze šablony 
+	 * @param menuVytvoreniSablona JMenu pro vytvoření grafu ze šablony 
+	 */
 	public static void setMenuVytvoreniSablona(JMenu menuVytvoreniSablona) {
 		Ukladani.menuVytvoreniSablona = menuVytvoreniSablona;
 	}
 
+	/**
+	 * Vrací odkaz na položku menu pro smazání šablony
+	 * @return JMenu pro smazání šablony
+	 */
 	public static JMenu getMenuSmazaniSablona() {
 		return menuSmazaniSablona;
 	}
 
+	/**
+	 * Nastaví odkaz na položku menu pro vytvoření grafu ze šablony 
+	 * @param menuSmazaniSablona JMenu pro smazání šablony
+	 */
 	public static void setMenuSmazaniSablona(JMenu menuSmazaniSablona) {
 		Ukladani.menuSmazaniSablona = menuSmazaniSablona;
 	}
@@ -395,6 +419,10 @@ public class Ukladani {
 		}
 	};
 	
+	/**
+	 * Metoda pro smazání grafu
+	 * @param nazev grafu
+	 */
 	public static void smazGraf(String nazev) {
 		int id;
 		for (int i = 0; i < save.size(); i++) {
@@ -450,6 +478,10 @@ public class Ukladani {
 		}
 	};
 
+	/**
+	 * Metoda pro odstranění šablony
+	 * @param nazev šablony
+	 */
 	public static void smazSablonu(String nazev) {
 		for (int i = 0; i < sablony.size(); i++) {
 			if (sablony.get(i).getNazev().equals(nazev)) {

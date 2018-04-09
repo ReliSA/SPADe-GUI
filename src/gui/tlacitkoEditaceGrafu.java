@@ -7,17 +7,28 @@ import javax.swing.SwingUtilities;
 import data.sablonaCustomGrafu;
 import ostatni.Konstanty;
 
+/**
+ * Tlačítko pro otevření editace uloženého custom grafu
+ */
 public class tlacitkoEditaceGrafu extends JMenuItem implements ActionListener {
 
 	private static final long serialVersionUID = -1349817940520879175L;
-	sablonaCustomGrafu sablona;	
+	private sablonaCustomGrafu sablona;	// Sablona pro vytvoření grafu
+	
+	/**
+	 * Kontruktor třídy
+	 * @param sablona sablona pro vykreslení grafu
+	 */
 	public tlacitkoEditaceGrafu(sablonaCustomGrafu sablona) {
 		super();
 		this.sablona=sablona;
 		this.setText(Konstanty.POPISY.getProperty("edituj"));	
 		this.addActionListener(this);
 	}
-
+ 
+	/**
+	 * Akce pro stisknutí tlačítka editace grafu
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		SwingUtilities.invokeLater(() -> {		

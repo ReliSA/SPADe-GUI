@@ -18,15 +18,14 @@ import ostatni.Konstanty;
 
 /**
  * Přihlašovací okno, spouští se jako první, zajišťuje spojení s databází
- * @author michalvselko
- *
  */
 public class OknoPrihlasovani extends JFrame {
 
+	private static final long serialVersionUID = -8229943813762614201L;
 	private JButton btPrihlasit = new JButton(Konstanty.POPISY.getProperty("tlacitkoPrihlasit"));		//tlačítko pro přihlášení
 	private JButton btUkoncit = new JButton(Konstanty.POPISY.getProperty("tlacitkoUkoncit"));			//tlačítko pro ukončení
 	private JTextField tfLogin = new JTextField();														//pole pro zadaní loginu
-	private JPasswordField pfHeslo = new JPasswordField();												//polo pro zadání hesla
+	private JPasswordField pfHeslo = new JPasswordField();												//pole pro zadání hesla
 	
 	public OknoPrihlasovani(){
 		setSize(Konstanty.VELIKOST_PRIHLASOVACIHO_OKNA);		

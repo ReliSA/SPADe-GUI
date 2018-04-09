@@ -46,6 +46,7 @@ public class panelDatCustomGrafu extends JPanel {
 		colorPicker = new ColorChooserButton(colors[index]);
 		this.setBackground(Color.white);
 		pouzit.setBackground(Color.white);
+		pouzit.setHorizontalAlignment(SwingConstants.CENTER);
 		this.setLayout(new GridLayout(0, 1));
 		this.nazev.setText(nazev);
 		Font font = new Font("Courier", Font.BOLD, 12);

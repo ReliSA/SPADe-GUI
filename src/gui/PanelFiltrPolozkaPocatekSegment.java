@@ -312,6 +312,17 @@ public class PanelFiltrPolozkaPocatekSegment extends PanelFiltrPolozkaPocatek {
 	protected void nastavAkce() {
 		super.nastavAkce();
 
+		/*Akce pro změně zaškrtávátka Použít filtr*/
+		ActionListener actPouzitFiltr = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(!ckPouzitFiltr.isSelected()){
+					lsSeznamFiltr.clearSelection();
+					dpDatumODKonec.getModel().setValue(null);
+					dpDatumDOKonec.getModel().setValue(null);
+				}
+			}
+		};
+		
 		/* Akce pro změně operatoru datumů */
 		cbOperatorDatumKonec = new JComboBox<String>(Konstanty.POLE_OPERATORU);
 		ActionListener actZmenaOperatoruDatumKonec = new ActionListener() {
@@ -324,5 +335,6 @@ public class PanelFiltrPolozkaPocatekSegment extends PanelFiltrPolozkaPocatek {
 			}
 		};
 		cbOperatorDatumKonec.addActionListener(actZmenaOperatoruDatumKonec);
+		ckPouzitFiltr.addActionListener(actPouzitFiltr);
 	}
 }

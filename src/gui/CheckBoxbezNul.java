@@ -34,16 +34,26 @@ import data.ciselnik.Status;
 import data.ciselnik.Typ;
 import ostatni.Konstanty;
 
+/**
+ * Tlačítko pro schování nulových sloupců u vykreslených grafů
+ */
 public class CheckBoxbezNul extends JCheckBox implements Serializable, ActionListener {
 
 	private static final long serialVersionUID = -4935806712434825124L;
-	ChartPanel chartPanel;
-	int typGrafu;
-	int typTlacitka;
-	Ciselnik seznam;
-	ArrayList<Segment> segmenty;
-	Projekt projekt;
+	private ChartPanel chartPanel; // panel grafu
+	private int typGrafu; // typ grafu
+	private int typTlacitka; //typ tlacitka
+	private Ciselnik seznam; // ciselnik pro vykresleni grafu
+	private ArrayList<Segment> segmenty; // arraylist segmentu pro vykresleni grafu
+	private Projekt projekt; // projekt grafu
 
+	/**
+	 * Kontruktor třídy
+	 * @param projekt projekt grafu
+	 * @param chartPanel panel grafu
+	 * @param typVypoctu typ vypoctu pro vykreslení grafu
+	 * @param typ typ tlačítka
+	 */
 	public CheckBoxbezNul(Projekt projekt, ChartPanel chartPanel, int typVypoctu, int typ) {
 		this.typGrafu = typVypoctu;
 		this.typTlacitka = typ;
@@ -52,6 +62,14 @@ public class CheckBoxbezNul extends JCheckBox implements Serializable, ActionLis
 		this.addActionListener(this);
 	}
 
+	/**
+	 * Kontruktor třídy
+	 * @param projekt projekt grafu
+	 * @param chartPanel panel grafu
+	 * @param seznam segmentů pro vykreslení grafu
+	 * @param typGrafu typ grafu
+	 * @param typ typ tlačítka
+	 */
 	public CheckBoxbezNul(Projekt projekt, ChartPanel chartPanel, Ciselnik seznam, int typGrafu, int typ) {
 		this.typGrafu = typGrafu;
 		this.typTlacitka = typ;
@@ -61,6 +79,14 @@ public class CheckBoxbezNul extends JCheckBox implements Serializable, ActionLis
 		this.addActionListener(this);
 	}
 
+	/**
+	 * Kontruktor třídy
+	 * @param projekt projekt grafu
+	 * @param chartPanel panel grafu
+	 * @param segmenty seznam segmentů pro vykreslení grafu
+	 * @param typGrafu typ grafu
+	 * @param typ typ tlačítka
+	 */
 	public CheckBoxbezNul(Projekt projekt, ChartPanel chartPanel, ArrayList<Segment> segmenty, int typGrafu, int typ) {
 		this.typGrafu = typGrafu;
 		this.typTlacitka = typ;
@@ -70,6 +96,9 @@ public class CheckBoxbezNul extends JCheckBox implements Serializable, ActionLis
 		this.addActionListener(this);
 	}
 
+	/**
+	 * Akce pro odstranění nulových sloupců z grafu
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 
@@ -114,7 +143,7 @@ public class CheckBoxbezNul extends JCheckBox implements Serializable, ActionLis
 	 *            true, pokud se mají do datasetu vložit i nulové sloupce
 	 * @return sloupcový graf počtu podle autorů
 	 */
-	public JFreeChart getAutorGraf(Projekt projekt, int typVypoctu, boolean bezNul) {
+	private JFreeChart getAutorGraf(Projekt projekt, int typVypoctu, boolean bezNul) {
 		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 		String nazevGrafu = "";
 		try {
@@ -184,7 +213,7 @@ public class CheckBoxbezNul extends JCheckBox implements Serializable, ActionLis
 	 * @param typGrafu
 	 *            typ grafu
 	 */
-	public void nastavGraf(JFreeChart graf, int typGrafu) {
+	private void nastavGraf(JFreeChart graf, int typGrafu) {
 		try {
 			graf.getTitle().setFont(Konstanty.FONT_NAZEV_GRAFU);
 

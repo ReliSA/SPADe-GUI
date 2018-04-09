@@ -9,7 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.jfree.chart.ChartFactory;
@@ -32,10 +31,10 @@ import ostatni.Konstanty;
 import ostatni.Ukladani;
 
 /**
- * Okno náhledu custom grafu. Slouží pro náhled vytvořeného grafu a jeho
+ * Panel náhledu custom grafu. Slouží pro náhled vytvořeného grafu a jeho
  * následné uložení.
  */
-public class OknoCustomNahled extends JPanel {
+public class PanelCustomNahled extends JPanel {
 
 	private static final long serialVersionUID = 8910356012762472124L;
 
@@ -45,10 +44,10 @@ public class OknoCustomNahled extends JPanel {
 	private String nazev; // nazev grafu
 	private JButton save; // tlačítko pro uložení vytvořeného grafu
 	private JButton saveTemplate; // tlačítko pro uložení vytvořeného grafu
-	private OknoCustomGraf okno;
+	private OknoCustomGraf okno; // odkaz na okno vytváření custom grafu
 
 	/**
-	 * Konstruktor okna pro všechny grafy kromě koláčových
+	 * Konstruktor panelu pro všechny grafy kromě koláčových
 	 * 
 	 * @param title
 	 *            název grafu
@@ -67,7 +66,7 @@ public class OknoCustomNahled extends JPanel {
 	 * @param projectID
 	 *            ID projektu
 	 */
-	public OknoCustomNahled(String title, DefaultCategoryDataset bary, DefaultCategoryDataset body,
+	public PanelCustomNahled(String title, DefaultCategoryDataset bary, DefaultCategoryDataset body,
 			DefaultCategoryDataset spojnice, DefaultCategoryDataset area, DefaultCategoryDataset detected,
 			HashMap<String, Color> colors, int projectID, OknoCustomGraf okno) {
 
@@ -145,7 +144,7 @@ public class OknoCustomNahled extends JPanel {
 	}
 
 	/**
-	 * Konstruktor okna pro koláčové grafy
+	 * Konstruktor panelu pro koláčové grafy
 	 * 
 	 * @param title
 	 *            název grafu
@@ -154,7 +153,7 @@ public class OknoCustomNahled extends JPanel {
 	 * @param projectID
 	 *            ID projektu
 	 */
-	public OknoCustomNahled(String title, DefaultPieDataset dataset, int projectID, OknoCustomGraf okno) {
+	public PanelCustomNahled(String title, DefaultPieDataset dataset, int projectID, OknoCustomGraf okno) {
 		this.projectID = projectID;
 		this.typGrafu = Konstanty.PIE;
 		this.nazev = title;
@@ -203,6 +202,8 @@ public class OknoCustomNahled extends JPanel {
 							Ukladani.smazGraf(nazev);
 							Ukladani.add(prepravka);
 							okno.nakresliGraf();
+							JOptionPane.showMessageDialog(okno,
+									Konstanty.POPISY.getProperty("uspesneUlozenoGraf"));
 						}
 					} else {
 
@@ -210,11 +211,14 @@ public class OknoCustomNahled extends JPanel {
 								okno.ulozNastaveni());
 						Ukladani.add(prepravka);
 						okno.nakresliGraf();
+						JOptionPane.showMessageDialog(okno,
+								Konstanty.POPISY.getProperty("uspesneUlozenoGraf"));
 					}
 				}
 			}
 		};
 
+		//Akce pro uložení šablony
 		ActionListener actSaveSablona = new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
@@ -238,14 +242,17 @@ public class OknoCustomNahled extends JPanel {
 							sablona.setOsoby(-1);
 							Ukladani.smazSablonu(nazev);
 							Ukladani.add(sablona);
+							JOptionPane.showMessageDialog(okno,
+									Konstanty.POPISY.getProperty("uspesneUlozenoSablona"));
 						}
 					} else {
 
 						sablonaCustomGrafu sablona = okno.ulozNastaveni();
 						sablona.setIterace(-1);
 						sablona.setOsoby(-1);
-
 						Ukladani.add(sablona);
+						JOptionPane.showMessageDialog(okno,
+								Konstanty.POPISY.getProperty("uspesneUlozenoSablona"));
 					}
 				}
 			}

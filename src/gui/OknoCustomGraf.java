@@ -120,6 +120,8 @@ public class OknoCustomGraf extends JFrame {
 
 		dataPanel = new JPanel(new GridLayout(1, 0));
 		JScrollPane scrollDataPanel = new JScrollPane(dataPanel);
+		scrollDataPanel.getHorizontalScrollBar().setUnitIncrement(15);
+		scrollDataPanel.getVerticalScrollBar().setUnitIncrement(15);
 		controlPanel = new JPanel(new GridLayout(1, 0));
 		nahled = new JPanel();
 		tfNazev = new JTextField();
@@ -327,7 +329,7 @@ public class OknoCustomGraf extends JFrame {
 							pie.setValue(data.getDatum(j), data.getData(i - 1, j));
 						}
 
-						OknoCustomNahled example = new OknoCustomNahled(tfNazev.getText(), pie, projekt.getID(), this);
+						PanelCustomNahled example = new PanelCustomNahled(tfNazev.getText(), pie, projekt.getID(), this);
 
 						nahled.removeAll();
 						nahled.add(example);
@@ -340,7 +342,7 @@ public class OknoCustomGraf extends JFrame {
 			}
 		}
 
-		OknoCustomNahled example = new OknoCustomNahled(tfNazev.getText(), bary, body, spojnice, area, detected, hmap,
+		PanelCustomNahled example = new PanelCustomNahled(tfNazev.getText(), bary, body, spojnice, area, detected, hmap,
 				projekt.getID(), this);
 		nahled.removeAll();
 		nahled.add(example);

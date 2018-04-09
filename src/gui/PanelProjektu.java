@@ -74,6 +74,7 @@ public class PanelProjektu extends JPanel {
 		this.nastavAkce();
 		Ukladani.setPanelProjektu(this);
 		Ukladani.nactiGrafy(projekt.getID());
+		Ukladani.loadSablony();
 	}
 
 	/**
@@ -97,6 +98,7 @@ public class PanelProjektu extends JPanel {
 		this.nastavZobrazeni();
 		this.nastavAkce();
 		Ukladani.nactiGrafy(projekt.getID());
+		Ukladani.loadSablony();
 		this.revalidate();
 
 	}
@@ -155,6 +157,7 @@ public class PanelProjektu extends JPanel {
 		this.nastavZobrazeni();
 		this.nastavAkce();
 		Ukladani.nactiGrafy(projekt.getID());
+		Ukladani.loadSablony();
 		this.revalidate();
 	}
 

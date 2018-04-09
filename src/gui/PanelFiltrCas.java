@@ -490,7 +490,7 @@ public class PanelFiltrCas extends PanelFiltr {
 		formatter.setValueClass(Integer.class);
 		formatter.setMinimum(0);
 		formatter.setMaximum(Integer.MAX_VALUE);
-		formatter.setAllowsInvalid(false);
+		formatter.setAllowsInvalid(true);
 		stravenyOD = new JFormattedTextField(formatter);
 		stravenyDO = new JFormattedTextField(formatter);
 		predpokladanyOD = new JFormattedTextField(formatter);
@@ -529,6 +529,18 @@ public class PanelFiltrCas extends PanelFiltr {
 		cbOperatorStraveny = new JComboBox<String>(Konstanty.POLE_OPERATORU);
 		cbOperatorPredpokladany = new JComboBox<String>(Konstanty.POLE_OPERATORU);
 
+		/*Akce pro změně zaškrtávátka Použít filtr*/
+		ActionListener actPouzitFiltr = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(!ckPouzitFiltr.isSelected()){
+					stravenyOD.setText(null); 
+					stravenyDO.setText(null);  
+					predpokladanyOD.setText(null);
+					predpokladanyDO.setText(null); 
+				}
+			}
+		};
+		
 		/* Akce pro změnu operátoru předpokládaného času */
 		ActionListener actZmenaOperatoruPredpokladany = new ActionListener() {
 
@@ -553,6 +565,7 @@ public class PanelFiltrCas extends PanelFiltr {
 
 		cbOperatorStraveny.addActionListener(actZmenaOperatoruStraveny);
 		cbOperatorPredpokladany.addActionListener(actZmenaOperatoruPredpokladany);
+		ckPouzitFiltr.addActionListener(actPouzitFiltr);
 	}
 
 }
