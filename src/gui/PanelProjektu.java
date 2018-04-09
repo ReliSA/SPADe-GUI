@@ -64,19 +64,16 @@ public class PanelProjektu extends JPanel {
 	 * 
 	 * @param projekt aktuálně vybraný projekt
 	 */
-	public PanelProjektu(Projekt projekt,boolean nacti) {
+	public PanelProjektu(Projekt projekt) {
 		super();
 		this.setBackground(Color.WHITE);
 
 		this.projekt = projekt;
-		if (nacti) {
-			this.projekt.nactiData();
-		}		
+		this.projekt.nactiData();
 		this.nastavZobrazeni();
 		this.nastavAkce();
 		Ukladani.setPanelProjektu(this);
 		Ukladani.nactiGrafy(projekt.getID());
-		Ukladani.loadSablony();
 	}
 
 	/**

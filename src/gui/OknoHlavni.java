@@ -106,7 +106,7 @@ public class OknoHlavni extends JFrame {
 		Konstanty.PRIPOJENI = pripojeni;
 		Konstanty.projektVyber = lsSeznamProjektu;
 		nactiProjekty();
-		nastavZobrazeni(true);
+		nastavZobrazeni();
 		this.setVisible(true);
 	}
 
@@ -139,9 +139,9 @@ public class OknoHlavni extends JFrame {
 	/**
 	 * Nastaví zobrazení okna
 	 */
-	private void nastavZobrazeni(boolean nacti) {
+	private void nastavZobrazeni() {
 		nastavOkno();
-
+	
 		btZapniFiltr = new JButton(Konstanty.POPISY.getProperty("tlacitkoZapniFiltr"));
 		fileMenu = new JMenu(Konstanty.POPISY.getProperty("menuSoubor"));
 		customGrafMenu = new JMenu(Konstanty.POPISY.getProperty("menuCustomGraf"));
@@ -171,7 +171,7 @@ public class OknoHlavni extends JFrame {
 		panelProjektMenu = new JPanel(new BorderLayout());
 		panelMenu.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
 		JPanel pnFiltr = new JPanel();
-		panelGrafu = new PanelProjektu(this.getProjekt(), nacti);
+		panelGrafu = new PanelProjektu(this.getProjekt());
 		menuBar = new JMenuBar();
 		scScrollFiltru = new JScrollPane(pnBoxFiltru, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -216,10 +216,12 @@ public class OknoHlavni extends JFrame {
 		importExportMenu.add(exportProjekt);
 		customGrafMenu.add(vytvorGraf);
 		customGrafMenu.add(vytvorSablonaMenu);
+		customGrafMenu.add(new JSeparator());
 		customGrafMenu.add(removeSablonaMenu);
 		customGrafMenu.add(removeMainMenu);
 		removeMainMenu.add(removeChartMenu);
 		removeMainMenu.add(removeChartProject);
+		customGrafMenu.add(new JSeparator());
 		customGrafMenu.add(importExportMenu);
 		languageMenu.add(czech);
 		languageMenu.add(english);
@@ -250,7 +252,7 @@ public class OknoHlavni extends JFrame {
 		/* akce při změně projektu v panelu menu */
 		ActionListener actZmenaProjektu = new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-
+				Konstanty.CITAC_PROGRESU=0;
 				try {
 					/* vlákno zobrazuje okno s progresem načítání */
 					Thread t1 = new Thread(new Runnable() {
@@ -261,6 +263,7 @@ public class OknoHlavni extends JFrame {
 							btZapniFiltr.setEnabled(false);
 							filtry.setSelected(false);
 							panelGrafu.statistikyVisible = true;
+							lsSeznamProjektu.setEnabled(false);
 							zakazTlacitka();
 							boolean ulozeniCustomGrafu = false;
 
@@ -296,6 +299,7 @@ public class OknoHlavni extends JFrame {
 							}
 							cbTypFiltru.setEnabled(true);
 							btZapniFiltr.setEnabled(true);
+							lsSeznamProjektu.setEnabled(true);
 							povolTlacitka();
 							oknoProgres.setVisible(false);
 
@@ -727,6 +731,7 @@ public class OknoHlavni extends JFrame {
 						public void run() {
 							cbTypFiltru.setEnabled(false);
 							btZapniFiltr.setEnabled(false);
+							lsSeznamProjektu.setEnabled(false);
 							zakazTlacitka();
 
 							OknoProgresNacitani oknoProgres = new OknoProgresNacitani(panelGrafu);
@@ -738,6 +743,7 @@ public class OknoHlavni extends JFrame {
 								Thread.yield();
 							}
 							povolTlacitka();
+							lsSeznamProjektu.setEnabled(true);
 							cbTypFiltru.setEnabled(true);
 							btZapniFiltr.setEnabled(true);
 							oknoProgres.setVisible(false);
@@ -882,6 +888,7 @@ public class OknoHlavni extends JFrame {
 							public void run() {
 								cbTypFiltru.setEnabled(false);
 								btZapniFiltr.setEnabled(false);
+								lsSeznamProjektu.setEnabled(false);
 								zakazTlacitka();
 
 								OknoProgresNacitani oknoProgres = new OknoProgresNacitani(panelGrafu);
@@ -893,6 +900,7 @@ public class OknoHlavni extends JFrame {
 									Thread.yield();
 								}
 								povolTlacitka();
+								lsSeznamProjektu.setEnabled(true);
 								cbTypFiltru.setEnabled(true);
 								btZapniFiltr.setEnabled(true);
 								oknoProgres.setVisible(false);
@@ -1113,17 +1121,12 @@ public class OknoHlavni extends JFrame {
 		/* akce pro změnu jazyka na angličtinu */
 		ActionListener actJazykEnglish = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				try {				
+				try {
 					Konstanty.POPISY.load(
 							new InputStreamReader(new FileInputStream(Konstanty.NAZEV_SOUBORU_POPISU_ENGLISH), "UTF8"));
-					Konstanty.nastavPopisComboBox();				
+					Konstanty.nastavPopisComboBox();
 					cbTypFiltru.setModel(new DefaultComboBoxModel(Konstanty.POLE_FILTRU));
-					okno.setVisible(false);
-					getContentPane().removeAll();
-					okno.nastavZobrazeni(false);
-					okno.revalidate();
-					okno.repaint();
-					okno.setVisible(true);
+					restartOkna();
 
 				} catch (FileNotFoundException e1) {
 					JOptionPane.showMessageDialog(null, Konstanty.POPISY.getProperty("chybaSoubor")
@@ -1144,19 +1147,14 @@ public class OknoHlavni extends JFrame {
 
 		/* akce pro změnu jazyka na čestinu */
 		ActionListener actJazykCzech = new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e) {				
 				try {
-
 					Konstanty.POPISY.load(
 							new InputStreamReader(new FileInputStream(Konstanty.NAZEV_SOUBORU_POPISU_CZECH), "UTF8"));
 					Konstanty.nastavPopisComboBox();
 					cbTypFiltru.setModel(new DefaultComboBoxModel(Konstanty.POLE_FILTRU));
-					okno.setVisible(false);
-					getContentPane().removeAll();
-					okno.nastavZobrazeni(false);
-					okno.revalidate();
-					okno.repaint();
-					okno.setVisible(true);
+					restartOkna();
+
 				} catch (FileNotFoundException e1) {
 					JOptionPane.showMessageDialog(null, Konstanty.POPISY.getProperty("chybaSoubor")
 							+ Konstanty.NAZEV_SOUBORU_POPISU_CZECH + Konstanty.POPISY.getProperty("chybaSoubor2"));
@@ -1486,6 +1484,37 @@ public class OknoHlavni extends JFrame {
 		for (int i = 0; i < listaTlacitekSmazaniFiltru.getComponentCount(); i++) {
 			listaTlacitekSmazaniFiltru.getComponent(i).setEnabled(true);
 		}
+	}
+	
+	/**
+	 * Metoda sloužící pro restart hlavního okna a nového načtení konfigurací.
+	 */
+	private void restartOkna() {
+		setVisible(false);
+		Konstanty.CITAC_PROGRESU = 0;
+		Thread t1 = new Thread(new Runnable() {
+			public void run() {
+				OknoProgresNacitani oknoProgres = new OknoProgresNacitani();
+				while (Konstanty.CITAC_PROGRESU <= Konstanty.POCET_KROKU_PROGRESU) {
+					oknoProgres.nastavProgres();
+					if (Konstanty.CITAC_PROGRESU >= Konstanty.POCET_KROKU_PROGRESU) {
+						break;
+					}
+					Thread.yield();
+				}
+				oknoProgres.setVisible(false);
+			}
+		});
+
+		/* vlákno spustí hlavní okno programu */
+		Thread t2 = new Thread(new Runnable() {
+			public void run() {
+				new OknoHlavni(Konstanty.PRIPOJENI);
+			}
+		});
+		t1.start();
+		t2.start();
+		dispose();
 	}
 
 }
