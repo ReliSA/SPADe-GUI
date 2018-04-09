@@ -10,6 +10,7 @@ import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
+
 import ostatni.Konstanty;
 
 /**
@@ -19,7 +20,7 @@ public class ColorChooserButton extends JButton {
 
 	private static final long serialVersionUID = 4240004211439922869L;
 	private Color current; // právě zvolená barva
-	private List<ColorChangedListener> listeners = new ArrayList<ColorChangedListener>();
+	private List<ActionListener> listeners = new ArrayList<ActionListener>(); // seznam listenerů
 
 	/**
 	 * Konstruktor třídy
@@ -55,9 +56,9 @@ public class ColorChooserButton extends JButton {
 	 * @param newColor nová barva
 	 */
 	public void setSelectedColor(Color newColor) {
-		setSelectedColor(newColor, true);
+		setSelectedColor(newColor, true);	
 	}
-
+	
 	/**
 	 * Nastaví novou barvu colorpickeru
 	 * 
@@ -71,30 +72,24 @@ public class ColorChooserButton extends JButton {
 
 		current = newColor;
 
-		setIcon(createIcon(current, this.getWidth() - 10, this.getHeight() - 10));
+		setIcon(createIcon(current, 60, 13));
 
 		repaint();
 
 		if (notify) {
-			for (ColorChangedListener l : listeners) {
-				l.colorChanged(newColor);
+			for (ActionListener l : listeners) {
+				l.actionPerformed(null);
 			}
 		}
 	}
 
-	/**
-	 * Rozhraní ColorChangedListener
-	 */
-	public static interface ColorChangedListener {
-		public void colorChanged(Color newColor);
-	}
 
 	/**
 	 * Přidá nový ColorChangedListener
 	 * 
 	 * @param toAdd ColorChangedListener pro přidání
 	 */
-	public void addColorChangedListener(ColorChangedListener toAdd) {
+	public void addColorChangedListener(ActionListener toAdd) {
 		listeners.add(toAdd);
 	}
 

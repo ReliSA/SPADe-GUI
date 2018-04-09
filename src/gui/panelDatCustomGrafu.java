@@ -50,18 +50,19 @@ public class panelDatCustomGrafu extends JPanel {
 		this.nazev.setText(nazev);
 		Font font = new Font("Courier", Font.BOLD, 12);
 		this.nazev.setFont(font);
-		this.nazev.setHorizontalAlignment(SwingConstants.CENTER);
-		this.add(this.nazev);		
+		this.nazev.setHorizontalAlignment(SwingConstants.CENTER);			
 		if (!nazev.equals("detected")) {
 			this.add(pouzit);
 			 this.add(typGrafu);
 			 this.add(colorPicker);
+			 this.add(this.nazev);
 			nastavAkce();
 		}
 		else {
 			this.add(new JLabel());
 			this.add(pouzit);
 			this.add(new JLabel());
+			this.add(this.nazev);
 		}
 		this.nazev.setBorder(new MatteBorder(1,0,1,0, Color.BLACK));
 		typGrafu.setBorder(new MatteBorder(1,0,1,0, Color.BLACK));
@@ -94,11 +95,12 @@ public class panelDatCustomGrafu extends JPanel {
 		Font font = new Font("Courier", Font.BOLD, 12);
 		this.nazev.setFont(font);
 		this.nazev.setHorizontalAlignment(SwingConstants.CENTER);
-		this.add(this.nazev);		
+						
+		this.add(new JLabel());
+		this.add(new JLabel());
+		this.add(new JLabel());
 		
-		this.add(new JLabel());
-		this.add(new JLabel());
-		this.add(new JLabel());
+		this.add(this.nazev);
 		
 		this.nazev.setBorder(new MatteBorder(1,0,1,0, Color.BLACK));
 		this.setBorder(BorderFactory.createLineBorder(Color.BLACK,1));
@@ -112,12 +114,24 @@ public class panelDatCustomGrafu extends JPanel {
 		} 
 	}
 
+	
+	/**
+	 * Nastaví listenery pro zobrazování náhledu grafu
+	 * @param listener
+	 */
+	public void nastavListeneryPreview(ActionListener listener) {
+		pouzit.addActionListener(listener);
+		typGrafu.addActionListener(listener);
+		colorPicker.addColorChangedListener(listener);
+	}
+	
 	/**
 	 * Vrací zvolený typ grafu
 	 * 
 	 * @return typ grafu
 	 */
 	public int getTyp() {
+		System.out.println(this.typGrafu.getSelectedIndex());
 		return this.typGrafu.getSelectedIndex();
 	}
 
@@ -176,12 +190,13 @@ public class panelDatCustomGrafu extends JPanel {
 					lblBarva.setVisible(false);
 					colorPicker.setVisible(false);
 
-					for (int i = 0; i < container.getComponentCount(); i++) {
+					for (int i = 1; i < container.getComponentCount(); i++) {
+
 						container.getComponent(i).setVisible(false);
 						((panelDatCustomGrafu) container.getComponent(i)).setPouzit(false);
 					}
 
-					container.setComponentZOrder(panel, 0);
+					container.setComponentZOrder(panel, 1);
 					panel.setVisible(true);
 					((panelDatCustomGrafu) panel).setPouzit(true);
 
