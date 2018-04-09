@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 import data.sablonaCustomGrafu;
+import ostatni.Konstanty;
 
 public class tlacitkoEditaceGrafu extends JMenuItem implements ActionListener {
 
@@ -13,7 +14,7 @@ public class tlacitkoEditaceGrafu extends JMenuItem implements ActionListener {
 	public tlacitkoEditaceGrafu(sablonaCustomGrafu sablona) {
 		super();
 		this.sablona=sablona;
-		this.setText("Edituj graf");	
+		this.setText(Konstanty.POPISY.getProperty("edituj"));	
 		this.addActionListener(this);
 	}
 

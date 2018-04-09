@@ -64,12 +64,14 @@ public class PanelProjektu extends JPanel {
 	 * 
 	 * @param projekt aktuálně vybraný projekt
 	 */
-	public PanelProjektu(Projekt projekt) {
+	public PanelProjektu(Projekt projekt,boolean nacti) {
 		super();
 		this.setBackground(Color.WHITE);
 
 		this.projekt = projekt;
-		this.projekt.nactiData();
+		if (nacti) {
+			this.projekt.nactiData();
+		}		
 		this.nastavZobrazeni();
 		this.nastavAkce();
 		Ukladani.setPanelProjektu(this);
@@ -566,6 +568,29 @@ public class PanelProjektu extends JPanel {
 		this.panelFiltrySipka.remove(panel);
 		this.revalidate();
 	}
+	
+	/**
+	 * Metoda pro zobrazení panelu statistik
+	 * @param panel panel filtrů
+	 */
+	public void zobrazSchovejStatistiky() {
+		if (statistikyVisible == false) {
+			panelStatistikSipka.add(panelStatistik);
+			statistikyVisible = true;
+			btSipkaStatistiky.setText("<");
+			panelStatistikSipka.revalidate();
+		} else {
+			panelStatistikSipka.remove(panelStatistik);
+			statistikyVisible = false;
+			btSipkaStatistiky.setText(">");
+			panelStatistikSipka.revalidate();
+		}
+		this.revalidate();
+	}
+	
+	public boolean getStatistikyVisible(){
+		return statistikyVisible;
+	}
 
 	/**
 	 * Nastaví akce komponentám panelu
@@ -575,17 +600,7 @@ public class PanelProjektu extends JPanel {
 		/* akce pro schovani panelu statistik */
 		ActionListener actZobrazeniStatistikButton = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (statistikyVisible == false) {
-					panelStatistikSipka.add(panelStatistik);
-					statistikyVisible = true;
-					btSipkaStatistiky.setText("<");
-					panelStatistikSipka.revalidate();
-				} else {
-					panelStatistikSipka.remove(panelStatistik);
-					statistikyVisible = false;
-					btSipkaStatistiky.setText(">");
-					panelStatistikSipka.revalidate();
-				}
+				zobrazSchovejStatistiky();
 			}
 		};
 

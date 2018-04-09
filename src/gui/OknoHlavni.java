@@ -64,8 +64,8 @@ public class OknoHlavni extends JFrame {
 	private JComboBox<String> cbTypPodfiltru = new JComboBox<String>(Konstanty.POLE_PODFILTRU); // seznam možných
 																								// podfiltrů úkolu
 	private JPanel pnBoxFiltru = new JPanel(); // box s vybranými filtry
-	private JButton btZapniFiltr = new JButton(Konstanty.POPISY.getProperty("tlacitkoZapniFiltr")); // tlačítko pro
-																									// načtení filtrů
+	private JButton btZapniFiltr;// tlačítko pro
+									// načtení filtrů
 	private JButton btSipkaFiltry; // tlačítko pro schování panelu filtrů
 	private JScrollPane scScrollFiltru; // scrollpanel pro filtry
 
@@ -86,10 +86,10 @@ public class OknoHlavni extends JFrame {
 	private JMenuItem czech; // Tlačítko horního menu pro přepnutí programu do češtiny
 	private JMenuItem english; // Tlačítko horního menu pro přepnutí programu do angličtiny
 	private JCheckBoxMenuItem filtry; // Checkbox pro nastavení zda se má zobrazovat
-	// private JFrame frameCustomGrafu = new JFrame(); //odkaz na frame vytvoreni
-	// custom grafu
+	private JCheckBoxMenuItem statistikyMenu;
 	private int polohaPaneluUkol; // poloha panelu filtru úkol v panelu filtrů
-	sablonaCustomGrafu ulozeni = null;
+	private sablonaCustomGrafu ulozeni = null;
+	private OknoHlavni okno = this;
 
 	/**
 	 * Konstruktor třídy, naplní ve třídě konstant připojení, načte projekty a
@@ -102,7 +102,7 @@ public class OknoHlavni extends JFrame {
 		Konstanty.PRIPOJENI = pripojeni;
 		Konstanty.projektVyber = lsSeznamProjektu;
 		nactiProjekty();
-		nastavZobrazeni();
+		nastavZobrazeni(true);
 		this.setVisible(true);
 	}
 
@@ -135,9 +135,10 @@ public class OknoHlavni extends JFrame {
 	/**
 	 * Nastaví zobrazení okna
 	 */
-	private void nastavZobrazeni() {
+	private void nastavZobrazeni(boolean nacti) {
 		nastavOkno();
 
+		btZapniFiltr = new JButton(Konstanty.POPISY.getProperty("tlacitkoZapniFiltr"));
 		fileMenu = new JMenu(Konstanty.POPISY.getProperty("menuSoubor"));
 		customGrafMenu = new JMenu(Konstanty.POPISY.getProperty("menuCustomGraf"));
 		settingsMenu = new JMenu(Konstanty.POPISY.getProperty("menuNastaveni"));
@@ -155,14 +156,14 @@ public class OknoHlavni extends JFrame {
 		czech = new JMenuItem(Konstanty.POPISY.getProperty("menuCestina"));
 		english = new JMenuItem(Konstanty.POPISY.getProperty("menuAnglictina"));
 		filtry = new JCheckBoxMenuItem(Konstanty.POPISY.getProperty("filtryTrue"), false);
+		statistikyMenu = new JCheckBoxMenuItem(Konstanty.POPISY.getProperty("zobrazStatistiky"), true);
 
 		JLabel nadpis = new JLabel(Konstanty.POPISY.getProperty("nadpisFiltru"));
-		panelGrafu = new PanelProjektu(this.getProjekt());
 		panelMenu = new JPanel();
 		panelProjektMenu = new JPanel(new BorderLayout());
 		panelMenu.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
 		JPanel pnFiltr = new JPanel();
-
+		panelGrafu = new PanelProjektu(this.getProjekt(), nacti);
 		menuBar = new JMenuBar();
 		scScrollFiltru = new JScrollPane(pnBoxFiltru, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -199,6 +200,7 @@ public class OknoHlavni extends JFrame {
 		menuBar.add(settingsMenu);
 		settingsMenu.add(languageMenu);
 		settingsMenu.add(filtry);
+		settingsMenu.add(statistikyMenu);
 		fileMenu.add(exitAction);
 		importExportMenu.add(importGrafy);
 		importExportMenu.add(new JSeparator());
@@ -238,6 +240,7 @@ public class OknoHlavni extends JFrame {
 		/* akce při změně projektu v panelu menu */
 		ActionListener actZmenaProjektu = new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+
 				try {
 					/* vlákno zobrazuje okno s progresem načítání */
 					Thread t1 = new Thread(new Runnable() {
@@ -250,8 +253,8 @@ public class OknoHlavni extends JFrame {
 							panelGrafu.statistikyVisible = true;
 							zakazTlacitka();
 							boolean ulozeniCustomGrafu = false;
-							
-							if (OknoCustomGraf.instance != null) {								//Uloží data pro vytvoření custom grafu
+
+							if (OknoCustomGraf.instance != null) { // Uloží data pro vytvoření custom grafu
 								if (OknoCustomGraf.instance.isVisible()) {
 									ulozeni = OknoCustomGraf.instance.ulozNastaveni();
 									ulozeni.setIterace(-1);
@@ -285,8 +288,8 @@ public class OknoHlavni extends JFrame {
 							btZapniFiltr.setEnabled(true);
 							povolTlacitka();
 							oknoProgres.setVisible(false);
-							
-							if (ulozeniCustomGrafu) {											//Otevře okno pro vytvoření custom grafu
+
+							if (ulozeniCustomGrafu) { // Otevře okno pro vytvoření custom grafu
 								SwingUtilities.invokeLater(() -> {
 									OknoCustomGraf example = new OknoCustomGraf(ulozeni, getProjekt());
 									example.setLocationRelativeTo(null);
@@ -492,8 +495,8 @@ public class OknoHlavni extends JFrame {
 							filtry.setSelected(false);
 							panelGrafu.statistikyVisible = true;
 							pnBoxFiltru.revalidate();
+							btSipkaFiltry.setText("v");
 							panelGrafu.panelFiltrySipka.add(btSipkaFiltry, BorderLayout.SOUTH);
-
 						}
 
 					});
@@ -862,7 +865,7 @@ public class OknoHlavni extends JFrame {
 				}
 
 				else {
-
+					Konstanty.CITAC_PROGRESU = 0;
 					try {
 						/* vlákno zobrazuje okno s progresem načítání */
 						Thread t1 = new Thread(new Runnable() {
@@ -1105,7 +1108,12 @@ public class OknoHlavni extends JFrame {
 							new InputStreamReader(new FileInputStream(Konstanty.NAZEV_SOUBORU_POPISU_ENGLISH), "UTF8"));
 					Konstanty.nastavPopisComboBox();
 					cbTypFiltru.setModel(new DefaultComboBoxModel(Konstanty.POLE_FILTRU));
-					restartOkna();
+					okno.setVisible(false);
+					getContentPane().removeAll();
+					okno.nastavZobrazeni(false);
+					okno.revalidate();
+					okno.repaint();
+					okno.setVisible(true);
 
 				} catch (FileNotFoundException e1) {
 					JOptionPane.showMessageDialog(null, Konstanty.POPISY.getProperty("chybaSoubor")
@@ -1133,8 +1141,12 @@ public class OknoHlavni extends JFrame {
 							new InputStreamReader(new FileInputStream(Konstanty.NAZEV_SOUBORU_POPISU_CZECH), "UTF8"));
 					Konstanty.nastavPopisComboBox();
 					cbTypFiltru.setModel(new DefaultComboBoxModel(Konstanty.POLE_FILTRU));
-					restartOkna();
-
+					okno.setVisible(false);
+					getContentPane().removeAll();
+					okno.nastavZobrazeni(false);
+					okno.revalidate();
+					okno.repaint();
+					okno.setVisible(true);
 				} catch (FileNotFoundException e1) {
 					JOptionPane.showMessageDialog(null, Konstanty.POPISY.getProperty("chybaSoubor")
 							+ Konstanty.NAZEV_SOUBORU_POPISU_CZECH + Konstanty.POPISY.getProperty("chybaSoubor2"));
@@ -1151,6 +1163,14 @@ public class OknoHlavni extends JFrame {
 			}
 		};
 
+		/* akce pro schování panelu filtrů z horního menu */
+		ActionListener actZobrazSchovejStatistiky = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				statistikyMenu.setSelected(!panelGrafu.getStatistikyVisible());
+				panelGrafu.zobrazSchovejStatistiky();
+			}
+		};
+		
 		/* akce pro schování panelu filtrů z horního menu */
 		ActionListener actZobrazeniFiltruMenu = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -1261,6 +1281,7 @@ public class OknoHlavni extends JFrame {
 		exportProjekt.addActionListener(actExportProjekt);
 		importGrafy.addActionListener(actImportGrafu);
 		removeChartProject.addActionListener(actRemoveChartProject);
+		statistikyMenu.addActionListener(actZobrazSchovejStatistiky);
 
 		this.addComponentListener(actResizePaneluGrafu);
 		this.addWindowListener(actUkonceniOkna);
@@ -1353,6 +1374,7 @@ public class OknoHlavni extends JFrame {
 			if (!(listaTlacitekSmazaniFiltru.getComponent(0).getName()
 					.equals(Konstanty.POPISY.getProperty("smazVse")))) {
 				JButton tlacitkoMazaniVse = new JButton();
+				tlacitkoMazaniVse.setFont(Konstanty.FONT_TLACITKA);
 				tlacitkoMazaniVse.setName(Konstanty.POPISY.getProperty("smazVse"));
 				tlacitkoMazaniVse.setText(Konstanty.POPISY.getProperty("smazVse"));
 				tlacitkoMazaniVse.setBackground(Color.WHITE);
@@ -1423,37 +1445,6 @@ public class OknoHlavni extends JFrame {
 			t2.start();
 		}
 	};
-
-	/**
-	 * Metoda sloužící pro restart hlavního okna a nového načtení konfigurací.
-	 */
-	private void restartOkna() {
-		setVisible(false);
-		Konstanty.CITAC_PROGRESU = 0;
-		Thread t1 = new Thread(new Runnable() {
-			public void run() {
-				OknoProgresNacitani oknoProgres = new OknoProgresNacitani();
-				while (Konstanty.CITAC_PROGRESU <= Konstanty.POCET_KROKU_PROGRESU) {
-					oknoProgres.nastavProgres();
-					if (Konstanty.CITAC_PROGRESU >= Konstanty.POCET_KROKU_PROGRESU) {
-						break;
-					}
-					Thread.yield();
-				}
-				oknoProgres.setVisible(false);
-			}
-		});
-
-		/* vlákno spustí hlavní okno programu */
-		Thread t2 = new Thread(new Runnable() {
-			public void run() {
-				new OknoHlavni(Konstanty.PRIPOJENI);
-			}
-		});
-		t1.start();
-		t2.start();
-		dispose();
-	}
 
 	/**
 	 * Zjistí podle názvu filtru, zda je filtr již zadaný

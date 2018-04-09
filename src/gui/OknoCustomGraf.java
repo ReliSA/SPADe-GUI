@@ -14,8 +14,6 @@ import java.util.HashMap;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
 import data.CustomGraf;
@@ -146,7 +144,6 @@ public class OknoCustomGraf extends JFrame {
 
 		this.add(nahled, BorderLayout.SOUTH);
 		this.setMinimumSize(new Dimension(850, 700));
-		this.setVisible(true);
 	}
 
 	/**
@@ -268,7 +265,7 @@ public class OknoCustomGraf extends JFrame {
 	/**
 	 * Metoda dle údajů zvolených v ovládacím menu načte data pro vykreslení grafu
 	 */
-	private void nakresliGraf() {
+	protected void nakresliGraf() {
 
 		DefaultCategoryDataset bary = new DefaultCategoryDataset();
 		DefaultCategoryDataset body = new DefaultCategoryDataset();
@@ -362,9 +359,7 @@ public class OknoCustomGraf extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 
 				sablonaCustomGrafu ulozeni = ulozNastaveni();
-
 				nactiData();
-
 				nactiNastaveni(ulozeni.getSloupce());
 			}
 		};
@@ -446,6 +441,10 @@ public class OknoCustomGraf extends JFrame {
 					seznam);
 		}
 
+	}
+	
+	protected String getNazev() {
+		return tfNazev.getText();
 	}
 
 }

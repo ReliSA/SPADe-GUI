@@ -168,8 +168,11 @@ public class OknoCustomNahled extends JPanel {
 
 		// Akce pro uložení grafu
 		ActionListener actSaveButton = new ActionListener() {
-
+			
 			public void actionPerformed(ActionEvent e) {
+				
+				nazev=okno.getNazev();
+				chart.setTitle(nazev);
 
 				if (nazev.equals("")) { // Kontrola zda název není prázdný
 					JOptionPane.showMessageDialog(null, Konstanty.POPISY.getProperty("prazdnyNazev"),
@@ -190,8 +193,8 @@ public class OknoCustomNahled extends JPanel {
 
 					prepravkaUkladaniCustom prepravka = new prepravkaUkladaniCustom(chart, projectID, typGrafu, nazev, okno.ulozNastaveni());
 					Ukladani.add(prepravka);
-				}
-
+					okno.nakresliGraf();
+				}			
 			}
 		};
 
