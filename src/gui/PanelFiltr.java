@@ -116,7 +116,7 @@ public abstract class PanelFiltr extends JPanel {
 			titulek = Konstanty.POPISY.getProperty("nazevResoluce");
 			this.setBackground(Konstanty.barvaUkol);
 			break;
-		case "Persons":
+		case "People":
 		case "Osoby":
 			titulek = Konstanty.POPISY.getProperty("nazevOsoby");
 			this.setBackground(Konstanty.barvaOsoby);

@@ -355,10 +355,10 @@ public class OknoHlavni extends JFrame {
 											JOptionPane.showMessageDialog(pnBoxFiltru,
 													Konstanty.POPISY.getProperty("chybaVlozPriority"));
 										} else {
-											seznamIdPriorit = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
 											((PanelFiltrCiselnik) pnPanelFiltr)
 													.nactiNovyProjekt((new Priority(getProjekt().getID())).getSeznam());
 											operandy[0] = ((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
+											seznamIdPriorit = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
 										}
 										break;
 									case "Severity":
@@ -366,10 +366,10 @@ public class OknoHlavni extends JFrame {
 											JOptionPane.showMessageDialog(pnBoxFiltru,
 													Konstanty.POPISY.getProperty("chybaVlozSeverity"));
 										} else {
-											seznamIdSeverit = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
 											((PanelFiltrCiselnik) pnPanelFiltr)
 													.nactiNovyProjekt((new Severity(getProjekt().getID())).getSeznam());
 											operandy[1] = ((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
+											seznamIdSeverit = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
 										}
 										break;
 									case "Status":
@@ -378,10 +378,10 @@ public class OknoHlavni extends JFrame {
 											JOptionPane.showMessageDialog(pnBoxFiltru,
 													Konstanty.POPISY.getProperty("chybaVlozStatusy"));
 										} else {
-											seznamIdStatusu = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
 											((PanelFiltrCiselnik) pnPanelFiltr)
 													.nactiNovyProjekt((new Status(getProjekt().getID())).getSeznam());
 											operandy[2] = ((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
+											seznamIdStatusu = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
 										}
 										break;
 									case "Types":
@@ -390,10 +390,10 @@ public class OknoHlavni extends JFrame {
 											JOptionPane.showMessageDialog(pnBoxFiltru,
 													Konstanty.POPISY.getProperty("chybaVlozTypy"));
 										} else {
-											seznamIdTypu = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
 											((PanelFiltrCiselnik) pnPanelFiltr)
 													.nactiNovyProjekt((new Typ(getProjekt().getID())).getSeznam());
 											operandy[3] = ((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
+											seznamIdTypu = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
 										}
 										break;
 									case "Resolution":
@@ -402,23 +402,23 @@ public class OknoHlavni extends JFrame {
 											JOptionPane.showMessageDialog(pnBoxFiltru,
 													Konstanty.POPISY.getProperty("chybaVlozResoluce"));
 										} else {
-											seznamIdResoluci = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
 											((PanelFiltrCiselnik) pnPanelFiltr)
 													.nactiNovyProjekt((new Resoluce(getProjekt().getID())).getSeznam());
 											operandy[4] = ((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
+											seznamIdResoluci = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
 										}
 										break;
-									case "Persons":
+									case "People":
 									case "Osoby":
 										if ((new Osoby(getProjekt().getID())).getSeznam().isEmpty()) {
 											JOptionPane.showMessageDialog(pnBoxFiltru,
 													Konstanty.POPISY.getProperty("chybaVlozOsoby"));
 										} else {
 											((PanelFiltr) pnPanelFiltr).lsSeznamFiltr.clearSelection();
-											seznamIdOsob = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
 											((PanelFiltrCiselnik) pnPanelFiltr)
 													.nactiNovyProjekt((new Osoby(getProjekt().getID())).getSeznam());
 											operandy[5] = ((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
+											seznamIdOsob = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
 										}
 										break;
 									case "Phase":
@@ -805,7 +805,7 @@ public class OknoHlavni extends JFrame {
 										seznamIdResoluci = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
 										operandy[4] = ((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
 										break;
-									case "Persons":
+									case "People":
 									case "Osoby":
 										seznamIdOsob = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
 										operandy[5] = ((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
@@ -980,7 +980,7 @@ public class OknoHlavni extends JFrame {
 													pnBoxFiltru.getComponents()[i]).addActionListener(actSmazaniFiltru);
 											operandy[4] = ((PanelFiltrCiselnik) pnPanelFiltr).getLogOperand();
 											break;
-										case "Persons":
+										case "People":
 										case "Osoby":
 											seznamIdOsob = ((PanelFiltrCiselnik) pnPanelFiltr).getSeznamId();
 											vytvorTlacitkoMazaniFiltru(
@@ -1343,7 +1343,7 @@ public class OknoHlavni extends JFrame {
 		case "Rezoluce":
 			tlacitkoMazaniFilru.setBackground(Konstanty.barvaUkol);
 			break;
-		case "Persons":
+		case "People":
 		case "Osoby":
 			tlacitkoMazaniFilru.setBackground(Konstanty.barvaOsoby);
 			break;
