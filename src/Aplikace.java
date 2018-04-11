@@ -25,11 +25,11 @@ public class Aplikace {
 			Konstanty.nastavPopisComboBox();
 			Ukladani.load();
 		} catch (FileNotFoundException e) {
-			JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaSoubor")+ Konstanty.NAZEV_SOUBORU_POPISU_ENGLISH +Konstanty.POPISY.getProperty("chybaSoubor2"));			
+			JOptionPane.showMessageDialog(null , "Unable to find file "+ Konstanty.NAZEV_SOUBORU_POPISU_ENGLISH + " needed to load descriptions! The application will not start!");			
 			e.printStackTrace();
 			System.exit(0);
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaNacitaniSouboru2")+ Konstanty.NAZEV_SOUBORU_POPISU_ENGLISH +Konstanty.POPISY.getProperty("chybaNacitaniSouboru2"));			
+			JOptionPane.showMessageDialog(null , "Error loading file"+ Konstanty.NAZEV_SOUBORU_POPISU_ENGLISH + "needed to load descriptions! The application will not start!");			
 			e.printStackTrace();
 			System.exit(0);
 		} catch (Exception e) {
