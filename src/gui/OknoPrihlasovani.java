@@ -31,7 +31,7 @@ public class OknoPrihlasovani extends JFrame {
 		setSize(Konstanty.VELIKOST_PRIHLASOVACIHO_OKNA);		
     	setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		setTitle(Konstanty.POPISY.getProperty("titlePrihlaseni"));
+		this.setTitle(Konstanty.POPISY.getProperty("titlePrihlaseni"));
 	
 		JLabel lblLogin = new JLabel(Konstanty.POPISY.getProperty("popisLogin"));
 		JLabel lblHeslo = new JLabel(Konstanty.POPISY.getProperty("popisHeslo"));
@@ -122,7 +122,8 @@ public class OknoPrihlasovani extends JFrame {
 		/*akce po kliknutí na tlačítko přihlásit*/
 		ActionListener actPrihlasit = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+				tfLogin.setText("ppicha");
+				pfHeslo.setText("Phjdhg3h3gws.s");
 				try{
 					if(tfLogin.getText().equals("") || pfHeslo.getPassword().length == 0 ){
 						JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaUdaju"));	
