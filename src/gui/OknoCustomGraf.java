@@ -16,12 +16,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
-import data.CustomGraf;
+
 import data.Projekt;
 import data.Segment;
-import data.nastaveniCustomSloupec;
-import data.sablonaCustomGrafu;
 import data.ciselnik.Osoby;
+import data.custom.CustomGraf;
+import data.custom.nastaveniCustomSloupec;
+import data.custom.sablonaCustomGrafu;
 import data.polozky.PolozkaCiselnik;
 import databaze.CustomGrafDAO;
 import ostatni.Konstanty;

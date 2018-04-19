@@ -1,7 +1,9 @@
-package data;
+package data.custom;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+
+import data.Projekt;
 
 /**
  * Třída sloužící pro uložení nastavení vykreslení custom grafu

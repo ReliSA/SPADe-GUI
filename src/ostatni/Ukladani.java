@@ -15,8 +15,8 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import data.Projekt;
-import data.prepravkaUkladaniCustom;
-import data.sablonaCustomGrafu;
+import data.custom.prepravkaUkladaniCustom;
+import data.custom.sablonaCustomGrafu;
 import gui.DropChartPanel;
 import gui.OknoCustomGraf;
 import gui.PanelProjektu;
@@ -28,11 +28,9 @@ import gui.PanelGrafuCustom;
  */
 public class Ukladani {
 
-	private static ArrayList<prepravkaUkladaniCustom> save = new ArrayList<prepravkaUkladaniCustom>(); // Arraylist
-																										// všech custom
-																										// grafů
+	private static ArrayList<prepravkaUkladaniCustom> save = new ArrayList<prepravkaUkladaniCustom>(); // Arraylist všech custom grafů
 	private static ArrayList<sablonaCustomGrafu> sablony = new ArrayList<sablonaCustomGrafu>();
-	private static PanelGrafuCustom panelMiniatur; // odkaz na panel miniatur custom grafů
+	private static PanelGrafuCustom panelMiniatur; // odkaz na panel miniatur custom grafůTrida U
 	private static JMenu menuMazaniGrafu; // odkaz na položku JMenu smaž graf
 	private static JMenu menuVytvoreniSablona; // odkaz na položku JMenu smaž graf
 	private static JMenu menuSmazaniSablona; // odkaz na položku JMenu smaž graf
@@ -41,8 +39,7 @@ public class Ukladani {
 	/**
 	 * Přidá přepravku s custom grafem do arraylistu a miniaturu do panelu miniatur
 	 * 
-	 * @param prepravka
-	 *            pro přidání
+	 * @param prepravka pro přidání
 	 */
 	public static void add(prepravkaUkladaniCustom prepravka) {
 		save.add(prepravka);

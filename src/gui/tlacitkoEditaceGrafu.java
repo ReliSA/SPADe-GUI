@@ -4,7 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
-import data.sablonaCustomGrafu;
+
+import data.custom.sablonaCustomGrafu;
 import ostatni.Konstanty;
 
 /**

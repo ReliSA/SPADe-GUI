@@ -1,4 +1,4 @@
-package data;
+package data.custom;
 
 import java.io.Serializable;
 import org.jfree.chart.JFreeChart;

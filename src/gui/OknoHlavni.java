@@ -43,6 +43,7 @@ import ostatni.Konstanty;
 import ostatni.Ukladani;
 import data.*;
 import data.ciselnik.*;
+import data.custom.sablonaCustomGrafu;
 import databaze.IProjektDAO;
 import databaze.ProjektDAO;
 

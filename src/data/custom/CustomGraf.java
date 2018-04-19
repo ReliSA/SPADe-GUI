@@ -1,4 +1,4 @@
-package data;
+package data.custom;
 
 import java.util.ArrayList;
 import java.util.Collections;

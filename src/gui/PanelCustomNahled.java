@@ -25,8 +25,9 @@ import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.chart.renderer.category.StandardBarPainter;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
-import data.prepravkaUkladaniCustom;
-import data.sablonaCustomGrafu;
+
+import data.custom.prepravkaUkladaniCustom;
+import data.custom.sablonaCustomGrafu;
 import ostatni.Konstanty;
 import ostatni.Ukladani;
 
