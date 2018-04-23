@@ -11,7 +11,7 @@ import ostatni.Konstanty;
 /**
  * Tlačítko pro otevření editace uloženého custom grafu
  */
-public class tlacitkoEditaceGrafu extends JMenuItem implements ActionListener {
+public class TlacitkoEditaceGrafu extends JMenuItem implements ActionListener {
 
 	private static final long serialVersionUID = -1349817940520879175L;
 	private sablonaCustomGrafu sablona;	// Sablona pro vytvoření grafu
@@ -20,7 +20,7 @@ public class tlacitkoEditaceGrafu extends JMenuItem implements ActionListener {
 	 * Kontruktor třídy
 	 * @param sablona sablona pro vykreslení grafu
 	 */
-	public tlacitkoEditaceGrafu(sablonaCustomGrafu sablona) {
+	public TlacitkoEditaceGrafu(sablonaCustomGrafu sablona) {
 		super();
 		this.sablona=sablona;
 		this.setText(Konstanty.POPISY.getProperty("edituj"));	

@@ -52,15 +52,6 @@ public class DropChartPanel extends ChartPanel {
 		this.setRangeZoomable(false);
 		this.menu = this.getPopupMenu();
 	}
-
-	public DropChartPanel(JFreeChart chart,int typGrafu) {
-		super(chart);
-		this.typGrafu = typGrafu;
-		this.typPanelu = 14;
-		this.setDomainZoomable(false);
-		this.setRangeZoomable(false);
-		this.menu = this.getPopupMenu();
-	}
 	
 	/**
 	 * Metoda pro vytvoření a přidání drag and drop handleru.

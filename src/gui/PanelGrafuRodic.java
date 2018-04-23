@@ -76,6 +76,9 @@ public abstract  class PanelGrafuRodic extends JPanel {
 		;
 	};
 
+	/**
+	 * Vrátí miniaturu grafu zpet do příslušného panelu
+	 */
 	protected void vratGrafMiniatura(DropChartPanel panel) {
 
 		panel.setDragable(true);

@@ -20,7 +20,7 @@ import data.custom.sablonaCustomGrafu;
 import gui.DropChartPanel;
 import gui.OknoCustomGraf;
 import gui.PanelProjektu;
-import gui.tlacitkoEditaceGrafu;
+import gui.TlacitkoEditaceGrafu;
 import gui.PanelGrafuCustom;
 
 /**
@@ -46,10 +46,10 @@ public class Ukladani {
 		JMenuItem item = new JMenuItem(prepravka.getNazev());
 		item.addActionListener(actSmazaniGrafuJmeno);
 		menuMazaniGrafu.add(item);
-		DropChartPanel graf = new DropChartPanel(prepravka.getPanel(), prepravka.getTypGrafu());
+		DropChartPanel graf = new DropChartPanel(prepravka.getPanel(), prepravka.getTypGrafu(),Konstanty.CUSTOM);
 		graf.setName(prepravka.getNazev());
 
-		graf.getMenu().add(new tlacitkoEditaceGrafu(prepravka.getNastaveni()));
+		graf.getMenu().add(new TlacitkoEditaceGrafu(prepravka.getNastaveni()));
 
 		panelMiniatur.vlozGraf(graf);
 		save();
@@ -244,10 +244,10 @@ public class Ukladani {
 		for (Iterator<prepravkaUkladaniCustom> iterator = save.iterator(); iterator.hasNext();) {
 			prepravkaUkladaniCustom prepravka = (prepravkaUkladaniCustom) iterator.next();
 			if (prepravka.getProjectID() == projektID) {
-				graf = new DropChartPanel(prepravka.getPanel(), prepravka.getTypGrafu());
+				graf = new DropChartPanel(prepravka.getPanel(), prepravka.getTypGrafu(),Konstanty.CUSTOM);
 				graf.setName(prepravka.getNazev());
 
-				graf.getMenu().add(new tlacitkoEditaceGrafu(prepravka.getNastaveni()));
+				graf.getMenu().add(new TlacitkoEditaceGrafu(prepravka.getNastaveni()));
 
 				JMenuItem item = new JMenuItem(prepravka.getNazev());
 				item.addActionListener(actSmazaniGrafuJmeno);
