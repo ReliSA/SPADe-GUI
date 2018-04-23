@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Toolkit;
 import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -16,8 +15,8 @@ import gui.ComboBoxDynamicky;
  * Třída konstant
  */
 public class Konstanty {
+	
 	/*----------------Velikosti komponent------------------*/
-
 	public static final Dimension VELIKOST_PRIHLASOVACIHO_OKNA = new Dimension(380, 180);
 	public static final Dimension VELIKOST_NACITACIHO_OKNA = new Dimension(500, 150);
 	public static final Dimension MINIMALNI_VELIKOST_OKNA = new Dimension(750, 750);
@@ -41,7 +40,7 @@ public class Konstanty {
 	public static final Dimension VELIKOST_CTVRTINOVA_SIRKA = new Dimension(150, 23);
 	public static final Dimension VELIKOST_COLOR_PICKER = new Dimension(70, 23);
 		
-	/*-------------Nastavení grafů------------------*/
+	/*-------------Nastavení fontů grafů------------------*/
 	public static final FlowLayout FLOW_LAYOUT = new FlowLayout(FlowLayout.CENTER, 10, 10);
 	
 	public static final Font FONT_NADPIS = new Font("TimesRoman", Font.BOLD, 25);
@@ -51,7 +50,7 @@ public class Konstanty {
 	public static final Font FONT_TLACITKA = new Font("TimesRoman", Font.BOLD, 12);
 	/*-----------------------------------------------*/
 	
-	/*--------Nastavení panelu statistik-------------*/
+	/*--------Nastavení fontů panelu statistik-------------*/
 	public static final Font FONT_NADPIS_STATISTIK = new Font("Dialog", Font.BOLD, 12);
 	public static final Font FONT_STATISTIK = new Font("Dialog", Font.PLAIN, 12);
 	/*-----------------------------------------------*/

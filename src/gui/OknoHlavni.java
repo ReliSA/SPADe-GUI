@@ -57,15 +57,12 @@ public class OknoHlavni extends JFrame {
 	private JPanel panelProjektMenu; // panel pro výběr projektu
 	private PanelProjektu panelGrafu; // centrální panel zobrazující statistiky a grafy
 
-	private DefaultComboBoxModel<Projekt> modelProjekt = new DefaultComboBoxModel<Projekt>(); // model pro seznam
-																								// projektů
+	private DefaultComboBoxModel<Projekt> modelProjekt = new DefaultComboBoxModel<Projekt>(); // model pro seznam projektů
 	private ComboBoxDynamicky lsSeznamProjektu = new ComboBoxDynamicky(modelProjekt); // seznam projektů
 	private JComboBox<String> cbTypFiltru = new JComboBox<String>(Konstanty.POLE_FILTRU); // seznam možných filtrů
-	private JComboBox<String> cbTypPodfiltru = new JComboBox<String>(Konstanty.POLE_PODFILTRU); // seznam možných
-																								// podfiltrů úkolu
+	private JComboBox<String> cbTypPodfiltru = new JComboBox<String>(Konstanty.POLE_PODFILTRU); // seznam možných podfiltrů úkolu
 	private JPanel pnBoxFiltru = new JPanel(); // box s vybranými filtry
-	private JButton btZapniFiltr;// tlačítko pro
-									// načtení filtrů
+	private JButton btZapniFiltr;// tlačítko pro načtení filtrů
 	private JButton btSipkaFiltry; // tlačítko pro schování panelu filtrů
 	private JScrollPane scScrollFiltru; // scrollpanel pro filtry
 
@@ -228,6 +225,7 @@ public class OknoHlavni extends JFrame {
 		this.add(panelProjektMenu, BorderLayout.NORTH);
 		this.add(panelGrafu, BorderLayout.CENTER);
 
+		schovaniSipky();
 		nastavAkce();
 	}
 
@@ -261,6 +259,7 @@ public class OknoHlavni extends JFrame {
 							filtry.setSelected(false);
 							panelGrafu.statistikyVisible = true;
 							lsSeznamProjektu.setEnabled(false);
+							schovaniSipky();
 							zakazTlacitka();
 							boolean ulozeniCustomGrafu = false;
 
@@ -531,7 +530,7 @@ public class OknoHlavni extends JFrame {
 						panelGrafu.zobrazFiltry(scScrollFiltru);
 						filtry.setSelected(true);
 					}
-
+					
 					switch (cbTypFiltru.getSelectedIndex()) { // podle zadaného typu filtru vloží konkrétní panel filtru
 					case 0:
 						/* pokud je panel již vložen, nelze ho znovu dodat */
@@ -607,6 +606,7 @@ public class OknoHlavni extends JFrame {
 					}
 					pnBoxFiltru.revalidate();
 					btSipkaFiltry.setText("ʌ");
+					schovaniSipky();
 				} catch (Exception e1) {
 					JOptionPane.showMessageDialog(null, Konstanty.POPISY.getProperty("chybaVlozFiltr"));
 					e1.printStackTrace();
@@ -719,7 +719,7 @@ public class OknoHlavni extends JFrame {
 				if (listaTlacitekSmazaniFiltru.getComponentCount() == 2) {
 					listaTlacitekSmazaniFiltru.remove(0);
 				}
-
+				
 				listaTlacitekSmazaniFiltru.revalidate();
 				listaTlacitekSmazaniFiltru.repaint();
 
@@ -857,6 +857,7 @@ public class OknoHlavni extends JFrame {
 									operandy[4], seznamIdTypu, operandy[5], seznamIdOsob, seznamIdFazi, seznamIdIteraci,
 									seznamIdAktivit, seznamIdKonfiguraci, seznamIdArtefaktu);
 							panelGrafu.panelFiltrySipka.add(btSipkaFiltry, BorderLayout.SOUTH);
+							schovaniSipky();
 						}
 
 					});
@@ -1052,6 +1053,7 @@ public class OknoHlavni extends JFrame {
 								filtry.setSelected(false);
 								panelGrafu.statistikyVisible = true;
 								btSipkaFiltry.setText("v");
+								schovaniSipky();
 								pnBoxFiltru.revalidate();
 								/* spustí se nastavení podmínek a tím i nové načtení panelu grafů */
 								panelGrafu.setPodminkyProjektu(seznamIdUkolu, operandy[0], seznamIdPriorit, operandy[1],
@@ -1205,7 +1207,6 @@ public class OknoHlavni extends JFrame {
 					JOptionPane.showMessageDialog(null, Konstanty.POPISY.getProperty("zadneFiltry"),
 							Konstanty.POPISY.getProperty("chyba"), JOptionPane.ERROR_MESSAGE);
 				} else {
-
 					if (filtry.isSelected() == false) {
 						panelGrafu.zobrazFiltry(scScrollFiltru);
 						btSipkaFiltry.setText("ʌ");
@@ -1446,6 +1447,7 @@ public class OknoHlavni extends JFrame {
 					pnBoxFiltru.removeAll();
 					panelGrafu.setProjekt(getProjekt());
 					panelGrafu.panelFiltrySipka.add(btSipkaFiltry, BorderLayout.SOUTH);
+					schovaniSipky();
 					listaTlacitekSmazaniFiltru.revalidate();
 					listaTlacitekSmazaniFiltru.repaint();
 				}
@@ -1475,15 +1477,34 @@ public class OknoHlavni extends JFrame {
 		return vystup;
 	}
 
+	/**
+	 * Metoda pro zablokování ovládacích tlačítek během načítaní
+	 */
 	private void zakazTlacitka() {
 		for (int i = 0; i < listaTlacitekSmazaniFiltru.getComponentCount(); i++) {
 			listaTlacitekSmazaniFiltru.getComponent(i).setEnabled(false);
 		}
 	}
 
+	/**
+	 * Metoda pro povolení ovládacích tlačítek během načítaní
+	 */
 	private void povolTlacitka() {
 		for (int i = 0; i < listaTlacitekSmazaniFiltru.getComponentCount(); i++) {
 			listaTlacitekSmazaniFiltru.getComponent(i).setEnabled(true);
+		}
+	}
+	
+	/**
+	 * Metoda pro schování a oběvení sipky filtru, podle poctu zvolených filtrů 
+	 */
+	private void schovaniSipky() {
+		if (pnBoxFiltru.getComponentCount()>0) {
+			btSipkaFiltry.setVisible(true);			
+		}
+		else{
+			btSipkaFiltry.setVisible(false);
+			listaTlacitekSmazaniFiltru.removeAll();
 		}
 	}
 	
