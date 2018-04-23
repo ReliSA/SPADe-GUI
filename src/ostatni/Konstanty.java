@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -16,33 +17,30 @@ import gui.ComboBoxDynamicky;
  */
 public class Konstanty {
 	/*----------------Velikosti komponent------------------*/
-	public static final int SIRKA_OKNA = 1600;
-	public static final int VYSKA_OKNA = 900;
-	public static final int SIRKA_PANELU_MENU = 600;
-	public static final int SIRKA_PANELU_GRAFU = 1800;
-	
-	public static final int VYSKA_PANELU_GRAFU_STANDART = 210;
-	public static final int VYSKA_PANELU_GRAFU_UKOL = 850;
-	
-	public static final Dimension VELIKOST_OKNA = new Dimension(SIRKA_OKNA, VYSKA_OKNA);
+
 	public static final Dimension VELIKOST_PRIHLASOVACIHO_OKNA = new Dimension(380, 180);
 	public static final Dimension VELIKOST_NACITACIHO_OKNA = new Dimension(500, 150);
-	public static final Dimension MINIMALNI_VELIKOST_OKNA = new Dimension(SIRKA_PANELU_MENU + 100, 750);
+	public static final Dimension MINIMALNI_VELIKOST_OKNA = new Dimension(750, 750);
 		
-	public static final Dimension VELIKOST_PANELU = new Dimension(SIRKA_PANELU_GRAFU+40,2 * VYSKA_PANELU_GRAFU_STANDART +475);
-	public static final Dimension VELIKOST_SIPKY_STATISTIKY = new Dimension(15, 2 * VYSKA_PANELU_GRAFU_STANDART +550);
-	public static final Dimension VELIKOST_SIPKY_FILTRY = new Dimension(SIRKA_PANELU_GRAFU, 15);
-	public static final Dimension VELIKOST_PANELU_STANDARD = new Dimension(SIRKA_PANELU_GRAFU, VYSKA_PANELU_GRAFU_STANDART);
-	public static final Dimension VELIKOST_PANELU_UKOL = new Dimension(SIRKA_PANELU_GRAFU, VYSKA_PANELU_GRAFU_UKOL);
-		
-	public static final Dimension VELIKOST_GRAFU = new Dimension(280, 200);
+	public static final int SIRKA_PANELU_GRAFU = 1920;
+	public static final int VYSKA_PANELU_GRAFU = 1080;
 	
+	public static final Dimension VELIKOST_SIPKY_STATISTIKY = new Dimension(15, SIRKA_PANELU_GRAFU);
+	public static final Dimension VELIKOST_SIPKY_FILTRY = new Dimension(VYSKA_PANELU_GRAFU, 15);
+	
+	public static final Dimension VELIKOST_PANELU = new Dimension(1000,930);		
+	public static final Dimension VELIKOST_GRAFU = new Dimension(280, 200);
+	public static final Dimension VELIKOST_SCROL_GRAFU = new Dimension(SIRKA_PANELU_GRAFU, 240);
+	public static final Dimension VELIKOST_FILTRU = new Dimension(270, 225);
+	public static final Dimension VELIKOST_STATISTIK = new Dimension(270, 225);
+	public static final Dimension VELIKOST_PROJEKT_MENU = new Dimension(500, 50);
+		
 	public static final Dimension VELIKOST_SEZNAMU_CELA_SIRKA = new Dimension(230, 80);
 	public static final Dimension VELIKOST_CELA_SIRKA = new Dimension(230, 28);
 	public static final Dimension VELIKOST_POLOVICNI_SIRKA = new Dimension(115, 28);
 	public static final Dimension VELIKOST_CTVRTINOVA_SIRKA = new Dimension(150, 23);
 	public static final Dimension VELIKOST_COLOR_PICKER = new Dimension(70, 23);
-	
+		
 	/*-------------Nastavení grafů------------------*/
 	public static final FlowLayout FLOW_LAYOUT = new FlowLayout(FlowLayout.CENTER, 10, 10);
 	
@@ -173,7 +171,7 @@ public class Konstanty {
 			vystup += ", ?";
 		return vystup;
 	}
-	
+		
 	/**
 	 * Nastaví popisky comboboxu
 	 */

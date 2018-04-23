@@ -3,7 +3,6 @@ package gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Frame;
@@ -180,7 +179,7 @@ public class OknoHlavni extends JFrame {
 		panelProjektMenu.add(panelMenu, BorderLayout.WEST);
 		listaTlacitekSmazaniFiltru = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
 		panelProjektMenu.add(listaTlacitekSmazaniFiltru, BorderLayout.CENTER);
-
+		panelProjektMenu.setPreferredSize(Konstanty.VELIKOST_PROJEKT_MENU);
 		nadpis.setFont(Konstanty.FONT_NADPIS);
 
 		btSipkaFiltry = new JButton("v");
@@ -195,7 +194,7 @@ public class OknoHlavni extends JFrame {
 
 		lsSeznamProjektu.setPreferredSize(Konstanty.VELIKOST_CELA_SIRKA);
 
-		scScrollFiltru.setPreferredSize(new Dimension(270, 225));
+		scScrollFiltru.setPreferredSize(Konstanty.VELIKOST_FILTRU);
 		scScrollFiltru.getVerticalScrollBar().setUnitIncrement(15);
 
 		setJMenuBar(menuBar);
@@ -236,7 +235,6 @@ public class OknoHlavni extends JFrame {
 	 * Nastaví atributy okna a akci po ukončení
 	 */
 	private void nastavOkno() {
-		this.setSize(Konstanty.VELIKOST_OKNA);
 		this.setExtendedState(Frame.MAXIMIZED_BOTH);
 		this.setMinimumSize(Konstanty.MINIMALNI_VELIKOST_OKNA);
 		this.setLocationRelativeTo(null);
@@ -608,6 +606,7 @@ public class OknoHlavni extends JFrame {
 						break;
 					}
 					pnBoxFiltru.revalidate();
+					btSipkaFiltry.setText("ʌ");
 				} catch (Exception e1) {
 					JOptionPane.showMessageDialog(null, Konstanty.POPISY.getProperty("chybaVlozFiltr"));
 					e1.printStackTrace();
@@ -1052,6 +1051,7 @@ public class OknoHlavni extends JFrame {
 								}
 								filtry.setSelected(false);
 								panelGrafu.statistikyVisible = true;
+								btSipkaFiltry.setText("v");
 								pnBoxFiltru.revalidate();
 								/* spustí se nastavení podmínek a tím i nové načtení panelu grafů */
 								panelGrafu.setPodminkyProjektu(seznamIdUkolu, operandy[0], seznamIdPriorit, operandy[1],
@@ -1189,8 +1189,10 @@ public class OknoHlavni extends JFrame {
 				} else {
 					if (filtry.isSelected() == true) {
 						panelGrafu.zobrazFiltry(scScrollFiltru);
+						btSipkaFiltry.setText("ʌ");
 					} else {
 						panelGrafu.schovejFiltry(scScrollFiltru);
+						btSipkaFiltry.setText("v");
 					}
 				}
 			}
@@ -1206,7 +1208,7 @@ public class OknoHlavni extends JFrame {
 
 					if (filtry.isSelected() == false) {
 						panelGrafu.zobrazFiltry(scScrollFiltru);
-						btSipkaFiltry.setText("^");
+						btSipkaFiltry.setText("ʌ");
 						filtry.setSelected(true);
 					} else {
 						panelGrafu.schovejFiltry(scScrollFiltru);

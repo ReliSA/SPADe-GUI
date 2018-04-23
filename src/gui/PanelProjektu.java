@@ -8,6 +8,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
@@ -186,16 +187,12 @@ public class PanelProjektu extends JPanel {
 		JScrollPane scrollUkoly = new JScrollPane(panelUkol);
 		scrollUkoly.getHorizontalScrollBar().setUnitIncrement(25);
 		scrollUkoly.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-		scrollUkoly.setPreferredSize(
-				new Dimension(Konstanty.SIRKA_PANELU_GRAFU + 40, Konstanty.VYSKA_PANELU_GRAFU_STANDART + 40));
-		scrollUkoly.revalidate();
-
+		scrollUkoly.setPreferredSize(Konstanty.VELIKOST_SCROL_GRAFU);
+		
 		JScrollPane scrollCustom = new JScrollPane(panelCustom);
 		scrollCustom.getHorizontalScrollBar().setUnitIncrement(25);
 		scrollCustom.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-		scrollCustom.setPreferredSize(
-				new Dimension(Konstanty.SIRKA_PANELU_GRAFU + 40, Konstanty.VYSKA_PANELU_GRAFU_STANDART + 40));
-		scrollCustom.revalidate();
+		scrollCustom.setPreferredSize(Konstanty.VELIKOST_SCROL_GRAFU);
 
 		JTabbedPane tabbedPanelGrafu = new JTabbedPane();
 		tabbedPanelGrafu.add(Konstanty.POPISY.getProperty("ukoly"), scrollUkoly);

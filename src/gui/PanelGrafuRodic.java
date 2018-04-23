@@ -82,7 +82,6 @@ public abstract  class PanelGrafuRodic extends JPanel {
 		panel.setDomainZoomable(false);
 		panel.setRangeZoomable(false);
 		panel.zobrazLegendu(false);
-		panel.setPreferredSize(Konstanty.VELIKOST_GRAFU);
 		panel.setPopupMenu(null);
 		this.add(panel);
 

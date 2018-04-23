@@ -37,7 +37,6 @@ public class PanelGrafuArtefakt extends PanelGrafuRodic {
 	 * Vytvoří grafy, vloží je do panelu a spustí nastavení zobrazení
 	 */
 	protected void vlozGrafy(){
-		this.setPreferredSize(Konstanty.VELIKOST_PANELU_STANDARD);		
 		this.setBorder(BorderFactory.createTitledBorder(Konstanty.POPISY.getProperty("nazevArtefakty")));
 		
 		DropChartPanel panelGrafu1 = new DropChartPanel(this.getHistogramArtefakty(),Konstanty.HISTOGRAM ,Konstanty.ARTEFAKT);

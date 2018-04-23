@@ -39,7 +39,6 @@ public class PanelGrafuCustom extends PanelGrafuRodic {
 	 * Vloží grafy do panelu a nastaví zobrazení
 	 */
 	public void vlozGraf(DropChartPanel panel) {
-
 		panel.setDragable(true);
 		panel.setDomainZoomable(false);
 		panel.setRangeZoomable(false);

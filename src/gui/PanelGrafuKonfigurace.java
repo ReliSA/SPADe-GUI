@@ -34,16 +34,11 @@ public class PanelGrafuKonfigurace extends PanelGrafuRodic{
 	 * Vytvoří grafy, vloží je do panelu a spustí nastavení zobrazení
 	 */
 	protected void vlozGrafy(){
-		this.setPreferredSize(Konstanty.VELIKOST_PANELU_STANDARD);		
 		this.setBorder(BorderFactory.createTitledBorder(Konstanty.POPISY.getProperty("nazevKonfigurace")));
 		DropChartPanel panelGrafu1 = new DropChartPanel(this.getHistogramKonfigurace(),Konstanty.HISTOGRAM ,Konstanty.KONFIGURACE);
 		DropChartPanel panelGrafu2 = new DropChartPanel(this.getSpojnicovyGrafPocet(this.projekt.getKonfigurace(), Konstanty.POPISY.getProperty("konfiguraceNadpisSpojnicovy")),Konstanty.SPOJNICOVY ,Konstanty.KONFIGURACE);
 		DropChartPanel panelGrafu3 = new DropChartPanel(this.getAutorGraf(Konstanty.KONFIGURACE, false),Konstanty.SLOUPCOVY,Konstanty.KONFIGURACE);
-		
-        panelGrafu1.setPreferredSize(Konstanty.VELIKOST_GRAFU);
-        panelGrafu2.setPreferredSize(Konstanty.VELIKOST_GRAFU);
-        panelGrafu3.setPreferredSize(Konstanty.VELIKOST_GRAFU);
-        
+	        
         vlozCheckBoxBezNulAutor(panelGrafu3, Konstanty.KONFIGURACE);
 
  		this.add(panelGrafu1);

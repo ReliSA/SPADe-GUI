@@ -1,5 +1,6 @@
 package gui;
 
+import java.awt.GridLayout;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
@@ -34,8 +35,7 @@ public class PanelGrafuSegment extends PanelGrafuRodic{
 	 * Vytvoří grafy, vloží je do panelu a spustí nastavení zobrazení
 	 */
 	protected void vlozGrafy(){
-		this.setPreferredSize(Konstanty.VELIKOST_PANELU_STANDARD);		
-		
+	
 		this.setBorder(BorderFactory.createTitledBorder(Konstanty.POPISY.getProperty("titleSegmenty")));
 		DropChartPanel panelGrafu1 = new DropChartPanel(this.getGanttGraf(Konstanty.FAZE),Konstanty.GANTT ,Konstanty.SEGMENT);
 		DropChartPanel panelGrafu2 = new DropChartPanel(this.getGanttGraf(Konstanty.ITERACE),Konstanty.GANTT ,Konstanty.SEGMENT);

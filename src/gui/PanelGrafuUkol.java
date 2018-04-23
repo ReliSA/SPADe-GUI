@@ -1,6 +1,7 @@
 package gui;
 
 import java.awt.BasicStroke;
+import java.awt.GridLayout;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import javax.swing.BorderFactory;
