@@ -122,8 +122,8 @@ public class PanelFiltrPolozkaVytvoreniArtefakt extends PanelFiltrPolozkaVytvore
 		try {
 			if (min.getValue() != null && max.getValue() != null) {
 
-				double minVal = (double) min.getValue();
-				double maxVal = (double) max.getValue();
+				Integer minVal = (Integer) min.getValue();
+				Integer maxVal = (Integer) max.getValue();
 				Artefakt artefakt = (Artefakt) polozka;
 
 				if ((artefakt.getVelikost() > minVal || artefakt.getVelikost() == minVal)
