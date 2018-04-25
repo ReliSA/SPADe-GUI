@@ -8,7 +8,7 @@ import data.Projekt;
 /**
  * Třída sloužící pro uložení nastavení vykreslení custom grafu
  */
-public class sablonaCustomGrafu implements Serializable{
+public class SablonaCustomGrafu implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	private String nazev; // název grafu
@@ -16,7 +16,7 @@ public class sablonaCustomGrafu implements Serializable{
 	private int sql = -1; // sql pro vykreslení
 	private int osoby = -1; // vybrané osoby pro vykreslení
 	private int iterace = -1; // vybrané iterace pro vykreslení
-	private ArrayList<nastaveniCustomSloupec> sloupce;
+	private ArrayList<NastaveniCustomSloupec> sloupce;
 
 
 	/**
@@ -28,8 +28,8 @@ public class sablonaCustomGrafu implements Serializable{
 	 * @param iterace pro vykreslení grafu
 	 * @param sloupce nastavení sloupců dat pro vykreslení grafu
 	 */
-	private sablonaCustomGrafu(String nazev, Projekt projekt, int sql, int osoby, int iterace,
-			ArrayList<nastaveniCustomSloupec> sloupce) {
+	private SablonaCustomGrafu(String nazev, Projekt projekt, int sql, int osoby, int iterace,
+			ArrayList<NastaveniCustomSloupec> sloupce) {
 		super();
 		this.nazev = nazev;
 		this.projekt = projekt;
@@ -47,8 +47,8 @@ public class sablonaCustomGrafu implements Serializable{
 	 * @param sloupce nastavení sloupců dat pro vykreslení grafu
 	 * @return instance sablonaCustomGrafu
 	 */
-	public static sablonaCustomGrafu sablonaCustomGrafuNic(String nazev, Projekt projekt, int sql, ArrayList<nastaveniCustomSloupec> sloupce) {
-		return new sablonaCustomGrafu(nazev, projekt, sql, -1, -1, sloupce);
+	public static SablonaCustomGrafu sablonaCustomGrafuNic(String nazev, Projekt projekt, int sql, ArrayList<NastaveniCustomSloupec> sloupce) {
+		return new SablonaCustomGrafu(nazev, projekt, sql, -1, -1, sloupce);
 	}
 	
 	/**
@@ -60,9 +60,9 @@ public class sablonaCustomGrafu implements Serializable{
 	 * @param sloupce nastavení sloupců dat pro vykreslení grafu
 	 * @return instance sablonaCustomGrafu
 	 */
-	public static sablonaCustomGrafu sablonaCustomGrafuIterace(String nazev, Projekt projekt, int sql, int iterace,
-			ArrayList<nastaveniCustomSloupec> sloupce) {
-		return new sablonaCustomGrafu(nazev, projekt, sql, -1, iterace, sloupce);
+	public static SablonaCustomGrafu sablonaCustomGrafuIterace(String nazev, Projekt projekt, int sql, int iterace,
+			ArrayList<NastaveniCustomSloupec> sloupce) {
+		return new SablonaCustomGrafu(nazev, projekt, sql, -1, iterace, sloupce);
 	}
 
 	/**
@@ -74,8 +74,8 @@ public class sablonaCustomGrafu implements Serializable{
 	 * @param osoby pro vykreslení grafu
 	 * @return instance sablonaCustomGrafu
 	 */
-	public static sablonaCustomGrafu sablonaCustomGrafuOsoba(String nazev, Projekt projekt, int sql, int osoby, ArrayList<nastaveniCustomSloupec> sloupce) {
-		return new sablonaCustomGrafu(nazev, projekt,sql, osoby, -1, sloupce);
+	public static SablonaCustomGrafu sablonaCustomGrafuOsoba(String nazev, Projekt projekt, int sql, int osoby, ArrayList<NastaveniCustomSloupec> sloupce) {
+		return new SablonaCustomGrafu(nazev, projekt,sql, osoby, -1, sloupce);
 	}
 	
 	/**
@@ -88,8 +88,8 @@ public class sablonaCustomGrafu implements Serializable{
 	 * @param iterace pro vykreslení grafu
 	 * @return instance sablonaCustomGrafu
 	 */
-	public static sablonaCustomGrafu sablonaCustomGrafuVse(String nazev, Projekt projekt,int sql, int osoby,int iterace, ArrayList<nastaveniCustomSloupec> sloupce) {
-		return new sablonaCustomGrafu(nazev, projekt, sql, osoby, iterace, sloupce);
+	public static SablonaCustomGrafu sablonaCustomGrafuVse(String nazev, Projekt projekt,int sql, int osoby,int iterace, ArrayList<NastaveniCustomSloupec> sloupce) {
+		return new SablonaCustomGrafu(nazev, projekt, sql, osoby, iterace, sloupce);
 	}
 
 	/**
@@ -176,7 +176,7 @@ public class sablonaCustomGrafu implements Serializable{
 	 * Vrací nastavení sloupců dat použíté pro vykreslení grafu (barva,typ,pouziti)
 	 * @return nastavení vykreslení sloupců dat
 	 */ 
-	public ArrayList<nastaveniCustomSloupec> getSloupce() {
+	public ArrayList<NastaveniCustomSloupec> getSloupce() {
 		return sloupce;
 	}
 
@@ -184,7 +184,7 @@ public class sablonaCustomGrafu implements Serializable{
 	 * Nastavuje nastavení sloupců dat použíté pro vykreslení grafu (barva,typ,pouziti)
 	 * @param sloupce nastavení vykreslení sloupců dat
 	 */
-	public void setSloupce(ArrayList<nastaveniCustomSloupec> sloupce) {
+	public void setSloupce(ArrayList<NastaveniCustomSloupec> sloupce) {
 		this.sloupce = sloupce;
 	}
 

@@ -6,7 +6,7 @@ import java.io.Serializable;
 /**
  * Třída pro uložení nastavení sloupce dat custom grafu
  */
-public class nastaveniCustomSloupec implements Serializable{
+public class NastaveniCustomSloupec implements Serializable{
 
 	private static final long serialVersionUID = 5463862874537236741L;
 	private boolean pouzit; // označuje zda se mají data z tohoto sloupce použít
@@ -19,7 +19,7 @@ public class nastaveniCustomSloupec implements Serializable{
 	 * @param typGrafu Typ grafu pro vykreslení
 	 * @param barva Barva grafu pro vykreslení
 	 */
-	public nastaveniCustomSloupec(boolean pouzit, int typGrafu, Color barva) {
+	public NastaveniCustomSloupec(boolean pouzit, int typGrafu, Color barva) {
 		super();
 		this.pouzit = pouzit;
 		this.typGrafu = typGrafu;

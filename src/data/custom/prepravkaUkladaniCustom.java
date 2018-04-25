@@ -6,7 +6,7 @@ import org.jfree.chart.JFreeChart;
 /**
  * Třída sloužící pro uložení custom grafu
  */
-public class prepravkaUkladaniCustom implements Serializable{
+public class PrepravkaUkladaniCustom implements Serializable{
 	
 	private static final long serialVersionUID = 4881143472479215994L;
 	
@@ -14,7 +14,7 @@ public class prepravkaUkladaniCustom implements Serializable{
 	private String Nazev; // název grafu
 	private int projectID; // id projektu, kterému graf patří
 	private int typGrafu; // typ grafu
-	private sablonaCustomGrafu nastaveni;
+	private SablonaCustomGrafu nastaveni;
 	
 	/**
 	 * Konstuktor třídy
@@ -23,7 +23,7 @@ public class prepravkaUkladaniCustom implements Serializable{
 	 * @param typGrafu
 	 * @param Nazev
 	 */
-	public prepravkaUkladaniCustom(JFreeChart panel, int projectID, int typGrafu,String Nazev, sablonaCustomGrafu nastaveni) {
+	public PrepravkaUkladaniCustom(JFreeChart panel, int projectID, int typGrafu,String Nazev, SablonaCustomGrafu nastaveni) {
 		this.panel = panel;
 		this.Nazev=Nazev;
 		this.projectID = projectID;
@@ -31,11 +31,11 @@ public class prepravkaUkladaniCustom implements Serializable{
 		this.nastaveni=nastaveni;
 	}
 	
-	public sablonaCustomGrafu getNastaveni() {
+	public SablonaCustomGrafu getNastaveni() {
 		return nastaveni;
 	}
 
-	public void setNastaveni(sablonaCustomGrafu nastaveni) {
+	public void setNastaveni(SablonaCustomGrafu nastaveni) {
 		this.nastaveni = nastaveni;
 	}
 

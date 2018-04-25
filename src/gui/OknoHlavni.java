@@ -42,7 +42,7 @@ import ostatni.Konstanty;
 import ostatni.Ukladani;
 import data.*;
 import data.ciselnik.*;
-import data.custom.sablonaCustomGrafu;
+import data.custom.SablonaCustomGrafu;
 import databaze.IProjektDAO;
 import databaze.ProjektDAO;
 
@@ -87,7 +87,7 @@ public class OknoHlavni extends JFrame {
 	private JCheckBoxMenuItem filtry; // Checkbox pro nastavení zda se má zobrazovat
 	private JCheckBoxMenuItem statistikyMenu;
 	private int polohaPaneluUkol; // poloha panelu filtru úkol v panelu filtrů
-	private sablonaCustomGrafu ulozeni = null;
+	private SablonaCustomGrafu ulozeni = null;
 	private OknoHlavni okno = this;
 
 	/**

@@ -26,8 +26,8 @@ import org.jfree.chart.renderer.category.StandardBarPainter;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
 
-import data.custom.prepravkaUkladaniCustom;
-import data.custom.sablonaCustomGrafu;
+import data.custom.PrepravkaUkladaniCustom;
+import data.custom.SablonaCustomGrafu;
 import ostatni.Konstanty;
 import ostatni.Ukladani;
 
@@ -198,7 +198,7 @@ public class PanelCustomNahled extends JPanel {
 								Konstanty.POPISY.getProperty("duplicitaNazev"),
 								Konstanty.POPISY.getProperty("chyba"), JOptionPane.YES_NO_OPTION);
 						if (dialogResult == 0) {
-							prepravkaUkladaniCustom prepravka = new prepravkaUkladaniCustom(chart, projectID, typGrafu, nazev,
+							PrepravkaUkladaniCustom prepravka = new PrepravkaUkladaniCustom(chart, projectID, typGrafu, nazev,
 									okno.ulozNastaveni());
 							Ukladani.smazGraf(nazev);
 							Ukladani.add(prepravka);
@@ -208,7 +208,7 @@ public class PanelCustomNahled extends JPanel {
 						}
 					} else {
 
-						prepravkaUkladaniCustom prepravka = new prepravkaUkladaniCustom(chart, projectID, typGrafu, nazev,
+						PrepravkaUkladaniCustom prepravka = new PrepravkaUkladaniCustom(chart, projectID, typGrafu, nazev,
 								okno.ulozNastaveni());
 						Ukladani.add(prepravka);
 						okno.nakresliGraf();
@@ -238,7 +238,7 @@ public class PanelCustomNahled extends JPanel {
 								Konstanty.POPISY.getProperty("duplicitaSablonaText"),
 								Konstanty.POPISY.getProperty("chyba"), JOptionPane.YES_NO_OPTION);
 						if (dialogResult == 0) {
-							sablonaCustomGrafu sablona = okno.ulozNastaveni();
+							SablonaCustomGrafu sablona = okno.ulozNastaveni();
 							sablona.setIterace(-1);
 							sablona.setOsoby(-1);
 							Ukladani.smazSablonu(nazev);
@@ -248,7 +248,7 @@ public class PanelCustomNahled extends JPanel {
 						}
 					} else {
 
-						sablonaCustomGrafu sablona = okno.ulozNastaveni();
+						SablonaCustomGrafu sablona = okno.ulozNastaveni();
 						sablona.setIterace(-1);
 						sablona.setOsoby(-1);
 						Ukladani.add(sablona);

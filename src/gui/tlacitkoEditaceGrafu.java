@@ -5,7 +5,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 
-import data.custom.sablonaCustomGrafu;
+import data.custom.SablonaCustomGrafu;
 import ostatni.Konstanty;
 
 /**
@@ -14,13 +14,13 @@ import ostatni.Konstanty;
 public class TlacitkoEditaceGrafu extends JMenuItem implements ActionListener {
 
 	private static final long serialVersionUID = -1349817940520879175L;
-	private sablonaCustomGrafu sablona;	// Sablona pro vytvoření grafu
+	private SablonaCustomGrafu sablona;	// Sablona pro vytvoření grafu
 	
 	/**
 	 * Kontruktor třídy
 	 * @param sablona sablona pro vykreslení grafu
 	 */
-	public TlacitkoEditaceGrafu(sablonaCustomGrafu sablona) {
+	public TlacitkoEditaceGrafu(SablonaCustomGrafu sablona) {
 		super();
 		this.sablona=sablona;
 		this.setText(Konstanty.POPISY.getProperty("edituj"));	
