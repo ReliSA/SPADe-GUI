@@ -10,7 +10,7 @@ import ostatni.Konstanty;
 public class TlacitkoMazaniFiltru extends JButton {
 	
 	private static final long serialVersionUID = -8567560808117527374L;
-	private Component comp; // odkaz na panel, které má po stisku odstranit
+	private Component comp; // odkaz na panel, který má po stisku odstranit
 	
 	/**
 	 * Vrací odkaz na panel filtru

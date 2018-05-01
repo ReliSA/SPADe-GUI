@@ -129,14 +129,13 @@ public class Konstanty {
 	public static final int BEZ_SEGMENTY = 2;
 	/*-----------------------------------------------*/
 	
-	public static Connection PRIPOJENI = null;														//připojení k databázi
-	public static final String CESTA_K_DATABAZI = "jdbc:mysql://127.0.0.1:3306/ppicha?allowMultiQueries=true";				//cesta k databázi
-	//public static final String CESTA_K_DATABAZI = "jdbc:mysql://students.kiv.zcu.cz:3306/ppicha?allowMultiQueries=true";
+	public static Connection PRIPOJENI = null;																			 //připojení k databázi
+	public static final String CESTA_K_DATABAZI = "jdbc:mysql://students.kiv.zcu.cz:3306/ppicha?allowMultiQueries=true"; //cesta k databázi
 	
-	public static int CITAC_PROGRESU = 0;															//čítač progresu
-	public static final int POCET_KROKU_PROGRESU = 7;												//počet načítaných skupin dat
+	public static int CITAC_PROGRESU = 0;																				 //čítač progresu
+	public static final int POCET_KROKU_PROGRESU = 7;																	 //počet načítaných skupin dat
 	
-	public static final LocalDate DATUM_PRAZDNY = LocalDate.of(1900, 12, 31);						//prázdný datum
+	public static final LocalDate DATUM_PRAZDNY = LocalDate.of(1900, 12, 31);											 //prázdný datum
 
 	public static final String NAZEV_SOUBORU_POPISU_CZECH = "czech.properties";
 	public static final String NAZEV_SOUBORU_POPISU_ENGLISH = "english.properties";

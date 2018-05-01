@@ -91,9 +91,6 @@ public class PanelFiltrCas extends PanelFiltr {
 				switch (cbOperatorStraveny.getSelectedItem().toString()) { // podle zadaného typu operátoru volá
 																			// konkrétní kontrolní metodu
 				case "mezi":
-					if (vlozitDoSeznamuMeziStraveny(polozka))
-						seznamId.add(polozka.getID()); // pokud metoda vrátí true, vloží se id do seznamu
-					break;
 				case "between":
 					if (vlozitDoSeznamuMeziStraveny(polozka))
 						seznamId.add(polozka.getID()); // pokud metoda vrátí true, vloží se id do seznamu
@@ -286,11 +283,8 @@ public class PanelFiltrCas extends PanelFiltr {
 		if (jePouzit()) { // musí být zaškrtnuto Použít filtr
 			for (int i = 0; i < this.seznam.size(); i++) {
 				PolozkaPocatek polozka = (PolozkaPocatek) this.seznam.get(i);
-				switch (cbOperatorStraveny.getSelectedItem().toString()) { // podle zadaného typu operátoru volá konkrétní kontrolní metodu
+				switch (cbOperatorPredpokladany.getSelectedItem().toString()) { // podle zadaného typu operátoru volá konkrétní kontrolní metodu
 				case "mezi":
-					if (vlozitDoSeznamuMeziPredpokladany(polozka))
-						seznamId.add(polozka.getID()); // pokud metoda vrátí true, vloží se id do seznamu
-					break;
 				case "between":
 					if (vlozitDoSeznamuMeziPredpokladany(polozka))
 						seznamId.add(polozka.getID());
@@ -340,11 +334,11 @@ public class PanelFiltrCas extends PanelFiltr {
 			/* Zkontroluje zda není datum od a do prázdné */
 			if (predpokladanyOD.getValue() != null && predpokladanyDO.getValue() != null) {
 
-				double predpokladanyMin = (double) predpokladanyOD.getValue();
-				double predpokladanyMax = (double) predpokladanyDO.getValue();
+				Integer predpokladanyMin = (Integer) predpokladanyOD.getValue();
+				Integer predpokladanyMax = (Integer) predpokladanyDO.getValue();
 				Ukol ukol = (Ukol) polozka;
 
-				if ((ukol.getStravenyCas() > predpokladanyMin || ukol.getStravenyCas() == predpokladanyMin)
+				if ((ukol.getPredpokladanyCas() > predpokladanyMin || ukol.getPredpokladanyCas() == predpokladanyMin)
 						&& (ukol.getPredpokladanyCas() < predpokladanyMax || ukol.getPredpokladanyCas() == predpokladanyMax)) {
 					return true;
 				}
@@ -367,7 +361,7 @@ public class PanelFiltrCas extends PanelFiltr {
 	private boolean vlozitDoSeznamuVetsiPredpokladany(PolozkaPocatek polozka) {
 		if (predpokladanyOD.getValue() != null) {
 			Integer predpokladanyMin = (Integer) predpokladanyOD.getValue();
-			Ukol ukol = (Ukol) polozka;
+			Ukol ukol = (Ukol) polozka;		
 			if (ukol.getPredpokladanyCas() > predpokladanyMin) {
 				return true;
 			}
@@ -470,6 +464,10 @@ public class PanelFiltrCas extends PanelFiltr {
 			return true;
 		}
 		return false;
+	}
+	
+	protected void nactiNovyProjekt(ArrayList seznam) {
+		this.seznam = seznam;
 	}
 	
 	/**

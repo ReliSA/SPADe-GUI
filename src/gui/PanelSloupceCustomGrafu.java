@@ -34,10 +34,8 @@ public class PanelSloupceCustomGrafu extends JPanel {
 	/**
 	 * Konstruktor panelu
 	 * 
-	 * @param nazev
-	 *            název dat
-	 * @param index
-	 *            udává pozici, na které je tento panel zobrazen
+	 * @param nazev název dat
+	 * @param index udává pozici, na které je tento panel zobrazen
 	 */
 	public PanelSloupceCustomGrafu(String nazev, ArrayList<Double> data, int index, ActionListener listener) {
 		if (index >= 10) {
@@ -118,15 +116,6 @@ public class PanelSloupceCustomGrafu extends JPanel {
 			this.add(lblHodnota);
 		} 
 	}
-
-	
-	/**
-	 * Nastaví listenery pro zobrazování náhledu grafu
-	 * @param listener
-	 */
-	public void nastavListeneryPreview(ActionListener listener) {
-		
-	}
 	
 	/**
 	 * Vrací zvolený typ grafu
@@ -137,6 +126,10 @@ public class PanelSloupceCustomGrafu extends JPanel {
 		return this.typGrafu.getSelectedIndex();
 	}
 
+	/**
+	 * Nastaví typ grafu
+	 * @param index typ grafu
+	 */
 	public void setTyp(int index) {
 			this.typGrafu.setSelectedIndex(index);
 	}
@@ -159,6 +152,11 @@ public class PanelSloupceCustomGrafu extends JPanel {
 		return colorPicker.getSelectedColor();
 	}
 
+	
+	/**
+	 * Nastaví barvu grafu
+	 * @param color barva grafu
+	 */
 	public void setColor(Color color) {
 		colorPicker.setSelectedColor(color);
 	}
@@ -175,8 +173,7 @@ public class PanelSloupceCustomGrafu extends JPanel {
 	/**
 	 * Nastaví zda se mají tyto data použít
 	 * 
-	 * @param bool
-	 *            true/false
+	 * @param bool true/false
 	 */
 	public void setPouzit(boolean bool) {
 		pouzit.setSelected(bool);
@@ -206,8 +203,6 @@ public class PanelSloupceCustomGrafu extends JPanel {
 						((PanelSloupceCustomGrafu) container.getComponent(i)).setPouzit(false);
 					}
 
-					//container.setComponentZOrder(panel, 1);
-					//((panelDatCustomGrafu) panel).setPouzit(true);
 					panel.setVisible(true);					
 
 					container.revalidate();

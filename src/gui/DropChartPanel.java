@@ -23,21 +23,10 @@ public class DropChartPanel extends ChartPanel {
 	private DragGestureRecognizer dgr;
 	private DragGestureHandler dragGestureHandler;
 
-	/** Slouží pro povolení a zakázaní přetahování panelu. */
-	private boolean dragable = true;
-
-	private int typGrafu;
-	protected int typPanelu;
-	private JPopupMenu menu;
-
-
-	public JPopupMenu getMenu() {
-		return menu;
-	}
-
-	public void setMenu(JPopupMenu menu) {
-		this.menu = menu;
-	}
+	private boolean dragable = true; // Slouží pro povolení a zakázaní přetahování panelu.
+	private int typGrafu; // Typ grafu
+	protected int typPanelu; // Panel do kterého graf patří
+	private JPopupMenu menu; // Kontextové menu grafu
 
 	/**
 	 * Kontruktor DropChartPanelu. Vytvoří panel a zakáže zoomování grafu.
@@ -106,6 +95,14 @@ public class DropChartPanel extends ChartPanel {
 	 */
 	public void setDragable(boolean dragable) {
 		this.dragable = dragable;
+	}
+	
+	/**
+	 * Vrací kontextové menu grafu
+	 * @return
+	 */
+	public JPopupMenu getMenu() {
+		return menu;
 	}
 	
 	/**

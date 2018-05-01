@@ -22,14 +22,17 @@ public abstract class PanelFiltr extends JPanel {
 
 	private static final long serialVersionUID = 6333285605158443235L;
 	protected ArrayList<?> seznam; // seznam možného výběru
-	protected JCheckBox ckPouzitFiltr = new JCheckBox(Konstanty.POPISY.getProperty("checkBoxPouzitFiltr"), true); // zaškrtávátko Použít filtr
+	protected JCheckBox ckPouzitFiltr = new JCheckBox(Konstanty.POPISY.getProperty("checkBoxPouzitFiltr"), true); // zaškrtávátko
+																													// Použít
+																													// filtr
 	protected JList<?> lsSeznamFiltr; // zobrazený seznam
 	private GridBagConstraints grid = new GridBagConstraints(); // grid pro nastavení pozic komponent
 
 	/**
 	 * Konstruktor třídy, nastaví seznam výběru
 	 * 
-	 * @param seznam seznam výběru
+	 * @param seznam
+	 *            seznam výběru
 	 */
 	public PanelFiltr(ArrayList seznam) {
 		this.seznam = seznam;
@@ -56,13 +59,14 @@ public abstract class PanelFiltr extends JPanel {
 	/**
 	 * Vrací model ze seznamu z parametru
 	 * 
-	 * @param seznam seznam, ze kterého se vytvoří model
+	 * @param seznam
+	 *            seznam, ze kterého se vytvoří model
 	 * @return vytvořený model
 	 */
 	protected DefaultComboBoxModel getModel(ArrayList seznam) {
 		DefaultComboBoxModel model = new DefaultComboBoxModel();
 		for (int i = 0; i < seznam.size(); i++) {
-			if (seznam.get(i).toString()!=null) {
+			if (seznam.get(i).toString() != null) {
 				model.addElement(seznam.get(i));
 			}
 		}
@@ -81,74 +85,54 @@ public abstract class PanelFiltr extends JPanel {
 	/**
 	 * Nastaví panel filtrů
 	 * 
-	 * @param nazev název panelu filtrů
+	 * @param nazev
+	 *            název panelu filtrů
 	 */
 	protected void nastavPanel(String nazev) {
 		String titulek = "";
 		ckPouzitFiltr.setOpaque(false);
-		switch (nazev) {
-		case "Tasks":
-		case "Úkoly":
+
+		if (nazev.equals(Konstanty.POPISY.getProperty("nazevUkoly"))) {
 			titulek = Konstanty.POPISY.getProperty("nazevUkoly");
 			this.setBackground(Konstanty.barvaUkol);
-			break;
-		case "Priorities":
-		case "Priority":
+		} else if (nazev.equals(Konstanty.POPISY.getProperty("nazevPriority"))) {
 			titulek = Konstanty.POPISY.getProperty("nazevPriority");
 			this.setBackground(Konstanty.barvaUkol);
-			break;
-		case "Severity":
+		} else if (nazev.equals(Konstanty.POPISY.getProperty("nazevSeverity"))) {
 			titulek = Konstanty.POPISY.getProperty("nazevSeverity");
 			this.setBackground(Konstanty.barvaUkol);
-			break;
-		case "Status":
-		case "Statusy":
+		} else if (nazev.equals(Konstanty.POPISY.getProperty("nazevStatusy"))) {
 			titulek = Konstanty.POPISY.getProperty("nazevStatusy");
 			this.setBackground(Konstanty.barvaUkol);
-			break;
-		case "Types":
-		case "Typy":
+		} else if (nazev.equals(Konstanty.POPISY.getProperty("nazevTypy"))) {
 			titulek = Konstanty.POPISY.getProperty("nazevTypy");
 			this.setBackground(Konstanty.barvaUkol);
-			break;
-		case "Resolution":
-		case "Rezoluce":
+		} else if (nazev.equals(Konstanty.POPISY.getProperty("nazevResoluce"))) {
 			titulek = Konstanty.POPISY.getProperty("nazevResoluce");
 			this.setBackground(Konstanty.barvaUkol);
-			break;
-		case "People":
-		case "Osoby":
+		} else if (nazev.equals(Konstanty.POPISY.getProperty("cas"))) {
+			titulek = Konstanty.POPISY.getProperty("cas");
+			this.setBackground(Konstanty.barvaUkol);
+		} else if (nazev.equals(Konstanty.POPISY.getProperty("nazevOsoby"))) {
 			titulek = Konstanty.POPISY.getProperty("nazevOsoby");
 			this.setBackground(Konstanty.barvaOsoby);
-			break;
-		case "Phase":
-		case "Fáze":
+		} else if (nazev.equals(Konstanty.POPISY.getProperty("nazevFaze"))) {
 			titulek = Konstanty.POPISY.getProperty("nazevFaze");
 			this.setBackground(Konstanty.barvaFaze);
-			break;
-		case "Iterations":
-		case "Iterace":
+		} else if (nazev.equals(Konstanty.POPISY.getProperty("nazevIterace"))) {
 			titulek = Konstanty.POPISY.getProperty("nazevIterace");
 			this.setBackground(Konstanty.barvaIterace);
-			break;
-		case "Activities":
-		case "Aktivity":
+		} else if (nazev.equals(Konstanty.POPISY.getProperty("nazevAktivity"))) {
 			titulek = Konstanty.POPISY.getProperty("nazevAktivity");
 			this.setBackground(Konstanty.barvaAktivity);
-			break;
-		case "Configurations":
-		case "Konfigurace":
+		} else if (nazev.equals(Konstanty.POPISY.getProperty("nazevKonfigurace"))) {
 			titulek = Konstanty.POPISY.getProperty("nazevKonfigurace");
 			this.setBackground(Konstanty.barvaKonfigurace);
-			break;
-		case "Artifacts":
-		case "Artefakty":
+		} else if (nazev.equals(Konstanty.POPISY.getProperty("nazevArtefakty"))) {
 			titulek = Konstanty.POPISY.getProperty("nazevArtefakty");
 			this.setBackground(Konstanty.barvaArtefakty);
-			break;
-		default:
-			break;
 		}
+
 		this.setBorder(BorderFactory.createTitledBorder(titulek));
 
 		lsSeznamFiltr = new JList(getModel(this.seznam));

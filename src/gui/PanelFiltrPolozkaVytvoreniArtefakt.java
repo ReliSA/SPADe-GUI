@@ -13,7 +13,7 @@ import data.Artefakt;
 import data.polozky.PolozkaVytvoreni;
 import ostatni.Konstanty;
 /**
- * Panel filtrů pro artefakty a konfigurace zděděný z PanelFiltrPolozkaVytvoreni. Přidává možnost filtrování artefaktů podle velikosti.s
+ * Panel filtrů pro artefakty a konfigurace zděděný z PanelFiltrPolozkaVytvoreni. Přidává možnost filtrování artefaktů podle velikosti.
  */
 public class PanelFiltrPolozkaVytvoreniArtefakt extends PanelFiltrPolozkaVytvoreni {
 

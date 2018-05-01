@@ -31,14 +31,6 @@ public class PrepravkaUkladaniCustom implements Serializable{
 		this.nastaveni=nastaveni;
 	}
 	
-	public SablonaCustomGrafu getNastaveni() {
-		return nastaveni;
-	}
-
-	public void setNastaveni(SablonaCustomGrafu nastaveni) {
-		this.nastaveni = nastaveni;
-	}
-
 	/**
 	 * Vrací typ grafu
 	 * @return typ grafu
@@ -100,6 +92,22 @@ public class PrepravkaUkladaniCustom implements Serializable{
 	 */
 	public void setProjectID(int projectID) {
 		this.projectID = projectID;
+	}
+	
+	/**
+	 * Vrací nastavení custom grafu
+	 * @return nastavení custom grafu
+	 */
+	public SablonaCustomGrafu getNastaveni() {
+		return nastaveni;
+	}
+
+	/**
+	 * Uloží nastavení custom grafu
+	 * @param nastaveni custom grafu
+	 */
+	public void setNastaveni(SablonaCustomGrafu nastaveni) {
+		this.nastaveni = nastaveni;
 	}
 
 }
