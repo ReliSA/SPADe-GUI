@@ -36,7 +36,6 @@ public class NastaveniCustomSloupec implements Serializable{
 	
 	/**
 	 * Nastavuje boolean zda se mají data použít
-	 * @return boolean zda se mají data použít
 	 */
 	public void setPouzit(boolean pouzit) {
 		this.pouzit = pouzit;

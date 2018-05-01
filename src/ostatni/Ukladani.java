@@ -58,7 +58,7 @@ public class Ukladani {
 	/**
 	 * Přidá sablonu do arraylistu
 	 * 
-	 * @param SablonaCustomGrafu
+	 * @param sablona
 	 */
 	public static void add(SablonaCustomGrafu sablona) {
 		sablony.add(sablona);
@@ -328,8 +328,6 @@ public class Ukladani {
 
 	/**
 	 * Nastaví panel projektu
-	 * 
-	 * @return panel projektu
 	 */
 	public static void setPanelProjektu(PanelProjektu panelGrafu) {
 		Ukladani.panelProjektu = panelGrafu;
@@ -393,9 +391,7 @@ public class Ukladani {
 	}
 
 	/**
-	 * Nastaví panel miniatur custom grafů
-	 * 
-	 * @return panel miniatur custom grafů
+	 * Nastaví panel miniatur custom grafů 
 	 */
 	public static void setPanel(PanelGrafuCustom panel) {
 		Ukladani.panelMiniatur = panel;

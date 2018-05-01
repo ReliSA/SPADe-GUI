@@ -78,8 +78,8 @@ public class OknoCustomGraf extends JFrame {
 
 	/**
 	 * Kontruktor okna pro editaci grafu
-	 * 
-	 * @param SablonaCustomGrafu sablona pro nacteni nastaveni
+	 * @param sablona nastavení okna
+	 * @param projekt zvolený projekt
 	 */
 	public OknoCustomGraf(SablonaCustomGrafu sablona, Projekt projekt) {
 		super(Konstanty.POPISY.getProperty("menuVytvorGraf"));
