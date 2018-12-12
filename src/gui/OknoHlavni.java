@@ -70,6 +70,7 @@ public class OknoHlavni extends JFrame {
 	private JMenu fileMenu; // Menu horního baru "Soubor"
 	private JMenu customGrafMenu; // Menu horního baru "Vlastní graf"
 	private JMenuItem vytvorGraf; // Tlačítko horního menu pro vytvoření custom grafu
+	private JMenuItem otevriGraf; // Tlačítko horního menu pro otevření custom grafu
 	private JMenu settingsMenu; // Menu horního baru "Nastavení"
 	private JMenu languageMenu; // Menu horního baru pro nastavení jazyka programu
 	private JMenu removeChartMenu; // Menu horního baru pro odstranění custom grafu podle jména
@@ -151,6 +152,7 @@ public class OknoHlavni extends JFrame {
 		exportProjekt = new JMenuItem(Konstanty.POPISY.getProperty("exportProjekt"));
 		importGrafy = new JMenuItem(Konstanty.POPISY.getProperty("importGrafu"));
 		vytvorGraf = new JMenuItem(Konstanty.POPISY.getProperty("menuVytvorGraf"));
+		otevriGraf = new JMenuItem(Konstanty.POPISY.getProperty("menuOtevriGraf"));
 		czech = new JMenuItem(Konstanty.POPISY.getProperty("menuCestina"));
 		english = new JMenuItem(Konstanty.POPISY.getProperty("menuAnglictina"));
 		filtry = new JCheckBoxMenuItem(Konstanty.POPISY.getProperty("filtryTrue"), false);
@@ -208,6 +210,7 @@ public class OknoHlavni extends JFrame {
 		importExportMenu.add(exportAll);
 		importExportMenu.add(exportProjekt);
 		customGrafMenu.add(vytvorGraf);
+		customGrafMenu.add(otevriGraf);
 		customGrafMenu.add(vytvorSablonaMenu);
 		customGrafMenu.add(new JSeparator());
 		customGrafMenu.add(removeSablonaMenu);
@@ -1273,6 +1276,20 @@ public class OknoHlavni extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 
 				SwingUtilities.invokeLater(() -> {
+					OknoVytvorGraf example = new OknoVytvorGraf();
+					//example.setSize(800, 400);
+					//example.setLocationRelativeTo(null);
+					example.setVisible(true);
+				});
+
+			}
+		};
+
+		/* akce pro otevření okna pro vytváření custom grafů */
+		ActionListener actOpenCustomGraf = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				SwingUtilities.invokeLater(() -> {
 					OknoCustomGraf example = new OknoCustomGraf(getProjekt());
 					example.setSize(800, 400);
 					example.setLocationRelativeTo(null);
@@ -1335,6 +1352,7 @@ public class OknoHlavni extends JFrame {
 		filtry.addActionListener(actZobrazeniFiltruMenu);
 		btSipkaFiltry.addActionListener(actZobrazeniFiltruButton);
 		vytvorGraf.addActionListener(actCustomGraf);
+		otevriGraf.addActionListener(actOpenCustomGraf);
 		exportAll.addActionListener(actExportAll);
 		exportProjekt.addActionListener(actExportProjekt);
 		importGrafy.addActionListener(actImportGrafu);

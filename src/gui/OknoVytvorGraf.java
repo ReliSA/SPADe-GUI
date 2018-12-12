@@ -1,44 +1,25 @@
 package gui;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.Font;
+import java.awt.*;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JScrollBar;
 import javax.swing.border.EmptyBorder;
 
 import ostatni.Konstanty;
 
-import java.awt.GridLayout;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.awt.event.ActionEvent;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.InputMap;
 
 public class OknoVytvorGraf extends JFrame {
 
@@ -99,6 +80,11 @@ public class OknoVytvorGraf extends JFrame {
         c.gridx = 0;
         c.gridy = row++;
         contentPane.add(tfVarCreation, c);
+        /*GridBagConstraints g = new GridBagConstraints();
+        g.insets = new Insets(0,5,0,5); //padding
+        g.fill = GridBagConstraints.HORIZONTAL;
+        g.anchor = GridBagConstraints.NORTH;
+        getContentPane().add(new ColorPanel(Color.pink, windowWidth, 100), g);*/
 
         String[] optionStrings = { "People", "Iterations", "Days", "Months", "Years" };
         JComboBox petList = new JComboBox(optionStrings);
