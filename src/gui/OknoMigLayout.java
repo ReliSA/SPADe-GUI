@@ -1,6 +1,7 @@
 package gui;
 
 import net.miginfocom.swing.MigLayout;
+import org.apache.commons.io.FileUtils;
 import ostatni.Konstanty;
 
 import javax.swing.*;
@@ -8,15 +9,18 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.json.*;
 
 public class OknoMigLayout {
 
     private static int constraintPanelWidth = 200;
     private static JFrame mainFrame;
+    private static String constantFolderPath = "C:\\WorkspaceSchool\\SPADE\\src\\zdroje\\konstanty\\";
 
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
@@ -42,12 +46,50 @@ public class OknoMigLayout {
 
         JButton addConstantBtn = new JButton("Add constant");
 
+        constantsPanel.add(addConstantBtn);
+        
+        File directory = new File(constantFolderPath);
+        if (!directory.exists()){
+            directory.mkdirs();
+        } else {
+            File[] files = directory.listFiles();
+            for (File file : files) {
+                try {
+                    String content = FileUtils.readFileToString(file, "utf-8");
+
+                    // Convert JSON string to JSONObject
+                    JSONObject obj = new JSONObject(content);
+                    String n = obj.getString("name");
+                    String a = obj.getString("value");
+                    System.out.println(n + " " + a);
+                    ConstantPanel constPanel = new ConstantPanel(obj.getString("name"), obj.getString("value"));
+                    constantsPanel.add(constPanel);
+                    constantsPanel.revalidate();
+                    constantsPanel.repaint();
+                } catch(IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
         addConstantBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 ConstantsForm constForm = new ConstantsForm();
                 if(!constForm.wasCancelled()) {
                     ConstantPanel constPanel = new ConstantPanel(constForm.getConstName(), constForm.getConstValue());
-
+                    String jsonString = new JSONObject()
+                            .put("name", constForm.getConstName())
+                            .put("value", constForm.getConstValue()).toString(2);
+                    Writer writer = null;
+                    try {
+                        writer = new BufferedWriter(new OutputStreamWriter(
+                                new FileOutputStream(constantFolderPath + constForm.getConstName() + ".json"), "utf-8"));
+                        writer.write(jsonString);
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    } finally {
+                        try {writer.close();} catch (Exception ex) {/*ignore*/}
+                    }
                     constantsPanel.add(constPanel);
                     constantsPanel.revalidate();
                     constantsPanel.repaint();
@@ -55,7 +97,6 @@ public class OknoMigLayout {
             }
         });
 
-        constantsPanel.add(addConstantBtn);
         //northPanel.add(new JButton("Add variable"), "grow");
 
         mainFrame.add(constantsPanel,"dock north");
@@ -184,6 +225,14 @@ public class OknoMigLayout {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     thisPanel.getParent().remove(thisPanel);
+                    try {
+                        File file = new File(constantFolderPath + varName + ".json");
+                        if( !file.delete() ){
+                            System.out.println("Delete operation failed.");
+                        }
+                    } catch(Exception ex){
+                        ex.printStackTrace();
+                    }
                     mainFrame.revalidate();
                     mainFrame.repaint();
                 }
