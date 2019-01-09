@@ -47,7 +47,7 @@ public class OknoMigLayout {
         JButton addConstantBtn = new JButton("Add constant");
 
         constantsPanel.add(addConstantBtn);
-        
+
         File directory = new File(constantFolderPath);
         if (!directory.exists()){
             directory.mkdirs();
@@ -56,12 +56,7 @@ public class OknoMigLayout {
             for (File file : files) {
                 try {
                     String content = FileUtils.readFileToString(file, "utf-8");
-
-                    // Convert JSON string to JSONObject
                     JSONObject obj = new JSONObject(content);
-                    String n = obj.getString("name");
-                    String a = obj.getString("value");
-                    System.out.println(n + " " + a);
                     ConstantPanel constPanel = new ConstantPanel(obj.getString("name"), obj.getString("value"));
                     constantsPanel.add(constPanel);
                     constantsPanel.revalidate();
@@ -152,6 +147,79 @@ public class OknoMigLayout {
         centerPanel.add(centerNorthPanel, "dock north, width 100%");
     }
 
+    private class ConstantPanel extends JPanel{
+        ConstantPanel thisPanel;
+        String name;
+        String value;
+
+        public ConstantPanel(String constName, String constValue) {
+            super();
+            thisPanel = this;
+            name = constName;
+            value = constValue;
+            this.setLayout(new MigLayout());
+            JLabel label = new JLabel(name + ":" + value);
+            this.add(label);
+
+            Border border = BorderFactory.createLineBorder(Color.BLACK, 1);
+            this.setBorder(border);
+
+            JButton editBtn = new JButton("E");
+            editBtn.addActionListener(new ActionListener(){
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    ConstantsForm constantsForm = new ConstantsForm(name, value);
+                    String oldName = name;
+                    name = constantsForm.getConstName();
+                    value = constantsForm.getConstValue();
+                    label.setText(constantsForm.getConstName() + ":" + constantsForm.getConstValue());
+                    mainFrame.revalidate();
+                    mainFrame.repaint();
+                    File oldFile = new File(constantFolderPath + oldName + ".json");
+                    String newFilePath = oldFile.getAbsolutePath().replace(oldFile.getName(), "") + name + ".json";
+                    File newFile = new File(newFilePath);
+                    String jsonString = new JSONObject()
+                            .put("name", name)
+                            .put("value", value).toString(2);
+                    Writer writer = null;
+                    try {
+                        FileUtils.moveFile(oldFile, newFile);
+                        writer = new BufferedWriter(new OutputStreamWriter(
+                                new FileOutputStream(newFile), "utf-8"));
+                        writer.write(jsonString);
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    } finally {
+                        try {writer.close();} catch (Exception ex) {/*ignore*/}
+                    }
+
+                }
+
+            });
+            this.add(editBtn);
+
+            JButton removeBtn = new JButton("R");
+            removeBtn.addActionListener(new ActionListener(){
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    thisPanel.getParent().remove(thisPanel);
+                    try {
+                        File file = new File(constantFolderPath + name + ".json");
+                        if( !file.delete() ){
+                            System.out.println("Delete operation failed.");
+                        }
+                    } catch(Exception ex){
+                        ex.printStackTrace();
+                    }
+                    mainFrame.revalidate();
+                    mainFrame.repaint();
+                }
+
+            });
+            this.add(removeBtn);
+        }
+    }
+
     private class ConstraintPanel extends JPanel {
 
         ConstraintPanel thisPanel;
@@ -185,54 +253,6 @@ public class OknoMigLayout {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     thisPanel.getParent().remove(thisPanel);
-                    mainFrame.revalidate();
-                    mainFrame.repaint();
-                }
-
-            });
-            this.add(removeBtn);
-        }
-    }
-
-    private class ConstantPanel extends JPanel{
-        ConstantPanel thisPanel;
-
-        public ConstantPanel(String varName, String varValue) {
-            super();
-            thisPanel = this;
-            this.setLayout(new MigLayout());
-            JLabel label = new JLabel(varName + ":" + varValue);
-            this.add(label);
-
-            Border border = BorderFactory.createLineBorder(Color.BLACK, 1);
-            this.setBorder(border);
-
-            JButton editBtn = new JButton("E");
-            editBtn.addActionListener(new ActionListener(){
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    ConstantsForm constantsForm = new ConstantsForm(varName, varValue);
-                    label.setText(constantsForm.getConstName() + ":" + constantsForm.getConstValue());
-                    mainFrame.revalidate();
-                    mainFrame.repaint();
-                }
-
-            });
-            this.add(editBtn);
-
-            JButton removeBtn = new JButton("R");
-            removeBtn.addActionListener(new ActionListener(){
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    thisPanel.getParent().remove(thisPanel);
-                    try {
-                        File file = new File(constantFolderPath + varName + ".json");
-                        if( !file.delete() ){
-                            System.out.println("Delete operation failed.");
-                        }
-                    } catch(Exception ex){
-                        ex.printStackTrace();
-                    }
                     mainFrame.revalidate();
                     mainFrame.repaint();
                 }
