@@ -21,6 +21,7 @@ public class OknoMigLayout {
     private static int constraintPanelWidth = 200;
     private static JFrame mainFrame;
     private static String constantFolderPath = "C:\\WorkspaceSchool\\SPADE\\src\\zdroje\\konstanty\\";
+    private static String queryFolderPath = "C:\\WorkspaceSchool\\SPADE\\src\\zdroje\\dotazy\\";
 
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
@@ -48,11 +49,16 @@ public class OknoMigLayout {
 
         constantsPanel.add(addConstantBtn);
 
-        File directory = new File(constantFolderPath);
-        if (!directory.exists()){
-            directory.mkdirs();
+        File queryFolder = new File(queryFolderPath);
+        if (!queryFolder.exists()) {
+            queryFolder.mkdirs();
+        }
+
+        File constantFolder = new File(constantFolderPath);
+        if (!constantFolder.exists()){
+            constantFolder.mkdirs();
         } else {
-            File[] files = directory.listFiles();
+            File[] files = constantFolder.listFiles();
             for (File file : files) {
                 try {
                     String content = FileUtils.readFileToString(file, "utf-8");
@@ -145,6 +151,76 @@ public class OknoMigLayout {
         centerNorthPanel.add(addConstraintBtn);
 
         centerPanel.add(centerNorthPanel, "dock north, width 100%");
+
+        JPanel axisPanel = new JPanel(new MigLayout());
+        axisPanel.setBackground(new Color(168, 79, 25));
+        centerPanel.add(axisPanel, "dock west, height 100%, width " + constraintPanelWidth);
+
+        String[] axisOptions = { "Person", "Iteration", "Days", "Weeks", "Months" };
+        JComboBox cboxAxisOptions = new JComboBox(axisOptions);
+        axisPanel.add(cboxAxisOptions, "width 90%");
+
+        JPanel bottomPanel = new JPanel(new MigLayout());
+        bottomPanel.setBackground(Color.GRAY);
+
+        JButton saveBtn = new JButton("Save");
+        saveBtn.addActionListener(new ActionListener(){
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                File file = new File(queryFolderPath + "query" + ".json");
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("axis", (String) cboxAxisOptions.getSelectedItem());
+
+                Component centerComponents[] = centerPanel.getComponents();
+                List<JSONObject> constList = new ArrayList<>();
+
+                for (Component component: centerComponents) {
+                    if(component instanceof ConstraintPanel) {
+                        ConstraintPanel constPanel = (ConstraintPanel) component;
+                        Map.Entry<String, List<JComboBox>> entry = constPanel.getAttributeMap().entrySet().iterator().next();
+                        JSONObject jsonConstraint = new JSONObject();
+                        jsonConstraint.put("table", entry.getKey());
+                        List<String> attList = new ArrayList<>();
+
+                        for (JComboBox att : entry.getValue()) {
+                            attList.add((String) att.getSelectedItem());
+                        }
+                        String[] attArray = new String[attList.size()];
+                        attArray = attList.toArray(attArray);
+                        jsonConstraint.put("attributes", attArray);
+                        constList.add(jsonConstraint);
+                    }
+                }
+                JSONObject[] constArray = new JSONObject[constList.size()];
+                constArray = constList.toArray(constArray);
+                jsonObject.put("constraints", constArray);
+
+                Writer writer = null;
+                try {
+                    writer = new BufferedWriter(new OutputStreamWriter(
+                            new FileOutputStream(file), "utf-8"));
+                    writer.write(jsonObject.toString(2));
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                } finally {
+                    try {writer.close();} catch (Exception ex) {/*ignore*/}
+                }
+            }
+        });
+        JButton loadBtn = new JButton("Load");
+        loadBtn.addActionListener(new ActionListener(){
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
+        bottomPanel.add(saveBtn);
+        bottomPanel.add(loadBtn);
+
+        mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
     }
 
     private class ConstantPanel extends JPanel{
@@ -223,10 +299,12 @@ public class OknoMigLayout {
     private class ConstraintPanel extends JPanel {
 
         ConstraintPanel thisPanel;
+        Map<String, List<JComboBox>> attMap;
 
         public ConstraintPanel(Map<String, List<JComboBox>> attMap) {
             super();
             thisPanel = this;
+            this.attMap = attMap;
             this.setLayout(new MigLayout());
             Map.Entry<String, List<JComboBox>> entry = attMap.entrySet().iterator().next();
             JLabel label = new JLabel(entry.getKey());
@@ -259,6 +337,10 @@ public class OknoMigLayout {
 
             });
             this.add(removeBtn);
+        }
+
+        public Map<String, List<JComboBox>> getAttributeMap(){
+            return this.attMap;
         }
     }
 }
