@@ -12,6 +12,7 @@ import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.json.*;
 
@@ -261,10 +262,20 @@ public class OknoMigLayout {
                 jsonObject.put("constraints", constArray);
                 String result = jsonObject.toString(2);
                 if(variableCreation){
-                    VariablePanel varPanel = new VariablePanel(varOrQueryNameTf.getText(), result);
-                    variablesPanel.add(varPanel);
-                    variablesPanel.revalidate();
-                    variablesPanel.repaint();
+                    File variableFolder = new File(variableFolderPath);
+                    File[] files = variableFolder.listFiles();
+                    if (files != null) {
+                        List<String> fileNames = Arrays.asList(files)
+                                .stream()
+                                .map(f -> f.getName().substring(0, f.getName().indexOf('.')))
+                                .collect(Collectors.toList());
+                        if(!fileNames.contains(varOrQueryNameTf.getText())){
+                            VariablePanel varPanel = new VariablePanel(varOrQueryNameTf.getText(), result);
+                            variablesPanel.add(varPanel);
+                            variablesPanel.revalidate();
+                            variablesPanel.repaint();
+                        }
+                    }
                     variableCreation = false;
                 }
                 Writer writer = null;
