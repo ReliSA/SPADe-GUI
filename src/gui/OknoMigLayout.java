@@ -34,6 +34,7 @@ public class OknoMigLayout {
     private static JPanel bottomPanel = new JPanel(new MigLayout());
     private static JPanel axisPanel = new JPanel(new MigLayout());
     private static JTextField varOrQueryNameTf = new JTextField(10);
+    private static final JFileChooser fileChooser = new JFileChooser();
 
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
@@ -200,8 +201,55 @@ public class OknoMigLayout {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                //open windows pop up to load file from disk
+
+                fileChooser.setCurrentDirectory(new File(queryFolderPath));
+                int returnVal = fileChooser.showOpenDialog(centerNorthPanel);
+
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    File file = fileChooser.getSelectedFile();
+
+                    centerPanel.removeAll();
+                    centerNorthPanel.removeAll();
+
+                    centerNorthPanel.add(addConstraintBtn);
+                    varOrQueryNameTf.setText(file.getName().substring(0, file.getName().indexOf('.')));
+                    centerNorthPanel.add(varOrQueryNameTf);
+
+                    mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
+
+                    centerPanel.add(centerNorthPanel, "dock north, width 100%");
+                    centerPanel.add(axisPanel, "dock west, height 100%, width " + constraintPanelWidth);
+
+                    try {
+                        String content = FileUtils.readFileToString(file, "utf-8");
+                        JSONObject obj = new JSONObject(content);
+
+                        JComboBox axisCBox = (JComboBox) axisPanel.getComponent(0);
+                        axisCBox.setSelectedItem(obj.getString("axis"));
+
+                        JSONArray constraints = (JSONArray) obj.get("constraints");
+                        for (Object cons : constraints)
+                        {
+                            JSONObject object = (JSONObject) cons;
+                            ConstraintPanel panel = new ConstraintPanel(object);
+                            centerPanel.add(panel, "dock west, height 100%, width " + constraintPanelWidth);
+                            centerPanel.revalidate();
+                            centerPanel.repaint();
+                        }
+                    } catch(IOException ex) {
+                        ex.printStackTrace();
+                    }
+
+                    centerPanel.revalidate();
+                    centerPanel.repaint();
+
+                    centerNorthPanel.revalidate();
+                    centerNorthPanel.repaint();
+                } else {
+                    //log.append("Open command cancelled by user." + newline);
+                }
             }
+
         });
 
         centerNorthPanel.add(createQueryBtn);
