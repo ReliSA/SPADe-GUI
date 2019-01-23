@@ -19,9 +19,20 @@ import org.json.*;
 public class OknoMigLayout {
 
     private static int constraintPanelWidth = 200;
+    private static boolean variableCreation = false;
     private static JFrame mainFrame;
     private static String constantFolderPath = "C:\\WorkspaceSchool\\SPADE\\src\\zdroje\\konstanty\\";
     private static String queryFolderPath = "C:\\WorkspaceSchool\\SPADE\\src\\zdroje\\dotazy\\";
+    private static String variableFolderPath = "C:\\WorkspaceSchool\\SPADE\\src\\zdroje\\promenne\\";
+    private static JButton addConstantBtn = new JButton("Add constant");
+    private static JButton addVariableBtn = new JButton("Add variable");
+    private static JButton addConstraintBtn = new JButton("Add constraint");
+    private static JButton createQueryBtn = new JButton("Create query");
+    private static JPanel centerNorthPanel = new JPanel(new MigLayout());
+    private static JPanel centerPanel = new JPanel(new MigLayout());
+    private static JPanel bottomPanel = new JPanel(new MigLayout());
+    private static JPanel axisPanel = new JPanel(new MigLayout());
+    private static JTextField varOrQueryNameTf = new JTextField(10);
 
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
@@ -43,9 +54,7 @@ public class OknoMigLayout {
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel constantsPanel = new JPanel(new MigLayout());
-        constantsPanel.setBackground(Color.gray);
-
-        JButton addConstantBtn = new JButton("Add constant");
+        constantsPanel.setBackground(Color.cyan);
 
         constantsPanel.add(addConstantBtn);
 
@@ -103,22 +112,41 @@ public class OknoMigLayout {
         mainFrame.add(constantsPanel,"dock north");
 
         JPanel variablesPanel = new JPanel(new MigLayout());
-        constantsPanel.setBackground(Color.cyan);
 
-        JButton addVariableBtn = new JButton("Add variable");
+        File variableFolder = new File(variableFolderPath);
+        if (!variableFolder.exists()){
+            variableFolder.mkdirs();
+        } else {
+            File[] files = variableFolder.listFiles();
+            for (File file : files) {
+                try {
+                    String content = FileUtils.readFileToString(file, "utf-8");
+
+
+                } catch(IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 
         addVariableBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                ConstantsForm constForm = new ConstantsForm();
-                if(!constForm.wasCancelled()) {
-                    JLabel label = new JLabel(constForm.getConstName() + ": " + constForm.getConstValue());
-                    Border border = BorderFactory.createLineBorder(Color.BLACK, 1);
-                    label.setBorder(border);
+                variableCreation = true;
+                centerPanel.removeAll();
+                centerNorthPanel.removeAll();
 
-                    variablesPanel.add(label);
-                    variablesPanel.revalidate();
-                    variablesPanel.repaint();
-                }
+                centerNorthPanel.add(addConstraintBtn);
+                centerNorthPanel.add(varOrQueryNameTf);
+
+                mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
+
+                centerPanel.add(centerNorthPanel, "dock north, width 100%");
+
+                centerPanel.revalidate();
+                centerPanel.repaint();
+
+                centerNorthPanel.revalidate();
+                centerNorthPanel.repaint();
             }
         });
 
@@ -127,14 +155,12 @@ public class OknoMigLayout {
 
         mainFrame.add(variablesPanel,"dock north");
 
-        JPanel centerPanel = new JPanel(new MigLayout());
         centerPanel.setBackground(Color.PINK);
 
         mainFrame.add(centerPanel, "dock center");
 
-        JPanel centerNorthPanel = new JPanel(new MigLayout());
         centerNorthPanel.setBackground(Color.orange);
-        JButton addConstraintBtn = new JButton("Add constraint");
+
         addConstraintBtn.addActionListener(new ActionListener(){
 
             @Override
@@ -148,19 +174,41 @@ public class OknoMigLayout {
             }
         });
 
-        centerNorthPanel.add(addConstraintBtn);
+        createQueryBtn.addActionListener(new ActionListener(){
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                centerPanel.removeAll();
+                centerNorthPanel.removeAll();
+
+                centerNorthPanel.add(addConstraintBtn);
+                centerNorthPanel.add(varOrQueryNameTf);
+
+                mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
+
+                centerPanel.add(centerNorthPanel, "dock north, width 100%");
+                centerPanel.add(axisPanel, "dock west, height 100%, width " + constraintPanelWidth);
+
+                centerPanel.revalidate();
+                centerPanel.repaint();
+
+                centerNorthPanel.revalidate();
+                centerNorthPanel.repaint();
+            }
+        });
+
+        centerNorthPanel.add(createQueryBtn);
 
         centerPanel.add(centerNorthPanel, "dock north, width 100%");
 
-        JPanel axisPanel = new JPanel(new MigLayout());
+
         axisPanel.setBackground(new Color(168, 79, 25));
-        centerPanel.add(axisPanel, "dock west, height 100%, width " + constraintPanelWidth);
 
         String[] axisOptions = { "Person", "Iteration", "Days", "Weeks", "Months" };
         JComboBox cboxAxisOptions = new JComboBox(axisOptions);
         axisPanel.add(cboxAxisOptions, "width 90%");
 
-        JPanel bottomPanel = new JPanel(new MigLayout());
+
         bottomPanel.setBackground(Color.GRAY);
 
         JButton saveBtn = new JButton("Save");
@@ -168,9 +216,15 @@ public class OknoMigLayout {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                File file = new File(queryFolderPath + "query" + ".json");
+                File file = null;
                 JSONObject jsonObject = new JSONObject();
-                jsonObject.put("axis", (String) cboxAxisOptions.getSelectedItem());
+                if (!variableCreation) {
+                    file = new File(queryFolderPath + varOrQueryNameTf.getText() + ".json");
+                    jsonObject.put("axis", (String) cboxAxisOptions.getSelectedItem());
+                } else {
+                    file = new File(variableFolderPath + varOrQueryNameTf.getText() + ".json");
+                }
+                variableCreation = false;
 
                 Component centerComponents[] = centerPanel.getComponents();
                 List<JSONObject> constList = new ArrayList<>();
@@ -206,6 +260,18 @@ public class OknoMigLayout {
                 } finally {
                     try {writer.close();} catch (Exception ex) {/*ignore*/}
                 }
+                centerNorthPanel.removeAll();
+                centerPanel.removeAll();
+                mainFrame.remove(bottomPanel);
+
+                varOrQueryNameTf.setText("");
+                centerNorthPanel.add(createQueryBtn);
+                centerPanel.add(centerNorthPanel, "dock north, width 100%");
+
+                mainFrame.revalidate();
+                mainFrame.repaint();
+
+                JOptionPane.showMessageDialog(null, "Save successful");
             }
         });
         JButton loadBtn = new JButton("Load");
@@ -219,8 +285,6 @@ public class OknoMigLayout {
 
         bottomPanel.add(saveBtn);
         bottomPanel.add(loadBtn);
-
-        mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
     }
 
     private class ConstantPanel extends JPanel{
