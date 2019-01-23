@@ -27,6 +27,7 @@ public class OknoMigLayout {
     private static JButton addVariableBtn = new JButton("Add variable");
     private static JButton addConstraintBtn = new JButton("Add constraint");
     private static JButton createQueryBtn = new JButton("Create query");
+    private static JButton loadQueryBtn = new JButton("Load query");
     private static JPanel centerNorthPanel = new JPanel(new MigLayout());
     private static JPanel centerPanel = new JPanel(new MigLayout());
     private static JPanel bottomPanel = new JPanel(new MigLayout());
@@ -194,7 +195,16 @@ public class OknoMigLayout {
             }
         });
 
+        loadQueryBtn.addActionListener(new ActionListener(){
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //open windows pop up to load file from disk
+            }
+        });
+
         centerNorthPanel.add(createQueryBtn);
+        centerNorthPanel.add(loadQueryBtn);
 
         centerPanel.add(centerNorthPanel, "dock north, width 100%");
 
@@ -221,7 +231,6 @@ public class OknoMigLayout {
                 } else {
                     file = new File(variableFolderPath + varOrQueryNameTf.getText() + ".json");
                 }
-                variableCreation = false;
 
                 Component centerComponents[] = centerPanel.getComponents();
                 List<JSONObject> constList = new ArrayList<>();
@@ -229,24 +238,35 @@ public class OknoMigLayout {
                 for (Component component: centerComponents) {
                     if(component instanceof ConstraintPanel) {
                         ConstraintPanel constPanel = (ConstraintPanel) component;
-                        Map.Entry<String, List<JComboBox>> entry = constPanel.getAttributeMap().entrySet().iterator().next();
-                        JSONObject jsonConstraint = new JSONObject();
-                        jsonConstraint.put("table", entry.getKey());
-                        List<String> attList = new ArrayList<>();
+                        if(constPanel.getAttributeMap() == null){
+                            constList.add(constPanel.getJsonConstraint());
+                        } else {
+                            Map.Entry<String, List<JComboBox>> entry = constPanel.getAttributeMap().entrySet().iterator().next();
+                            JSONObject jsonConstraint = new JSONObject();
+                            jsonConstraint.put("table", entry.getKey());
+                            List<String> attList = new ArrayList<>();
 
-                        for (JComboBox att : entry.getValue()) {
-                            attList.add((String) att.getSelectedItem());
+                            for (JComboBox att : entry.getValue()) {
+                                attList.add((String) att.getSelectedItem());
+                            }
+                            String[] attArray = new String[attList.size()];
+                            attArray = attList.toArray(attArray);
+                            jsonConstraint.put("attributes", attArray);
+                            constList.add(jsonConstraint);
                         }
-                        String[] attArray = new String[attList.size()];
-                        attArray = attList.toArray(attArray);
-                        jsonConstraint.put("attributes", attArray);
-                        constList.add(jsonConstraint);
                     }
                 }
                 JSONObject[] constArray = new JSONObject[constList.size()];
                 constArray = constList.toArray(constArray);
                 jsonObject.put("constraints", constArray);
                 String result = jsonObject.toString(2);
+                if(variableCreation){
+                    VariablePanel varPanel = new VariablePanel(varOrQueryNameTf.getText(), result);
+                    variablesPanel.add(varPanel);
+                    variablesPanel.revalidate();
+                    variablesPanel.repaint();
+                    variableCreation = false;
+                }
                 Writer writer = null;
                 try {
                     writer = new BufferedWriter(new OutputStreamWriter(
@@ -263,6 +283,7 @@ public class OknoMigLayout {
 
                 varOrQueryNameTf.setText("");
                 centerNorthPanel.add(createQueryBtn);
+                centerNorthPanel.add(loadQueryBtn);
                 centerPanel.add(centerNorthPanel, "dock north, width 100%");
 
                 mainFrame.revalidate();
@@ -271,17 +292,27 @@ public class OknoMigLayout {
                 JOptionPane.showMessageDialog(null, "Save successful");
             }
         });
-        JButton loadBtn = new JButton("Load");
-        loadBtn.addActionListener(new ActionListener(){
+        JButton cancelBtn = new JButton("Cancel");
+        cancelBtn.addActionListener(new ActionListener(){
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                centerNorthPanel.removeAll();
+                centerPanel.removeAll();
+                mainFrame.remove(bottomPanel);
 
+                varOrQueryNameTf.setText("");
+                centerNorthPanel.add(createQueryBtn);
+                centerNorthPanel.add(loadQueryBtn);
+                centerPanel.add(centerNorthPanel, "dock north, width 100%");
+
+                mainFrame.revalidate();
+                mainFrame.repaint();
             }
         });
 
         bottomPanel.add(saveBtn);
-        bottomPanel.add(loadBtn);
+        bottomPanel.add(cancelBtn);
     }
 
     private class ConstantPanel extends JPanel{
@@ -378,16 +409,18 @@ public class OknoMigLayout {
             editBtn.addActionListener(new ActionListener(){
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    variableCreation = true;
                     centerPanel.removeAll();
                     centerNorthPanel.removeAll();
 
                     centerNorthPanel.add(addConstraintBtn);
+                    varOrQueryNameTf.setText(name);
                     centerNorthPanel.add(varOrQueryNameTf);
 
                     mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
 
                     centerPanel.add(centerNorthPanel, "dock north, width 100%");
-                    centerPanel.add(axisPanel, "dock west, height 100%, width " + constraintPanelWidth);
+                    //centerPanel.add(axisPanel, "dock west, height 100%, width " + constraintPanelWidth);
 
                     centerPanel.revalidate();
                     centerPanel.repaint();
@@ -402,7 +435,7 @@ public class OknoMigLayout {
                     {
                         JSONObject object = (JSONObject) cons;
                         ConstraintPanel panel = new ConstraintPanel(object);
-                        centerPanel.add(panel);
+                        centerPanel.add(panel, "dock west, height 100%, width " + constraintPanelWidth);
                         centerPanel.revalidate();
                         centerPanel.repaint();
                     }
@@ -437,6 +470,7 @@ public class OknoMigLayout {
 
         ConstraintPanel thisPanel;
         Map<String, List<JComboBox>> attMap;
+        JSONObject constraints;
 
         public ConstraintPanel(Map<String, List<JComboBox>> attMap) {
             super();
@@ -477,16 +511,52 @@ public class OknoMigLayout {
         }
 
         public ConstraintPanel(JSONObject constraints) {
+            super();
+            thisPanel = this;
+            this.constraints = constraints;
+
             String tableName = constraints.getString("table");
+
+            this.setLayout(new MigLayout());
+            JLabel label = new JLabel(tableName);
+            this.add(label, "wrap");
+
             JSONArray attributes = (JSONArray) constraints.get("attributes");
             for(Object attribute: attributes){
-                String value = (String) attribute;
-                System.out.println(value + "---");
+                JLabel attValue = new JLabel((String) attribute);
+                this.add(attValue, "wrap");
             }
+
+            JButton editBtn = new JButton("Edit");
+            editBtn.addActionListener(new ActionListener(){
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    mainFrame.revalidate();
+                    mainFrame.repaint();
+                }
+
+            });
+            this.add(editBtn, "wrap");
+
+            JButton removeBtn = new JButton("Remove");
+            removeBtn.addActionListener(new ActionListener(){
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    thisPanel.getParent().remove(thisPanel);
+                    mainFrame.revalidate();
+                    mainFrame.repaint();
+                }
+
+            });
+            this.add(removeBtn);
         }
 
         public Map<String, List<JComboBox>> getAttributeMap(){
             return this.attMap;
+        }
+
+        public JSONObject getJsonConstraint() {
+            return this.constraints;
         }
     }
 }
