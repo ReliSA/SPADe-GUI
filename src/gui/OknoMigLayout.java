@@ -10,10 +10,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
+
 import org.json.*;
 
 public class OknoMigLayout {
@@ -107,11 +106,10 @@ public class OknoMigLayout {
             }
         });
 
-        //northPanel.add(new JButton("Add variable"), "grow");
-
         mainFrame.add(constantsPanel,"dock north");
 
         JPanel variablesPanel = new JPanel(new MigLayout());
+        variablesPanel.add(addVariableBtn);
 
         File variableFolder = new File(variableFolderPath);
         if (!variableFolder.exists()){
@@ -121,9 +119,11 @@ public class OknoMigLayout {
             for (File file : files) {
                 try {
                     String content = FileUtils.readFileToString(file, "utf-8");
-
-
-                } catch(IOException e) {
+                    VariablePanel varPanel = new VariablePanel(file.getName().substring(0, file.getName().indexOf('.')), content);
+                    variablesPanel.add(varPanel);
+                    variablesPanel.revalidate();
+                    variablesPanel.repaint();
+                } catch(Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -149,9 +149,6 @@ public class OknoMigLayout {
                 centerNorthPanel.repaint();
             }
         });
-
-        variablesPanel.add(addVariableBtn);
-        //northPanel.add(new JButton("Add variable"), "grow");
 
         mainFrame.add(variablesPanel,"dock north");
 
@@ -249,12 +246,12 @@ public class OknoMigLayout {
                 JSONObject[] constArray = new JSONObject[constList.size()];
                 constArray = constList.toArray(constArray);
                 jsonObject.put("constraints", constArray);
-
+                String result = jsonObject.toString(2);
                 Writer writer = null;
                 try {
                     writer = new BufferedWriter(new OutputStreamWriter(
                             new FileOutputStream(file), "utf-8"));
-                    writer.write(jsonObject.toString(2));
+                    writer.write(result);
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 } finally {
@@ -360,6 +357,82 @@ public class OknoMigLayout {
         }
     }
 
+    private class VariablePanel extends JPanel{
+        VariablePanel thisPanel;
+        String name;
+        String content;
+
+        public VariablePanel(String varName, String varContent) {
+            super();
+            thisPanel = this;
+            name = varName;
+            content = varContent;
+            this.setLayout(new MigLayout());
+            JLabel label = new JLabel(name);
+            this.add(label);
+
+            Border border = BorderFactory.createLineBorder(Color.BLACK, 1);
+            this.setBorder(border);
+
+            JButton editBtn = new JButton("E");
+            editBtn.addActionListener(new ActionListener(){
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    centerPanel.removeAll();
+                    centerNorthPanel.removeAll();
+
+                    centerNorthPanel.add(addConstraintBtn);
+                    centerNorthPanel.add(varOrQueryNameTf);
+
+                    mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
+
+                    centerPanel.add(centerNorthPanel, "dock north, width 100%");
+                    centerPanel.add(axisPanel, "dock west, height 100%, width " + constraintPanelWidth);
+
+                    centerPanel.revalidate();
+                    centerPanel.repaint();
+
+                    centerNorthPanel.revalidate();
+                    centerNorthPanel.repaint();
+
+                    JSONObject jsonObject = new JSONObject(content);
+
+                    JSONArray constraints = (JSONArray) jsonObject.get("constraints");
+                    for (Object cons : constraints)
+                    {
+                        JSONObject object = (JSONObject) cons;
+                        ConstraintPanel panel = new ConstraintPanel(object);
+                        centerPanel.add(panel);
+                        centerPanel.revalidate();
+                        centerPanel.repaint();
+                    }
+                }
+
+            });
+            this.add(editBtn);
+
+            JButton removeBtn = new JButton("R");
+            removeBtn.addActionListener(new ActionListener(){
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    thisPanel.getParent().remove(thisPanel);
+                    try {
+                        File file = new File(variableFolderPath + name + ".json");
+                        if( !file.delete() ){
+                            System.out.println("Delete operation failed.");
+                        }
+                    } catch(Exception ex){
+                        ex.printStackTrace();
+                    }
+                    mainFrame.revalidate();
+                    mainFrame.repaint();
+                }
+
+            });
+            this.add(removeBtn);
+        }
+    }
+
     private class ConstraintPanel extends JPanel {
 
         ConstraintPanel thisPanel;
@@ -401,6 +474,15 @@ public class OknoMigLayout {
 
             });
             this.add(removeBtn);
+        }
+
+        public ConstraintPanel(JSONObject constraints) {
+            String tableName = constraints.getString("table");
+            JSONArray attributes = (JSONArray) constraints.get("attributes");
+            for(Object attribute: attributes){
+                String value = (String) attribute;
+                System.out.println(value + "---");
+            }
         }
 
         public Map<String, List<JComboBox>> getAttributeMap(){
