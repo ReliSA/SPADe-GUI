@@ -165,7 +165,7 @@ public class OknoMigLayout {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                ConstraintForm constraintForm = new ConstraintForm();
+                ConstraintsForm constraintForm = new ConstraintsForm();
                 Map<String, List<JComboBox>> attMap = constraintForm.getFormData();
                 if (!attMap.isEmpty()) {
                     centerPanel.add(new ConstraintPanel(attMap), "dock west, height 100%, width " + constraintPanelWidth);
@@ -626,8 +626,8 @@ class ConstantsForm extends JDialog
     private JButton btnCancel = new JButton("Cancel");
     private JTextField tfName = new JTextField();
     private JTextField tfValue = new JTextField();
-    private String constName = "";
-    private String constValue = "";
+    private String constName;
+    private String constValue;
     private boolean cancelled = false;
 
     public ConstantsForm(String name, String value){
@@ -708,7 +708,7 @@ class ConstantsForm extends JDialog
     }
 }
 
-class ConstraintForm extends JDialog
+class ConstraintsForm extends JDialog
 {
     private static final long serialVersionUID = -8229943813762614201L;
     private JButton btnSubmit = new JButton("OK");
@@ -730,7 +730,7 @@ class ConstraintForm extends JDialog
     JComboBox cboxOperators = new JComboBox(operators);
     JTextField tfAttValue = new JTextField("Value");
 
-    public ConstraintForm()
+    public ConstraintsForm()
     {
         setModal(true);
         setLocation(400,300);
@@ -740,7 +740,7 @@ class ConstraintForm extends JDialog
         attValuesList.add(new JComboBox());
         attValuesList.clear();
 
-        setSize(600,200);
+        setSize(600,150);
         setLocationRelativeTo(null);
         this.setTitle("Attributes");
 
@@ -771,74 +771,53 @@ class ConstraintForm extends JDialog
                                          cboxOperators = new JComboBox(operators);
                                          cboxAttributes.setPreferredSize(Konstanty.VELIKOST_CELA_SIRKA);
                                          tfAttValue = new JTextField("Value");
-                                         GridBagConstraints g = new GridBagConstraints();
-                                         g.insets = new Insets(5, 5, 5, 5);
-                                         g.fill = GridBagConstraints.HORIZONTAL;
-                                         g.gridx = 1;
-                                         g.gridy = row;
-                                         g.weightx = 1.0;
-                                         g.weighty = 0.0;
-                                         g.gridwidth = 4;
-                                         setSize(getWidth(),getHeight() + 38);
+
+                                         setSize(getWidth(),getHeight() + 33);
                                          remove(btnClose);
                                          remove(btnSubmit);
-                                         add(cboxAttributes, g);
+                                         remove(btnAdd);
+
+                                         add(cboxAttributes, "width 40%");
                                          attValuesList.add(cboxAttributes);
-                                         g.gridx = 5;
-                                         g.gridy = row++;
-                                         g.gridwidth = 1;
-                                         add(cboxOperators, g);
-                                         g.gridx = 6;
-                                         add(tfAttValue, g);
-                                         GridBagConstraints g2 = new GridBagConstraints();
-                                         g2.insets = new Insets(5, 5, 5, 5);
-                                         g2.fill = GridBagConstraints.HORIZONTAL;
-                                         g2.weightx = 1.0;
-                                         g2.weighty = 0.0;
-                                         g2.gridx = 1;
-                                         g2.gridy = row++;
-                                         g2.gridwidth = 1;
-                                         add(btnSubmit, g2);
-                                         g2.gridx = 4;
-                                         add(btnClose, g2);
+
+                                         add(cboxOperators, "width 15%");
+
+                                         add(tfAttValue, "width 20%, wrap");
+
+                                         add(btnAdd);
+
+                                         add(new JLabel());
+
+                                         add(btnSubmit, "width 15%");
+
+                                         add(btnClose, "width 15%");
                                      }
                                  }
         );
 
-        this.setLayout(new GridBagLayout());
-        GridBagConstraints g = new GridBagConstraints();
-        g.insets = new Insets(5, 5, 5, 5);
-        g.fill = GridBagConstraints.HORIZONTAL;
-        g.gridx = 0;
-        g.gridy = 0;
-        g.weightx = 1.0;
-        g.weighty = 0.0;
-        g.gridwidth = 1;
-        this.add(lblType, g);
-        g.gridx = 1;
-        g.gridwidth = 4;
-        this.add(cboxTables, g);
-        g.gridx = 0;
-        g.gridy = 1;
-        g.gridwidth = 1;
-        this.add(lblAttribute, g);
-        g.gridx = 1;
-        g.gridwidth = 4;
-        this.add(cboxAttributes, g);
-        g.gridx = 5;
-        g.gridwidth = 1;
-        this.add(cboxOperators, g);
-        g.gridx = 6;
-        this.add(tfAttValue, g);
+        this.setLayout(new MigLayout());
+
+        this.add(lblType);
+
+        this.add(cboxTables, "width 40%, wrap");
+
+        this.add(lblAttribute);
+
+        this.add(cboxAttributes, "width 40%");
+
+        this.add(cboxOperators, "width 15%");
+
+        this.add(tfAttValue, "width 20%, wrap");
         attValuesList.add(cboxAttributes);
-        g.gridx = 1;
-        g.gridy = 2;
-        this.add(btnSubmit, g);
-        g.gridx = 4;
-        this.add(btnClose, g);
-        g.gridx = 0;
-        g.gridy = 2;
-        this.add(btnAdd, g);
+
+        this.add(btnAdd);
+
+        this.add(new JLabel());
+
+        this.add(btnSubmit, "width 15%");
+
+        this.add(btnClose, "width 15%");
+
         this.setVisible(true);
 
     }
