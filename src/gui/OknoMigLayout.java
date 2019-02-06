@@ -33,6 +33,7 @@ public class OknoMigLayout {
     private static JPanel centerPanel = new JPanel(new MigLayout());
     private static JPanel bottomPanel = new JPanel(new MigLayout());
     private static JPanel axisPanel = new JPanel(new MigLayout());
+    private static JLabel lblName = new JLabel("Name");
     private static JTextField varOrQueryNameTf = new JTextField(10);
     private static final JFileChooser fileChooser = new JFileChooser();
 
@@ -139,6 +140,7 @@ public class OknoMigLayout {
                 centerNorthPanel.removeAll();
 
                 centerNorthPanel.add(addConstraintBtn);
+                centerNorthPanel.add(lblName);
                 centerNorthPanel.add(varOrQueryNameTf);
 
                 mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
@@ -182,6 +184,7 @@ public class OknoMigLayout {
                 centerNorthPanel.removeAll();
 
                 centerNorthPanel.add(addConstraintBtn);
+                centerNorthPanel.add(lblName);
                 centerNorthPanel.add(varOrQueryNameTf);
 
                 mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
@@ -246,7 +249,7 @@ public class OknoMigLayout {
                     centerNorthPanel.revalidate();
                     centerNorthPanel.repaint();
                 } else {
-                    //log.append("Open command cancelled by user." + newline);
+                    // user cancelled the action - nothing happens
                 }
             }
 
@@ -796,30 +799,18 @@ class ConstraintsForm extends JDialog
         );
 
         this.setLayout(new MigLayout());
-
         this.add(lblType);
-
         this.add(cboxTables, "width 40%, wrap");
-
         this.add(lblAttribute);
-
         this.add(cboxAttributes, "width 40%");
-
         this.add(cboxOperators, "width 15%");
-
         this.add(tfAttValue, "width 20%, wrap");
         attValuesList.add(cboxAttributes);
-
         this.add(btnAdd);
-
         this.add(new JLabel());
-
         this.add(btnSubmit, "width 15%");
-
         this.add(btnClose, "width 15%");
-
         this.setVisible(true);
-
     }
 
     public Map<String, java.util.List<JComboBox>> getFormData()
