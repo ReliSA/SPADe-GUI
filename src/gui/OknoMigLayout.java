@@ -4,12 +4,15 @@ import net.miginfocom.swing.MigLayout;
 import org.apache.commons.io.FileUtils;
 import ostatni.Konstanty;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
+import java.net.URL;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,6 +25,7 @@ public class OknoMigLayout {
     private static boolean variableCreation = false;
     private static JFrame mainFrame;
     private static String constantFolderPath = "C:\\WorkspaceSchool\\SPADE\\src\\zdroje\\konstanty\\";
+    //private URL constantFolderPathUrl = this.getClass().getClassLoader().getResource("zdroje/konstanty");
     private static String queryFolderPath = "C:\\WorkspaceSchool\\SPADE\\src\\zdroje\\dotazy\\";
     private static String variableFolderPath = "C:\\WorkspaceSchool\\SPADE\\src\\zdroje\\promenne\\";
     private static JButton addConstantBtn = new JButton("Add constant");
@@ -275,7 +279,7 @@ public class OknoMigLayout {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                File file = null;
+                File file;
                 JSONObject jsonObject = new JSONObject();
                 if (!variableCreation) {
                     file = new File(queryFolderPath + varOrQueryNameTf.getText() + ".json");
@@ -325,6 +329,17 @@ public class OknoMigLayout {
                             variablesPanel.add(varPanel);
                             variablesPanel.revalidate();
                             variablesPanel.repaint();
+                        } else {
+                            //get var panel a nastavit mu content (result)
+                            Component[] components = variablesPanel.getComponents();
+                            for(Component comp :  components){
+                                if(comp instanceof VariablePanel){
+                                    VariablePanel varPanel = (VariablePanel) comp;
+                                    if(varPanel.getName().equals(varOrQueryNameTf.getText())) {
+                                        varPanel.setContent(result);
+                                    }
+                                }
+                            }
                         }
                     }
                     variableCreation = false;
@@ -394,7 +409,23 @@ public class OknoMigLayout {
             Border border = BorderFactory.createLineBorder(Color.BLACK, 1);
             this.setBorder(border);
 
-            JButton editBtn = new JButton("E");
+            JButton editBtn = new JButton();
+            try {
+                Image img = ImageIO.read(getClass().getClassLoader().getResource("zdroje/obrazky/editImage.png"));
+                if (img != null){
+                    Image newimg = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
+                    editBtn.setIcon(new ImageIcon(newimg));
+                } else {
+                    editBtn.setText("E");
+                }
+                editBtn.setMargin(new Insets(1,1,1,1));
+                editBtn.setBorderPainted(false);
+                editBtn.setContentAreaFilled(false);
+                editBtn.setFocusPainted(false);
+                editBtn.setOpaque(false);
+            } catch (Exception ex) {
+                System.out.println(ex);
+            }
             editBtn.addActionListener(new ActionListener(){
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -428,7 +459,23 @@ public class OknoMigLayout {
             });
             this.add(editBtn);
 
-            JButton removeBtn = new JButton("R");
+            JButton removeBtn = new JButton();
+            try {
+                Image img = ImageIO.read(getClass().getClassLoader().getResource("zdroje/obrazky/deleteImage.png"));
+                if (img != null){
+                    Image newimg = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
+                    removeBtn.setIcon(new ImageIcon(newimg));
+                } else {
+                    removeBtn.setText("R");
+                }
+                removeBtn.setMargin(new Insets(1,1,1,1));
+                removeBtn.setBorderPainted(false);
+                removeBtn.setContentAreaFilled(false);
+                removeBtn.setFocusPainted(false);
+                removeBtn.setOpaque(false);
+            } catch (Exception ex) {
+                System.out.println(ex);
+            }
             removeBtn.addActionListener(new ActionListener(){
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -467,7 +514,23 @@ public class OknoMigLayout {
             Border border = BorderFactory.createLineBorder(Color.BLACK, 1);
             this.setBorder(border);
 
-            JButton editBtn = new JButton("E");
+            JButton editBtn = new JButton();
+            try {
+                Image img = ImageIO.read(getClass().getClassLoader().getResource("zdroje/obrazky/editImage.png"));
+                if (img != null){
+                    Image newimg = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
+                    editBtn.setIcon(new ImageIcon(newimg));
+                } else {
+                    editBtn.setText("E");
+                }
+                editBtn.setMargin(new Insets(1,1,1,1));
+                editBtn.setBorderPainted(false);
+                editBtn.setContentAreaFilled(false);
+                editBtn.setFocusPainted(false);
+                editBtn.setOpaque(false);
+            } catch (Exception ex) {
+                System.out.println(ex);
+            }
             editBtn.addActionListener(new ActionListener(){
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -506,7 +569,23 @@ public class OknoMigLayout {
             });
             this.add(editBtn);
 
-            JButton removeBtn = new JButton("R");
+            JButton removeBtn = new JButton();
+            try {
+                Image img = ImageIO.read(getClass().getClassLoader().getResource("zdroje/obrazky/deleteImage.png"));
+                if (img != null){
+                    Image newimg = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
+                    removeBtn.setIcon(new ImageIcon(newimg));
+                } else {
+                    removeBtn.setText("R");
+                }
+                removeBtn.setMargin(new Insets(1,1,1,1));
+                removeBtn.setBorderPainted(false);
+                removeBtn.setContentAreaFilled(false);
+                removeBtn.setFocusPainted(false);
+                removeBtn.setOpaque(false);
+            } catch (Exception ex) {
+                System.out.println(ex);
+            }
             removeBtn.addActionListener(new ActionListener(){
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -526,6 +605,14 @@ public class OknoMigLayout {
             });
             this.add(removeBtn);
         }
+
+        public String getName(){
+            return this.name;
+        }
+
+        public void setContent(String content){
+            this.content = content;
+        }
     }
 
     private class ConstraintPanel extends JPanel {
@@ -540,6 +627,18 @@ public class OknoMigLayout {
             this.attMap = attMap;
             this.setLayout(new MigLayout());
             Map.Entry<String, List<JComboBox>> entry = attMap.entrySet().iterator().next();
+
+            JSONObject jsonConstraint = new JSONObject();
+            jsonConstraint.put("table", entry.getKey());
+            JSONArray attributes = new JSONArray();
+
+            for (JComboBox att : entry.getValue()) {
+                attributes.put(att.getSelectedItem());
+            }
+
+            jsonConstraint.put("attributes", attributes);
+            this.constraints = jsonConstraint;
+
             JLabel label = new JLabel(entry.getKey());
             this.add(label, "wrap");
 
@@ -552,6 +651,33 @@ public class OknoMigLayout {
             editBtn.addActionListener(new ActionListener(){
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    JSONObject constraint = getJsonConstraint();
+                    ConstraintsForm form = new ConstraintsForm(constraint);
+
+                    Component[] components = getComponents();
+                    for(int i = 0; i < components.length; i++){
+                        if(components[i] instanceof JLabel){
+                            remove(components[i]);
+                        }
+                    }
+
+                    Map<String, List<JComboBox>> attMap = form.getFormData();
+                    if (!attMap.isEmpty()) {
+                        Map.Entry<String, List<JComboBox>> entry = attMap.entrySet().iterator().next();
+                        JLabel label = new JLabel(entry.getKey());
+                        add(label, "wrap, dock north");
+                        // delete reminder box
+                        //attMap.get(entry.getKey()).remove(0);
+                        setAttMap(attMap);
+                        setConstraints(attMap);
+                        for(int i = 0; i< entry.getValue().size(); i++){
+                            JLabel attValue = new JLabel((String) entry.getValue().get(i).getSelectedItem());
+                            add(attValue, "wrap, dock north");
+                        }
+                    }
+
+                    setBorder(new EmptyBorder(10, 10, 10, 10));
+                    centerPanel.revalidate();
                     mainFrame.revalidate();
                     mainFrame.repaint();
                 }
@@ -593,6 +719,31 @@ public class OknoMigLayout {
             editBtn.addActionListener(new ActionListener(){
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    JSONObject constraint = getJsonConstraint();
+                    ConstraintsForm form = new ConstraintsForm(constraint);
+
+                    Component[] components = getComponents();
+                    for(int i = 0; i < components.length; i++){
+                        if(components[i] instanceof JLabel){
+                            remove(components[i]);
+                        }
+                    }
+                    Map<String, List<JComboBox>> attMap = form.getFormData();
+                    if (!attMap.isEmpty()) {
+                        Map.Entry<String, List<JComboBox>> entry = attMap.entrySet().iterator().next();
+                        JLabel label = new JLabel(entry.getKey());
+                        add(label, "wrap, dock north");
+                        // delete reminder box
+                        //attMap.get(entry.getKey()).remove(0);
+                        setAttMap(attMap);
+                        setConstraints(attMap);
+                        for(int i = 0; i< entry.getValue().size(); i++){
+                            JLabel attValue = new JLabel((String) entry.getValue().get(i).getSelectedItem());
+                            add(attValue, "wrap, dock north");
+                        }
+                    }
+                    setBorder(new EmptyBorder(10, 10, 10, 10));
+                    centerPanel.revalidate();
                     mainFrame.revalidate();
                     mainFrame.repaint();
                 }
@@ -611,6 +762,28 @@ public class OknoMigLayout {
 
             });
             this.add(removeBtn);
+        }
+
+        public void setAttMap(Map<String, List<JComboBox>> attMap){
+            this.attMap = attMap;
+        }
+
+        public void setAttMap(JSONObject constraints){
+            this.constraints = constraints;
+        }
+
+        public void setConstraints(Map<String, List<JComboBox>> attMap){
+            Map.Entry<String, List<JComboBox>> entry = attMap.entrySet().iterator().next();
+            JSONObject jsonConstraint = new JSONObject();
+            jsonConstraint.put("table", entry.getKey());
+            JSONArray attributes = new JSONArray();
+
+            for (JComboBox att : entry.getValue()) {
+                attributes.put(att.getSelectedItem());
+            }
+
+            jsonConstraint.put("attributes", attributes);
+            this.constraints = jsonConstraint;
         }
 
         public Map<String, List<JComboBox>> getAttributeMap(){
@@ -718,7 +891,6 @@ class ConstraintsForm extends JDialog
     private JButton btnClose = new JButton("CANCEL");
     private JButton btnAdd = new JButton("Add");
     private JTextField tfAttribute = new JTextField();
-    private int row = 2;
     private boolean closed = true;
 
     JTextField tf = new JTextField(8);
@@ -728,7 +900,7 @@ class ConstraintsForm extends JDialog
     JComboBox cboxTables = new JComboBox(tables);
     String[] attributes = { "Att1", "Att2", "Att3", "Att4", "Att5" };
     JComboBox cboxAttributes = new JComboBox(attributes);
-    java.util.List<JComboBox> attValuesList = new ArrayList<>();
+    List<JComboBox> attValuesList = new ArrayList<>();
     String[] operators = { "<", "=", ">", "!=" };
     JComboBox cboxOperators = new JComboBox(operators);
     JTextField tfAttValue = new JTextField("Value");
@@ -740,8 +912,8 @@ class ConstraintsForm extends JDialog
         // TODO - cancel on close - don't know how
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-        attValuesList.add(new JComboBox());
-        attValuesList.clear();
+        //attValuesList.add(new JComboBox());
+        //attValuesList.clear();
 
         setSize(600,150);
         setLocationRelativeTo(null);
@@ -782,17 +954,11 @@ class ConstraintsForm extends JDialog
 
                                          add(cboxAttributes, "width 40%");
                                          attValuesList.add(cboxAttributes);
-
                                          add(cboxOperators, "width 15%");
-
                                          add(tfAttValue, "width 20%, wrap");
-
                                          add(btnAdd);
-
                                          add(new JLabel());
-
                                          add(btnSubmit, "width 15%");
-
                                          add(btnClose, "width 15%");
                                      }
                                  }
@@ -806,6 +972,101 @@ class ConstraintsForm extends JDialog
         this.add(cboxOperators, "width 15%");
         this.add(tfAttValue, "width 20%, wrap");
         attValuesList.add(cboxAttributes);
+        this.add(btnAdd);
+        this.add(new JLabel());
+        this.add(btnSubmit, "width 15%");
+        this.add(btnClose, "width 15%");
+        this.setVisible(true);
+    }
+
+    public ConstraintsForm(JSONObject constraint){
+        setModal(true);
+        setLocation(400,300);
+        // TODO - cancel on close - don't know how
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        int temp = 0;
+
+        //attValuesList.add(new JComboBox());
+        //attValuesList.clear();
+
+        setSize(600,150);
+        setLocationRelativeTo(null);
+        this.setTitle("Attributes");
+
+        tfAttribute.setPreferredSize(Konstanty.VELIKOST_CELA_SIRKA);
+        btnSubmit.setPreferredSize(Konstanty.VELIKOST_POLOVICNI_SIRKA);
+        btnClose.setPreferredSize(Konstanty.VELIKOST_POLOVICNI_SIRKA);
+        tfAttValue.setPreferredSize(Konstanty.VELIKOST_POLOVICNI_SIRKA);
+        btnAdd.setPreferredSize(new Dimension(60,28));
+
+        btnSubmit.addActionListener(new ActionListener(){
+                                        public void actionPerformed(ActionEvent e){
+                                            closed = false;
+                                            dispose();
+                                        }
+                                    }
+        );
+
+        btnClose.addActionListener(new ActionListener(){
+                                       public void actionPerformed(ActionEvent e){
+                                           dispose();
+                                       }
+                                   }
+        );
+
+        btnAdd.addActionListener(new ActionListener(){
+                                     public void actionPerformed(ActionEvent e){
+                                         cboxAttributes = new JComboBox(attributes);
+                                         cboxOperators = new JComboBox(operators);
+                                         cboxAttributes.setPreferredSize(Konstanty.VELIKOST_CELA_SIRKA);
+                                         tfAttValue = new JTextField("Value");
+
+                                         setSize(getWidth(),getHeight() + 33);
+                                         remove(btnClose);
+                                         remove(btnSubmit);
+                                         remove(btnAdd);
+
+                                         add(cboxAttributes, "width 40%");
+                                         attValuesList.add(cboxAttributes);
+                                         add(cboxOperators, "width 15%");
+                                         add(tfAttValue, "width 20%, wrap");
+                                         add(btnAdd);
+                                         add(new JLabel());
+                                         add(btnSubmit, "width 15%");
+                                         add(btnClose, "width 15%");
+                                     }
+                                 }
+        );
+
+        this.setLayout(new MigLayout());
+        this.add(lblType);
+        String tableName = constraint.getString("table");
+        cboxTables.setSelectedItem(tableName);
+        this.add(cboxTables, "width 40%, wrap");
+        this.add(lblAttribute);
+        //attValuesList.add(cboxAttributes);
+
+        JSONArray atts = (JSONArray) constraint.get("attributes");
+        for(Object attribute: atts) {
+            cboxAttributes = new JComboBox(attributes);
+            cboxOperators = new JComboBox(operators);
+            cboxAttributes.setPreferredSize(Konstanty.VELIKOST_CELA_SIRKA);
+            tfAttValue = new JTextField("Value");
+
+            setSize(getWidth(), getHeight() + 33);
+
+            cboxAttributes.setSelectedItem((String) attribute);
+            if (temp != 0) {
+                add(new JLabel());
+            }
+            temp++;
+            add(cboxAttributes, "width 40%");
+            attValuesList.add(cboxAttributes);
+            add(cboxOperators, "width 15%");
+            add(tfAttValue, "width 20%, wrap");
+        }
+        temp = 0;
+
         this.add(btnAdd);
         this.add(new JLabel());
         this.add(btnSubmit, "width 15%");
