@@ -722,24 +722,26 @@ public class OknoMigLayout {
                     JSONObject constraint = getJsonConstraint();
                     ConstraintsForm form = new ConstraintsForm(constraint);
 
-                    Component[] components = getComponents();
-                    for(int i = 0; i < components.length; i++){
-                        if(components[i] instanceof JLabel){
-                            remove(components[i]);
+                    if(!form.wasClosed()) {
+                        Component[] components = getComponents();
+                        for (int i = 0; i < components.length; i++) {
+                            if (components[i] instanceof JLabel) {
+                                remove(components[i]);
+                            }
                         }
-                    }
-                    Map<String, List<JComboBox>> attMap = form.getFormData();
-                    if (!attMap.isEmpty()) {
-                        Map.Entry<String, List<JComboBox>> entry = attMap.entrySet().iterator().next();
-                        JLabel label = new JLabel(entry.getKey());
-                        add(label, "wrap, dock north");
-                        // delete reminder box
-                        //attMap.get(entry.getKey()).remove(0);
-                        setAttMap(attMap);
-                        setConstraints(attMap);
-                        for(int i = 0; i< entry.getValue().size(); i++){
-                            JLabel attValue = new JLabel((String) entry.getValue().get(i).getSelectedItem());
-                            add(attValue, "wrap, dock north");
+                        Map<String, List<JComboBox>> attMap = form.getFormData();
+                        if (!attMap.isEmpty()) {
+                            Map.Entry<String, List<JComboBox>> entry = attMap.entrySet().iterator().next();
+                            JLabel label = new JLabel(entry.getKey());
+                            add(label, "wrap, dock north");
+                            // delete reminder box
+                            //attMap.get(entry.getKey()).remove(0);
+                            setAttMap(attMap);
+                            setConstraints(attMap);
+                            for (int i = 0; i < entry.getValue().size(); i++) {
+                                JLabel attValue = new JLabel((String) entry.getValue().get(i).getSelectedItem());
+                                add(attValue, "wrap, dock north");
+                            }
                         }
                     }
                     setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -1072,6 +1074,10 @@ class ConstraintsForm extends JDialog
         this.add(btnSubmit, "width 15%");
         this.add(btnClose, "width 15%");
         this.setVisible(true);
+    }
+
+    public boolean wasClosed(){
+        return this.closed;
     }
 
     public Map<String, java.util.List<JComboBox>> getFormData()
