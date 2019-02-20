@@ -330,7 +330,6 @@ public class OknoMigLayout {
                             variablesPanel.revalidate();
                             variablesPanel.repaint();
                         } else {
-                            //get var panel a nastavit mu content (result)
                             Component[] components = variablesPanel.getComponents();
                             for(Component comp :  components){
                                 if(comp instanceof VariablePanel){
@@ -437,21 +436,22 @@ public class OknoMigLayout {
                     mainFrame.revalidate();
                     mainFrame.repaint();
                     File oldFile = new File(constantFolderPath + oldName + ".json");
-                    String newFilePath = oldFile.getAbsolutePath().replace(oldFile.getName(), "") + name + ".json";
-                    File newFile = new File(newFilePath);
+                    oldFile.delete();
+                    File newFile = new File(constantFolderPath + name + ".json");
                     String jsonString = new JSONObject()
                             .put("name", name)
                             .put("value", value).toString(2);
                     Writer writer = null;
                     try {
-                        FileUtils.moveFile(oldFile, newFile);
                         writer = new BufferedWriter(new OutputStreamWriter(
                                 new FileOutputStream(newFile), "utf-8"));
                         writer.write(jsonString);
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     } finally {
-                        try {writer.close();} catch (Exception ex) {/*ignore*/}
+                        try {
+                            writer.close();
+                        } catch (Exception ex) {/*ignore*/}
                     }
 
                 }
@@ -845,7 +845,7 @@ class ConstantsForm extends JDialog
     }
 
     public String getConstName(){
-        String returnValue = null;
+        String returnValue = this.constName;
         if(!cancelled){
             returnValue = tfName.getText();
         }
@@ -853,7 +853,7 @@ class ConstantsForm extends JDialog
     }
 
     public String getConstValue(){
-        String returnValue = null;
+        String returnValue = this.constValue;
         if(!cancelled){
             returnValue = tfValue.getText();
         }
