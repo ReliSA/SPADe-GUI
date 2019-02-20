@@ -1,18 +1,21 @@
 package gui;
 
+import databaze.PohledDAO;
 import net.miginfocom.swing.MigLayout;
 import org.apache.commons.io.FileUtils;
+import ostatni.Atribut;
 import ostatni.Konstanty;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
-import java.net.URL;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -172,7 +175,7 @@ public class OknoMigLayout {
             @Override
             public void actionPerformed(ActionEvent e) {
                 ConstraintsForm constraintForm = new ConstraintsForm();
-                Map<String, List<JComboBox>> attMap = constraintForm.getFormData();
+                Map<String, List<Atribut>> attMap = constraintForm.getFormData();
                 if (!attMap.isEmpty()) {
                     centerPanel.add(new ConstraintPanel(attMap), "dock west, height 100%, width " + constraintPanelWidth);
                     centerPanel.revalidate();
@@ -297,17 +300,20 @@ public class OknoMigLayout {
                         if(constPanel.getAttributeMap() == null){
                             constList.add(constPanel.getJsonConstraint());
                         } else {
-                            Map.Entry<String, List<JComboBox>> entry = constPanel.getAttributeMap().entrySet().iterator().next();
+                            Map.Entry<String, List<Atribut>> entry = constPanel.getAttributeMap().entrySet().iterator().next();
                             JSONObject jsonConstraint = new JSONObject();
                             jsonConstraint.put("table", entry.getKey());
-                            List<String> attList = new ArrayList<>();
+                            JSONArray attributes = new JSONArray();
 
-                            for (JComboBox att : entry.getValue()) {
-                                attList.add((String) att.getSelectedItem());
+                            for (Atribut att : entry.getValue()) {
+                                JSONObject attribute = new JSONObject();
+                                attribute.put("name", att.getName());
+                                attribute.put("operator", att.getOperator());
+                                attribute.put("value", att.getValue());
+                                attributes.put(attribute);
                             }
-                            String[] attArray = new String[attList.size()];
-                            attArray = attList.toArray(attArray);
-                            jsonConstraint.put("attributes", attArray);
+
+                            jsonConstraint.put("attributes", attributes);
                             constList.add(jsonConstraint);
                         }
                     }
@@ -618,22 +624,26 @@ public class OknoMigLayout {
     private class ConstraintPanel extends JPanel {
 
         ConstraintPanel thisPanel;
-        Map<String, List<JComboBox>> attMap;
+        Map<String, List<Atribut>> attMap;
         JSONObject constraints;
 
-        public ConstraintPanel(Map<String, List<JComboBox>> attMap) {
+        public ConstraintPanel(Map<String, List<Atribut>> attMap) {
             super();
             thisPanel = this;
             this.attMap = attMap;
             this.setLayout(new MigLayout());
-            Map.Entry<String, List<JComboBox>> entry = attMap.entrySet().iterator().next();
+            Map.Entry<String, List<Atribut>> entry = attMap.entrySet().iterator().next();
 
             JSONObject jsonConstraint = new JSONObject();
             jsonConstraint.put("table", entry.getKey());
             JSONArray attributes = new JSONArray();
 
-            for (JComboBox att : entry.getValue()) {
-                attributes.put(att.getSelectedItem());
+            for (Atribut att : entry.getValue()) {
+                JSONObject attribute = new JSONObject();
+                attribute.put("name", att.getName());
+                attribute.put("operator", att.getOperator());
+                attribute.put("value", att.getValue());
+                attributes.put(attribute);
             }
 
             jsonConstraint.put("attributes", attributes);
@@ -642,8 +652,8 @@ public class OknoMigLayout {
             JLabel label = new JLabel(entry.getKey());
             this.add(label, "wrap");
 
-            for (JComboBox att : entry.getValue()) {
-                JLabel attValue = new JLabel((String) att.getSelectedItem());
+            for (Atribut att : entry.getValue()) {
+                JLabel attValue = new JLabel(att.getName());
                 this.add(attValue, "wrap");
             }
 
@@ -661,9 +671,9 @@ public class OknoMigLayout {
                         }
                     }
 
-                    Map<String, List<JComboBox>> attMap = form.getFormData();
+                    Map<String, List<Atribut>> attMap = form.getFormData();
                     if (!attMap.isEmpty()) {
-                        Map.Entry<String, List<JComboBox>> entry = attMap.entrySet().iterator().next();
+                        Map.Entry<String, List<Atribut>> entry = attMap.entrySet().iterator().next();
                         JLabel label = new JLabel(entry.getKey());
                         add(label, "wrap, dock north");
                         // delete reminder box
@@ -671,7 +681,7 @@ public class OknoMigLayout {
                         setAttMap(attMap);
                         setConstraints(attMap);
                         for(int i = 0; i< entry.getValue().size(); i++){
-                            JLabel attValue = new JLabel((String) entry.getValue().get(i).getSelectedItem());
+                            JLabel attValue = new JLabel((String) entry.getValue().get(i).getName());
                             add(attValue, "wrap, dock north");
                         }
                     }
@@ -711,7 +721,8 @@ public class OknoMigLayout {
 
             JSONArray attributes = (JSONArray) constraints.get("attributes");
             for(Object attribute: attributes){
-                JLabel attValue = new JLabel((String) attribute);
+                JSONObject jsonObject = (JSONObject) attribute;
+                JLabel attValue = new JLabel(jsonObject.getString("name"));
                 this.add(attValue, "wrap");
             }
 
@@ -729,9 +740,9 @@ public class OknoMigLayout {
                                 remove(components[i]);
                             }
                         }
-                        Map<String, List<JComboBox>> attMap = form.getFormData();
+                        Map<String, List<Atribut>> attMap = form.getFormData();
                         if (!attMap.isEmpty()) {
-                            Map.Entry<String, List<JComboBox>> entry = attMap.entrySet().iterator().next();
+                            Map.Entry<String, List<Atribut>> entry = attMap.entrySet().iterator().next();
                             JLabel label = new JLabel(entry.getKey());
                             add(label, "wrap, dock north");
                             // delete reminder box
@@ -739,7 +750,7 @@ public class OknoMigLayout {
                             setAttMap(attMap);
                             setConstraints(attMap);
                             for (int i = 0; i < entry.getValue().size(); i++) {
-                                JLabel attValue = new JLabel((String) entry.getValue().get(i).getSelectedItem());
+                                JLabel attValue = new JLabel((String) entry.getValue().get(i).getName());
                                 add(attValue, "wrap, dock north");
                             }
                         }
@@ -766,7 +777,7 @@ public class OknoMigLayout {
             this.add(removeBtn);
         }
 
-        public void setAttMap(Map<String, List<JComboBox>> attMap){
+        public void setAttMap(Map<String, List<Atribut>> attMap){
             this.attMap = attMap;
         }
 
@@ -774,21 +785,25 @@ public class OknoMigLayout {
             this.constraints = constraints;
         }
 
-        public void setConstraints(Map<String, List<JComboBox>> attMap){
-            Map.Entry<String, List<JComboBox>> entry = attMap.entrySet().iterator().next();
+        public void setConstraints(Map<String, List<Atribut>> attMap){
+            Map.Entry<String, List<Atribut>> entry = attMap.entrySet().iterator().next();
             JSONObject jsonConstraint = new JSONObject();
             jsonConstraint.put("table", entry.getKey());
             JSONArray attributes = new JSONArray();
 
-            for (JComboBox att : entry.getValue()) {
-                attributes.put(att.getSelectedItem());
+            for (Atribut att : entry.getValue()) {
+                JSONObject attribute = new JSONObject();
+                attribute.put("name", att.getName());
+                attribute.put("operator", att.getOperator());
+                attribute.put("value", att.getValue());
+                attributes.put(attribute);
             }
 
             jsonConstraint.put("attributes", attributes);
             this.constraints = jsonConstraint;
         }
 
-        public Map<String, List<JComboBox>> getAttributeMap(){
+        public Map<String, List<Atribut>> getAttributeMap(){
             return this.attMap;
         }
 
@@ -894,6 +909,7 @@ class ConstraintsForm extends JDialog
     private JButton btnAdd = new JButton("Add");
     private JTextField tfAttribute = new JTextField();
     private boolean closed = true;
+    private List<Atribut> attributeList = new ArrayList<>();
 
     JTextField tf = new JTextField(8);
     JLabel lblType = new JLabel("Type");
@@ -914,12 +930,12 @@ class ConstraintsForm extends JDialog
         // TODO - cancel on close - don't know how
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-        //attValuesList.add(new JComboBox());
-        //attValuesList.clear();
-
-        setSize(600,150);
+        setSize(600,170);
         setLocationRelativeTo(null);
         this.setTitle("Attributes");
+
+//        PohledDAO pohledDAO = new PohledDAO();
+//        pohledDAO.testPripojeni();
 
         tfAttribute.setPreferredSize(Konstanty.VELIKOST_CELA_SIRKA);
         btnSubmit.setPreferredSize(Konstanty.VELIKOST_POLOVICNI_SIRKA);
@@ -949,17 +965,16 @@ class ConstraintsForm extends JDialog
                                          cboxAttributes.setPreferredSize(Konstanty.VELIKOST_CELA_SIRKA);
                                          tfAttValue = new JTextField("Value");
 
-                                         setSize(getWidth(),getHeight() + 33);
+                                         setSize(getWidth(),getHeight() + 40);
                                          remove(btnClose);
                                          remove(btnSubmit);
                                          remove(btnAdd);
 
-                                         add(cboxAttributes, "width 40%");
-                                         attValuesList.add(cboxAttributes);
-                                         add(cboxOperators, "width 15%");
-                                         add(tfAttValue, "width 20%, wrap");
+                                         AttributePanel attributePanel = new AttributePanel();
+                                         add(attributePanel, "width 100%, wrap");
+                                         attributeList.add(attributePanel.getAtribut());
                                          add(btnAdd);
-                                         add(new JLabel());
+                                         //add(new JLabel());
                                          add(btnSubmit, "width 15%");
                                          add(btnClose, "width 15%");
                                      }
@@ -970,12 +985,11 @@ class ConstraintsForm extends JDialog
         this.add(lblType);
         this.add(cboxTables, "width 40%, wrap");
         this.add(lblAttribute);
-        this.add(cboxAttributes, "width 40%");
-        this.add(cboxOperators, "width 15%");
-        this.add(tfAttValue, "width 20%, wrap");
-        attValuesList.add(cboxAttributes);
+        AttributePanel attributePanel = new AttributePanel();
+        this.add(attributePanel, "width 100%, wrap");
+        attributeList.add(attributePanel.getAtribut());
         this.add(btnAdd);
-        this.add(new JLabel());
+        //this.add(new JLabel());
         this.add(btnSubmit, "width 15%");
         this.add(btnClose, "width 15%");
         this.setVisible(true);
@@ -988,12 +1002,12 @@ class ConstraintsForm extends JDialog
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         int temp = 0;
 
-        //attValuesList.add(new JComboBox());
-        //attValuesList.clear();
-
         setSize(600,150);
         setLocationRelativeTo(null);
         this.setTitle("Attributes");
+
+//        PohledDAO pohledDAO = new PohledDAO();
+//        pohledDAO.testPripojeni();
 
         tfAttribute.setPreferredSize(Konstanty.VELIKOST_CELA_SIRKA);
         btnSubmit.setPreferredSize(Konstanty.VELIKOST_POLOVICNI_SIRKA);
@@ -1023,17 +1037,16 @@ class ConstraintsForm extends JDialog
                                          cboxAttributes.setPreferredSize(Konstanty.VELIKOST_CELA_SIRKA);
                                          tfAttValue = new JTextField("Value");
 
-                                         setSize(getWidth(),getHeight() + 33);
+                                         setSize(getWidth(),getHeight() + 40);
                                          remove(btnClose);
                                          remove(btnSubmit);
                                          remove(btnAdd);
 
-                                         add(cboxAttributes, "width 40%");
-                                         attValuesList.add(cboxAttributes);
-                                         add(cboxOperators, "width 15%");
-                                         add(tfAttValue, "width 20%, wrap");
+                                         AttributePanel attributePanel = new AttributePanel();
+                                         add(attributePanel, "width 100%, wrap");
+                                         attributeList.add(attributePanel.getAtribut());
                                          add(btnAdd);
-                                         add(new JLabel());
+                                         //add(new JLabel());
                                          add(btnSubmit, "width 15%");
                                          add(btnClose, "width 15%");
                                      }
@@ -1050,27 +1063,22 @@ class ConstraintsForm extends JDialog
 
         JSONArray atts = (JSONArray) constraint.get("attributes");
         for(Object attribute: atts) {
-            cboxAttributes = new JComboBox(attributes);
-            cboxOperators = new JComboBox(operators);
-            cboxAttributes.setPreferredSize(Konstanty.VELIKOST_CELA_SIRKA);
-            tfAttValue = new JTextField("Value");
+            setSize(getWidth(), getHeight() + 40);
 
-            setSize(getWidth(), getHeight() + 33);
-
-            cboxAttributes.setSelectedItem((String) attribute);
             if (temp != 0) {
-                add(new JLabel());
+//                add(new JLabel());
             }
             temp++;
-            add(cboxAttributes, "width 40%");
-            attValuesList.add(cboxAttributes);
-            add(cboxOperators, "width 15%");
-            add(tfAttValue, "width 20%, wrap");
+
+            JSONObject jsonObject = (JSONObject) attribute;
+            AttributePanel attributePanel = new AttributePanel(jsonObject.getString("name"), jsonObject.getString("operator"), jsonObject.getString("value"));
+            add(attributePanel, "width 100%, wrap");
+            attributeList.add(attributePanel.getAtribut());
         }
         temp = 0;
 
         this.add(btnAdd);
-        this.add(new JLabel());
+        //this.add(new JLabel());
         this.add(btnSubmit, "width 15%");
         this.add(btnClose, "width 15%");
         this.setVisible(true);
@@ -1080,15 +1088,139 @@ class ConstraintsForm extends JDialog
         return this.closed;
     }
 
-    public Map<String, java.util.List<JComboBox>> getFormData()
+    public Map<String, List<Atribut>> getFormData()
     {
-        Map<String, List<JComboBox>> dataMap = new LinkedHashMap<>();
+        Map<String, List<Atribut>> dataMap = new LinkedHashMap<>();
 
         if(!closed) {
-            dataMap.put((String) cboxTables.getSelectedItem(), attValuesList);
+            dataMap.put((String) cboxTables.getSelectedItem(), attributeList);
         }
 
         return dataMap;
+    }
+
+    private class AttributePanel extends JPanel{
+        Atribut atribut;
+        AttributePanel thisPanel;
+        JComboBox<String> cboxAttributes = new JComboBox<>();
+        JComboBox<String> cboxOperators = new JComboBox<>();
+        JTextField tfValue = new JTextField();
+
+        public AttributePanel() {
+            this(null);
+        }
+
+        public AttributePanel(String name, String operator, String value) {
+            this(new Atribut(name, operator, value));
+        }
+
+        public AttributePanel(Atribut newAtribut){
+            super();
+            thisPanel = this;
+            this.setLayout(new MigLayout());
+
+            // add items to the combo box
+            cboxAttributes.addItem("English");
+            cboxAttributes.addItem("French");
+            cboxAttributes.addItem("Spanish");
+            cboxAttributes.addItem("Japanese");
+            cboxAttributes.addItem("Chinese");
+
+            cboxOperators.addItem("<");
+            cboxOperators.addItem(">");
+            cboxOperators.addItem("=");
+
+            if(newAtribut == null) {
+                atribut = new Atribut(getAttributeName(), getOperator(), getValue());
+            } else {
+                atribut = newAtribut;
+                cboxAttributes.setSelectedItem(atribut.getName());
+                cboxOperators.setSelectedItem(atribut.getOperator());
+                tfValue.setText(atribut.getValue());
+            }
+
+            JButton removeBtn = new JButton();
+            try {
+                Image img = ImageIO.read(getClass().getClassLoader().getResource("zdroje/obrazky/deleteImage.png"));
+                if (img != null){
+                    Image newimg = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
+                    removeBtn.setIcon(new ImageIcon(newimg));
+                } else {
+                    removeBtn.setText("R");
+                }
+                removeBtn.setMargin(new Insets(1,1,1,1));
+                removeBtn.setBorderPainted(false);
+                removeBtn.setContentAreaFilled(false);
+                removeBtn.setFocusPainted(false);
+                removeBtn.setOpaque(false);
+            } catch (Exception ex) {
+                System.out.println(ex);
+            }
+            removeBtn.addActionListener(new ActionListener(){
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    Container container = thisPanel.getParent();
+                    thisPanel.getParent().remove(thisPanel);
+                    container.setSize(container.getWidth(), container.getHeight() - 40);
+                    container.revalidate();
+                    container.repaint();
+                }
+            });
+
+            cboxAttributes.addActionListener (new ActionListener () {
+                public void actionPerformed(ActionEvent e) {
+                    atribut.setName((String) cboxAttributes.getSelectedItem());
+                }
+            });
+
+            cboxOperators.addActionListener (new ActionListener () {
+                public void actionPerformed(ActionEvent e) {
+                    atribut.setOperator((String) cboxOperators.getSelectedItem());
+                }
+            });
+
+            tfValue.getDocument().addDocumentListener(new DocumentListener() {
+                public void changedUpdate(DocumentEvent e) {
+                    atribut.setValue(tfValue.getText());
+                }
+                public void removeUpdate(DocumentEvent e) {
+                    atribut.setValue(tfValue.getText());
+                }
+                public void insertUpdate(DocumentEvent e) {
+                    atribut.setValue(tfValue.getText());
+                }
+
+//                public void warn() {
+//                    if (Integer.parseInt(tfValue.getText())<=0){
+//                        JOptionPane.showMessageDialog(null,
+//                                "Error: Please enter number bigger than 0", "Error Massage",
+//                                JOptionPane.ERROR_MESSAGE);
+//                    }
+//                }
+            });
+
+            this.add(cboxAttributes,"width 40%");
+            this.add(cboxOperators,"width 15%");
+            this.add(tfValue,"width 20%");
+//            this.add(removeBtn);
+            this.setVisible(true);
+        }
+
+        public String getAttributeName(){
+            return (String) cboxAttributes.getSelectedItem();
+        }
+
+        public String getOperator(){
+            return (String) cboxOperators.getSelectedItem();
+        }
+
+        public String getValue(){
+            return tfValue.getText();
+        }
+
+        public Atribut getAtribut(){
+            return atribut;
+        }
     }
 }
 
