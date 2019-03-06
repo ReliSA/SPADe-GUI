@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.json.*;
+import ostatni.PohledEnum;
+import ostatni.Sloupec;
 
 public class OknoMigLayout {
 
@@ -43,6 +45,7 @@ public class OknoMigLayout {
     private static JLabel lblName = new JLabel("Name");
     private static JTextField varOrQueryNameTf = new JTextField(10);
     private static final JFileChooser fileChooser = new JFileChooser();
+    private static final Map<String, List<Sloupec>> strukturyPohledu = new TreeMap<>();
 
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
@@ -62,6 +65,15 @@ public class OknoMigLayout {
         mainFrame.setBounds(100,100,1600,800);
         mainFrame.setVisible(true);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        PohledDAO pohledDAO = new PohledDAO();
+        PohledEnum[] pohledy = PohledEnum.values();
+        List<Sloupec> sloupce;
+
+        for(PohledEnum pohled : pohledy){
+            sloupce = pohledDAO.nactecniStrukturyPohledu(pohled.getViewName());
+            strukturyPohledu.put(pohled.getViewName(), sloupce);
+        }
 
         JPanel constantsPanel = new JPanel(new MigLayout());
         constantsPanel.setBackground(Color.cyan);
@@ -174,7 +186,7 @@ public class OknoMigLayout {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                ConstraintsForm constraintForm = new ConstraintsForm();
+                ConstraintsForm constraintForm = new ConstraintsForm(strukturyPohledu);
                 Map<String, List<Atribut>> attMap = constraintForm.getFormData();
                 if (!attMap.isEmpty()) {
                     centerPanel.add(new ConstraintPanel(attMap), "dock west, height 100%, width " + constraintPanelWidth);
@@ -662,7 +674,7 @@ public class OknoMigLayout {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     JSONObject constraint = getJsonConstraint();
-                    ConstraintsForm form = new ConstraintsForm(constraint);
+                    ConstraintsForm form = new ConstraintsForm(strukturyPohledu ,constraint);
 
                     Component[] components = getComponents();
                     for(int i = 0; i < components.length; i++){
@@ -731,7 +743,7 @@ public class OknoMigLayout {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     JSONObject constraint = getJsonConstraint();
-                    ConstraintsForm form = new ConstraintsForm(constraint);
+                    ConstraintsForm form = new ConstraintsForm(strukturyPohledu, constraint);
 
                     if(!form.wasClosed()) {
                         Component[] components = getComponents();
@@ -914,8 +926,7 @@ class ConstraintsForm extends JDialog
     JTextField tf = new JTextField(8);
     JLabel lblType = new JLabel("Type");
     JLabel lblAttribute = new JLabel("Attribute");
-    String[] tables = { "Table1", "Table2", "Table3", "Table4", "Table5" };
-    JComboBox cboxTables = new JComboBox(tables);
+    JComboBox cboxTables = new JComboBox();
     String[] attributes = { "Att1", "Att2", "Att3", "Att4", "Att5" };
     JComboBox cboxAttributes = new JComboBox(attributes);
     List<JComboBox> attValuesList = new ArrayList<>();
@@ -923,19 +934,20 @@ class ConstraintsForm extends JDialog
     JComboBox cboxOperators = new JComboBox(operators);
     JTextField tfAttValue = new JTextField("Value");
 
-    public ConstraintsForm()
+    public ConstraintsForm(Map<String, List<Sloupec>> strukturaPohledu)
     {
         setModal(true);
         setLocation(400,300);
         // TODO - cancel on close - don't know how
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
+        for(Map.Entry<String, List<Sloupec>> entry : strukturaPohledu.entrySet()) {
+            cboxTables.addItem(entry.getKey());
+        }
+
         setSize(600,170);
         setLocationRelativeTo(null);
         this.setTitle("Attributes");
-
-//        PohledDAO pohledDAO = new PohledDAO();
-//        pohledDAO.testPripojeni();
 
         tfAttribute.setPreferredSize(Konstanty.VELIKOST_CELA_SIRKA);
         btnSubmit.setPreferredSize(Konstanty.VELIKOST_POLOVICNI_SIRKA);
@@ -944,48 +956,79 @@ class ConstraintsForm extends JDialog
         btnAdd.setPreferredSize(new Dimension(60,28));
 
         btnSubmit.addActionListener(new ActionListener(){
-                                        public void actionPerformed(ActionEvent e){
-                                            closed = false;
-                                            dispose();
-                                        }
-                                    }
+                public void actionPerformed(ActionEvent e){
+                    closed = false;
+                    dispose();
+                }
+            }
         );
 
         btnClose.addActionListener(new ActionListener(){
-                                       public void actionPerformed(ActionEvent e){
-                                           dispose();
-                                       }
-                                   }
+               public void actionPerformed(ActionEvent e){
+                   dispose();
+               }
+           }
         );
 
         btnAdd.addActionListener(new ActionListener(){
-                                     public void actionPerformed(ActionEvent e){
-                                         cboxAttributes = new JComboBox(attributes);
-                                         cboxOperators = new JComboBox(operators);
-                                         cboxAttributes.setPreferredSize(Konstanty.VELIKOST_CELA_SIRKA);
-                                         tfAttValue = new JTextField("Value");
+             public void actionPerformed(ActionEvent e){
+                 cboxAttributes.setPreferredSize(Konstanty.VELIKOST_CELA_SIRKA);
+                 tfAttValue = new JTextField("Value");
 
-                                         setSize(getWidth(),getHeight() + 40);
-                                         remove(btnClose);
-                                         remove(btnSubmit);
-                                         remove(btnAdd);
+                 setSize(getWidth(),getHeight() + 43);
+                 remove(btnClose);
+                 remove(btnSubmit);
+                 remove(btnAdd);
 
-                                         AttributePanel attributePanel = new AttributePanel();
-                                         add(attributePanel, "width 100%, wrap");
-                                         attributeList.add(attributePanel.getAtribut());
-                                         add(btnAdd);
-                                         //add(new JLabel());
-                                         add(btnSubmit, "width 15%");
-                                         add(btnClose, "width 15%");
-                                     }
-                                 }
+                 add(new JLabel());
+                 AttributePanel attributePanel = new AttributePanel(strukturaPohledu.get((String) cboxTables.getSelectedItem()));
+                 add(attributePanel, "width 100%, wrap");
+                 attributeList.add(attributePanel.getAtribut());
+                 add(btnAdd);
+
+                 add(btnSubmit, "width 15%");
+                 add(btnClose, "width 15%");
+             }
+         }
         );
+
+        cboxTables.addActionListener (new ActionListener () {
+            public void actionPerformed(ActionEvent e) {
+                Component[] components = getContentPane().getComponents();
+                for(Component comp : components){
+                    if(comp instanceof AttributePanel){
+                        remove(comp);
+                    } else if (comp instanceof JLabel){
+                        if(((JLabel) comp).getText().equals("")){
+                            remove(comp);
+                        }
+                    }
+                }
+                remove(btnClose);
+                remove(btnSubmit);
+                remove(btnAdd);
+                setSize(600,165);
+
+                attributeList.clear();
+                strukturaPohledu.get(cboxTables.getSelectedItem());
+                AttributePanel attributePanel = new AttributePanel(null, strukturaPohledu.get(cboxTables.getSelectedItem()));
+                add(attributePanel, "width 100%, wrap");
+                attributeList.add(attributePanel.getAtribut());
+                System.out.println();
+                add(btnAdd);
+                //add(new JLabel());
+                add(btnSubmit, "width 15%");
+                add(btnClose, "width 15%");
+                revalidate();
+                repaint();
+            }
+        });
 
         this.setLayout(new MigLayout());
         this.add(lblType);
         this.add(cboxTables, "width 40%, wrap");
         this.add(lblAttribute);
-        AttributePanel attributePanel = new AttributePanel();
+        AttributePanel attributePanel = new AttributePanel(strukturaPohledu.get((String) cboxTables.getSelectedItem()));
         this.add(attributePanel, "width 100%, wrap");
         attributeList.add(attributePanel.getAtribut());
         this.add(btnAdd);
@@ -995,7 +1038,7 @@ class ConstraintsForm extends JDialog
         this.setVisible(true);
     }
 
-    public ConstraintsForm(JSONObject constraint){
+    public ConstraintsForm(Map<String, List<Sloupec>> strukturaPohledu, JSONObject constraint){
         setModal(true);
         setLocation(400,300);
         // TODO - cancel on close - don't know how
@@ -1006,8 +1049,12 @@ class ConstraintsForm extends JDialog
         setLocationRelativeTo(null);
         this.setTitle("Attributes");
 
-//        PohledDAO pohledDAO = new PohledDAO();
-//        pohledDAO.testPripojeni();
+        for(Map.Entry<String, List<Sloupec>> entry : strukturaPohledu.entrySet()) {
+            cboxTables.addItem(entry.getKey());
+        }
+
+        String tableName = constraint.getString("table");
+        cboxTables.setSelectedItem(tableName);
 
         tfAttribute.setPreferredSize(Konstanty.VELIKOST_CELA_SIRKA);
         btnSubmit.setPreferredSize(Konstanty.VELIKOST_POLOVICNI_SIRKA);
@@ -1016,47 +1063,75 @@ class ConstraintsForm extends JDialog
         btnAdd.setPreferredSize(new Dimension(60,28));
 
         btnSubmit.addActionListener(new ActionListener(){
-                                        public void actionPerformed(ActionEvent e){
-                                            closed = false;
-                                            dispose();
-                                        }
-                                    }
+                public void actionPerformed(ActionEvent e){
+                    closed = false;
+                    dispose();
+                }
+            }
         );
 
         btnClose.addActionListener(new ActionListener(){
-                                       public void actionPerformed(ActionEvent e){
-                                           dispose();
-                                       }
-                                   }
+               public void actionPerformed(ActionEvent e){
+                   dispose();
+               }
+           }
         );
 
         btnAdd.addActionListener(new ActionListener(){
-                                     public void actionPerformed(ActionEvent e){
-                                         cboxAttributes = new JComboBox(attributes);
-                                         cboxOperators = new JComboBox(operators);
-                                         cboxAttributes.setPreferredSize(Konstanty.VELIKOST_CELA_SIRKA);
-                                         tfAttValue = new JTextField("Value");
+             public void actionPerformed(ActionEvent e){
+                 cboxAttributes.setPreferredSize(Konstanty.VELIKOST_CELA_SIRKA);
+                 tfAttValue = new JTextField("Value");
 
-                                         setSize(getWidth(),getHeight() + 40);
-                                         remove(btnClose);
-                                         remove(btnSubmit);
-                                         remove(btnAdd);
+                 setSize(getWidth(),getHeight() + 43);
+                 remove(btnClose);
+                 remove(btnSubmit);
+                 remove(btnAdd);
 
-                                         AttributePanel attributePanel = new AttributePanel();
-                                         add(attributePanel, "width 100%, wrap");
-                                         attributeList.add(attributePanel.getAtribut());
-                                         add(btnAdd);
-                                         //add(new JLabel());
-                                         add(btnSubmit, "width 15%");
-                                         add(btnClose, "width 15%");
-                                     }
-                                 }
+                 add(new JLabel());
+                 AttributePanel attributePanel = new AttributePanel(strukturaPohledu.get((String) cboxTables.getSelectedItem()));
+                 add(attributePanel, "width 100%, wrap");
+                 attributeList.add(attributePanel.getAtribut());
+                 add(btnAdd);
+                 add(btnSubmit, "width 15%");
+                 add(btnClose, "width 15%");
+             }
+         }
         );
+
+        cboxTables.addActionListener (new ActionListener () {
+            public void actionPerformed(ActionEvent e) {
+                Component[] components = getContentPane().getComponents();
+                for(Component comp : components){
+                    if(comp instanceof AttributePanel){
+                        remove(comp);
+                    } else if (comp instanceof JLabel){
+                        if(((JLabel) comp).getText().equals("")){
+                            remove(comp);
+                        }
+                    }
+                }
+                remove(btnClose);
+                remove(btnSubmit);
+                remove(btnAdd);
+                setSize(600,165);
+
+                attributeList.clear();
+                strukturaPohledu.get(cboxTables.getSelectedItem());
+                AttributePanel attributePanel = new AttributePanel(null, strukturaPohledu.get(cboxTables.getSelectedItem()));
+                add(attributePanel, "width 100%, wrap");
+                attributeList.add(attributePanel.getAtribut());
+                System.out.println();
+                add(btnAdd);
+//                add(new JLabel());
+                add(btnSubmit, "width 15%");
+                add(btnClose, "width 15%");
+                revalidate();
+                repaint();
+            }
+        });
 
         this.setLayout(new MigLayout());
         this.add(lblType);
-        String tableName = constraint.getString("table");
-        cboxTables.setSelectedItem(tableName);
         this.add(cboxTables, "width 40%, wrap");
         this.add(lblAttribute);
         //attValuesList.add(cboxAttributes);
@@ -1071,7 +1146,7 @@ class ConstraintsForm extends JDialog
             temp++;
 
             JSONObject jsonObject = (JSONObject) attribute;
-            AttributePanel attributePanel = new AttributePanel(jsonObject.getString("name"), jsonObject.getString("operator"), jsonObject.getString("value"));
+            AttributePanel attributePanel = new AttributePanel(jsonObject.getString("name"), jsonObject.getString("operator"), jsonObject.getString("value"), strukturaPohledu.get((tableName)));
             add(attributePanel, "width 100%, wrap");
             attributeList.add(attributePanel.getAtribut());
         }
@@ -1106,29 +1181,26 @@ class ConstraintsForm extends JDialog
         JComboBox<String> cboxOperators = new JComboBox<>();
         JTextField tfValue = new JTextField();
 
-        public AttributePanel() {
-            this(null);
+        public AttributePanel(List<Sloupec> sloupce) {
+            this(null, sloupce);
         }
 
-        public AttributePanel(String name, String operator, String value) {
-            this(new Atribut(name, operator, value));
+        public AttributePanel(String name, String operator, String value, List<Sloupec> sloupce) {
+            this(new Atribut(name, operator, value), sloupce);
         }
 
-        public AttributePanel(Atribut newAtribut){
+        public AttributePanel(Atribut newAtribut, List<Sloupec> sloupce){
             super();
             thisPanel = this;
             this.setLayout(new MigLayout());
 
-            // add items to the combo box
-            cboxAttributes.addItem("English");
-            cboxAttributes.addItem("French");
-            cboxAttributes.addItem("Spanish");
-            cboxAttributes.addItem("Japanese");
-            cboxAttributes.addItem("Chinese");
-
-            cboxOperators.addItem("<");
-            cboxOperators.addItem(">");
-            cboxOperators.addItem("=");
+            List<String> firstOperators = getOperatorForType(sloupce.iterator().next().getType());
+            for(Sloupec sloupec : sloupce){
+                cboxAttributes.addItem(sloupec.getName());
+            }
+            for(String operator : firstOperators){
+                cboxOperators.addItem(operator);
+            }
 
             if(newAtribut == null) {
                 atribut = new Atribut(getAttributeName(), getOperator(), getValue());
@@ -1170,6 +1242,14 @@ class ConstraintsForm extends JDialog
             cboxAttributes.addActionListener (new ActionListener () {
                 public void actionPerformed(ActionEvent e) {
                     atribut.setName((String) cboxAttributes.getSelectedItem());
+                    cboxOperators.removeAllItems();
+                    Sloupec sloupec = sloupce.stream()
+                            .filter(sl -> atribut.getName().equals(sl.getName()))
+                            .findAny()
+                            .orElse(null);
+                    for(String operator : getOperatorForType(sloupec.getType())){
+                        cboxOperators.addItem(operator);
+                    }
                 }
             });
 
@@ -1204,6 +1284,27 @@ class ConstraintsForm extends JDialog
             this.add(tfValue,"width 20%");
 //            this.add(removeBtn);
             this.setVisible(true);
+        }
+
+        private List<String> getOperatorForType(String columnType){
+            List<String> operators = new ArrayList<>();
+            switch(columnType){
+                case "bigint":
+                    operators.add("<");
+                    operators.add(">");
+                    operators.add("=");
+                    break;
+                case "varchar":
+                    operators.add("like");
+                    break;
+                case "longtext":
+                    operators.add("like");
+                    break;
+                case "datetime":
+                    operators.add("dunno");
+                    break;
+            }
+            return operators;
         }
 
         public String getAttributeName(){
