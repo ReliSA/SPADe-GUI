@@ -3,10 +3,10 @@ package gui;
 import databaze.PohledDAO;
 import net.miginfocom.swing.MigLayout;
 import org.apache.commons.io.FileUtils;
-import ostatni.Atribut;
-import ostatni.Konstanty;
+import ostatni.*;
 
 import javax.imageio.ImageIO;
+import javax.jnlp.JNLPRandomAccessFile;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
@@ -21,11 +21,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.json.*;
-import ostatni.PohledEnum;
-import ostatni.Sloupec;
 
-public class OknoMigLayout {
+public class OknoMigLayout extends JFrame{
 
+    public static OknoMigLayout instance;
     private static int constraintPanelWidth = 200;
     private static boolean variableCreation = false;
     private static JFrame mainFrame;
@@ -38,6 +37,14 @@ public class OknoMigLayout {
     private static JButton addConstraintBtn = new JButton("Add constraint");
     private static JButton createQueryBtn = new JButton("Create query");
     private static JButton loadQueryBtn = new JButton("Load query");
+    private static JButton testVarQueryBtn = new JButton("Test query");
+    private static JButton testQueryBtn = new JButton("Test query");
+    private static ButtonGroup group = new ButtonGroup();
+    private static List<JRadioButton> radioButtonList = new ArrayList<>();
+    private static JRadioButton radioSum = new JRadioButton("SUM");
+    private static JRadioButton radioCount = new JRadioButton("COUNT");
+    private static JRadioButton radioMin = new JRadioButton("MIN");
+    private static JRadioButton radioMax = new JRadioButton("MAX");
     private static JPanel centerNorthPanel = new JPanel(new MigLayout());
     private static JPanel centerPanel = new JPanel(new MigLayout());
     private static JPanel bottomPanel = new JPanel(new MigLayout());
@@ -60,6 +67,11 @@ public class OknoMigLayout {
     }
 
     public OknoMigLayout() {
+//        super(Konstanty.POPISY.getProperty("menuVytvorGraf"));
+//        if (instance != null)
+//            instance.dispose();
+//        instance = this;
+
         mainFrame = new JFrame();
         mainFrame.setLayout(new MigLayout());
         mainFrame.setBounds(100,100,1600,800);
@@ -74,6 +86,13 @@ public class OknoMigLayout {
             sloupce = pohledDAO.nactecniStrukturyPohledu(pohled.getViewName());
             strukturyPohledu.put(pohled.getViewName(), sloupce);
         }
+
+//        List<ArtifactView> artifactViews = pohledDAO.nactiArtifactView();
+//        List<CommitedConfigView> commitedConfigViews = pohledDAO.nactiCommitedConfigView();
+//        List<CommitView> commitViews = pohledDAO.nactiCommitView();
+//        List<ConfigurationView> configurationViews = pohledDAO.nactiConfigurationView();
+//        List<FieldChangeView> fieldChangeViews = pohledDAO.nactiFieldChangeView();
+//        List<WorkUnitView> workUnitViews = pohledDAO.nactiWorkUnitView();
 
         JPanel constantsPanel = new JPanel(new MigLayout());
         constantsPanel.setBackground(Color.cyan);
@@ -161,6 +180,12 @@ public class OknoMigLayout {
                 centerNorthPanel.add(addConstraintBtn);
                 centerNorthPanel.add(lblName);
                 centerNorthPanel.add(varOrQueryNameTf);
+                centerNorthPanel.add(radioSum);
+                centerNorthPanel.add(radioCount);
+                centerNorthPanel.add(radioMin);
+                centerNorthPanel.add(radioMax);
+                radioSum.setSelected(true);
+                centerNorthPanel.add(testVarQueryBtn);
 
                 mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
 
@@ -182,6 +207,18 @@ public class OknoMigLayout {
 
         centerNorthPanel.setBackground(Color.orange);
 
+        group.add(radioSum);
+        group.add(radioCount);
+        group.add(radioMin);
+        group.add(radioMax);
+        // default
+        radioSum.setSelected(true);
+
+        radioButtonList.add(radioCount);
+        radioButtonList.add(radioMax);
+        radioButtonList.add(radioMin);
+        radioButtonList.add(radioSum);
+
         addConstraintBtn.addActionListener(new ActionListener(){
 
             @Override
@@ -192,6 +229,14 @@ public class OknoMigLayout {
                     centerPanel.add(new ConstraintPanel(attMap), "dock west, height 100%, width " + constraintPanelWidth);
                     centerPanel.revalidate();
                 }
+            }
+        });
+
+        testVarQueryBtn.addActionListener(new ActionListener(){
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                testQuery();
             }
         });
 
@@ -282,7 +327,7 @@ public class OknoMigLayout {
 
         axisPanel.setBackground(new Color(168, 79, 25));
 
-        String[] axisOptions = { "Person", "Iteration", "Days", "Weeks", "Months" };
+        String[] axisOptions = { "Person", "Iteration"};
         JComboBox cboxAxisOptions = new JComboBox(axisOptions);
         axisPanel.add(cboxAxisOptions, "width 90%");
 
@@ -310,11 +355,18 @@ public class OknoMigLayout {
                     if(component instanceof ConstraintPanel) {
                         ConstraintPanel constPanel = (ConstraintPanel) component;
                         if(constPanel.getAttributeMap() == null){
-                            constList.add(constPanel.getJsonConstraint());
+                            JSONObject jsonConstraint = constPanel.getJsonConstraint();
+                            if(variableCreation){
+                                jsonConstraint = writeQueryResult(jsonConstraint);
+                            }
+                            constList.add(jsonConstraint);
                         } else {
                             Map.Entry<String, List<Atribut>> entry = constPanel.getAttributeMap().entrySet().iterator().next();
                             JSONObject jsonConstraint = new JSONObject();
                             jsonConstraint.put("table", entry.getKey());
+                            if (variableCreation) {
+                                jsonConstraint = writeQueryResult(jsonConstraint);
+                            }
                             JSONArray attributes = new JSONArray();
 
                             for (Atribut att : entry.getValue()) {
@@ -405,8 +457,256 @@ public class OknoMigLayout {
             }
         });
 
+        JButton runQueryBtn = new JButton("Run");
+        runQueryBtn.addActionListener(new ActionListener(){
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String condition = "";
+                String axisTable = "";
+                Component[] components = centerPanel.getComponents();
+                List<ConstraintPanel> constraintPanels = new ArrayList<>();
+                List<String> conditions = new ArrayList<>();
+                for(Component comp : components){
+                    if(comp instanceof ConstraintPanel){
+                        constraintPanels.add((ConstraintPanel) comp);
+                    } else if (comp instanceof JPanel) {
+                        JPanel axisPanel = (JPanel) comp;
+                        for(Component component : axisPanel.getComponents()){
+                            if(component instanceof JComboBox){
+                                JComboBox cBox = (JComboBox) component;
+                                axisTable = ((String) cBox.getSelectedItem()).toLowerCase();
+                            }
+                        }
+                    }
+                }
+                // dotaz nad jednou tabulkou bez ohledu na osu zatím - vytváření proměnných
+                if(constraintPanels.size() == 1) {
+                    ConstraintPanel constraintPanel = constraintPanels.iterator().next();
+                    JSONObject object = constraintPanel.getJsonConstraint();
+                    String tableName = object.getString("table");
+                    String query = "select * from " + tableName + " where ";
+
+                    JSONArray atts = (JSONArray) object.get("attributes");
+
+                    Iterator<Object> iterator = atts.iterator();
+                    while(iterator.hasNext()) {
+                        JSONObject jsonObject = (JSONObject) iterator.next();
+                        condition = jsonObject.getString("name") + " " + jsonObject.getString("operator") + " ";
+                        if(jsonObject.getString("operator").equals("like")){
+                            condition += "\"" + jsonObject.getString("value") + "\"";
+                        } else {
+                            condition += jsonObject.getString("value") ;
+                        }
+                        if (iterator.hasNext()) {
+                            condition += " AND ";
+                        }
+                        query += condition;
+                    }
+
+                    //a poslat data někam dál a co s nima?
+                    switch(tableName){
+                        case "artifactView":
+                            List<ArtifactView> artifactViews = pohledDAO.nactiArtifactView(query);
+                            break;
+                        case "configurationView":
+                            List<ConfigurationView> configurationViews = pohledDAO.nactiConfigurationView(query);
+                            break;
+                        case "commitedConfigView":
+                            List<CommitedConfigView> commitedConfigViews = pohledDAO.nactiCommitedConfigView(query);
+                            break;
+                        case "commitView":
+                            List<CommitView> commitViews = pohledDAO.nactiCommitView(query);
+                            break;
+                        case "workUnitView":
+                            List<WorkUnitView> workUnitViews = pohledDAO.nactiWorkUnitView(query);
+                            break;
+                        case "fieldChangeView":
+                            List<FieldChangeView> fieldChangeViews = pohledDAO.nactiFieldChangeView(query);
+                            break;
+                        case "personView":
+                            List<PersonView> personViews = pohledDAO.nactiPersonView(query);
+                            break;
+                    }
+                    System.out.println(query);
+
+                } else {
+                    // join přes více tabulek - vytváření dotazů
+                    String query = "select * from " + axisTable + " ";
+                    for(ConstraintPanel constraintPanel : constraintPanels) {
+                        JSONObject object = constraintPanel.getJsonConstraint();
+                        String tableName = object.getString("table");
+                        query += "join " + tableName + " on " + tableName + ".personId = " + axisTable + ".id ";
+
+                        JSONArray atts = (JSONArray) object.get("attributes");
+
+                        Iterator<Object> iterator = atts.iterator();
+                        while (iterator.hasNext()) {
+                            JSONObject jsonObject = (JSONObject) iterator.next();
+                            condition = tableName + "." + jsonObject.getString("name") + " " + jsonObject.getString("operator") + " ";
+                            if (jsonObject.getString("operator").equals("like")) {
+                                condition += "\"" + jsonObject.getString("value") + "\"";
+                            } else {
+                                condition += jsonObject.getString("value");
+                            }
+                            conditions.add(condition);
+                        }
+                    }
+                    query += " where ";
+                    Iterator<String> iterator = conditions.iterator();
+                    while(iterator.hasNext()){
+                        String cond = iterator.next();
+                        query += cond;
+                        if (iterator.hasNext()) {
+                            query += " AND ";
+                        }
+                    }
+                    // query se dá pustit
+                    System.out.println(query);
+                }
+            }
+
+        });
+
         bottomPanel.add(saveBtn);
         bottomPanel.add(cancelBtn);
+        bottomPanel.add(runQueryBtn);
+    }
+
+    private JSONObject writeQueryResult(JSONObject jsonConstraint){
+        for (Enumeration<AbstractButton> buttons = group.getElements(); buttons.hasMoreElements();) {
+            AbstractButton button = buttons.nextElement();
+            if (button.isSelected()) {
+                jsonConstraint.put("function", button.getText());
+            }
+        }
+
+        Long result = testQuery();
+        if(result == null) {
+            jsonConstraint.put("queryResult", "NULL");
+        } else {
+            jsonConstraint.put("queryResult", result);
+        }
+
+        return jsonConstraint;
+    }
+
+    private Long testQuery(){
+        PohledDAO pohledDAO = new PohledDAO();
+        String condition = "";
+        String axisTable = "";
+        Long result = null;
+        Component[] components = centerPanel.getComponents();
+        List<ConstraintPanel> constraintPanels = new ArrayList<>();
+        List<String> conditions = new ArrayList<>();
+        for(Component comp : components){
+            if(comp instanceof ConstraintPanel){
+                constraintPanels.add((ConstraintPanel) comp);
+            } else if (comp instanceof JPanel) {
+                JPanel axisPanel = (JPanel) comp;
+                for(Component component : axisPanel.getComponents()){
+                    if(component instanceof JComboBox){
+                        JComboBox cBox = (JComboBox) component;
+                        axisTable = ((String) cBox.getSelectedItem()).toLowerCase();
+                    }
+                }
+            }
+        }
+        // dotaz nad jednou tabulkou bez ohledu na osu zatím - vytváření proměnných
+        if(constraintPanels.size() == 1) {
+            String function = "";
+            String selectedColumn = "";
+            for (Enumeration<AbstractButton> buttons = group.getElements(); buttons.hasMoreElements();) {
+                AbstractButton button = buttons.nextElement();
+                if (button.isSelected()) {
+                    function = button.getText();
+                }
+            }
+
+            ConstraintPanel constraintPanel = constraintPanels.iterator().next();
+            JSONObject object = constraintPanel.getJsonConstraint();
+            String tableName = object.getString("table");
+            String query = "";
+            for(Component comp : constraintPanel.getComponents()){
+                if(comp instanceof JRadioButton){
+                    JRadioButton radioButton = (JRadioButton) comp;
+                    if(radioButton.isSelected()){
+                        selectedColumn = radioButton.getText();
+                    }
+                }
+            }
+            if(function.equals("COUNT")) {
+                query = "select count(*) from " + tableName + " where ";
+            } else {
+                query = "select " + function + "(" + selectedColumn + ") from " + tableName + " where ";
+            }
+
+            JSONArray atts = (JSONArray) object.get("attributes");
+
+            Iterator<Object> iterator = atts.iterator();
+            while(iterator.hasNext()) {
+                JSONObject jsonObject = (JSONObject) iterator.next();
+                condition = jsonObject.getString("name") + " " + jsonObject.getString("operator") + " ";
+                if(jsonObject.getString("operator").equals("like")){
+                    condition += "\"" + jsonObject.getString("value") + "\"";
+                } else {
+                    condition += jsonObject.getString("value") ;
+                }
+                if (iterator.hasNext()) {
+                    condition += " AND ";
+                }
+                query += condition;
+            }
+            result = pohledDAO.dotaz(query);
+            if( result == null ) {
+                JOptionPane.showMessageDialog(mainFrame,
+                        "Query result is NULL",
+                        "Warning",
+                        JOptionPane.WARNING_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(mainFrame,
+                        "Query result is " + result);
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(mainFrame,
+                    "Only 1 table queries are supported now.",
+                    "Warning",
+                    JOptionPane.WARNING_MESSAGE);
+//                    // join přes více tabulek - vytváření dotazů
+//                    String query = "select * from " + axisTable + " ";
+//                    for(ConstraintPanel constraintPanel : constraintPanels) {
+//                        JSONObject object = constraintPanel.getJsonConstraint();
+//                        String tableName = object.getString("table");
+//                        query += "join " + tableName + " on " + tableName + ".personId = " + axisTable + ".id ";
+//
+//                        JSONArray atts = (JSONArray) object.get("attributes");
+//
+//                        Iterator<Object> iterator = atts.iterator();
+//                        while (iterator.hasNext()) {
+//                            JSONObject jsonObject = (JSONObject) iterator.next();
+//                            condition = tableName + "." + jsonObject.getString("name") + " " + jsonObject.getString("operator") + " ";
+//                            if (jsonObject.getString("operator").equals("like")) {
+//                                condition += "\"" + jsonObject.getString("value") + "\"";
+//                            } else {
+//                                condition += jsonObject.getString("value");
+//                            }
+//                            conditions.add(condition);
+//                            }
+//                    }
+//                    query += " where ";
+//                    Iterator<String> iterator = conditions.iterator();
+//                    while(iterator.hasNext()){
+//                        String cond = iterator.next();
+//                        query += cond;
+//                        if (iterator.hasNext()) {
+//                            query += " AND ";
+//                        }
+//                    }
+//                    // query se dá pustit
+//                    System.out.println(query);
+        }
+        return result;
     }
 
     private class ConstantPanel extends JPanel{
@@ -559,6 +859,11 @@ public class OknoMigLayout {
                     centerNorthPanel.add(addConstraintBtn);
                     varOrQueryNameTf.setText(name);
                     centerNorthPanel.add(varOrQueryNameTf);
+                    centerNorthPanel.add(radioSum);
+                    centerNorthPanel.add(radioCount);
+                    centerNorthPanel.add(radioMin);
+                    centerNorthPanel.add(radioMax);
+                    centerNorthPanel.add(testVarQueryBtn);
 
                     mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
 
@@ -573,10 +878,21 @@ public class OknoMigLayout {
 
                     JSONObject jsonObject = new JSONObject(content);
 
+
+
                     JSONArray constraints = (JSONArray) jsonObject.get("constraints");
                     for (Object cons : constraints)
                     {
                         JSONObject object = (JSONObject) cons;
+                        String function = object.getString("function");
+
+                        for (Enumeration<AbstractButton> buttons = group.getElements(); buttons.hasMoreElements();) {
+                            AbstractButton button = buttons.nextElement();
+                            if (button.getText().equals(function)) {
+                                button.setSelected(true);
+                            }
+                        }
+
                         ConstraintPanel panel = new ConstraintPanel(object);
                         centerPanel.add(panel, "dock west, height 100%, width " + constraintPanelWidth);
                         centerPanel.revalidate();
@@ -645,6 +961,7 @@ public class OknoMigLayout {
             this.attMap = attMap;
             this.setLayout(new MigLayout());
             Map.Entry<String, List<Atribut>> entry = attMap.entrySet().iterator().next();
+            ButtonGroup buttonGroup = new ButtonGroup();
 
             JSONObject jsonConstraint = new JSONObject();
             jsonConstraint.put("table", entry.getKey());
@@ -661,12 +978,15 @@ public class OknoMigLayout {
             jsonConstraint.put("attributes", attributes);
             this.constraints = jsonConstraint;
 
-            JLabel label = new JLabel(entry.getKey());
+            JLabel label = new JLabel(entry.getKey().toUpperCase());
             this.add(label, "wrap");
 
             for (Atribut att : entry.getValue()) {
-                JLabel attValue = new JLabel(att.getName());
-                this.add(attValue, "wrap");
+//                JLabel attValue = new JLabel(att.getName());
+                JRadioButton radioButton = new JRadioButton(att.getName());
+                buttonGroup.add(radioButton);
+                radioButton.setSelected(true);
+                this.add(radioButton, "wrap");
             }
 
             JButton editBtn = new JButton("Edit");
@@ -678,7 +998,7 @@ public class OknoMigLayout {
 
                     Component[] components = getComponents();
                     for(int i = 0; i < components.length; i++){
-                        if(components[i] instanceof JLabel){
+                        if(components[i] instanceof JLabel || components[i] instanceof JRadioButton){
                             remove(components[i]);
                         }
                     }
@@ -693,8 +1013,10 @@ public class OknoMigLayout {
                         setAttMap(attMap);
                         setConstraints(attMap);
                         for(int i = 0; i< entry.getValue().size(); i++){
-                            JLabel attValue = new JLabel((String) entry.getValue().get(i).getName());
-                            add(attValue, "wrap, dock north");
+                            JRadioButton radioButton = new JRadioButton((String) entry.getValue().get(i).getName());
+                            buttonGroup.add(radioButton);
+                            radioButton.setSelected(true);
+                            add(radioButton, "wrap, dock north");
                         }
                     }
 
@@ -724,18 +1046,20 @@ public class OknoMigLayout {
             super();
             thisPanel = this;
             this.constraints = constraints;
-
+            ButtonGroup buttonGroup = new ButtonGroup();
             String tableName = constraints.getString("table");
 
             this.setLayout(new MigLayout());
-            JLabel label = new JLabel(tableName);
+            JLabel label = new JLabel(tableName.toUpperCase());
             this.add(label, "wrap");
 
             JSONArray attributes = (JSONArray) constraints.get("attributes");
             for(Object attribute: attributes){
                 JSONObject jsonObject = (JSONObject) attribute;
-                JLabel attValue = new JLabel(jsonObject.getString("name"));
-                this.add(attValue, "wrap");
+                JRadioButton radioButton = new JRadioButton(jsonObject.getString("name"));
+                buttonGroup.add(radioButton);
+                radioButton.setSelected(true);
+                this.add(radioButton, "wrap");
             }
 
             JButton editBtn = new JButton("Edit");
@@ -748,7 +1072,7 @@ public class OknoMigLayout {
                     if(!form.wasClosed()) {
                         Component[] components = getComponents();
                         for (int i = 0; i < components.length; i++) {
-                            if (components[i] instanceof JLabel) {
+                            if (components[i] instanceof JLabel || components[i] instanceof JRadioButton) {
                                 remove(components[i]);
                             }
                         }
@@ -762,8 +1086,10 @@ public class OknoMigLayout {
                             setAttMap(attMap);
                             setConstraints(attMap);
                             for (int i = 0; i < entry.getValue().size(); i++) {
-                                JLabel attValue = new JLabel((String) entry.getValue().get(i).getName());
-                                add(attValue, "wrap, dock north");
+                                JRadioButton radioButton = new JRadioButton((String) entry.getValue().get(i).getName());
+                                buttonGroup.add(radioButton);
+                                radioButton.setSelected(true);
+                                add(radioButton, "wrap, dock north");
                             }
                         }
                     }
@@ -1193,6 +1519,7 @@ class ConstraintsForm extends JDialog
             super();
             thisPanel = this;
             this.setLayout(new MigLayout());
+            JComboBox variableValues = new JComboBox();
 
             List<String> firstOperators = getOperatorForType(sloupce.iterator().next().getType());
             for(Sloupec sloupec : sloupce){
@@ -1250,6 +1577,16 @@ class ConstraintsForm extends JDialog
                     for(String operator : getOperatorForType(sloupec.getType())){
                         cboxOperators.addItem(operator);
                     }
+                    if(sloupec.getType().equals("bigint") || sloupec.getType().equals("int") || sloupec.getType().equals("double")){
+                        add(variableValues);
+                    } else {
+                        // att panel ma max 4 componenty - pokud to neni cislo tak 4. vyhodit
+                        if(getComponents().length > 3){
+                            remove(getComponents()[3]);
+                        }
+                        revalidate();
+                        repaint();
+                    }
                 }
             });
 
@@ -1282,6 +1619,7 @@ class ConstraintsForm extends JDialog
             this.add(cboxAttributes,"width 40%");
             this.add(cboxOperators,"width 15%");
             this.add(tfValue,"width 20%");
+            // doesnt work properly
 //            this.add(removeBtn);
             this.setVisible(true);
         }
@@ -1290,6 +1628,8 @@ class ConstraintsForm extends JDialog
             List<String> operators = new ArrayList<>();
             switch(columnType){
                 case "bigint":
+                case "int":
+                case "double":
                     operators.add("<");
                     operators.add(">");
                     operators.add("=");
@@ -1299,6 +1639,12 @@ class ConstraintsForm extends JDialog
                     break;
                 case "longtext":
                     operators.add("like");
+                    break;
+                case "bit":
+                    operators.add("=");
+                    break;
+                case "date":
+                    operators.add("dunno");
                     break;
                 case "datetime":
                     operators.add("dunno");

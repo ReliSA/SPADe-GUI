@@ -1276,10 +1276,10 @@ public class OknoHlavni extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 
 				SwingUtilities.invokeLater(() -> {
-					OknoVytvorGraf example = new OknoVytvorGraf();
+					OknoMigLayout example = new OknoMigLayout();
 					//example.setSize(800, 400);
 					//example.setLocationRelativeTo(null);
-					example.setVisible(true);
+					//example.setVisible(true);
 				});
 
 			}
