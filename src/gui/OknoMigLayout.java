@@ -572,6 +572,36 @@ public class OknoMigLayout extends JFrame{
         bottomPanel.add(runQueryBtn);
     }
 
+    private JButton createButtonWithImage(String buttonOperation){
+        JButton button = new JButton();
+        Image img = null;
+        try {
+            if(buttonOperation.equals("edit") || buttonOperation.equals("delete")) {
+                img = ImageIO.read(new File("zdroje/obrazky/" + buttonOperation + "Image.png"));
+            }
+            if (img != null){
+                Image newimg = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
+                button.setIcon(new ImageIcon(newimg));
+            } else {
+                if(buttonOperation.equals("edit")) {
+                    button.setText("E");
+                } else if (buttonOperation.equals("delete")){
+                    button.setText("R");
+                } else {
+                    button.setText("X");
+                }
+            }
+            button.setMargin(new Insets(1,1,1,1));
+            button.setBorderPainted(false);
+            button.setContentAreaFilled(false);
+            button.setFocusPainted(false);
+            button.setOpaque(false);
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+        return button;
+    }
+
     private JSONObject writeQueryResult(JSONObject jsonConstraint){
         for (Enumeration<AbstractButton> buttons = group.getElements(); buttons.hasMoreElements();) {
             AbstractButton button = buttons.nextElement();
@@ -725,23 +755,7 @@ public class OknoMigLayout extends JFrame{
             Border border = BorderFactory.createLineBorder(Color.BLACK, 1);
             this.setBorder(border);
 
-            JButton editBtn = new JButton();
-            try {
-                Image img = ImageIO.read(new File("zdroje/obrazky/editImage.png"));
-                if (img != null){
-                    Image newimg = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
-                    editBtn.setIcon(new ImageIcon(newimg));
-                } else {
-                    editBtn.setText("E");
-                }
-                editBtn.setMargin(new Insets(1,1,1,1));
-                editBtn.setBorderPainted(false);
-                editBtn.setContentAreaFilled(false);
-                editBtn.setFocusPainted(false);
-                editBtn.setOpaque(false);
-            } catch (Exception ex) {
-                System.out.println(ex);
-            }
+            JButton editBtn = createButtonWithImage("edit");
             editBtn.addActionListener(new ActionListener(){
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -776,23 +790,7 @@ public class OknoMigLayout extends JFrame{
             });
             this.add(editBtn);
 
-            JButton removeBtn = new JButton();
-            try {
-                Image img = ImageIO.read(new File("zdroje/obrazky/deleteImage.png"));
-                if (img != null){
-                    Image newimg = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
-                    removeBtn.setIcon(new ImageIcon(newimg));
-                } else {
-                    removeBtn.setText("R");
-                }
-                removeBtn.setMargin(new Insets(1,1,1,1));
-                removeBtn.setBorderPainted(false);
-                removeBtn.setContentAreaFilled(false);
-                removeBtn.setFocusPainted(false);
-                removeBtn.setOpaque(false);
-            } catch (Exception ex) {
-                System.out.println(ex);
-            }
+            JButton removeBtn = createButtonWithImage("delete");
             removeBtn.addActionListener(new ActionListener(){
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -831,23 +829,7 @@ public class OknoMigLayout extends JFrame{
             Border border = BorderFactory.createLineBorder(Color.BLACK, 1);
             this.setBorder(border);
 
-            JButton editBtn = new JButton();
-            try {
-                Image img = ImageIO.read(new File("zdroje/obrazky/editImage.png"));
-                if (img != null){
-                    Image newimg = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
-                    editBtn.setIcon(new ImageIcon(newimg));
-                } else {
-                    editBtn.setText("E");
-                }
-                editBtn.setMargin(new Insets(1,1,1,1));
-                editBtn.setBorderPainted(false);
-                editBtn.setContentAreaFilled(false);
-                editBtn.setFocusPainted(false);
-                editBtn.setOpaque(false);
-            } catch (Exception ex) {
-                System.out.println(ex);
-            }
+            JButton editBtn = createButtonWithImage("edit");
             editBtn.addActionListener(new ActionListener(){
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -902,23 +884,7 @@ public class OknoMigLayout extends JFrame{
             });
             this.add(editBtn);
 
-            JButton removeBtn = new JButton();
-            try {
-                Image img = ImageIO.read(new File("zdroje/obrazky/deleteImage.png"));
-                if (img != null){
-                    Image newimg = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
-                    removeBtn.setIcon(new ImageIcon(newimg));
-                } else {
-                    removeBtn.setText("R");
-                }
-                removeBtn.setMargin(new Insets(1,1,1,1));
-                removeBtn.setBorderPainted(false);
-                removeBtn.setContentAreaFilled(false);
-                removeBtn.setFocusPainted(false);
-                removeBtn.setOpaque(false);
-            } catch (Exception ex) {
-                System.out.println(ex);
-            }
+            JButton removeBtn = createButtonWithImage("delete");
             removeBtn.addActionListener(new ActionListener(){
                 @Override
                 public void actionPerformed(ActionEvent e) {
