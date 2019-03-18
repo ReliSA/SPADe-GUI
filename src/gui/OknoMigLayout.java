@@ -76,7 +76,7 @@ public class OknoMigLayout extends JFrame{
         mainFrame.setLayout(new MigLayout());
         mainFrame.setBounds(100,100,1600,800);
         mainFrame.setVisible(true);
-        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        mainFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         PohledDAO pohledDAO = new PohledDAO();
         PohledEnum[] pohledy = PohledEnum.values();
