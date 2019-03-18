@@ -221,7 +221,7 @@ public class OknoMigLayout extends JFrame{
         addConstraintBtn.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                FormularVytvoreniOmezeni constraintForm = new FormularVytvoreniOmezeni(strukturyPohledu);
+                FormularVytvoreniOmezeni constraintForm = new FormularVytvoreniOmezeni(strukturyPohledu, null);
                 Map<String, List<Atribut>> attMap = constraintForm.getFormData();
                 if (!attMap.isEmpty()) {
                     centerPanel.add(new ConstraintPanel(attMap), "dock west, height 100%, width " + constraintPanelWidth);
@@ -960,27 +960,29 @@ public class OknoMigLayout extends JFrame{
                     JSONObject constraint = getJsonConstraint();
                     FormularVytvoreniOmezeni form = new FormularVytvoreniOmezeni(strukturyPohledu ,constraint);
 
-                    Component[] components = getComponents();
-                    for(int i = 0; i < components.length; i++){
-                        if(components[i] instanceof JLabel || components[i] instanceof JRadioButton){
-                            remove(components[i]);
+                    if(!form.wasClosed()) {
+                        Component[] components = getComponents();
+                        for (int i = 0; i < components.length; i++) {
+                            if (components[i] instanceof JLabel || components[i] instanceof JRadioButton) {
+                                remove(components[i]);
+                            }
                         }
-                    }
 
-                    Map<String, List<Atribut>> attMap = form.getFormData();
-                    if (!attMap.isEmpty()) {
-                        Map.Entry<String, List<Atribut>> entry = attMap.entrySet().iterator().next();
-                        JLabel label = new JLabel(entry.getKey());
-                        add(label, "wrap, dock north");
-                        // delete reminder box
-                        //attMap.get(entry.getKey()).remove(0);
-                        setAttMap(attMap);
-                        setConstraints(attMap);
-                        for(int i = 0; i< entry.getValue().size(); i++){
-                            JRadioButton radioButton = new JRadioButton((String) entry.getValue().get(i).getName());
-                            buttonGroup.add(radioButton);
-                            radioButton.setSelected(true);
-                            add(radioButton, "wrap, dock north");
+                        Map<String, List<Atribut>> attMap = form.getFormData();
+                        if (!attMap.isEmpty()) {
+                            Map.Entry<String, List<Atribut>> entry = attMap.entrySet().iterator().next();
+                            JLabel label = new JLabel(entry.getKey());
+                            add(label, "wrap, dock north");
+                            // delete reminder box
+                            //attMap.get(entry.getKey()).remove(0);
+                            setAttMap(attMap);
+                            setConstraints(attMap);
+                            for (int i = 0; i < entry.getValue().size(); i++) {
+                                JRadioButton radioButton = new JRadioButton((String) entry.getValue().get(i).getName());
+                                buttonGroup.add(radioButton);
+                                radioButton.setSelected(true);
+                                add(radioButton, "wrap, dock north");
+                            }
                         }
                     }
 
