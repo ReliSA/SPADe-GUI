@@ -6,7 +6,6 @@ import org.apache.commons.io.FileUtils;
 import ostatni.*;
 
 import javax.imageio.ImageIO;
-import javax.jnlp.JNLPRandomAccessFile;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
@@ -28,10 +27,10 @@ public class OknoMigLayout extends JFrame{
     private static int constraintPanelWidth = 200;
     private static boolean variableCreation = false;
     private static JFrame mainFrame;
-    private static String constantFolderPath = "C:\\WorkspaceSchool\\SPADE\\src\\zdroje\\konstanty\\";
+    private static String constantFolderPath = "zdroje\\konstanty\\";
     //private URL constantFolderPathUrl = this.getClass().getClassLoader().getResource("zdroje/konstanty");
-    private static String queryFolderPath = "C:\\WorkspaceSchool\\SPADE\\src\\zdroje\\dotazy\\";
-    private static String variableFolderPath = "C:\\WorkspaceSchool\\SPADE\\src\\zdroje\\promenne\\";
+    private static String queryFolderPath = "zdroje\\dotazy\\";
+    private static String variableFolderPath = "zdroje\\promenne\\";
     private static JButton addConstantBtn = new JButton("Add constant");
     private static JButton addVariableBtn = new JButton("Add variable");
     private static JButton addConstraintBtn = new JButton("Add constraint");
@@ -728,7 +727,7 @@ public class OknoMigLayout extends JFrame{
 
             JButton editBtn = new JButton();
             try {
-                Image img = ImageIO.read(getClass().getClassLoader().getResource("zdroje/obrazky/editImage.png"));
+                Image img = ImageIO.read(new File("zdroje/obrazky/editImage.png"));
                 if (img != null){
                     Image newimg = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
                     editBtn.setIcon(new ImageIcon(newimg));
@@ -779,7 +778,7 @@ public class OknoMigLayout extends JFrame{
 
             JButton removeBtn = new JButton();
             try {
-                Image img = ImageIO.read(getClass().getClassLoader().getResource("zdroje/obrazky/deleteImage.png"));
+                Image img = ImageIO.read(new File("zdroje/obrazky/deleteImage.png"));
                 if (img != null){
                     Image newimg = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
                     removeBtn.setIcon(new ImageIcon(newimg));
@@ -834,7 +833,7 @@ public class OknoMigLayout extends JFrame{
 
             JButton editBtn = new JButton();
             try {
-                Image img = ImageIO.read(getClass().getClassLoader().getResource("zdroje/obrazky/editImage.png"));
+                Image img = ImageIO.read(new File("zdroje/obrazky/editImage.png"));
                 if (img != null){
                     Image newimg = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
                     editBtn.setIcon(new ImageIcon(newimg));
@@ -905,7 +904,7 @@ public class OknoMigLayout extends JFrame{
 
             JButton removeBtn = new JButton();
             try {
-                Image img = ImageIO.read(getClass().getClassLoader().getResource("zdroje/obrazky/deleteImage.png"));
+                Image img = ImageIO.read(new File("zdroje/obrazky/deleteImage.png"));
                 if (img != null){
                     Image newimg = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
                     removeBtn.setIcon(new ImageIcon(newimg));
@@ -1540,7 +1539,7 @@ class ConstraintsForm extends JDialog
 
             JButton removeBtn = new JButton();
             try {
-                Image img = ImageIO.read(getClass().getClassLoader().getResource("zdroje/obrazky/deleteImage.png"));
+                Image img = ImageIO.read(new File("zdroje/obrazky/deleteImage.png"));
                 if (img != null){
                     Image newimg = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
                     removeBtn.setIcon(new ImageIcon(newimg));
