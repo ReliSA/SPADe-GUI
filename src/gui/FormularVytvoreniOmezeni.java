@@ -138,8 +138,9 @@ class FormularVytvoreniOmezeni extends JDialog
             for (Object attribute : atts) {
                 setSize(getWidth(), getHeight() + 40);
 
+                // odsazení v layoutu
                 if (temp != 0) {
-        //                add(new JLabel());
+                        add(new JLabel());
                 }
                 temp++;
 
@@ -148,7 +149,6 @@ class FormularVytvoreniOmezeni extends JDialog
                 add(attributePanel, "width 100%, wrap");
                 attributeList.add(attributePanel.getAtribut());
             }
-            temp = 0;
         } else {
             AttributePanel attributePanel = new AttributePanel(strukturaPohledu.get((String) cboxTables.getSelectedItem()));
             this.add(attributePanel, "width 100%, wrap");
