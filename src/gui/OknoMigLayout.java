@@ -124,7 +124,7 @@ public class OknoMigLayout extends JFrame{
 
         addConstantBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                ConstantsForm constForm = new ConstantsForm();
+                FormularVytvoreniKonstanty constForm = new FormularVytvoreniKonstanty();
                 if(!constForm.wasCancelled()) {
                     ConstantPanel constPanel = new ConstantPanel(constForm.getConstName(), constForm.getConstValue());
                     String jsonString = new JSONObject()
@@ -759,7 +759,7 @@ public class OknoMigLayout extends JFrame{
             editBtn.addActionListener(new ActionListener(){
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    ConstantsForm constantsForm = new ConstantsForm(name, value);
+                    FormularVytvoreniKonstanty constantsForm = new FormularVytvoreniKonstanty(name, value);
                     String oldName = name;
                     name = constantsForm.getConstName();
                     value = constantsForm.getConstValue();
@@ -1113,94 +1113,6 @@ public class OknoMigLayout extends JFrame{
         public JSONObject getJsonConstraint() {
             return this.constraints;
         }
-    }
-}
-
-class ConstantsForm extends JDialog
-{
-    private JButton btnOk = new JButton("OK");
-    private JButton btnCancel = new JButton("Cancel");
-    private JTextField tfName = new JTextField();
-    private JTextField tfValue = new JTextField();
-    private String constName;
-    private String constValue;
-    private boolean cancelled = false;
-
-    public ConstantsForm(String name, String value){
-        setModal(true);
-
-        setSize(Konstanty.VELIKOST_PRIHLASOVACIHO_OKNA);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-
-        this.setTitle("Create constants");
-
-        JLabel lblName = new JLabel("Name");
-        JLabel lblValue = new JLabel("Value");
-
-        tfName.setPreferredSize(Konstanty.VELIKOST_CELA_SIRKA);
-        tfValue.setPreferredSize(Konstanty.VELIKOST_CELA_SIRKA);
-        btnOk.setPreferredSize(Konstanty.VELIKOST_POLOVICNI_SIRKA);
-        btnCancel.setPreferredSize(Konstanty.VELIKOST_POLOVICNI_SIRKA);
-
-        nastavAkce();        //nastaví akce tlačítek
-
-        constName = name;
-        constValue = value;
-        tfName.setText(constName);
-        tfValue.setText(constValue);
-
-        this.setLayout(new MigLayout());
-        this.add(lblName);
-        this.add(tfName, "wrap");
-        this.add(lblValue);
-        this.add(tfValue, "wrap");
-        this.add(btnOk);
-        this.add(btnCancel);
-        this.setVisible(true);
-    }
-
-    public ConstantsForm() {
-        this("","");
-    }
-
-    public String getConstName(){
-        String returnValue = this.constName;
-        if(!cancelled){
-            returnValue = tfName.getText();
-        }
-        return returnValue;
-    }
-
-    public String getConstValue(){
-        String returnValue = this.constValue;
-        if(!cancelled){
-            returnValue = tfValue.getText();
-        }
-        return returnValue;
-    }
-
-    public boolean wasCancelled(){
-        return cancelled;
-    }
-
-    private void nastavAkce(){
-        /*akce po kliknutí na tlačítko přihlásit*/
-        ActionListener actOk = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-            }
-        };
-        /*akce po kliknutí na tlačítko ukončit*/
-        ActionListener actCancel = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                cancelled = true;
-                dispose();
-            }
-        };
-        /*připojení akcí k jednotlivým komponentám*/
-        btnOk.addActionListener(actOk);
-        btnCancel.addActionListener(actCancel);
     }
 }
 
