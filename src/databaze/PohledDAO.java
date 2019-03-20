@@ -12,6 +12,8 @@ import java.util.List;
  */
 public class PohledDAO {
     private Connection pripojeni;					//připojení k databázi
+    private static String name = "";
+    private static String pass = "";
 
     public PohledDAO(){
         this.pripojeni = Konstanty.PRIPOJENI;		//nastaví připojení uložené ve třídě Konstanty
@@ -23,7 +25,7 @@ public class PohledDAO {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
-            pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, "", "");
+            pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, name, pass);
             stmt = pripojeni.prepareStatement(query);
 
             rs = stmt.executeQuery();
@@ -56,7 +58,7 @@ public class PohledDAO {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
-            pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, "", "");
+            pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, name, pass);
             stmt = pripojeni.prepareStatement("select COLUMN_NAME, DATA_TYPE from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME='" + viewName + "'");
 
             rs = stmt.executeQuery();
@@ -86,7 +88,7 @@ public class PohledDAO {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
-            pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, "", "");
+            pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, name, pass);
             stmt = pripojeni.prepareStatement("select * from artifactView");
 
             rs = stmt.executeQuery();
@@ -118,7 +120,7 @@ public class PohledDAO {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
-            pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, "", "");
+            pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, name, pass);
             stmt = pripojeni.prepareStatement("select * from commitView");
 
             rs = stmt.executeQuery();
@@ -151,7 +153,7 @@ public class PohledDAO {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
-            pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, "", "");
+            pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, name, pass);
             stmt = pripojeni.prepareStatement("select * from commitedConfigView");
 
             rs = stmt.executeQuery();
@@ -184,7 +186,7 @@ public class PohledDAO {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
-            pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, "", "");
+            pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, name, pass);
             stmt = pripojeni.prepareStatement("select * from configurationView");
 
             rs = stmt.executeQuery();
@@ -216,7 +218,7 @@ public class PohledDAO {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
-            pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, "", "");
+            pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, name, pass);
             stmt = pripojeni.prepareStatement("select * from fieldChangeView");
 
             rs = stmt.executeQuery();
@@ -248,7 +250,7 @@ public class PohledDAO {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
-            pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, "", "");
+            pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, name, pass);
             stmt = pripojeni.prepareStatement("select * from workUnitView");
 
             rs = stmt.executeQuery();
@@ -290,7 +292,7 @@ public class PohledDAO {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
-            pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, "", "");
+            pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, name, pass);
             stmt = pripojeni.prepareStatement("select * from personView");
 
             rs = stmt.executeQuery();
