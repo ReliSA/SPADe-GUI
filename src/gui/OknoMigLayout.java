@@ -9,8 +9,6 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -28,7 +26,6 @@ public class OknoMigLayout extends JFrame{
     private static boolean variableCreation = false;
     private static JFrame mainFrame;
     private static String constantFolderPath = "zdroje\\konstanty\\";
-    //private URL constantFolderPathUrl = this.getClass().getClassLoader().getResource("zdroje/konstanty");
     private static String queryFolderPath = "zdroje\\dotazy\\";
     private static String variableFolderPath = "zdroje\\promenne\\";
     private static JButton addConstantBtn = new JButton("Add constant");
@@ -234,9 +231,9 @@ public class OknoMigLayout extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 FormularVytvoreniOmezeni constraintForm = new FormularVytvoreniOmezeni(strukturyPohledu, null, preparedVariableValues);
-                Map<String, List<Atribut>> attMap = constraintForm.getFormData();
-                if (!attMap.isEmpty()) {
-                    centerPanel.add(new ConstraintPanel(attMap), "dock west, height 100%, width " + constraintPanelWidth);
+                JSONObject attributes = constraintForm.getFormData();
+                if (!attributes.isEmpty()) {
+                    centerPanel.add(new ConstraintPanel(attributes), "dock west, height 100%, width " + constraintPanelWidth);
                     centerPanel.revalidate();
                 }
             }
@@ -946,95 +943,6 @@ public class OknoMigLayout extends JFrame{
         Map<String, List<Atribut>> attMap;
         JSONObject constraints;
 
-        public ConstraintPanel(Map<String, List<Atribut>> attMap) {
-            super();
-            thisPanel = this;
-            this.attMap = attMap;
-            this.setLayout(new MigLayout());
-            Map.Entry<String, List<Atribut>> entry = attMap.entrySet().iterator().next();
-            ButtonGroup buttonGroup = new ButtonGroup();
-
-            JSONObject jsonConstraint = new JSONObject();
-            jsonConstraint.put("table", entry.getKey());
-            JSONArray attributes = new JSONArray();
-
-            for (Atribut att : entry.getValue()) {
-                JSONObject attribute = new JSONObject();
-                attribute.put("name", att.getName());
-                attribute.put("operator", att.getOperator());
-                attribute.put("value", att.getValue());
-                attributes.put(attribute);
-            }
-
-            jsonConstraint.put("attributes", attributes);
-            this.constraints = jsonConstraint;
-
-            JLabel label = new JLabel(entry.getKey().toUpperCase());
-            this.add(label, "wrap");
-
-            for (Atribut att : entry.getValue()) {
-//                JLabel attValue = new JLabel(att.getName());
-                JRadioButton radioButton = new JRadioButton(att.getName());
-                buttonGroup.add(radioButton);
-                radioButton.setSelected(true);
-                this.add(radioButton, "wrap");
-            }
-
-            JButton editBtn = new JButton("Edit");
-            editBtn.addActionListener(new ActionListener(){
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    JSONObject constraint = getJsonConstraint();
-                    FormularVytvoreniOmezeni form = new FormularVytvoreniOmezeni(strukturyPohledu ,constraint, preparedVariableValues);
-
-                    if(!form.wasClosed()) {
-                        Component[] components = getComponents();
-                        for (int i = 0; i < components.length; i++) {
-                            if (components[i] instanceof JLabel || components[i] instanceof JRadioButton) {
-                                remove(components[i]);
-                            }
-                        }
-
-                        Map<String, List<Atribut>> attMap = form.getFormData();
-                        if (!attMap.isEmpty()) {
-                            Map.Entry<String, List<Atribut>> entry = attMap.entrySet().iterator().next();
-                            JLabel label = new JLabel(entry.getKey());
-                            add(label, "wrap, dock north");
-                            // delete reminder box
-                            //attMap.get(entry.getKey()).remove(0);
-                            setAttMap(attMap);
-                            setConstraints(attMap);
-                            for (int i = 0; i < entry.getValue().size(); i++) {
-                                JRadioButton radioButton = new JRadioButton((String) entry.getValue().get(i).getName());
-                                buttonGroup.add(radioButton);
-                                radioButton.setSelected(true);
-                                add(radioButton, "wrap, dock north");
-                            }
-                        }
-                    }
-
-                    setBorder(new EmptyBorder(10, 10, 10, 10));
-                    centerPanel.revalidate();
-                    mainFrame.revalidate();
-                    mainFrame.repaint();
-                }
-
-            });
-            this.add(editBtn, "wrap");
-
-            JButton removeBtn = new JButton("Remove");
-            removeBtn.addActionListener(new ActionListener(){
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    thisPanel.getParent().remove(thisPanel);
-                    mainFrame.revalidate();
-                    mainFrame.repaint();
-                }
-
-            });
-            this.add(removeBtn);
-        }
-
         public ConstraintPanel(JSONObject constraints) {
             super();
             thisPanel = this;
@@ -1069,17 +977,17 @@ public class OknoMigLayout extends JFrame{
                                 remove(components[i]);
                             }
                         }
-                        Map<String, List<Atribut>> attMap = form.getFormData();
-                        if (!attMap.isEmpty()) {
-                            Map.Entry<String, List<Atribut>> entry = attMap.entrySet().iterator().next();
-                            JLabel label = new JLabel(entry.getKey());
+                        JSONObject attributes = form.getFormData();
+                        if (!attributes.isEmpty()) {
+                            JLabel label = new JLabel(attributes.getString("table"));
                             add(label, "wrap, dock north");
                             // delete reminder box
                             //attMap.get(entry.getKey()).remove(0);
-                            setAttMap(attMap);
-                            setConstraints(attMap);
-                            for (int i = 0; i < entry.getValue().size(); i++) {
-                                JRadioButton radioButton = new JRadioButton((String) entry.getValue().get(i).getName());
+                            setAttributes(attributes);
+                            JSONArray atts = (JSONArray) attributes.get("attributes");
+                            for (Object attribute : atts) {
+                                JSONObject jsonObject = (JSONObject) attribute;
+                                JRadioButton radioButton = new JRadioButton(jsonObject.getString("name"));
                                 buttonGroup.add(radioButton);
                                 radioButton.setSelected(true);
                                 add(radioButton, "wrap, dock north");
@@ -1108,30 +1016,8 @@ public class OknoMigLayout extends JFrame{
             this.add(removeBtn);
         }
 
-        public void setAttMap(Map<String, List<Atribut>> attMap){
-            this.attMap = attMap;
-        }
-
-        public void setAttMap(JSONObject constraints){
+        public void setAttributes(JSONObject constraints){
             this.constraints = constraints;
-        }
-
-        public void setConstraints(Map<String, List<Atribut>> attMap){
-            Map.Entry<String, List<Atribut>> entry = attMap.entrySet().iterator().next();
-            JSONObject jsonConstraint = new JSONObject();
-            jsonConstraint.put("table", entry.getKey());
-            JSONArray attributes = new JSONArray();
-
-            for (Atribut att : entry.getValue()) {
-                JSONObject attribute = new JSONObject();
-                attribute.put("name", att.getName());
-                attribute.put("operator", att.getOperator());
-                attribute.put("value", att.getValue());
-                attributes.put(attribute);
-            }
-
-            jsonConstraint.put("attributes", attributes);
-            this.constraints = jsonConstraint;
         }
 
         public Map<String, List<Atribut>> getAttributeMap(){

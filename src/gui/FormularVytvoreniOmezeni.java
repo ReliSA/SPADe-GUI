@@ -169,15 +169,24 @@ class FormularVytvoreniOmezeni extends JDialog
         return this.closed;
     }
 
-    public Map<String, List<Atribut>> getFormData()
+    public JSONObject getFormData()
     {
-        Map<String, List<Atribut>> dataMap = new LinkedHashMap<>();
-
+        JSONObject jsonConstraint = new JSONObject();
         if(!closed) {
-            dataMap.put((String) cboxTables.getSelectedItem(), attributeList);
-        }
+            jsonConstraint.put("table", (String) cboxTables.getSelectedItem());
+            JSONArray attributes = new JSONArray();
 
-        return dataMap;
+            for (Atribut att : attributeList) {
+                JSONObject attribute = new JSONObject();
+                attribute.put("name", att.getName());
+                attribute.put("operator", att.getOperator());
+                attribute.put("value", att.getValue());
+                attributes.put(attribute);
+            }
+
+            jsonConstraint.put("attributes", attributes);
+        }
+        return jsonConstraint;
     }
 
     private class AttributePanel extends JPanel{
