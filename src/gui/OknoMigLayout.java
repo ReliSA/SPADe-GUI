@@ -52,6 +52,7 @@ public class OknoMigLayout extends JFrame{
     private static JTextField varOrQueryNameTf = new JTextField(10);
     private static final JFileChooser fileChooser = new JFileChooser();
     private static final Map<String, List<Sloupec>> strukturyPohledu = new TreeMap<>();
+    private static List<ComboBoxItem> preparedVariableValues = new ArrayList<>();
 
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
@@ -114,6 +115,9 @@ public class OknoMigLayout extends JFrame{
                     JSONObject obj = new JSONObject(content);
                     ConstantPanel constPanel = new ConstantPanel(obj.getString("name"), obj.getString("value"));
                     constantsPanel.add(constPanel);
+                    ComboBoxItem comboBoxItem = new ComboBoxItem(obj.getString("name"), "konstanta", obj.getString("value"));
+                    preparedVariableValues.add(comboBoxItem);
+                    System.out.println(preparedVariableValues);
                     constantsPanel.revalidate();
                     constantsPanel.repaint();
                 } catch(IOException e) {
@@ -126,6 +130,9 @@ public class OknoMigLayout extends JFrame{
             public void actionPerformed(ActionEvent arg0) {
                 FormularVytvoreniKonstanty constForm = new FormularVytvoreniKonstanty();
                 if(!constForm.wasCancelled()) {
+                    ComboBoxItem comboBoxItem = new ComboBoxItem(constForm.getConstName(), "konstanta",constForm.getConstValue());
+                    preparedVariableValues.add(comboBoxItem);
+                    System.out.println(preparedVariableValues);
                     ConstantPanel constPanel = new ConstantPanel(constForm.getConstName(), constForm.getConstValue());
                     String jsonString = new JSONObject()
                             .put("name", constForm.getConstName())
@@ -160,7 +167,12 @@ public class OknoMigLayout extends JFrame{
             for (File file : files) {
                 try {
                     String content = FileUtils.readFileToString(file, "utf-8");
-                    VariablePanel varPanel = new VariablePanel(file.getName().substring(0, file.getName().indexOf('.')), content);
+                    String varName = file.getName().substring(0, file.getName().indexOf('.'));
+                    VariablePanel varPanel = new VariablePanel(varName, content);
+                    JSONObject obj = new JSONObject(content);
+                    ComboBoxItem comboBoxItem = new ComboBoxItem(varName, "promenna", obj.getString("queryResult"));
+                    preparedVariableValues.add(comboBoxItem);
+                    System.out.println(preparedVariableValues);
                     variablesPanel.add(varPanel);
                     variablesPanel.revalidate();
                     variablesPanel.repaint();
@@ -221,7 +233,7 @@ public class OknoMigLayout extends JFrame{
         addConstraintBtn.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                FormularVytvoreniOmezeni constraintForm = new FormularVytvoreniOmezeni(strukturyPohledu, null);
+                FormularVytvoreniOmezeni constraintForm = new FormularVytvoreniOmezeni(strukturyPohledu, null, preparedVariableValues);
                 Map<String, List<Atribut>> attMap = constraintForm.getFormData();
                 if (!attMap.isEmpty()) {
                     centerPanel.add(new ConstraintPanel(attMap), "dock west, height 100%, width " + constraintPanelWidth);
@@ -355,7 +367,10 @@ public class OknoMigLayout extends JFrame{
                         if(constPanel.getAttributeMap() == null){
                             JSONObject jsonConstraint = constPanel.getJsonConstraint();
                             if(variableCreation){
-                                jsonConstraint = writeQueryResult(jsonConstraint);
+                                jsonObject = writeQueryResult(jsonObject);
+                                ComboBoxItem comboBoxItem = new ComboBoxItem(varOrQueryNameTf.getText(), "promenna", jsonObject.getString("queryResult"));
+                                preparedVariableValues.add(comboBoxItem);
+                                System.out.println(preparedVariableValues);
                             }
                             constList.add(jsonConstraint);
                         } else {
@@ -363,7 +378,10 @@ public class OknoMigLayout extends JFrame{
                             JSONObject jsonConstraint = new JSONObject();
                             jsonConstraint.put("table", entry.getKey());
                             if (variableCreation) {
-                                jsonConstraint = writeQueryResult(jsonConstraint);
+                                jsonObject = writeQueryResult(jsonObject);
+                                ComboBoxItem comboBoxItem = new ComboBoxItem(varOrQueryNameTf.getText(), "promenna", jsonObject.getString("queryResult"));
+                                preparedVariableValues.add(comboBoxItem);
+                                System.out.println(preparedVariableValues);
                             }
                             JSONArray attributes = new JSONArray();
 
@@ -613,7 +631,7 @@ public class OknoMigLayout extends JFrame{
         if(result == null) {
             jsonConstraint.put("queryResult", "NULL");
         } else {
-            jsonConstraint.put("queryResult", result);
+            jsonConstraint.put("queryResult", result.toString());
         }
 
         return jsonConstraint;
@@ -758,11 +776,16 @@ public class OknoMigLayout extends JFrame{
             editBtn.addActionListener(new ActionListener(){
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    preparedVariableValues.removeIf(item -> item.getName().equals(name));
+                    System.out.println(preparedVariableValues);
                     FormularVytvoreniKonstanty constantsForm = new FormularVytvoreniKonstanty(name, value);
                     String oldName = name;
                     name = constantsForm.getConstName();
                     value = constantsForm.getConstValue();
                     label.setText(constantsForm.getConstName() + ":" + constantsForm.getConstValue());
+                    ComboBoxItem comboBoxItem = new ComboBoxItem(constantsForm.getConstName(), "konstanta",constantsForm.getConstValue());
+                    preparedVariableValues.add(comboBoxItem);
+                    System.out.println(preparedVariableValues);
                     mainFrame.revalidate();
                     mainFrame.repaint();
                     File oldFile = new File(constantFolderPath + oldName + ".json");
@@ -793,6 +816,8 @@ public class OknoMigLayout extends JFrame{
             removeBtn.addActionListener(new ActionListener(){
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    preparedVariableValues.removeIf(item -> item.getName().equals(name));
+                    System.out.println(preparedVariableValues);
                     thisPanel.getParent().remove(thisPanel);
                     try {
                         File file = new File(constantFolderPath + name + ".json");
@@ -887,6 +912,8 @@ public class OknoMigLayout extends JFrame{
             removeBtn.addActionListener(new ActionListener(){
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    preparedVariableValues.removeIf(item -> item.getName().equals(name));
+                    System.out.println(preparedVariableValues);
                     thisPanel.getParent().remove(thisPanel);
                     try {
                         File file = new File(variableFolderPath + name + ".json");
@@ -958,7 +985,7 @@ public class OknoMigLayout extends JFrame{
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     JSONObject constraint = getJsonConstraint();
-                    FormularVytvoreniOmezeni form = new FormularVytvoreniOmezeni(strukturyPohledu ,constraint);
+                    FormularVytvoreniOmezeni form = new FormularVytvoreniOmezeni(strukturyPohledu ,constraint, preparedVariableValues);
 
                     if(!form.wasClosed()) {
                         Component[] components = getComponents();
@@ -1033,7 +1060,7 @@ public class OknoMigLayout extends JFrame{
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     JSONObject constraint = getJsonConstraint();
-                    FormularVytvoreniOmezeni form = new FormularVytvoreniOmezeni(strukturyPohledu, constraint);
+                    FormularVytvoreniOmezeni form = new FormularVytvoreniOmezeni(strukturyPohledu, constraint, preparedVariableValues);
 
                     if(!form.wasClosed()) {
                         Component[] components = getComponents();

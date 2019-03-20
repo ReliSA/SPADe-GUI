@@ -4,6 +4,7 @@ import net.miginfocom.swing.MigLayout;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import ostatni.Atribut;
+import ostatni.ComboBoxItem;
 import ostatni.Konstanty;
 import ostatni.Sloupec;
 
@@ -14,6 +15,8 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -35,7 +38,7 @@ class FormularVytvoreniOmezeni extends JDialog
     private JComboBox cboxTables = new JComboBox();
     private JTextField tfAttValue = new JTextField("Value");
 
-    public FormularVytvoreniOmezeni(Map<String, List<Sloupec>> strukturaPohledu, JSONObject constraint){
+    public FormularVytvoreniOmezeni(Map<String, List<Sloupec>> strukturaPohledu, JSONObject constraint, List<ComboBoxItem> variableValues){
         setModal(true);
         setLocation(400,300);
         // TODO - cancel on close - don't know how
@@ -87,7 +90,7 @@ class FormularVytvoreniOmezeni extends JDialog
                                          remove(btnAdd);
 
                                          add(new JLabel());
-                                         AttributePanel attributePanel = new AttributePanel(strukturaPohledu.get((String) cboxTables.getSelectedItem()));
+                                         AttributePanel attributePanel = new AttributePanel(strukturaPohledu.get((String) cboxTables.getSelectedItem()), variableValues);
                                          add(attributePanel, "width 100%, wrap");
                                          attributeList.add(attributePanel.getAtribut());
                                          add(btnAdd);
@@ -116,7 +119,7 @@ class FormularVytvoreniOmezeni extends JDialog
 
                 attributeList.clear();
                 strukturaPohledu.get(cboxTables.getSelectedItem());
-                AttributePanel attributePanel = new AttributePanel(null, strukturaPohledu.get(cboxTables.getSelectedItem()));
+                AttributePanel attributePanel = new AttributePanel(null, strukturaPohledu.get(cboxTables.getSelectedItem()), variableValues);
                 add(attributePanel, "width 100%, wrap");
                 attributeList.add(attributePanel.getAtribut());
                 System.out.println();
@@ -145,12 +148,12 @@ class FormularVytvoreniOmezeni extends JDialog
                 temp++;
 
                 JSONObject jsonObject = (JSONObject) attribute;
-                AttributePanel attributePanel = new AttributePanel(jsonObject.getString("name"), jsonObject.getString("operator"), jsonObject.getString("value"), strukturaPohledu.get((tableName)));
+                AttributePanel attributePanel = new AttributePanel(jsonObject.getString("name"), jsonObject.getString("operator"), jsonObject.getString("value"), strukturaPohledu.get((tableName)), variableValues);
                 add(attributePanel, "width 100%, wrap");
                 attributeList.add(attributePanel.getAtribut());
             }
         } else {
-            AttributePanel attributePanel = new AttributePanel(strukturaPohledu.get((String) cboxTables.getSelectedItem()));
+            AttributePanel attributePanel = new AttributePanel(strukturaPohledu.get((String) cboxTables.getSelectedItem()), variableValues);
             this.add(attributePanel, "width 100%, wrap");
             attributeList.add(attributePanel.getAtribut());
         }
@@ -182,21 +185,23 @@ class FormularVytvoreniOmezeni extends JDialog
         AttributePanel thisPanel;
         JComboBox<String> cboxAttributes = new JComboBox<>();
         JComboBox<String> cboxOperators = new JComboBox<>();
+        JComboBox<ComboBoxItem> cboxVariableValues = new JComboBox();
         JTextField tfValue = new JTextField();
+        JCheckBox checkBocUseVariable = new JCheckBox();
 
-        public AttributePanel(List<Sloupec> sloupce) {
-            this(null, sloupce);
+        public AttributePanel(List<Sloupec> sloupce, List<ComboBoxItem> variableValues) {
+            this(null, sloupce, variableValues);
         }
 
-        public AttributePanel(String name, String operator, String value, List<Sloupec> sloupce) {
-            this(new Atribut(name, operator, value), sloupce);
+        public AttributePanel(String name, String operator, String value, List<Sloupec> sloupce, List<ComboBoxItem> variableValues) {
+            this(new Atribut(name, operator, value), sloupce, variableValues);
         }
 
-        public AttributePanel(Atribut newAtribut, List<Sloupec> sloupce){
+        public AttributePanel(Atribut newAtribut, List<Sloupec> sloupce, List<ComboBoxItem> variableValues){
             super();
             thisPanel = this;
             this.setLayout(new MigLayout());
-            JComboBox variableValues = new JComboBox();
+
 
             List<String> firstOperators = getOperatorForType(sloupce.iterator().next().getType());
             for(Sloupec sloupec : sloupce){
@@ -204,6 +209,9 @@ class FormularVytvoreniOmezeni extends JDialog
             }
             for(String operator : firstOperators){
                 cboxOperators.addItem(operator);
+            }
+            for(ComboBoxItem varValue : variableValues){
+                cboxVariableValues.addItem(varValue);
             }
 
             if(newAtribut == null) {
@@ -254,16 +262,6 @@ class FormularVytvoreniOmezeni extends JDialog
                     for(String operator : getOperatorForType(sloupec.getType())){
                         cboxOperators.addItem(operator);
                     }
-                    if(sloupec.getType().equals("bigint") || sloupec.getType().equals("int") || sloupec.getType().equals("double")){
-                        add(variableValues);
-                    } else {
-                        // att panel ma max 4 componenty - pokud to neni cislo tak 4. vyhodit
-                        if(getComponents().length > 3){
-                            remove(getComponents()[3]);
-                        }
-                        revalidate();
-                        repaint();
-                    }
                 }
             });
 
@@ -273,15 +271,52 @@ class FormularVytvoreniOmezeni extends JDialog
                 }
             });
 
+            checkBocUseVariable.addItemListener(new ItemListener() {
+
+                public void itemStateChanged(ItemEvent e) {
+                    if(checkBocUseVariable.isSelected()){
+                        thisPanel.remove(tfValue);
+                        thisPanel.remove(checkBocUseVariable);
+                        thisPanel.add(cboxVariableValues, "width 20%");
+                        if(!variableValues.isEmpty()) {
+                            cboxVariableValues.setSelectedIndex(0);
+                        }
+                        thisPanel.add(checkBocUseVariable);
+                        revalidate();
+                        repaint();
+                    } else {
+                        thisPanel.remove(cboxVariableValues);
+                        thisPanel.remove(checkBocUseVariable);
+                        thisPanel.add(tfValue, "width 20%");
+                        tfValue.setText("");
+                        thisPanel.add(checkBocUseVariable);
+                        revalidate();
+                        repaint();
+                    }
+                }
+            });
+
             tfValue.getDocument().addDocumentListener(new DocumentListener() {
                 public void changedUpdate(DocumentEvent e) {
-                    atribut.setValue(tfValue.getText());
+                    if(checkBocUseVariable.isSelected()) {
+                        atribut.setValue(((ComboBoxItem) cboxVariableValues.getSelectedItem()).getValue());
+                    } else {
+                        atribut.setValue(tfValue.getText());
+                    }
                 }
                 public void removeUpdate(DocumentEvent e) {
-                    atribut.setValue(tfValue.getText());
+                    if(checkBocUseVariable.isSelected()) {
+                        atribut.setValue(((ComboBoxItem) cboxVariableValues.getSelectedItem()).getValue());
+                    } else {
+                        atribut.setValue(tfValue.getText());
+                    }
                 }
                 public void insertUpdate(DocumentEvent e) {
-                    atribut.setValue(tfValue.getText());
+                    if(checkBocUseVariable.isSelected()) {
+                        atribut.setValue(((ComboBoxItem) cboxVariableValues.getSelectedItem()).getValue());
+                    } else {
+                        atribut.setValue(tfValue.getText());
+                    }
                 }
 
 //                public void warn() {
@@ -293,9 +328,16 @@ class FormularVytvoreniOmezeni extends JDialog
 //                }
             });
 
+            cboxVariableValues.addActionListener (new ActionListener () {
+                public void actionPerformed(ActionEvent e) {
+                    atribut.setValue(((ComboBoxItem) cboxVariableValues.getSelectedItem()).getValue());
+                }
+            });
+
             this.add(cboxAttributes,"width 40%");
             this.add(cboxOperators,"width 15%");
             this.add(tfValue,"width 20%");
+            this.add(checkBocUseVariable);
             // doesnt work properly
 //            this.add(removeBtn);
             this.setVisible(true);

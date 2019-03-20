@@ -43,9 +43,10 @@ class FormularVytvoreniKonstanty extends JDialog
 
         this.setLayout(new MigLayout());
         this.add(lblName);
-        this.add(tfName, "wrap");
+        this.add(tfName, "wrap, span 2");
         this.add(lblValue);
-        this.add(tfValue, "wrap");
+        this.add(tfValue, "wrap, span 2");
+        this.add(new JLabel());
         this.add(btnOk);
         this.add(btnCancel);
         this.setVisible(true);
