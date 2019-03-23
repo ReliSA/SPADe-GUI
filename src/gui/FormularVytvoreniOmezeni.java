@@ -38,13 +38,16 @@ class FormularVytvoreniOmezeni extends JDialog
     private JComboBox cboxTables = new JComboBox();
     private JTextField tfAttValue = new JTextField("Value");
 
+    private FormularVytvoreniOmezeni parentForm;
+
     public FormularVytvoreniOmezeni(Map<String, List<Sloupec>> strukturaPohledu, JSONObject constraint, List<ComboBoxItem> variableValues){
         setModal(true);
         setLocation(400,300);
         // TODO - cancel on close - don't know how
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        int temp = 0;
         String tableName = "";
+        parentForm = this;
+        boolean first = true;
 
         setSize(600,150);
         setLocationRelativeTo(null);
@@ -89,9 +92,8 @@ class FormularVytvoreniOmezeni extends JDialog
                                          remove(btnSubmit);
                                          remove(btnAdd);
 
-                                         add(new JLabel());
-                                         AttributePanel attributePanel = new AttributePanel(strukturaPohledu.get((String) cboxTables.getSelectedItem()), variableValues);
-                                         add(attributePanel, "width 100%, wrap");
+                                         AttributePanel attributePanel = new AttributePanel(strukturaPohledu.get((String) cboxTables.getSelectedItem()), variableValues, parentForm);
+                                         add(attributePanel, "gapleft 60, span 2, width 100%, wrap");
                                          attributeList.add(attributePanel.getAtribut());
                                          add(btnAdd);
                                          add(btnSubmit, "width 15%");
@@ -119,12 +121,11 @@ class FormularVytvoreniOmezeni extends JDialog
 
                 attributeList.clear();
                 strukturaPohledu.get(cboxTables.getSelectedItem());
-                AttributePanel attributePanel = new AttributePanel(null, strukturaPohledu.get(cboxTables.getSelectedItem()), variableValues);
+                AttributePanel attributePanel = new AttributePanel(null, strukturaPohledu.get(cboxTables.getSelectedItem()), variableValues, parentForm);
                 add(attributePanel, "width 100%, wrap");
                 attributeList.add(attributePanel.getAtribut());
                 System.out.println();
                 add(btnAdd);
-//                add(new JLabel());
                 add(btnSubmit, "width 15%");
                 add(btnClose, "width 15%");
                 revalidate();
@@ -141,25 +142,23 @@ class FormularVytvoreniOmezeni extends JDialog
             for (Object attribute : atts) {
                 setSize(getWidth(), getHeight() + 40);
 
-                // odsazení v layoutu
-                if (temp != 0) {
-                        add(new JLabel());
-                }
-                temp++;
-
                 JSONObject jsonObject = (JSONObject) attribute;
-                AttributePanel attributePanel = new AttributePanel(jsonObject.getString("name"), jsonObject.getString("operator"), jsonObject.getString("value"), strukturaPohledu.get((tableName)), variableValues);
-                add(attributePanel, "width 100%, wrap");
+                AttributePanel attributePanel = new AttributePanel(jsonObject.getString("name"), jsonObject.getString("operator"), jsonObject.getString("value"), strukturaPohledu.get((tableName)), variableValues, parentForm);
+                if(first){
+                    add(attributePanel, "width 100%, wrap");
+                    first = false;
+                } else {
+                    add(attributePanel, "gapleft 60, span 2, width 100%, wrap");
+                }
                 attributeList.add(attributePanel.getAtribut());
             }
         } else {
-            AttributePanel attributePanel = new AttributePanel(strukturaPohledu.get((String) cboxTables.getSelectedItem()), variableValues);
+            AttributePanel attributePanel = new AttributePanel(strukturaPohledu.get((String) cboxTables.getSelectedItem()), variableValues, parentForm);
             this.add(attributePanel, "width 100%, wrap");
             attributeList.add(attributePanel.getAtribut());
         }
 
         this.add(btnAdd);
-        //this.add(new JLabel());
         this.add(btnSubmit, "width 15%");
         this.add(btnClose, "width 15%");
         this.setVisible(true);
@@ -189,6 +188,13 @@ class FormularVytvoreniOmezeni extends JDialog
         return jsonConstraint;
     }
 
+    public void resizeComponent(){
+        //vyřešit resizing, propojení je vyřešený
+        //this.setSize(200,200);
+        this.revalidate();
+        this.repaint();
+    }
+
     private class AttributePanel extends JPanel{
         Atribut atribut;
         AttributePanel thisPanel;
@@ -197,18 +203,20 @@ class FormularVytvoreniOmezeni extends JDialog
         JComboBox<ComboBoxItem> cboxVariableValues = new JComboBox();
         JTextField tfValue = new JTextField();
         JCheckBox checkBocUseVariable = new JCheckBox();
+        FormularVytvoreniOmezeni parentForm;
 
-        public AttributePanel(List<Sloupec> sloupce, List<ComboBoxItem> variableValues) {
-            this(null, sloupce, variableValues);
+        public AttributePanel(List<Sloupec> sloupce, List<ComboBoxItem> variableValues, FormularVytvoreniOmezeni parentForm) {
+            this(null, sloupce, variableValues, parentForm);
         }
 
-        public AttributePanel(String name, String operator, String value, List<Sloupec> sloupce, List<ComboBoxItem> variableValues) {
-            this(new Atribut(name, operator, value), sloupce, variableValues);
+        public AttributePanel(String name, String operator, String value, List<Sloupec> sloupce, List<ComboBoxItem> variableValues, FormularVytvoreniOmezeni parentForm) {
+            this(new Atribut(name, operator, value), sloupce, variableValues, parentForm);
         }
 
-        public AttributePanel(Atribut newAtribut, List<Sloupec> sloupce, List<ComboBoxItem> variableValues){
+        public AttributePanel(Atribut newAtribut, List<Sloupec> sloupce, List<ComboBoxItem> variableValues, FormularVytvoreniOmezeni parentForm){
             super();
             thisPanel = this;
+            this.parentForm = parentForm;
             this.setLayout(new MigLayout());
 
 
@@ -252,11 +260,8 @@ class FormularVytvoreniOmezeni extends JDialog
             removeBtn.addActionListener(new ActionListener(){
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    Container container = thisPanel.getParent();
+                    parentForm.resizeComponent();
                     thisPanel.getParent().remove(thisPanel);
-                    container.setSize(container.getWidth(), container.getHeight() - 40);
-                    container.revalidate();
-                    container.repaint();
                 }
             });
 
@@ -342,6 +347,7 @@ class FormularVytvoreniOmezeni extends JDialog
                     atribut.setValue(((ComboBoxItem) cboxVariableValues.getSelectedItem()).getValue());
                 }
             });
+
 
             this.add(cboxAttributes,"width 40%");
             this.add(cboxOperators,"width 15%");

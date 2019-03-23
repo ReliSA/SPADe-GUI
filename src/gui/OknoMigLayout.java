@@ -1,6 +1,7 @@
 package gui;
 
 import databaze.PohledDAO;
+import javafx.scene.control.RadioButton;
 import net.miginfocom.swing.MigLayout;
 import org.apache.commons.io.FileUtils;
 import ostatni.*;
@@ -35,7 +36,7 @@ public class OknoMigLayout extends JFrame{
     private static JButton loadQueryBtn = new JButton("Load query");
     private static JButton testVarQueryBtn = new JButton("Test query");
     private static JButton testQueryBtn = new JButton("Test query");
-    private static ButtonGroup group = new ButtonGroup();
+    private static ButtonGroup buttonGroupFunction = new ButtonGroup();
     private static List<JRadioButton> radioButtonList = new ArrayList<>();
     private static JRadioButton radioSum = new JRadioButton("SUM");
     private static JRadioButton radioCount = new JRadioButton("COUNT");
@@ -215,10 +216,10 @@ public class OknoMigLayout extends JFrame{
 
         centerNorthPanel.setBackground(Color.orange);
 
-        group.add(radioSum);
-        group.add(radioCount);
-        group.add(radioMin);
-        group.add(radioMax);
+        buttonGroupFunction.add(radioSum);
+        buttonGroupFunction.add(radioCount);
+        buttonGroupFunction.add(radioMin);
+        buttonGroupFunction.add(radioMax);
         // default
         radioSum.setSelected(true);
 
@@ -233,7 +234,7 @@ public class OknoMigLayout extends JFrame{
                 FormularVytvoreniOmezeni constraintForm = new FormularVytvoreniOmezeni(strukturyPohledu, null, preparedVariableValues);
                 JSONObject attributes = constraintForm.getFormData();
                 if (!attributes.isEmpty()) {
-                    centerPanel.add(new ConstraintPanel(attributes), "dock west, height 100%, width " + constraintPanelWidth);
+                    centerPanel.add(new ConstraintPanel(attributes, false), "dock west, height 100%, width " + constraintPanelWidth);
                     centerPanel.revalidate();
                 }
             }
@@ -305,7 +306,7 @@ public class OknoMigLayout extends JFrame{
                         for (Object cons : constraints)
                         {
                             JSONObject object = (JSONObject) cons;
-                            ConstraintPanel panel = new ConstraintPanel(object);
+                            ConstraintPanel panel = new ConstraintPanel(object, false);
                             centerPanel.add(panel, "dock west, height 100%, width " + constraintPanelWidth);
                             centerPanel.revalidate();
                             centerPanel.repaint();
@@ -361,38 +362,33 @@ public class OknoMigLayout extends JFrame{
                 for (Component component: centerComponents) {
                     if(component instanceof ConstraintPanel) {
                         ConstraintPanel constPanel = (ConstraintPanel) component;
-                        if(constPanel.getAttributeMap() == null){
-                            JSONObject jsonConstraint = constPanel.getJsonConstraint();
-                            if(variableCreation){
-                                jsonObject = writeQueryResult(jsonObject);
-                                ComboBoxItem comboBoxItem = new ComboBoxItem(varOrQueryNameTf.getText(), "promenna", jsonObject.getString("queryResult"));
-                                preparedVariableValues.add(comboBoxItem);
-                                System.out.println(preparedVariableValues);
+                        JSONObject jsonConstraint = constPanel.getJsonConstraint();
+                        if(variableCreation){
+                            jsonObject = writeQueryResult(jsonObject);
+                            ComboBoxItem comboBoxItem = new ComboBoxItem(varOrQueryNameTf.getText(), "promenna", jsonObject.getString("queryResult"));
+                            preparedVariableValues.add(comboBoxItem);
+                            System.out.println(preparedVariableValues);
+                            List<JRadioButton> radioButtons = constPanel.getRadioButtons();
+                            String selected = "";
+                            for(JRadioButton radioButton : radioButtons){
+                                if(radioButton.isSelected()){
+                                    selected = radioButton.getText();
+                                }
                             }
-                            constList.add(jsonConstraint);
-                        } else {
-                            Map.Entry<String, List<Atribut>> entry = constPanel.getAttributeMap().entrySet().iterator().next();
-                            JSONObject jsonConstraint = new JSONObject();
-                            jsonConstraint.put("table", entry.getKey());
-                            if (variableCreation) {
-                                jsonObject = writeQueryResult(jsonObject);
-                                ComboBoxItem comboBoxItem = new ComboBoxItem(varOrQueryNameTf.getText(), "promenna", jsonObject.getString("queryResult"));
-                                preparedVariableValues.add(comboBoxItem);
-                                System.out.println(preparedVariableValues);
-                            }
-                            JSONArray attributes = new JSONArray();
-
-                            for (Atribut att : entry.getValue()) {
-                                JSONObject attribute = new JSONObject();
-                                attribute.put("name", att.getName());
-                                attribute.put("operator", att.getOperator());
-                                attribute.put("value", att.getValue());
-                                attributes.put(attribute);
+                            JSONArray attributes = (JSONArray) jsonConstraint.get("attributes");
+                            for(Object attribute: attributes){
+                                JSONObject obj = (JSONObject) attribute;
+                                //pokud tam bude jeden sloupec 2x tak to nastaví true na 2 - asi to vyřešit že to bude kontrolovat všechno a ne jen jméno
+                                // zkusit co to udělá v button group když bych měl 3x stejný název a 3x true v souboru jak se to zachová
+                                if(obj.getString("name").equals(selected)){
+                                    obj.put("aggregatedColumn","true");
+                                } else {
+                                    obj.put("aggregatedColumn","false");
+                                }
                             }
 
-                            jsonConstraint.put("attributes", attributes);
-                            constList.add(jsonConstraint);
                         }
+                        constList.add(jsonConstraint);
                     }
                 }
                 JSONObject[] constArray = new JSONObject[constList.size()];
@@ -617,7 +613,7 @@ public class OknoMigLayout extends JFrame{
     }
 
     private JSONObject writeQueryResult(JSONObject jsonConstraint){
-        for (Enumeration<AbstractButton> buttons = group.getElements(); buttons.hasMoreElements();) {
+        for (Enumeration<AbstractButton> buttons = buttonGroupFunction.getElements(); buttons.hasMoreElements();) {
             AbstractButton button = buttons.nextElement();
             if (button.isSelected()) {
                 jsonConstraint.put("function", button.getText());
@@ -659,7 +655,7 @@ public class OknoMigLayout extends JFrame{
         if(constraintPanels.size() == 1) {
             String function = "";
             String selectedColumn = "";
-            for (Enumeration<AbstractButton> buttons = group.getElements(); buttons.hasMoreElements();) {
+            for (Enumeration<AbstractButton> buttons = buttonGroupFunction.getElements(); buttons.hasMoreElements();) {
                 AbstractButton button = buttons.nextElement();
                 if (button.isSelected()) {
                     function = button.getText();
@@ -880,22 +876,20 @@ public class OknoMigLayout extends JFrame{
 
                     JSONObject jsonObject = new JSONObject(content);
 
-
-
                     JSONArray constraints = (JSONArray) jsonObject.get("constraints");
+                    String function = jsonObject.getString("function");
                     for (Object cons : constraints)
                     {
                         JSONObject object = (JSONObject) cons;
-                        String function = object.getString("function");
 
-                        for (Enumeration<AbstractButton> buttons = group.getElements(); buttons.hasMoreElements();) {
+                        for (Enumeration<AbstractButton> buttons = buttonGroupFunction.getElements(); buttons.hasMoreElements();) {
                             AbstractButton button = buttons.nextElement();
                             if (button.getText().equals(function)) {
                                 button.setSelected(true);
                             }
                         }
 
-                        ConstraintPanel panel = new ConstraintPanel(object);
+                        ConstraintPanel panel = new ConstraintPanel(object, true);
                         centerPanel.add(panel, "dock west, height 100%, width " + constraintPanelWidth);
                         centerPanel.revalidate();
                         centerPanel.repaint();
@@ -940,10 +934,10 @@ public class OknoMigLayout extends JFrame{
     private class ConstraintPanel extends JPanel {
 
         ConstraintPanel thisPanel;
-        Map<String, List<Atribut>> attMap;
         JSONObject constraints;
+        List<JRadioButton> radioButtons = new ArrayList<>();
 
-        public ConstraintPanel(JSONObject constraints) {
+        public ConstraintPanel(JSONObject constraints, boolean editing) {
             super();
             thisPanel = this;
             this.constraints = constraints;
@@ -958,8 +952,16 @@ public class OknoMigLayout extends JFrame{
             for(Object attribute: attributes){
                 JSONObject jsonObject = (JSONObject) attribute;
                 JRadioButton radioButton = new JRadioButton(jsonObject.getString("name"));
+                if(editing) {
+                    boolean aggregated = jsonObject.getBoolean("aggregatedColumn");
+                    if(aggregated) {
+                        radioButton.setSelected(true);
+                    }
+                } else {
+                    radioButton.setSelected(true);
+                }
+                radioButtons.add(radioButton);
                 buttonGroup.add(radioButton);
-                radioButton.setSelected(true);
                 this.add(radioButton, "wrap");
             }
 
@@ -971,6 +973,7 @@ public class OknoMigLayout extends JFrame{
                     FormularVytvoreniOmezeni form = new FormularVytvoreniOmezeni(strukturyPohledu, constraint, preparedVariableValues);
 
                     if(!form.wasClosed()) {
+                        radioButtons.clear();
                         Component[] components = getComponents();
                         for (int i = 0; i < components.length; i++) {
                             if (components[i] instanceof JLabel || components[i] instanceof JRadioButton) {
@@ -988,6 +991,7 @@ public class OknoMigLayout extends JFrame{
                             for (Object attribute : atts) {
                                 JSONObject jsonObject = (JSONObject) attribute;
                                 JRadioButton radioButton = new JRadioButton(jsonObject.getString("name"));
+                                radioButtons.add(radioButton);
                                 buttonGroup.add(radioButton);
                                 radioButton.setSelected(true);
                                 add(radioButton, "wrap, dock north");
@@ -1020,12 +1024,12 @@ public class OknoMigLayout extends JFrame{
             this.constraints = constraints;
         }
 
-        public Map<String, List<Atribut>> getAttributeMap(){
-            return this.attMap;
-        }
-
         public JSONObject getJsonConstraint() {
             return this.constraints;
+        }
+
+        public List<JRadioButton> getRadioButtons(){
+            return this.radioButtons;
         }
     }
 }
