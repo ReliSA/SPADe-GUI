@@ -32,6 +32,8 @@ class FormularVytvoreniOmezeni extends JDialog
     private JTextField tfAttribute = new JTextField();
     private boolean closed = true;
     private List<Atribut> attributeList = new ArrayList<>();
+    private List<AttributePanel> attributePanels = new ArrayList<>();
+    private boolean validForm = false;
 
     private JLabel lblType = new JLabel("Type");
     private JLabel lblAttribute = new JLabel("Attribute");
@@ -70,8 +72,10 @@ class FormularVytvoreniOmezeni extends JDialog
 
         btnSubmit.addActionListener(new ActionListener(){
                                         public void actionPerformed(ActionEvent e){
-                                            closed = false;
-                                            dispose();
+                                            if(validateForm(attributePanels)){
+                                                closed = false;
+                                                dispose();
+                                            }
                                         }
                                     }
         );
@@ -94,6 +98,7 @@ class FormularVytvoreniOmezeni extends JDialog
 
                                          AttributePanel attributePanel = new AttributePanel(strukturaPohledu.get((String) cboxTables.getSelectedItem()), variableValues, parentForm);
                                          add(attributePanel, "gapleft 60, span 2, width 100%, wrap");
+                                         attributePanels.add(attributePanel);
                                          attributeList.add(attributePanel.getAtribut());
                                          add(btnAdd);
                                          add(btnSubmit, "width 15%");
@@ -120,9 +125,11 @@ class FormularVytvoreniOmezeni extends JDialog
                 setSize(600,165);
 
                 attributeList.clear();
+                attributePanels.clear();
                 strukturaPohledu.get(cboxTables.getSelectedItem());
                 AttributePanel attributePanel = new AttributePanel(null, strukturaPohledu.get(cboxTables.getSelectedItem()), variableValues, parentForm);
                 add(attributePanel, "width 100%, wrap");
+                attributePanels.add(attributePanel);
                 attributeList.add(attributePanel.getAtribut());
                 System.out.println();
                 add(btnAdd);
@@ -143,18 +150,20 @@ class FormularVytvoreniOmezeni extends JDialog
                 setSize(getWidth(), getHeight() + 40);
 
                 JSONObject jsonObject = (JSONObject) attribute;
-                AttributePanel attributePanel = new AttributePanel(jsonObject.getString("name"), jsonObject.getString("operator"), jsonObject.getString("value"), strukturaPohledu.get((tableName)), variableValues, parentForm);
+                AttributePanel attributePanel = new AttributePanel(jsonObject.getString("name"), jsonObject.getString("operator"), jsonObject.getString("value"), jsonObject.getString("type"), strukturaPohledu.get((tableName)), variableValues, parentForm);
                 if(first){
                     add(attributePanel, "width 100%, wrap");
                     first = false;
                 } else {
                     add(attributePanel, "gapleft 60, span 2, width 100%, wrap");
                 }
+                attributePanels.add(attributePanel);
                 attributeList.add(attributePanel.getAtribut());
             }
         } else {
             AttributePanel attributePanel = new AttributePanel(strukturaPohledu.get((String) cboxTables.getSelectedItem()), variableValues, parentForm);
             this.add(attributePanel, "width 100%, wrap");
+            attributePanels.add(attributePanel);
             attributeList.add(attributePanel.getAtribut());
         }
 
@@ -162,6 +171,25 @@ class FormularVytvoreniOmezeni extends JDialog
         this.add(btnSubmit, "width 15%");
         this.add(btnClose, "width 15%");
         this.setVisible(true);
+    }
+
+    public boolean validateForm(List<AttributePanel> attributePanels){
+        boolean validForm = true;
+        for(AttributePanel attributePanel : attributePanels){
+            boolean valid = attributePanel.getAtribut().validate();
+            if(valid){
+                attributePanel.setFieldOk();
+            } else {
+                attributePanel.setFieldWarning();
+            }
+        }
+        for(AttributePanel attributePanel : attributePanels){
+            if(!attributePanel.getAtribut().isValid()){
+                validForm = false;
+                break;
+            }
+        }
+        return validForm;
     }
 
     public boolean wasClosed(){
@@ -180,6 +208,7 @@ class FormularVytvoreniOmezeni extends JDialog
                 attribute.put("name", att.getName());
                 attribute.put("operator", att.getOperator());
                 attribute.put("value", att.getValue());
+                attribute.put("type", att.getType());
                 attributes.put(attribute);
             }
 
@@ -202,15 +231,15 @@ class FormularVytvoreniOmezeni extends JDialog
         JComboBox<String> cboxOperators = new JComboBox<>();
         JComboBox<ComboBoxItem> cboxVariableValues = new JComboBox();
         JTextField tfValue = new JTextField();
-        JCheckBox checkBocUseVariable = new JCheckBox();
+        JCheckBox checkBoxUseVariable = new JCheckBox();
         FormularVytvoreniOmezeni parentForm;
 
         public AttributePanel(List<Sloupec> sloupce, List<ComboBoxItem> variableValues, FormularVytvoreniOmezeni parentForm) {
             this(null, sloupce, variableValues, parentForm);
         }
 
-        public AttributePanel(String name, String operator, String value, List<Sloupec> sloupce, List<ComboBoxItem> variableValues, FormularVytvoreniOmezeni parentForm) {
-            this(new Atribut(name, operator, value), sloupce, variableValues, parentForm);
+        public AttributePanel(String name, String operator, String value, String type, List<Sloupec> sloupce, List<ComboBoxItem> variableValues, FormularVytvoreniOmezeni parentForm) {
+            this(new Atribut(name, operator, value, type), sloupce, variableValues, parentForm);
         }
 
         public AttributePanel(Atribut newAtribut, List<Sloupec> sloupce, List<ComboBoxItem> variableValues, FormularVytvoreniOmezeni parentForm){
@@ -219,26 +248,56 @@ class FormularVytvoreniOmezeni extends JDialog
             this.parentForm = parentForm;
             this.setLayout(new MigLayout());
 
-
-            List<String> firstOperators = getOperatorForType(sloupce.iterator().next().getType());
-            for(Sloupec sloupec : sloupce){
-                cboxAttributes.addItem(sloupec.getName());
-            }
-            for(String operator : firstOperators){
-                cboxOperators.addItem(operator);
-            }
             for(ComboBoxItem varValue : variableValues){
                 cboxVariableValues.addItem(varValue);
             }
+            for(Sloupec sloupec : sloupce){
+                cboxAttributes.addItem(sloupec.getName());
+            }
 
             if(newAtribut == null) {
-                atribut = new Atribut(getAttributeName(), getOperator(), getValue());
+                Sloupec sl = sloupce.iterator().next();
+                atribut = new Atribut();
+                atribut.setName(sl.getName());
+                List<String> operators = getOperatorForColumnType(sl.getType());
+                for(String operator : operators){
+                    cboxOperators.addItem(operator);
+                }
+                atribut.setOperator(getOperator());
+                atribut.setValue("");
             } else {
                 atribut = newAtribut;
+                List<String> operators = getOperatorForAtributType(atribut.getType());
+                for(String operator : operators){
+                    cboxOperators.addItem(operator);
+                }
                 cboxAttributes.setSelectedItem(atribut.getName());
                 cboxOperators.setSelectedItem(atribut.getOperator());
                 tfValue.setText(atribut.getValue());
             }
+
+//            if(newAtribut == null){
+//                atribut = new Atribut();
+//            } else {
+//                atribut = newAtribut;
+//            }
+//
+//            List<String> firstOperators = getOperatorForColumnType(sloupce.iterator().next().getType());
+//            for(Sloupec sloupec : sloupce){
+//                cboxAttributes.addItem(sloupec.getName());
+//            }
+//            for(String operator : firstOperators){
+//                cboxOperators.addItem(operator);
+//            }
+//
+//            if(newAtribut == null) {
+//                atribut = new Atribut(getAttributeName(), getOperator(), getValue());
+//            } else {
+//                atribut = newAtribut;
+//                cboxAttributes.setSelectedItem(atribut.getName());
+//                cboxOperators.setSelectedItem(atribut.getOperator());
+//                tfValue.setText(atribut.getValue());
+//            }
 
             JButton removeBtn = new JButton();
             try {
@@ -273,9 +332,10 @@ class FormularVytvoreniOmezeni extends JDialog
                             .filter(sl -> atribut.getName().equals(sl.getName()))
                             .findAny()
                             .orElse(null);
-                    for(String operator : getOperatorForType(sloupec.getType())){
+                    for(String operator : getOperatorForColumnType(sloupec.getType())){
                         cboxOperators.addItem(operator);
                     }
+                    // TODO - přidat atributu type
                 }
             });
 
@@ -285,25 +345,25 @@ class FormularVytvoreniOmezeni extends JDialog
                 }
             });
 
-            checkBocUseVariable.addItemListener(new ItemListener() {
+            checkBoxUseVariable.addItemListener(new ItemListener() {
 
                 public void itemStateChanged(ItemEvent e) {
-                    if(checkBocUseVariable.isSelected()){
+                    if(checkBoxUseVariable.isSelected()){
                         thisPanel.remove(tfValue);
-                        thisPanel.remove(checkBocUseVariable);
+                        thisPanel.remove(checkBoxUseVariable);
                         thisPanel.add(cboxVariableValues, "width 20%");
                         if(!variableValues.isEmpty()) {
                             cboxVariableValues.setSelectedIndex(0);
                         }
-                        thisPanel.add(checkBocUseVariable);
+                        thisPanel.add(checkBoxUseVariable);
                         revalidate();
                         repaint();
                     } else {
                         thisPanel.remove(cboxVariableValues);
-                        thisPanel.remove(checkBocUseVariable);
+                        thisPanel.remove(checkBoxUseVariable);
                         thisPanel.add(tfValue, "width 20%");
                         tfValue.setText("");
-                        thisPanel.add(checkBocUseVariable);
+                        thisPanel.add(checkBoxUseVariable);
                         revalidate();
                         repaint();
                     }
@@ -312,21 +372,21 @@ class FormularVytvoreniOmezeni extends JDialog
 
             tfValue.getDocument().addDocumentListener(new DocumentListener() {
                 public void changedUpdate(DocumentEvent e) {
-                    if(checkBocUseVariable.isSelected()) {
+                    if(checkBoxUseVariable.isSelected()) {
                         atribut.setValue(((ComboBoxItem) cboxVariableValues.getSelectedItem()).getValue());
                     } else {
                         atribut.setValue(tfValue.getText());
                     }
                 }
                 public void removeUpdate(DocumentEvent e) {
-                    if(checkBocUseVariable.isSelected()) {
+                    if(checkBoxUseVariable.isSelected()) {
                         atribut.setValue(((ComboBoxItem) cboxVariableValues.getSelectedItem()).getValue());
                     } else {
                         atribut.setValue(tfValue.getText());
                     }
                 }
                 public void insertUpdate(DocumentEvent e) {
-                    if(checkBocUseVariable.isSelected()) {
+                    if(checkBoxUseVariable.isSelected()) {
                         atribut.setValue(((ComboBoxItem) cboxVariableValues.getSelectedItem()).getValue());
                     } else {
                         atribut.setValue(tfValue.getText());
@@ -352,13 +412,42 @@ class FormularVytvoreniOmezeni extends JDialog
             this.add(cboxAttributes,"width 40%");
             this.add(cboxOperators,"width 15%");
             this.add(tfValue,"width 20%");
-            this.add(checkBocUseVariable);
-            // doesnt work properly
+            this.add(checkBoxUseVariable);
+            // TODO - vyresit resizing a povolit
 //            this.add(removeBtn);
             this.setVisible(true);
         }
 
-        private List<String> getOperatorForType(String columnType){
+        private void setFieldOk(){
+            tfValue.setBackground(UIManager.getColor ("TextField.background"));
+        }
+
+        private void setFieldWarning(){
+            tfValue.setBackground(Color.RED);
+        }
+
+        private List<String> getOperatorForAtributType(String attType){
+            List<String> operators = new ArrayList<>();
+            switch(attType){
+                case "number":
+                    operators.add("<");
+                    operators.add(">");
+                    operators.add("=");
+                    break;
+                case "text":
+                    operators.add("like");
+                    break;
+                case "boolean":
+                    operators.add("=");
+                    break;
+                case "date":
+                    operators.add("like");
+                    break;
+            }
+            return operators;
+        }
+
+        private List<String> getOperatorForColumnType(String columnType){
             List<String> operators = new ArrayList<>();
             switch(columnType){
                 case "bigint":
@@ -367,21 +456,21 @@ class FormularVytvoreniOmezeni extends JDialog
                     operators.add("<");
                     operators.add(">");
                     operators.add("=");
+                    atribut.setType("number");
                     break;
                 case "varchar":
-                    operators.add("like");
-                    break;
                 case "longtext":
                     operators.add("like");
+                    atribut.setType("text");
                     break;
                 case "bit":
                     operators.add("=");
+                    atribut.setType("boolean");
                     break;
                 case "date":
-                    operators.add("dunno");
-                    break;
                 case "datetime":
-                    operators.add("dunno");
+                    operators.add("like");
+                    atribut.setType("date");
                     break;
             }
             return operators;
