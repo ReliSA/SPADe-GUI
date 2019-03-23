@@ -178,9 +178,17 @@ class FormularVytvoreniOmezeni extends JDialog
         for(AttributePanel attributePanel : attributePanels){
             boolean valid = attributePanel.getAtribut().validate();
             if(valid){
-                attributePanel.setFieldOk();
+                if(attributePanel.useVariables()){
+                    attributePanel.setCboxValuesOk();
+                } else {
+                    attributePanel.setFieldOk();
+                }
             } else {
-                attributePanel.setFieldWarning();
+                if(attributePanel.useVariables()){
+                    attributePanel.setCboxValuesWarning();
+                } else {
+                    attributePanel.setFieldWarning();
+                }
             }
         }
         for(AttributePanel attributePanel : attributePanels){
@@ -233,6 +241,7 @@ class FormularVytvoreniOmezeni extends JDialog
         JTextField tfValue = new JTextField();
         JCheckBox checkBoxUseVariable = new JCheckBox();
         FormularVytvoreniOmezeni parentForm;
+        boolean useVariables = false;
 
         public AttributePanel(List<Sloupec> sloupce, List<ComboBoxItem> variableValues, FormularVytvoreniOmezeni parentForm) {
             this(null, sloupce, variableValues, parentForm);
@@ -356,6 +365,7 @@ class FormularVytvoreniOmezeni extends JDialog
                             cboxVariableValues.setSelectedIndex(0);
                         }
                         thisPanel.add(checkBoxUseVariable);
+                        thisPanel.setUseVariables(true);
                         revalidate();
                         repaint();
                     } else {
@@ -364,6 +374,7 @@ class FormularVytvoreniOmezeni extends JDialog
                         thisPanel.add(tfValue, "width 20%");
                         tfValue.setText("");
                         thisPanel.add(checkBoxUseVariable);
+                        thisPanel.setUseVariables(false);
                         revalidate();
                         repaint();
                     }
@@ -418,12 +429,20 @@ class FormularVytvoreniOmezeni extends JDialog
             this.setVisible(true);
         }
 
+        private void setCboxValuesOk(){
+            cboxVariableValues.setForeground(Color.BLACK);
+        }
+
+        private void setCboxValuesWarning(){
+            cboxVariableValues.setForeground(Color.RED);
+        }
+
         private void setFieldOk(){
-            tfValue.setBackground(UIManager.getColor ("TextField.background"));
+            tfValue.setForeground(Color.BLACK);
         }
 
         private void setFieldWarning(){
-            tfValue.setBackground(Color.RED);
+            tfValue.setForeground(Color.RED);
         }
 
         private List<String> getOperatorForAtributType(String attType){
@@ -476,20 +495,28 @@ class FormularVytvoreniOmezeni extends JDialog
             return operators;
         }
 
-        public String getAttributeName(){
+        public String getAttributeName() {
             return (String) cboxAttributes.getSelectedItem();
         }
 
-        public String getOperator(){
+        public String getOperator() {
             return (String) cboxOperators.getSelectedItem();
         }
 
-        public String getValue(){
+        public String getValue() {
             return tfValue.getText();
         }
 
-        public Atribut getAtribut(){
+        public Atribut getAtribut() {
             return atribut;
+        }
+
+        public boolean useVariables() {
+            return useVariables;
+        }
+
+        public void setUseVariables(boolean useVariables) {
+            this.useVariables = useVariables;
         }
     }
 }
