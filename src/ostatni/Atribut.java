@@ -89,7 +89,14 @@ public class Atribut {
                     return false;
                 }
             case "date":
-                // TODO - validate date
+                // only DD-MM-YYYY pattern is allowed
+                if(value.trim().matches("^([0-2][0-9]|(3)[0-1])(\\-)(((0)[0-9])|((1)[0-2]))(\\-)\\d{4}$")){
+                    setValid(true);
+                    return true;
+                } else {
+                    setValid(false);
+                    return false;
+                }
             case "text":
                 setValid(true);
                 return true;
