@@ -13,13 +13,9 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.*;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,27 +30,38 @@ class FormularVytvoreniOmezeni extends JDialog
     private List<Atribut> attributeList = new ArrayList<>();
     private List<AttributePanel> attributePanels = new ArrayList<>();
     private boolean validForm = false;
+    private JPanel mainPanel = new JPanel();
+    private final JScrollPane scrollPane = new JScrollPane();
+    private int heightDifference = 30;
+    private int attributeCount = 1;
 
     private JLabel lblType = new JLabel("Type");
     private JLabel lblAttribute = new JLabel("Attribute");
     private JComboBox cboxTables = new JComboBox();
     private JTextField tfAttValue = new JTextField("Value");
-    private JLabel lblDateHint = new JLabel("*Only DD-MM-YYYY format is supported");
+    private JLabel lblDateHint = new JLabel("*Only DD-MM-YYYY format for dates is supported");
     private JLabel lblWarningText = new JLabel("*Value in red text are in wrong format.");
 
     private FormularVytvoreniOmezeni parentForm;
 
     public FormularVytvoreniOmezeni(Map<String, List<Sloupec>> strukturaPohledu, JSONObject constraint, List<ComboBoxItem> variableValues){
-        setModal(true);
-        setLocation(400,300);
+        this.setModal(true);
+        this.setLocation(400,300);
         // TODO - cancel on close - don't know how
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         String tableName = "";
         parentForm = this;
         boolean isFirst = true;
+        mainPanel.setLayout(new MigLayout());
+        mainPanel.setAutoscrolls(true);
 
-        setSize(600,200);
-        setLocationRelativeTo(null);
+        JScrollPane scrollPane = new JScrollPane(mainPanel);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+        this.add(scrollPane);
+
+        this.setSize(600,185);
+        this.setLocationRelativeTo(null);
         this.setTitle("Attributes");
 
         for(Map.Entry<String, List<Sloupec>> entry : strukturaPohledu.entrySet()) {
@@ -93,18 +100,23 @@ class FormularVytvoreniOmezeni extends JDialog
                                      public void actionPerformed(ActionEvent e){
                                          tfAttValue = new JTextField("Value");
 
-                                         setSize(getWidth(),getHeight() + 43);
-                                         remove(btnClose);
-                                         remove(btnSubmit);
-                                         remove(btnAdd);
+                                         if(getHeight() <= 400) {
+                                             setSize(getWidth(), getHeight() + heightDifference);
+                                         }
+                                         mainPanel.remove(btnClose);
+                                         mainPanel.remove(btnSubmit);
+                                         mainPanel.remove(btnAdd);
 
                                          AttributePanel attributePanel = new AttributePanel(strukturaPohledu.get((String) cboxTables.getSelectedItem()), variableValues, parentForm, false);
-                                         add(attributePanel, "gapleft 60, span 2, width 100%, wrap");
+                                         mainPanel.add(attributePanel, "gapleft 65, span 2, wrap");
                                          attributePanels.add(attributePanel);
                                          attributeList.add(attributePanel.getAtribut());
-                                         add(btnAdd);
-                                         add(btnSubmit, "width 15%");
-                                         add(btnClose, "width 15%");
+                                         mainPanel.add(btnAdd);
+                                         mainPanel.add(btnSubmit, "split 2");
+                                         mainPanel.add(btnClose);
+                                         scroll(scrollPane, ScrollDirection.DOWN);
+                                         mainPanel.revalidate();
+                                         attributeCount++;
                                      }
                                  }
         );
@@ -121,61 +133,63 @@ class FormularVytvoreniOmezeni extends JDialog
                         }
                     }
                 }
-                remove(btnClose);
-                remove(btnSubmit);
-                remove(btnAdd);
-                setSize(600,200);
+                mainPanel.remove(btnClose);
+                mainPanel.remove(btnSubmit);
+                mainPanel.remove(btnAdd);
+                mainPanel.setSize(600,185);
 
                 attributeList.clear();
                 attributePanels.clear();
                 strukturaPohledu.get(cboxTables.getSelectedItem());
                 AttributePanel attributePanel = new AttributePanel(null, strukturaPohledu.get(cboxTables.getSelectedItem()), variableValues, parentForm, true);
-                add(attributePanel, "width 100%, wrap");
+                mainPanel.add(attributePanel, "wrap");
                 attributePanels.add(attributePanel);
                 attributeList.add(attributePanel.getAtribut());
-                System.out.println();
-                add(btnAdd);
-                add(btnSubmit, "width 15%");
-                add(btnClose, "width 15%");
-                revalidate();
-                repaint();
+                mainPanel.add(btnAdd);
+                mainPanel.add(btnSubmit, "split 2");
+                mainPanel.add(btnClose);
+                mainPanel.revalidate();
+                mainPanel.repaint();
             }
         });
 
-        this.setLayout(new MigLayout());
-        this.add(lblDateHint, "wrap, span 3");
-        this.add(lblWarningText, "wrap, span 3");
-        this.add(lblType);
-        this.add(cboxTables, "width 40%, gapleft 7, wrap");
-        this.add(lblAttribute);
+//        this.setLayout(new MigLayout());
+        mainPanel.add(lblDateHint, "wrap, span 3");
+        mainPanel.add(lblWarningText, "wrap, span 3");
+        mainPanel.add(lblType, "w 50");
+        mainPanel.add(cboxTables, "w 150, wrap");
+        mainPanel.add(lblAttribute, "w 50");
         if( constraint != null) {
             JSONArray atts = (JSONArray) constraint.get("attributes");
             for (Object attribute : atts) {
-                setSize(getWidth(), getHeight() + 43);
+                if(getHeight() <= 400) {
+                    setSize(getWidth(), getHeight() + heightDifference);
+                }
 
                 JSONObject jsonObject = (JSONObject) attribute;
                 AttributePanel attributePanel;
                 if(isFirst){
                     attributePanel = new AttributePanel(jsonObject.getString("name"), jsonObject.getString("operator"), jsonObject.getString("value"), jsonObject.getString("type"), strukturaPohledu.get((tableName)), variableValues, parentForm, true);
-                    add(attributePanel, "width 100%, wrap");
+                    mainPanel.add(attributePanel, "w 400, wrap");
                     isFirst = false;
                 } else {
                     attributePanel = new AttributePanel(jsonObject.getString("name"), jsonObject.getString("operator"), jsonObject.getString("value"), jsonObject.getString("type"), strukturaPohledu.get((tableName)), variableValues, parentForm, false);
-                    add(attributePanel, "gapleft 60, span 2, width 100%, wrap");
+                    mainPanel.add(attributePanel, "w 400, gapleft 50, span 2, wrap");
                 }
                 attributePanels.add(attributePanel);
                 attributeList.add(attributePanel.getAtribut());
             }
         } else {
             AttributePanel attributePanel = new AttributePanel(strukturaPohledu.get((String) cboxTables.getSelectedItem()), variableValues, parentForm, true);
-            this.add(attributePanel, "width 100%, wrap");
+            mainPanel.add(attributePanel, "w 400, wrap");
             attributePanels.add(attributePanel);
             attributeList.add(attributePanel.getAtribut());
         }
 
-        this.add(btnAdd);
-        this.add(btnSubmit, "width 15%");
-        this.add(btnClose, "width 15%");
+        mainPanel.add(btnAdd);
+        mainPanel.add(btnSubmit, "split 2");
+        mainPanel.add(btnClose);
+        mainPanel.setVisible(true);
         this.setVisible(true);
     }
 
@@ -232,9 +246,34 @@ class FormularVytvoreniOmezeni extends JDialog
     }
 
     public void resizeComponent(){
-        this.setSize(600, this.getHeight() - 43);
-        this.revalidate();
-        this.repaint();
+        if(attributeCount < 10) {
+            setSize(getWidth(), getHeight() - heightDifference);
+        }
+        attributeCount--;
+        mainPanel.revalidate();
+        mainPanel.repaint();
+    }
+
+    public void scroll(JScrollPane scrollPane, ScrollDirection direction) {
+        JScrollBar verticalBar = scrollPane.getVerticalScrollBar();
+        int topOrBottom = direction == ScrollDirection.UP ?
+                verticalBar.getMinimum() :
+                verticalBar.getMaximum();
+
+        AdjustmentListener scroller = new AdjustmentListener() {
+            @Override
+            public void adjustmentValueChanged(AdjustmentEvent e) {
+                Adjustable adjustable = e.getAdjustable();
+                adjustable.setValue(topOrBottom);
+                // We have to remove the listener, otherwise the user would be unable to scroll afterwards
+                verticalBar.removeAdjustmentListener(this);
+            }
+        };
+        verticalBar.addAdjustmentListener(scroller);
+    }
+
+    public enum ScrollDirection {
+        UP, DOWN
     }
 
     private class AttributePanel extends JPanel{
@@ -260,7 +299,7 @@ class FormularVytvoreniOmezeni extends JDialog
             super();
             thisPanel = this;
             this.parentForm = parentForm;
-            this.setLayout(new MigLayout());
+            this.setLayout(new MigLayout("insets 0"));
 
             for(ComboBoxItem varValue : variableValues){
                 cboxVariableValues.addItem(varValue);
@@ -366,7 +405,7 @@ class FormularVytvoreniOmezeni extends JDialog
                         thisPanel.remove(tfValue);
                         thisPanel.remove(checkBoxUseVariable);
                         thisPanel.remove(removeBtn);
-                        thisPanel.add(cboxVariableValues, "width 20%");
+                        thisPanel.add(cboxVariableValues, "w 150");
                         if(!variableValues.isEmpty()) {
                             cboxVariableValues.setSelectedIndex(0);
                         }
@@ -378,7 +417,7 @@ class FormularVytvoreniOmezeni extends JDialog
                     } else {
                         thisPanel.remove(cboxVariableValues);
                         thisPanel.remove(checkBoxUseVariable);
-                        thisPanel.add(tfValue, "width 20%");
+                        thisPanel.add(tfValue, "w 150");
                         tfValue.setText("");
                         thisPanel.add(checkBoxUseVariable);
                         thisPanel.add(removeBtn);
@@ -427,9 +466,9 @@ class FormularVytvoreniOmezeni extends JDialog
                 }
             });
 
-            this.add(cboxAttributes,"width 55%");
-            this.add(cboxOperators,"width 15%");
-            this.add(tfValue,"width 20%");
+            this.add(cboxAttributes, "w 150");
+            this.add(cboxOperators, "w 50");
+            this.add(tfValue, "w 150");
             this.add(checkBoxUseVariable);
             // TODO - vyresit resizing a povolit
             if(!isFirst) {

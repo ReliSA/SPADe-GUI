@@ -1,7 +1,6 @@
 package gui;
 
 import databaze.PohledDAO;
-import javafx.scene.control.RadioButton;
 import net.miginfocom.swing.MigLayout;
 import org.apache.commons.io.FileUtils;
 import ostatni.*;
