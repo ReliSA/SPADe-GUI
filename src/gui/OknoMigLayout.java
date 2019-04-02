@@ -205,6 +205,9 @@ public class OknoMigLayout extends JFrame{
 
                 centerNorthPanel.revalidate();
                 centerNorthPanel.repaint();
+
+                mainFrame.revalidate();
+                mainFrame.repaint();
             }
         });
 
@@ -212,7 +215,9 @@ public class OknoMigLayout extends JFrame{
 
         centerPanel.setBackground(Color.PINK);
 
-        mainFrame.add(centerPanel, "dock center");
+        JScrollPane scrollFrame = new JScrollPane(centerPanel);
+        centerPanel.setAutoscrolls(true);
+        mainFrame.add(scrollFrame, "dock center");
 
         centerNorthPanel.setBackground(Color.orange);
 
@@ -234,7 +239,7 @@ public class OknoMigLayout extends JFrame{
                 FormularVytvoreniOmezeni constraintForm = new FormularVytvoreniOmezeni(strukturyPohledu, null, preparedVariableValues);
                 JSONObject attributes = constraintForm.getFormData();
                 if (!attributes.isEmpty()) {
-                    centerPanel.add(new ConstraintPanel(attributes, false), "dock west, height 100%, width " + constraintPanelWidth);
+                    centerPanel.add(new ConstraintPanel(attributes, false), "dock west, height 800, width " + constraintPanelWidth);
                     centerPanel.revalidate();
                 }
             }
