@@ -1,5 +1,6 @@
 package databaze;
 
+import gui.SloupecCustomGrafu;
 import ostatni.*;
 
 import javax.swing.*;
@@ -19,7 +20,93 @@ public class PohledDAO {
         this.pripojeni = Konstanty.PRIPOJENI;		//nastaví připojení uložené ve třídě Konstanty
     }
 
-    public Long dotaz(String query){
+    public int getRows(ResultSet res){
+        int totalRows = 0;
+        try {
+            res.last();
+            totalRows = res.getRow();
+            res.beforeFirst();
+        }
+        catch(Exception ex)  {
+            return 0;
+        }
+        return totalRows ;
+    }
+
+    public List<SloupecCustomGrafu> dotaz(String query, List<ComboBoxItem> preparedVariableValues){
+        Connection pripojeni;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        ArrayList<ArrayList<String>> data = new ArrayList<>();
+        List<String> nazvySloupcu = new ArrayList<>();
+        List<SloupecCustomGrafu> sloupce = new ArrayList<>();
+
+
+        try {
+            pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, name, pass);
+            stmt = pripojeni.prepareStatement(query);
+
+//            rs = stmt.executeQuery();
+//            while(rs.next()){
+//
+//            }
+
+            boolean isResultSet = stmt.execute();
+            while (true) {
+                if (isResultSet) {
+                    rs = stmt.getResultSet();
+                    ResultSetMetaData rsmd = rs.getMetaData();
+                    int columnsNumber = rsmd.getColumnCount();
+                    for (int i = 1; i <= columnsNumber; i++) {
+                        nazvySloupcu.add(rsmd.getColumnName(i));
+                    }
+                    for (int i = 0; i < columnsNumber; i++) {
+                        data.add(new ArrayList<String>());
+                    }
+                    
+                    while(rs.next()) {
+                        for (int i = 1; i <= columnsNumber; i++) {
+//                        data.addNazvySloupcu(rs.getString(i));
+                            System.out.println(rs.getString(i));
+                            if(rs.getString(i).equals("")){
+                                data.get(i-1).add("N/A");
+                            } else {
+                                data.get(i - 1).add(rs.getString(i));
+                            }
+                        }
+                        System.out.println("------------------------------");
+//                    data = new CustomGraf(columnsNumber);
+                    }
+                    for (int i = 0; i < columnsNumber; i++) {
+                        sloupce.add(new SloupecCustomGrafu(nazvySloupcu.get(i), data.get(i), i, preparedVariableValues, true));
+                    }
+                    rs.close();
+                } else {
+                    if (stmt.getUpdateCount() == -1) {
+                        break;
+                    }
+                }
+                isResultSet = stmt.getMoreResults();
+            }
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null , "Chyba při spuštění skriptu větví nebo tagů konfigurací!");
+            e.printStackTrace();
+        } catch (Exception e){
+            JOptionPane.showMessageDialog(null , "Chyba při výběru dat větví nebo tagů konfigurací z databáze!");
+            e.printStackTrace();
+        } finally {
+            try {
+                rs.close();
+                stmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return sloupce;
+    }
+
+    public Long createVariable(String query){
         Long result = null;
         Connection pripojeni;
         PreparedStatement stmt = null;

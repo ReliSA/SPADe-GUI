@@ -37,6 +37,9 @@ public class OknoMigLayout extends JFrame{
     private static JButton loadQueryBtn = new JButton("Load query");
     private static JButton testVarQueryBtn = new JButton("Test query");
     private static JButton testQueryBtn = new JButton("Test query");
+    private static JButton runQueryBtn = new JButton("Run");
+    private static JButton goBackBtn = new JButton("Back");
+    private static JButton detectBtn = new JButton("Detect");
     private static ButtonGroup buttonGroupFunction = new ButtonGroup();
     private static List<JRadioButton> radioButtonList = new ArrayList<>();
     private static JRadioButton radioSum = new JRadioButton("SUM");
@@ -44,7 +47,8 @@ public class OknoMigLayout extends JFrame{
     private static JRadioButton radioMin = new JRadioButton("MIN");
     private static JRadioButton radioMax = new JRadioButton("MAX");
     private static JPanel centerNorthPanel = new JPanel(new MigLayout());
-    private static JPanel centerPanel = new JPanel(new MigLayout());
+    private static JPanel centerPanel = new JPanel(new MigLayout("ins 0"));
+    private static JPanel centerTablePanel = new JPanel(new MigLayout("gap rel 0, ins 0"));
     private static JPanel bottomPanel = new JPanel(new MigLayout());
     private static JPanel axisPanel = new JPanel(new MigLayout());
     private static JLabel lblName = new JLabel("Name");
@@ -52,6 +56,9 @@ public class OknoMigLayout extends JFrame{
     private static final JFileChooser fileChooser = new JFileChooser();
     private static final Map<String, List<Sloupec>> strukturyPohledu = new TreeMap<>();
     private static List<ComboBoxItem> preparedVariableValues = new ArrayList<>();
+    private List<SloupecCustomGrafu> detectionColumns = new ArrayList<>();
+    private SloupecCustomGrafu detected;
+    private List<ConstraintPanel> constraintPanels = new ArrayList<>();
 
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
@@ -198,15 +205,11 @@ public class OknoMigLayout extends JFrame{
                 radioSum.setSelected(true);
                 centerNorthPanel.add(testVarQueryBtn);
 
+                bottomPanel.remove(runQueryBtn);
+                bottomPanel.remove(detectBtn);
                 mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
 
                 centerPanel.add(centerNorthPanel, "dock north, width 100%");
-
-                centerPanel.revalidate();
-                centerPanel.repaint();
-
-                centerNorthPanel.revalidate();
-                centerNorthPanel.repaint();
 
                 mainFrame.revalidate();
                 mainFrame.repaint();
@@ -269,6 +272,8 @@ public class OknoMigLayout extends JFrame{
                 centerPanel.add(centerNorthPanel, "dock north, width 100%");
                 centerPanel.add(axisPanel, "dock west, height 800, width " + constraintPanelWidth);
 
+                bottomPanel.add(runQueryBtn);
+                bottomPanel.add(detectBtn);
                 mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
 
                 mainFrame.revalidate();
@@ -319,11 +324,8 @@ public class OknoMigLayout extends JFrame{
 
                     mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
 
-                    centerPanel.revalidate();
-                    centerPanel.repaint();
-
-                    centerNorthPanel.revalidate();
-                    centerNorthPanel.repaint();
+                    mainFrame.revalidate();
+                    mainFrame.repaint();
                 } else {
                     // user cancelled the action - nothing happens
                 }
@@ -470,7 +472,28 @@ public class OknoMigLayout extends JFrame{
             }
         });
 
-        JButton runQueryBtn = new JButton("Run");
+        goBackBtn.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                centerPanel.remove(centerTablePanel);
+                centerPanel.add(axisPanel, "dock west, height 800");
+
+                for(ConstraintPanel panel : constraintPanels){
+                    centerPanel.add(panel, "dock west, width " + constraintPanelWidth);
+                }
+                constraintPanels.clear();
+
+                bottomPanel.remove(detectBtn);
+                bottomPanel.remove(goBackBtn);
+                bottomPanel.add(runQueryBtn);
+
+                mainFrame.revalidate();
+                mainFrame.repaint();
+            }
+        });
+
+
         runQueryBtn.addActionListener(new ActionListener(){
 
             @Override
@@ -478,7 +501,6 @@ public class OknoMigLayout extends JFrame{
                 String condition = "";
                 String axisTable = "";
                 Component[] components = centerPanel.getComponents();
-                List<ConstraintPanel> constraintPanels = new ArrayList<>();
                 List<String> conditions = new ArrayList<>();
                 for(Component comp : components){
                     if(comp instanceof ConstraintPanel){
@@ -542,6 +564,22 @@ public class OknoMigLayout extends JFrame{
 //                            break;
 //                    }
                     System.out.println(query);
+                    detectionColumns = pohledDAO.dotaz(query, preparedVariableValues);
+
+                    centerPanel.removeAll();
+                    centerTablePanel.removeAll();
+                    centerPanel.add(centerNorthPanel, "dock north");
+                    for(SloupecCustomGrafu sloupec : detectionColumns){
+                        centerTablePanel.add(sloupec, "dock west, grow");
+                    }
+                    detected = new SloupecCustomGrafu("detected", new ArrayList<>(), detectionColumns.size(), preparedVariableValues, false);
+                    centerTablePanel.add(detected, "dock west, grow");
+
+                    centerPanel.add(centerTablePanel, "grow");
+                    bottomPanel.remove(runQueryBtn);
+                    bottomPanel.add(goBackBtn);
+                    mainFrame.revalidate();
+                    mainFrame.repaint();
 
                 } else {
                     // join přes více tabulek - vytváření dotazů
@@ -581,9 +619,39 @@ public class OknoMigLayout extends JFrame{
 
         });
 
+        detectBtn.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SloupecCustomGrafu detectionColumn = null;
+                ArrayList<String> columnData = new ArrayList<>();
+                List<List<Boolean>> detectionValues = new ArrayList<>();
+                for(SloupecCustomGrafu sloupec : detectionColumns) {
+                    if (sloupec.useColum()) {
+                        detectionValues.add(sloupec.detectValues());
+                    }
+                }
+
+                for (int i = 0; i < detectionValues.get(0).size(); i++) {
+                    Boolean val = true;
+                    for (int j = 0; j < detectionValues.size(); j++) {
+                        val &= detectionValues.get(j).get(i);
+                    }
+                    columnData.add(val.toString());
+                }
+                centerTablePanel.remove(centerTablePanel.getComponentCount() - 1);
+
+                detected = new SloupecCustomGrafu("detected", columnData, detectionColumns.size(), preparedVariableValues, false);
+                centerTablePanel.add(detected, "dock west, grow");
+
+                centerTablePanel.revalidate();
+                centerTablePanel.repaint();
+            }
+        });
+
         bottomPanel.add(saveBtn);
         bottomPanel.add(cancelBtn);
         bottomPanel.add(runQueryBtn);
+        bottomPanel.add(detectBtn);
     }
 
     private JButton createButtonWithImage(String buttonOperation){
@@ -700,7 +768,7 @@ public class OknoMigLayout extends JFrame{
                 }
                 query += condition;
             }
-            result = pohledDAO.dotaz(query);
+            result = pohledDAO.createVariable(query);
             if( result == null ) {
                 JOptionPane.showMessageDialog(mainFrame,
                         "Query result is NULL",
