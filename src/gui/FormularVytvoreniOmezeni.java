@@ -245,11 +245,12 @@ class FormularVytvoreniOmezeni extends JDialog
         return jsonConstraint;
     }
 
-    public void resizeComponent(){
+    public void resizeComponent(Atribut attribute){
         if(attributeCount < 10) {
             setSize(getWidth(), getHeight() - heightDifference);
         }
         attributeCount--;
+        attributeList.remove(attribute);
         mainPanel.revalidate();
         mainPanel.repaint();
     }
@@ -372,7 +373,7 @@ class FormularVytvoreniOmezeni extends JDialog
             removeBtn.addActionListener(new ActionListener(){
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    parentForm.resizeComponent();
+                    parentForm.resizeComponent(atribut);
                     thisPanel.getParent().remove(thisPanel);
                 }
             });

@@ -1,5 +1,6 @@
 package gui;
 
+import data.Projekt;
 import databaze.PohledDAO;
 import net.miginfocom.swing.MigLayout;
 import org.apache.commons.io.FileUtils;
@@ -25,6 +26,7 @@ public class OknoMigLayout extends JFrame{
     private static int constraintPanelWidth = 200;
     private static boolean variableCreation = false;
     private static JFrame mainFrame;
+    private Projekt projekt;
     private static String constantFolderPath = "zdroje\\konstanty\\";
     private static String queryFolderPath = "zdroje\\dotazy\\";
     private static String variableFolderPath = "zdroje\\promenne\\";
@@ -55,7 +57,7 @@ public class OknoMigLayout extends JFrame{
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    OknoMigLayout frame = new OknoMigLayout();
+                    OknoMigLayout frame = new OknoMigLayout(new Projekt(1, null, null ,null));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -63,11 +65,12 @@ public class OknoMigLayout extends JFrame{
         });
     }
 
-    public OknoMigLayout() {
+    public OknoMigLayout(Projekt projekt) {
 //        super(Konstanty.POPISY.getProperty("menuVytvorGraf"));
 //        if (instance != null)
 //            instance.dispose();
 //        instance = this;
+        this.projekt = projekt;
 
         mainFrame = new JFrame();
         mainFrame.setLayout(new MigLayout());
@@ -263,16 +266,13 @@ public class OknoMigLayout extends JFrame{
                 centerNorthPanel.add(lblName);
                 centerNorthPanel.add(varOrQueryNameTf);
 
+                centerPanel.add(centerNorthPanel, "dock north, width 100%");
+                centerPanel.add(axisPanel, "dock west, height 800, width " + constraintPanelWidth);
+
                 mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
 
-                centerPanel.add(centerNorthPanel, "dock north, width 100%");
-                centerPanel.add(axisPanel, "dock west, height 100%, width " + constraintPanelWidth);
-
-                centerPanel.revalidate();
-                centerPanel.repaint();
-
-                centerNorthPanel.revalidate();
-                centerNorthPanel.repaint();
+                mainFrame.revalidate();
+                mainFrame.repaint();
             }
         });
 
@@ -294,10 +294,8 @@ public class OknoMigLayout extends JFrame{
                     varOrQueryNameTf.setText(file.getName().substring(0, file.getName().indexOf('.')));
                     centerNorthPanel.add(varOrQueryNameTf);
 
-                    mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
-
                     centerPanel.add(centerNorthPanel, "dock north, width 100%");
-                    centerPanel.add(axisPanel, "dock west, height 100%, width " + constraintPanelWidth);
+                    centerPanel.add(axisPanel, "dock west, height 800, width " + constraintPanelWidth);
 
                     try {
                         String content = FileUtils.readFileToString(file, "utf-8");
@@ -311,13 +309,15 @@ public class OknoMigLayout extends JFrame{
                         {
                             JSONObject object = (JSONObject) cons;
                             ConstraintPanel panel = new ConstraintPanel(object, false);
-                            centerPanel.add(panel, "dock west, height 100%, width " + constraintPanelWidth);
+                            centerPanel.add(panel, "dock west, height 800, width " + constraintPanelWidth);
                             centerPanel.revalidate();
                             centerPanel.repaint();
                         }
                     } catch(IOException ex) {
                         ex.printStackTrace();
                     }
+
+                    mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
 
                     centerPanel.revalidate();
                     centerPanel.repaint();
