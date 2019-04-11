@@ -39,6 +39,7 @@ public class PohledDAO {
         ResultSet rs = null;
         ArrayList<ArrayList<String>> data = new ArrayList<>();
         List<String> nazvySloupcu = new ArrayList<>();
+        List<String> typySloupcu = new ArrayList<>();
         List<SloupecCustomGrafu> sloupce = new ArrayList<>();
 
 
@@ -59,6 +60,7 @@ public class PohledDAO {
                     int columnsNumber = rsmd.getColumnCount();
                     for (int i = 1; i <= columnsNumber; i++) {
                         nazvySloupcu.add(rsmd.getColumnName(i));
+                        typySloupcu.add(rsmd.getColumnTypeName(i));
                     }
                     for (int i = 0; i < columnsNumber; i++) {
                         data.add(new ArrayList<String>());
@@ -68,17 +70,25 @@ public class PohledDAO {
                         for (int i = 1; i <= columnsNumber; i++) {
 //                        data.addNazvySloupcu(rs.getString(i));
                             System.out.println(rs.getString(i));
-                            if(rs.getString(i).equals("")){
-                                data.get(i-1).add("N/A");
+                            if(rs.getString(i) != null) {
+                                if (rs.getString(i).equals("")) {
+                                    data.get(i - 1).add("N/A");
+                                } else {
+                                    data.get(i - 1).add(rs.getString(i));
+                                }
                             } else {
-                                data.get(i - 1).add(rs.getString(i));
+                                data.get(i - 1).add("N/A");
                             }
                         }
                         System.out.println("------------------------------");
 //                    data = new CustomGraf(columnsNumber);
                     }
                     for (int i = 0; i < columnsNumber; i++) {
-                        sloupce.add(new SloupecCustomGrafu(nazvySloupcu.get(i), data.get(i), i, preparedVariableValues, true));
+                        if(typySloupcu.get(i).equals("BIGINT") || typySloupcu.get(i).equals("INT") || typySloupcu.get(i).equals("DOUBLE") || typySloupcu.get(i).equals("BIT")) {
+                            sloupce.add(new SloupecCustomGrafu(nazvySloupcu.get(i), data.get(i), i, preparedVariableValues, true));
+                        } else {
+                            sloupce.add(new SloupecCustomGrafu(nazvySloupcu.get(i), data.get(i), i, preparedVariableValues, false));
+                        }
                     }
                     rs.close();
                 } else {

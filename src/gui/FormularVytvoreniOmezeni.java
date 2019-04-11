@@ -123,10 +123,10 @@ class FormularVytvoreniOmezeni extends JDialog
 
         cboxTables.addActionListener (new ActionListener () {
             public void actionPerformed(ActionEvent e) {
-                Component[] components = getContentPane().getComponents();
+                Component[] components = mainPanel.getComponents();
                 for(Component comp : components){
                     if(comp instanceof AttributePanel){
-                        remove(comp);
+                        mainPanel.remove(comp);
                     } else if (comp instanceof JLabel){
                         if(((JLabel) comp).getText().equals("")){
                             remove(comp);
@@ -136,7 +136,7 @@ class FormularVytvoreniOmezeni extends JDialog
                 mainPanel.remove(btnClose);
                 mainPanel.remove(btnSubmit);
                 mainPanel.remove(btnAdd);
-                mainPanel.setSize(600,185);
+                setSize(600,185);
 
                 attributeList.clear();
                 attributePanels.clear();
@@ -174,7 +174,7 @@ class FormularVytvoreniOmezeni extends JDialog
                     isFirst = false;
                 } else {
                     attributePanel = new AttributePanel(jsonObject.getString("name"), jsonObject.getString("operator"), jsonObject.getString("value"), jsonObject.getString("type"), strukturaPohledu.get((tableName)), variableValues, parentForm, false);
-                    mainPanel.add(attributePanel, "w 400, gapleft 50, span 2, wrap");
+                    mainPanel.add(attributePanel, "gapleft 65, span 2, wrap");
                 }
                 attributePanels.add(attributePanel);
                 attributeList.add(attributePanel.getAtribut());
