@@ -16,6 +16,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 
@@ -34,10 +35,21 @@ class FormularVytvoreniOmezeni extends JDialog
     private final JScrollPane scrollPane = new JScrollPane();
     private int heightDifference = 30;
     private int attributeCount = 1;
+    private int windowHeight = 240;
+    private int windowWidth = 600;
 
-    private JLabel lblType = new JLabel("Type");
-    private JLabel lblAttribute = new JLabel("Attribute");
+    private JLabel lblTable = new JLabel("Table");
+    private JLabel lblColumn = new JLabel("Column");
+    private JLabel lblCondition = new JLabel("Condition");
+    private JLabel lblAggregate = new JLabel("Aggregate");
+    private ButtonGroup btnGroupAggregate = new ButtonGroup();
+    private JRadioButton radioSum = new JRadioButton("SUM");
+    private JRadioButton radioAvg = new JRadioButton("AVG");
+    private JRadioButton radioMin = new JRadioButton("MIN");
+    private JRadioButton radioMax = new JRadioButton("MAX");
+    private JRadioButton radioCount = new JRadioButton("COUNT");
     private JComboBox cboxTables = new JComboBox();
+    private JComboBox cboxColumns = new JComboBox();
     private JTextField tfAttValue = new JTextField("Value");
     private JLabel lblDateHint = new JLabel("*Only DD-MM-YYYY format for dates is supported");
     private JLabel lblWarningText = new JLabel("*Value in red text are in wrong format.");
@@ -55,12 +67,20 @@ class FormularVytvoreniOmezeni extends JDialog
         mainPanel.setLayout(new MigLayout());
         mainPanel.setAutoscrolls(true);
 
+        btnGroupAggregate.add(radioAvg);
+        btnGroupAggregate.add(radioMin);
+        btnGroupAggregate.add(radioMax);
+        btnGroupAggregate.add(radioCount);
+        btnGroupAggregate.add(radioSum);
+
+        radioSum.setSelected(true);
+
         JScrollPane scrollPane = new JScrollPane(mainPanel);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
         this.add(scrollPane);
 
-        this.setSize(600,185);
+        this.setSize(windowWidth,windowHeight);
         this.setLocationRelativeTo(null);
         this.setTitle("Attributes");
 
@@ -136,11 +156,11 @@ class FormularVytvoreniOmezeni extends JDialog
                 mainPanel.remove(btnClose);
                 mainPanel.remove(btnSubmit);
                 mainPanel.remove(btnAdd);
-                setSize(600,185);
+                setSize(windowWidth,windowHeight);
 
                 attributeList.clear();
                 attributePanels.clear();
-                strukturaPohledu.get(cboxTables.getSelectedItem());
+//                strukturaPohledu.get(cboxTables.getSelectedItem());
                 AttributePanel attributePanel = new AttributePanel(null, strukturaPohledu.get(cboxTables.getSelectedItem()), variableValues, parentForm, true);
                 mainPanel.add(attributePanel, "wrap");
                 attributePanels.add(attributePanel);
@@ -153,13 +173,35 @@ class FormularVytvoreniOmezeni extends JDialog
             }
         });
 
+        for (Sloupec s : strukturaPohledu.get(cboxTables.getSelectedItem())){
+            cboxColumns.addItem(s.getName());
+        }
+
 //        this.setLayout(new MigLayout());
         mainPanel.add(lblDateHint, "wrap, span 3");
         mainPanel.add(lblWarningText, "wrap, span 3");
-        mainPanel.add(lblType, "w 50");
+        mainPanel.add(lblTable, "w 50");
         mainPanel.add(cboxTables, "w 150, wrap");
-        mainPanel.add(lblAttribute, "w 50");
+        mainPanel.add(lblColumn, "w 50");
+        mainPanel.add(cboxColumns, "w 150, wrap");
+        mainPanel.add(lblAggregate, "w 50");
+        mainPanel.add(radioSum, "split 5");
+        mainPanel.add(radioCount);
+        mainPanel.add(radioMax);
+        mainPanel.add(radioMin);
+        mainPanel.add(radioAvg, "wrap");
+        mainPanel.add(lblCondition, "w 50");
+
         if( constraint != null) {
+            for (Enumeration<AbstractButton> buttons = btnGroupAggregate.getElements(); buttons.hasMoreElements();) {
+                AbstractButton button = buttons.nextElement();
+                if (button.getText().equals(constraint.getString("aggregate"))) {
+                    button.setSelected(true);
+                }
+            }
+
+            cboxColumns.setSelectedItem((String) constraint.getString("column"));
+
             JSONArray atts = (JSONArray) constraint.get("attributes");
             for (Object attribute : atts) {
                 if(getHeight() <= 400) {
@@ -229,6 +271,14 @@ class FormularVytvoreniOmezeni extends JDialog
         JSONObject jsonConstraint = new JSONObject();
         if(!closed) {
             jsonConstraint.put("table", (String) cboxTables.getSelectedItem());
+            jsonConstraint.put("column", (String) cboxColumns.getSelectedItem());
+            for (Enumeration<AbstractButton> buttons = btnGroupAggregate.getElements(); buttons.hasMoreElements();) {
+                AbstractButton button = buttons.nextElement();
+                if (button.isSelected()) {
+                    jsonConstraint.put("aggregate", (String) button.getText());
+                }
+            }
+
             JSONArray attributes = new JSONArray();
 
             for (Atribut att : attributeList) {
@@ -246,7 +296,7 @@ class FormularVytvoreniOmezeni extends JDialog
     }
 
     public void resizeComponent(Atribut attribute){
-        if(attributeCount < 10) {
+        if(attributeCount < 8) {
             setSize(getWidth(), getHeight() - heightDifference);
         }
         attributeCount--;
@@ -330,29 +380,6 @@ class FormularVytvoreniOmezeni extends JDialog
                 tfValue.setText(atribut.getValue());
             }
 
-//            if(newAtribut == null){
-//                atribut = new Atribut();
-//            } else {
-//                atribut = newAtribut;
-//            }
-//
-//            List<String> isFirstOperators = getOperatorForColumnType(sloupce.iterator().next().getType());
-//            for(Sloupec sloupec : sloupce){
-//                cboxAttributes.addItem(sloupec.getName());
-//            }
-//            for(String operator : isFirstOperators){
-//                cboxOperators.addItem(operator);
-//            }
-//
-//            if(newAtribut == null) {
-//                atribut = new Atribut(getAttributeName(), getOperator(), getValue());
-//            } else {
-//                atribut = newAtribut;
-//                cboxAttributes.setSelectedItem(atribut.getName());
-//                cboxOperators.setSelectedItem(atribut.getOperator());
-//                tfValue.setText(atribut.getValue());
-//            }
-
             JButton removeBtn = new JButton();
             try {
                 Image img = ImageIO.read(new File("zdroje/obrazky/deleteImage.png"));
@@ -411,7 +438,9 @@ class FormularVytvoreniOmezeni extends JDialog
                             cboxVariableValues.setSelectedIndex(0);
                         }
                         thisPanel.add(checkBoxUseVariable);
-                        thisPanel.add(removeBtn);
+                        if(!isFirst) {
+                            thisPanel.add(removeBtn);
+                        }
                         thisPanel.setUseVariables(true);
                         revalidate();
                         repaint();
@@ -421,7 +450,9 @@ class FormularVytvoreniOmezeni extends JDialog
                         thisPanel.add(tfValue, "w 150");
                         tfValue.setText("");
                         thisPanel.add(checkBoxUseVariable);
-                        thisPanel.add(removeBtn);
+                        if(!isFirst) {
+                            thisPanel.add(removeBtn);
+                        }
                         thisPanel.setUseVariables(false);
                         revalidate();
                         repaint();

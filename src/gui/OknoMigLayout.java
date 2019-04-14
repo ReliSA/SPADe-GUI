@@ -40,12 +40,6 @@ public class OknoMigLayout extends JFrame{
     private static JButton runQueryBtn = new JButton("Run");
     private static JButton goBackBtn = new JButton("Back");
     private static JButton detectBtn = new JButton("Detect");
-    private static ButtonGroup buttonGroupFunction = new ButtonGroup();
-    private static List<JRadioButton> radioButtonList = new ArrayList<>();
-    private static JRadioButton radioSum = new JRadioButton("SUM");
-    private static JRadioButton radioCount = new JRadioButton("COUNT");
-    private static JRadioButton radioMin = new JRadioButton("MIN");
-    private static JRadioButton radioMax = new JRadioButton("MAX");
     private static JPanel centerNorthPanel = new JPanel(new MigLayout());
     private static JPanel centerPanel = new JPanel(new MigLayout("ins 0"));
     private static JPanel centerTablePanel = new JPanel(new MigLayout("gap rel 0, ins 0"));
@@ -198,11 +192,6 @@ public class OknoMigLayout extends JFrame{
                 centerNorthPanel.add(addConstraintBtn);
                 centerNorthPanel.add(lblName);
                 centerNorthPanel.add(varOrQueryNameTf);
-                centerNorthPanel.add(radioSum);
-                centerNorthPanel.add(radioCount);
-                centerNorthPanel.add(radioMin);
-                centerNorthPanel.add(radioMax);
-                radioSum.setSelected(true);
                 centerNorthPanel.add(testVarQueryBtn);
 
                 bottomPanel.remove(runQueryBtn);
@@ -225,18 +214,6 @@ public class OknoMigLayout extends JFrame{
         mainFrame.add(scrollFrame, "dock center");
 
         centerNorthPanel.setBackground(Color.orange);
-
-        buttonGroupFunction.add(radioSum);
-        buttonGroupFunction.add(radioCount);
-        buttonGroupFunction.add(radioMin);
-        buttonGroupFunction.add(radioMax);
-        // default
-        radioSum.setSelected(true);
-
-        radioButtonList.add(radioCount);
-        radioButtonList.add(radioMax);
-        radioButtonList.add(radioMin);
-        radioButtonList.add(radioSum);
 
         addConstraintBtn.addActionListener(new ActionListener(){
             @Override
@@ -273,7 +250,6 @@ public class OknoMigLayout extends JFrame{
                 centerPanel.add(axisPanel, "dock west, height 800, width " + constraintPanelWidth);
 
                 bottomPanel.add(runQueryBtn);
-                bottomPanel.add(detectBtn);
                 mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
 
                 mainFrame.revalidate();
@@ -322,6 +298,7 @@ public class OknoMigLayout extends JFrame{
                         ex.printStackTrace();
                     }
 
+                    bottomPanel.add(runQueryBtn);
                     mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
 
                     mainFrame.revalidate();
@@ -374,25 +351,6 @@ public class OknoMigLayout extends JFrame{
                             ComboBoxItem comboBoxItem = new ComboBoxItem(varOrQueryNameTf.getText(), "promenna", jsonObject.getString("queryResult"));
                             preparedVariableValues.add(comboBoxItem);
                             System.out.println(preparedVariableValues);
-                            List<JRadioButton> radioButtons = constPanel.getRadioButtons();
-                            String selected = "";
-                            for(JRadioButton radioButton : radioButtons){
-                                if(radioButton.isSelected()){
-                                    selected = radioButton.getText();
-                                }
-                            }
-                            JSONArray attributes = (JSONArray) jsonConstraint.get("attributes");
-                            for(Object attribute: attributes){
-                                JSONObject obj = (JSONObject) attribute;
-                                //pokud tam bude jeden sloupec 2x tak to nastaví true na 2 - asi to vyřešit že to bude kontrolovat všechno a ne jen jméno
-                                // zkusit co to udělá v button group když bych měl 3x stejný název a 3x true v souboru jak se to zachová
-                                if(obj.getString("name").equals(selected)){
-                                    obj.put("aggregatedColumn","true");
-                                } else {
-                                    obj.put("aggregatedColumn","false");
-                                }
-                            }
-
                         }
                         constList.add(jsonConstraint);
                     }
@@ -460,6 +418,9 @@ public class OknoMigLayout extends JFrame{
             public void actionPerformed(ActionEvent e) {
                 centerNorthPanel.removeAll();
                 centerPanel.removeAll();
+                bottomPanel.removeAll();
+                bottomPanel.add(cancelBtn);
+                bottomPanel.add(saveBtn);
                 mainFrame.remove(bottomPanel);
 
                 varOrQueryNameTf.setText("");
@@ -577,6 +538,7 @@ public class OknoMigLayout extends JFrame{
 
                     centerPanel.add(centerTablePanel, "grow");
                     bottomPanel.remove(runQueryBtn);
+                    bottomPanel.add(detectBtn);
                     bottomPanel.add(goBackBtn);
                     mainFrame.revalidate();
                     mainFrame.repaint();
@@ -615,6 +577,7 @@ public class OknoMigLayout extends JFrame{
                     // query se dá pustit
                     System.out.println(query);
                 }
+                constraintPanels.clear();
             }
 
         });
@@ -651,7 +614,6 @@ public class OknoMigLayout extends JFrame{
         bottomPanel.add(saveBtn);
         bottomPanel.add(cancelBtn);
         bottomPanel.add(runQueryBtn);
-        bottomPanel.add(detectBtn);
     }
 
     private JButton createButtonWithImage(String buttonOperation){
@@ -685,13 +647,6 @@ public class OknoMigLayout extends JFrame{
     }
 
     private JSONObject writeQueryResult(JSONObject jsonConstraint){
-        for (Enumeration<AbstractButton> buttons = buttonGroupFunction.getElements(); buttons.hasMoreElements();) {
-            AbstractButton button = buttons.nextElement();
-            if (button.isSelected()) {
-                jsonConstraint.put("function", button.getText());
-            }
-        }
-
         Long result = testQuery();
         if(result == null) {
             jsonConstraint.put("queryResult", "NULL");
@@ -725,32 +680,13 @@ public class OknoMigLayout extends JFrame{
         }
         // dotaz nad jednou tabulkou bez ohledu na osu zatím - vytváření proměnných
         if(constraintPanels.size() == 1) {
-            String function = "";
-            String selectedColumn = "";
-            for (Enumeration<AbstractButton> buttons = buttonGroupFunction.getElements(); buttons.hasMoreElements();) {
-                AbstractButton button = buttons.nextElement();
-                if (button.isSelected()) {
-                    function = button.getText();
-                }
-            }
-
             ConstraintPanel constraintPanel = constraintPanels.iterator().next();
             JSONObject object = constraintPanel.getJsonConstraint();
+
+            String function = object.getString("aggregate");
             String tableName = object.getString("table");
-            String query = "";
-            for(Component comp : constraintPanel.getComponents()){
-                if(comp instanceof JRadioButton){
-                    JRadioButton radioButton = (JRadioButton) comp;
-                    if(radioButton.isSelected()){
-                        selectedColumn = radioButton.getText();
-                    }
-                }
-            }
-            if(function.equals("COUNT")) {
-                query = "select count(*) from " + tableName + " where ";
-            } else {
-                query = "select " + function + "(" + selectedColumn + ") from " + tableName + " where ";
-            }
+            String selectedColumn = object.getString("column");
+            String query = "select " + function + "(" + selectedColumn + ") from " + tableName + " where ";
 
             JSONArray atts = (JSONArray) object.get("attributes");
 
@@ -929,10 +865,6 @@ public class OknoMigLayout extends JFrame{
                     centerNorthPanel.add(addConstraintBtn);
                     varOrQueryNameTf.setText(name);
                     centerNorthPanel.add(varOrQueryNameTf);
-                    centerNorthPanel.add(radioSum);
-                    centerNorthPanel.add(radioCount);
-                    centerNorthPanel.add(radioMin);
-                    centerNorthPanel.add(radioMax);
                     centerNorthPanel.add(testVarQueryBtn);
 
                     mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
@@ -949,17 +881,9 @@ public class OknoMigLayout extends JFrame{
                     JSONObject jsonObject = new JSONObject(content);
 
                     JSONArray constraints = (JSONArray) jsonObject.get("constraints");
-                    String function = jsonObject.getString("function");
                     for (Object cons : constraints)
                     {
                         JSONObject object = (JSONObject) cons;
-
-                        for (Enumeration<AbstractButton> buttons = buttonGroupFunction.getElements(); buttons.hasMoreElements();) {
-                            AbstractButton button = buttons.nextElement();
-                            if (button.getText().equals(function)) {
-                                button.setSelected(true);
-                            }
-                        }
 
                         ConstraintPanel panel = new ConstraintPanel(object, true);
                         centerPanel.add(panel, "dock west, height 100%, width " + constraintPanelWidth);
@@ -1007,13 +931,11 @@ public class OknoMigLayout extends JFrame{
 
         ConstraintPanel thisPanel;
         JSONObject constraints;
-        List<JRadioButton> radioButtons = new ArrayList<>();
 
         public ConstraintPanel(JSONObject constraints, boolean editing) {
             super();
             thisPanel = this;
             this.constraints = constraints;
-            ButtonGroup buttonGroup = new ButtonGroup();
             String tableName = constraints.getString("table");
 
             this.setLayout(new MigLayout());
@@ -1023,18 +945,8 @@ public class OknoMigLayout extends JFrame{
             JSONArray attributes = (JSONArray) constraints.get("attributes");
             for(Object attribute: attributes){
                 JSONObject jsonObject = (JSONObject) attribute;
-                JRadioButton radioButton = new JRadioButton(jsonObject.getString("name"));
-                if(editing) {
-                    boolean aggregated = jsonObject.getBoolean("aggregatedColumn");
-                    if(aggregated) {
-                        radioButton.setSelected(true);
-                    }
-                } else {
-                    radioButton.setSelected(true);
-                }
-                radioButtons.add(radioButton);
-                buttonGroup.add(radioButton);
-                this.add(radioButton, "wrap");
+                JLabel lblName = new JLabel(jsonObject.getString("name"));
+                this.add(lblName, "wrap");
             }
 
             JButton editBtn = new JButton("Edit");
@@ -1045,16 +957,15 @@ public class OknoMigLayout extends JFrame{
                     FormularVytvoreniOmezeni form = new FormularVytvoreniOmezeni(strukturyPohledu, constraint, preparedVariableValues);
 
                     if(!form.wasClosed()) {
-                        radioButtons.clear();
                         Component[] components = getComponents();
                         for (int i = 0; i < components.length; i++) {
-                            if (components[i] instanceof JLabel || components[i] instanceof JRadioButton) {
+                            if (components[i] instanceof JLabel) {
                                 remove(components[i]);
                             }
                         }
                         JSONObject attributes = form.getFormData();
                         if (!attributes.isEmpty()) {
-                            JLabel label = new JLabel(attributes.getString("table"));
+                            JLabel label = new JLabel(attributes.getString("table").toUpperCase());
                             add(label, "wrap, dock north");
                             // delete reminder box
                             //attMap.get(entry.getKey()).remove(0);
@@ -1062,11 +973,8 @@ public class OknoMigLayout extends JFrame{
                             JSONArray atts = (JSONArray) attributes.get("attributes");
                             for (Object attribute : atts) {
                                 JSONObject jsonObject = (JSONObject) attribute;
-                                JRadioButton radioButton = new JRadioButton(jsonObject.getString("name"));
-                                radioButtons.add(radioButton);
-                                buttonGroup.add(radioButton);
-                                radioButton.setSelected(true);
-                                add(radioButton, "wrap, dock north");
+                                JLabel lblName = new JLabel(jsonObject.getString("name"));
+                                add(lblName, "wrap, dock north");
                             }
                         }
                     }
@@ -1098,10 +1006,6 @@ public class OknoMigLayout extends JFrame{
 
         public JSONObject getJsonConstraint() {
             return this.constraints;
-        }
-
-        public List<JRadioButton> getRadioButtons(){
-            return this.radioButtons;
         }
     }
 }
