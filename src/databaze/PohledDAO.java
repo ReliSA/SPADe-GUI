@@ -33,15 +33,16 @@ public class PohledDAO {
         return totalRows ;
     }
 
-    public List<SloupecCustomGrafu> dotaz(String query, List<ComboBoxItem> preparedVariableValues){
+    public SloupecCustomGrafu dotaz(String query, List<ComboBoxItem> preparedVariableValues, List<String> firstColumn){
         Connection pripojeni;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         ArrayList<ArrayList<String>> data = new ArrayList<>();
         List<String> nazvySloupcu = new ArrayList<>();
         List<String> typySloupcu = new ArrayList<>();
-        List<SloupecCustomGrafu> sloupce = new ArrayList<>();
-
+        SloupecCustomGrafu sloupec = null;
+        List<String> values = new ArrayList<>();
+        boolean found = false;
 
         try {
             pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, name, pass);
@@ -83,13 +84,20 @@ public class PohledDAO {
                         System.out.println("------------------------------");
 //                    data = new CustomGraf(columnsNumber);
                     }
-                    for (int i = 0; i < columnsNumber; i++) {
-                        if(typySloupcu.get(i).equals("BIGINT") || typySloupcu.get(i).equals("INT") || typySloupcu.get(i).equals("DOUBLE") || typySloupcu.get(i).equals("BIT")) {
-                            sloupce.add(new SloupecCustomGrafu(nazvySloupcu.get(i), data.get(i), i, preparedVariableValues, true));
-                        } else {
-                            sloupce.add(new SloupecCustomGrafu(nazvySloupcu.get(i), data.get(i), i, preparedVariableValues, false));
+
+                    for(String s : firstColumn) {
+                        for(int i = 0; i < data.get(0).size(); i++){
+                            if(s.equals(data.get(0).get(i))){
+                                values.add(data.get(1).get(i));
+                                found = true;
+                            }
                         }
+                        if(!found) {
+                            values.add("0");
+                        }
+                        found = false;
                     }
+                    sloupec = new SloupecCustomGrafu(nazvySloupcu.get(1), values, 1, preparedVariableValues, true);
                     rs.close();
                 } else {
                     if (stmt.getUpdateCount() == -1) {
@@ -113,7 +121,7 @@ public class PohledDAO {
                 e.printStackTrace();
             }
         }
-        return sloupce;
+        return sloupec;
     }
 
     public Long createVariable(String query){
@@ -131,6 +139,36 @@ public class PohledDAO {
                 if(rs.wasNull()){
                     result = null;
                 }
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null , "Chyba při spuštění skriptu větví nebo tagů konfigurací!");
+            e.printStackTrace();
+        } catch (Exception e){
+            JOptionPane.showMessageDialog(null , "Chyba při výběru dat větví nebo tagů konfigurací z databáze!");
+            e.printStackTrace();
+        } finally {
+            try {
+                rs.close();
+                stmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
+    }
+
+    public ArrayList<String> nactiOsobyProProjekt(int projektId){
+        ArrayList<String> result = new ArrayList<>();
+        Connection pripojeni;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try {
+            pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, name, pass);
+            stmt = pripojeni.prepareStatement("SELECT DISTINCT personName FROM personView where projectId = " + projektId);
+
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                result.add(rs.getString("personName"));
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null , "Chyba při spuštění skriptu větví nebo tagů konfigurací!");

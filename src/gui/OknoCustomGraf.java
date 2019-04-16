@@ -76,6 +76,22 @@ public class OknoCustomGraf extends JFrame {
 		nastavAkce();
 	}
 
+	public OknoCustomGraf(CustomGraf data, Projekt projekt) {
+		super(Konstanty.POPISY.getProperty("menuVytvorGraf"));
+
+		if (instance != null)
+			instance.dispose();
+		instance = this;
+		this.projekt = projekt;
+//		osoby = (new Osoby(projekt.getID())).getSeznam();
+//		iterace = projekt.getIterace();
+
+		nastavCustomZobrazení();
+//		nastavMenu();
+		vykresliData(data);
+		nastavAkce();
+	}
+
 	/**
 	 * Kontruktor okna pro editaci grafu
 	 * @param sablona nastavení okna
@@ -130,6 +146,42 @@ public class OknoCustomGraf extends JFrame {
 		cbSql = new JComboBox<String>(Konstanty.getSQLKeys());
 		cbIterace = new JComboBox(getModel(iterace));
 		cbOsoby = new JComboBox(getModel(osoby));
+		lblSql = new JLabel("SQL:");
+
+		cbSql.setPreferredSize(Konstanty.VELIKOST_CTVRTINOVA_SIRKA);
+		tfNazev.setPreferredSize(Konstanty.VELIKOST_CTVRTINOVA_SIRKA);
+
+		lblIterace.setHorizontalAlignment(JLabel.CENTER);
+		lblNazevGrafu.setHorizontalAlignment(JLabel.CENTER);
+		lblOsoba.setHorizontalAlignment(JLabel.CENTER);
+		lblSql.setHorizontalAlignment(JLabel.CENTER);
+
+		this.add(controlPanel, BorderLayout.NORTH);
+		this.add(scrollDataPanel, BorderLayout.CENTER);
+
+		this.add(nahled, BorderLayout.SOUTH);
+		this.setMinimumSize(new Dimension(850, 700));
+	}
+
+	/**
+	 * Nastaví componenty a zobrazení okna
+	 */
+	private void nastavCustomZobrazení() {
+		this.setLayout(new BorderLayout());
+
+		dataPanel = new JPanel(new GridLayout(1, 0));
+		JScrollPane scrollDataPanel = new JScrollPane(dataPanel);
+		scrollDataPanel.getHorizontalScrollBar().setUnitIncrement(15);
+		scrollDataPanel.getVerticalScrollBar().setUnitIncrement(15);
+		controlPanel = new JPanel(new GridLayout(1, 0));
+		nahled = new JPanel();
+		tfNazev = new JTextField();
+		lblIterace = new JLabel(Konstanty.POPISY.getProperty("nazevIterace"));
+		lblOsoba = new JLabel(Konstanty.POPISY.getProperty("osoba"));
+		lblNazevGrafu = new JLabel(Konstanty.POPISY.getProperty("nazevGrafu"));
+		cbSql = new JComboBox<String>(Konstanty.getSQLKeys());
+		cbIterace = new JComboBox();
+		cbOsoby = new JComboBox();
 		lblSql = new JLabel("SQL:");
 
 		cbSql.setPreferredSize(Konstanty.VELIKOST_CTVRTINOVA_SIRKA);
@@ -247,6 +299,27 @@ public class OknoCustomGraf extends JFrame {
 
 		data = dao.getCustomGrafData((String) cbSql.getSelectedItem(), projekt.getID(), getIdIterace(), getIdOsoby(),
 				parametryZvolenehoSql);
+
+		dataPanel.removeAll();
+
+		dataPanel.add(new PanelSloupceCustomGrafu(data.getNazevSloupce(0), data.getDatumy()));
+
+		for (int i = 1; i < data.pocetSloupcu(); i++) {
+			dataPanel.add(new PanelSloupceCustomGrafu(data.getNazevSloupce(i), data.getDataSloupec(i - 1), i - 1,
+					actNakresliGraf));
+		}
+
+		getContentPane().revalidate();
+		getContentPane().repaint();
+
+		nakresliGraf();
+	}
+
+	/**
+	 * Metoda dle údajů zvolených v ovládacím menu načte data pro vykreslení grafu
+	 */
+	private void vykresliData(CustomGraf data) {
+		this.data = data;
 
 		dataPanel.removeAll();
 

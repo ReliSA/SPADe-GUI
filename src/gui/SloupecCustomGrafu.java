@@ -16,7 +16,7 @@ public class SloupecCustomGrafu extends JPanel {
     private JLabel lblBarva = new JLabel();// popisek barva
     private JLabel lblTyp = new JLabel(); // popisek typ grafu
     private int index;
-    private ArrayList<String> data = new ArrayList<>();
+    private List<String> data = new ArrayList<>();
     private JCheckBox useColumn = new JCheckBox();
     private JCheckBox useVariable = new JCheckBox();
     private JComboBox<String> operators = new JComboBox<>();
@@ -30,7 +30,7 @@ public class SloupecCustomGrafu extends JPanel {
      * @param nazev název dat
      * @param data datumy k zobrazení
      */
-    public SloupecCustomGrafu(String nazev, ArrayList<String> data, int index, List<ComboBoxItem> variableValues, boolean includeHeader) {
+    public SloupecCustomGrafu(String nazev, List<String> data, int index, List<ComboBoxItem> variableValues, boolean includeHeader) {
         this.data = data;
         this.index = index;
         this.setBackground(Color.white);
@@ -106,7 +106,7 @@ public class SloupecCustomGrafu extends JPanel {
 
         JLabel lblHodnota;
         for (String hodnota : data) {
-            lblHodnota=new JLabel(hodnota);
+            lblHodnota = new JLabel(hodnota);
             lblHodnota.setBorder(new MatteBorder(1,0,1,0, Color.BLACK));
             lblHodnota.setHorizontalAlignment(SwingConstants.CENTER);
             this.add(lblHodnota, "grow, span 3, wrap, dock south");
@@ -114,14 +114,14 @@ public class SloupecCustomGrafu extends JPanel {
     }
     
     public List<Boolean> detectValues(){
-        Integer userInput = Integer.parseInt(getDetectedValue());
+        Double userInput = Double.parseDouble(getDetectedValue());
         String operator = getOperator();
         List<Boolean> tempDetect = new ArrayList<>();
         switch (operator) {
             case "=":
                 for (String data : getData()) {
-                    Integer temp = Integer.parseInt(data);
-                    if (userInput == temp) {
+                    Double temp = Double.parseDouble(data);
+                    if (temp == userInput) {
                         tempDetect.add(true);
                     } else {
                         tempDetect.add(false);
@@ -130,8 +130,8 @@ public class SloupecCustomGrafu extends JPanel {
                 break;
             case "<":
                 for (String data : getData()) {
-                    Integer temp = Integer.parseInt(data);
-                    if (userInput < temp) {
+                    Double temp = Double.parseDouble(data);
+                    if (temp < userInput) {
                         tempDetect.add(true);
                     } else {
                         tempDetect.add(false);
@@ -140,8 +140,8 @@ public class SloupecCustomGrafu extends JPanel {
                 break;
             case ">":
                 for (String data : getData()) {
-                    Integer temp = Integer.parseInt(data);
-                    if (userInput > temp) {
+                    Double temp = Double.parseDouble(data);
+                    if (temp > userInput) {
                         tempDetect.add(true);
                     } else {
                         tempDetect.add(false);
@@ -150,8 +150,8 @@ public class SloupecCustomGrafu extends JPanel {
                 break;
             case ">=":
                 for (String data : getData()) {
-                    Integer temp = Integer.parseInt(data);
-                    if (userInput >= temp) {
+                    Double temp = Double.parseDouble(data);
+                    if (temp >= userInput) {
                         tempDetect.add(true);
                     } else {
                         tempDetect.add(false);
@@ -160,8 +160,8 @@ public class SloupecCustomGrafu extends JPanel {
                 break;
             case "<=":
                 for (String data : getData()) {
-                    Integer temp = Integer.parseInt(data);
-                    if (userInput <= temp) {
+                    Double temp = Double.parseDouble(data);
+                    if (temp <= userInput) {
                         tempDetect.add(true);
                     } else {
                         tempDetect.add(false);
@@ -170,8 +170,8 @@ public class SloupecCustomGrafu extends JPanel {
                 break;
             case "!=":
                 for (String data : getData()) {
-                    Integer temp = Integer.parseInt(data);
-                    if (userInput != temp) {
+                    Double temp = Double.parseDouble(data);
+                    if (temp != userInput) {
                         tempDetect.add(true);
                     } else {
                         tempDetect.add(false);
@@ -203,7 +203,11 @@ public class SloupecCustomGrafu extends JPanel {
         return (String) this.operators.getSelectedItem();
     }
 
-    public ArrayList<String> getData(){
+    public List<String> getData(){
         return this.data;
+    }
+
+    public String getName(){
+        return lblNazev.getText();
     }
 }

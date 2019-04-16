@@ -1,6 +1,7 @@
 package gui;
 
 import data.Projekt;
+import data.custom.CustomGraf;
 import databaze.PohledDAO;
 import net.miginfocom.swing.MigLayout;
 import org.apache.commons.io.FileUtils;
@@ -27,6 +28,7 @@ public class OknoMigLayout extends JFrame{
     private static boolean variableCreation = false;
     private static JFrame mainFrame;
     private Projekt projekt;
+    private CustomGraf graphData;
     private static String constantFolderPath = "zdroje\\konstanty\\";
     private static String queryFolderPath = "zdroje\\dotazy\\";
     private static String variableFolderPath = "zdroje\\promenne\\";
@@ -40,6 +42,7 @@ public class OknoMigLayout extends JFrame{
     private static JButton runQueryBtn = new JButton("Run");
     private static JButton goBackBtn = new JButton("Back");
     private static JButton detectBtn = new JButton("Detect");
+    private static JButton showGraphBtn = new JButton("Show graph");
     private static JPanel centerNorthPanel = new JPanel(new MigLayout());
     private static JPanel centerPanel = new JPanel(new MigLayout("ins 0"));
     private static JPanel centerTablePanel = new JPanel(new MigLayout("gap rel 0, ins 0"));
@@ -53,6 +56,7 @@ public class OknoMigLayout extends JFrame{
     private List<SloupecCustomGrafu> detectionColumns = new ArrayList<>();
     private SloupecCustomGrafu detected;
     private List<ConstraintPanel> constraintPanels = new ArrayList<>();
+    private int columnsNumber = 0;
 
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
@@ -196,6 +200,7 @@ public class OknoMigLayout extends JFrame{
 
                 bottomPanel.remove(runQueryBtn);
                 bottomPanel.remove(detectBtn);
+                bottomPanel.remove(showGraphBtn);
                 mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
 
                 centerPanel.add(centerNorthPanel, "dock north, width 100%");
@@ -446,6 +451,7 @@ public class OknoMigLayout extends JFrame{
                 constraintPanels.clear();
 
                 bottomPanel.remove(detectBtn);
+                bottomPanel.remove(showGraphBtn);
                 bottomPanel.remove(goBackBtn);
                 bottomPanel.add(runQueryBtn);
 
@@ -459,8 +465,12 @@ public class OknoMigLayout extends JFrame{
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                int index = 2;
+                columnsNumber = 0;
+                constraintPanels.clear();
                 String condition = "";
                 String axisTable = "";
+                List<String> pplForProject = new ArrayList<>();
                 Component[] components = centerPanel.getComponents();
                 List<String> conditions = new ArrayList<>();
                 for(Component comp : components){
@@ -476,12 +486,39 @@ public class OknoMigLayout extends JFrame{
                         }
                     }
                 }
+
+
+                graphData = new CustomGraf(constraintPanels.size() + 1);
+                graphData.addNazvySloupcu("osa X");
+
+                if(axisTable.equals("person")){
+                    pplForProject = pohledDAO.nactiOsobyProProjekt(projekt.getID());
+                    pplForProject = pplForProject.stream().sorted().collect(Collectors.toList());
+                    //create column with names on the first place
+                    for(String s : pplForProject){
+                        graphData.addDatum(s);
+                    }
+                } else if (axisTable.equals("Iteration")) {
+
+                } else if (axisTable.equals("Date")) {
+
+                }
+
+                SloupecCustomGrafu sl = new SloupecCustomGrafu("Person name", pplForProject, -1, preparedVariableValues, false);
+                centerPanel.removeAll();
+                centerTablePanel.removeAll();
+                centerPanel.add(centerNorthPanel, "dock north");
+                centerTablePanel.add(sl, "dock west, grow");
+                columnsNumber++;
+
                 // dotaz nad jednou tabulkou bez ohledu na osu zatím - vytváření proměnných
-                if(constraintPanels.size() == 1) {
-                    ConstraintPanel constraintPanel = constraintPanels.iterator().next();
-                    JSONObject object = constraintPanel.getJsonConstraint();
+                for(ConstraintPanel panel : constraintPanels) {
+                    columnsNumber++;
+                    JSONObject object = panel.getJsonConstraint();
                     String tableName = object.getString("table");
-                    String query = "select * from " + tableName + " where ";
+                    String aggregate = object.getString("aggregate");
+                    String column = object.getString("column");
+                    String query = "SELECT personName, " + aggregate + "(" + column + ") FROM " + tableName + " WHERE ";
 
                     JSONArray atts = (JSONArray) object.get("attributes");
 
@@ -499,6 +536,8 @@ public class OknoMigLayout extends JFrame{
                         }
                         query += condition;
                     }
+                    query += " AND projectId = " + projekt.getID();
+                    query += " GROUP BY personName;";
 
                     //a poslat data někam dál a co s nima?
 //                    switch(tableName){
@@ -525,59 +564,29 @@ public class OknoMigLayout extends JFrame{
 //                            break;
 //                    }
                     System.out.println(query);
-                    detectionColumns = pohledDAO.dotaz(query, preparedVariableValues);
+                    SloupecCustomGrafu sloupec = pohledDAO.dotaz(query, preparedVariableValues, pplForProject);
+                    graphData.addNazvySloupcu(sloupec.getName());
 
-                    centerPanel.removeAll();
-                    centerTablePanel.removeAll();
-                    centerPanel.add(centerNorthPanel, "dock north");
-                    for(SloupecCustomGrafu sloupec : detectionColumns){
-                        centerTablePanel.add(sloupec, "dock west, grow");
+                    for(String s : sloupec.getData()){
+                        graphData.addData(index, Double.parseDouble(s));
                     }
-                    detected = new SloupecCustomGrafu("detected", new ArrayList<>(), detectionColumns.size(), preparedVariableValues, false);
-                    centerTablePanel.add(detected, "dock west, grow");
+                    index++;
 
-                    centerPanel.add(centerTablePanel, "grow");
-                    bottomPanel.remove(runQueryBtn);
-                    bottomPanel.add(detectBtn);
-                    bottomPanel.add(goBackBtn);
-                    mainFrame.revalidate();
-                    mainFrame.repaint();
-
-                } else {
-                    // join přes více tabulek - vytváření dotazů
-                    String query = "select * from " + axisTable + " ";
-                    for(ConstraintPanel constraintPanel : constraintPanels) {
-                        JSONObject object = constraintPanel.getJsonConstraint();
-                        String tableName = object.getString("table");
-                        query += "join " + tableName + " on " + tableName + ".personId = " + axisTable + ".id ";
-
-                        JSONArray atts = (JSONArray) object.get("attributes");
-
-                        Iterator<Object> iterator = atts.iterator();
-                        while (iterator.hasNext()) {
-                            JSONObject jsonObject = (JSONObject) iterator.next();
-                            condition = tableName + "." + jsonObject.getString("name") + " " + jsonObject.getString("operator") + " ";
-                            if (jsonObject.getString("operator").equals("like")) {
-                                condition += "\"" + jsonObject.getString("value") + "\"";
-                            } else {
-                                condition += jsonObject.getString("value");
-                            }
-                            conditions.add(condition);
-                        }
-                    }
-                    query += " where ";
-                    Iterator<String> iterator = conditions.iterator();
-                    while(iterator.hasNext()){
-                        String cond = iterator.next();
-                        query += cond;
-                        if (iterator.hasNext()) {
-                            query += " AND ";
-                        }
-                    }
-                    // query se dá pustit
-                    System.out.println(query);
+                    centerTablePanel.add(sloupec, "dock west, grow");
                 }
-                constraintPanels.clear();
+                columnsNumber++;
+                detected = new SloupecCustomGrafu("detected", new ArrayList<>(), columnsNumber, preparedVariableValues, false);
+                centerTablePanel.add(detected, "dock west, grow");
+
+                graphData.addNazvySloupcu("detected");
+
+                centerPanel.add(centerTablePanel, "grow");
+                bottomPanel.remove(runQueryBtn);
+                bottomPanel.add(detectBtn);
+                bottomPanel.add(goBackBtn);
+                bottomPanel.add(showGraphBtn);
+                mainFrame.revalidate();
+                mainFrame.repaint();
             }
 
         });
@@ -588,7 +597,14 @@ public class OknoMigLayout extends JFrame{
                 SloupecCustomGrafu detectionColumn = null;
                 ArrayList<String> columnData = new ArrayList<>();
                 List<List<Boolean>> detectionValues = new ArrayList<>();
-                for(SloupecCustomGrafu sloupec : detectionColumns) {
+                List<SloupecCustomGrafu> sloupce = new ArrayList<>();
+                Component[] components = centerTablePanel.getComponents();
+                for(Component comp : components){
+                    if(comp instanceof SloupecCustomGrafu){
+                        sloupce.add((SloupecCustomGrafu) comp);
+                    }
+                }
+                for(SloupecCustomGrafu sloupec : sloupce) {
                     if (sloupec.useColum()) {
                         detectionValues.add(sloupec.detectValues());
                     }
@@ -599,15 +615,41 @@ public class OknoMigLayout extends JFrame{
                     for (int j = 0; j < detectionValues.size(); j++) {
                         val &= detectionValues.get(j).get(i);
                     }
-                    columnData.add(val.toString());
+                    if(val){
+                        columnData.add("1");
+                    } else {
+                        columnData.add("0");
+                    }
                 }
                 centerTablePanel.remove(centerTablePanel.getComponentCount() - 1);
 
-                detected = new SloupecCustomGrafu("detected", columnData, detectionColumns.size(), preparedVariableValues, false);
+                detected = new SloupecCustomGrafu("detected", columnData, columnsNumber, preparedVariableValues, false);
                 centerTablePanel.add(detected, "dock west, grow");
+
+                for(String s : columnData){
+                    graphData.addData(columnsNumber, Double.parseDouble(s));
+                }
 
                 centerTablePanel.revalidate();
                 centerTablePanel.repaint();
+            }
+        });
+
+        showGraphBtn.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+
+//                while (rs.next()) {
+//                    data.addDatum(rs.getString(1));
+//                    for (int i = 2; i <= columnsNumber; i++) {
+//                        data.addData(i, rs.getDouble(i));
+//                    }
+//                }
+                OknoCustomGraf okno = new OknoCustomGraf(graphData, projekt);
+                okno.setSize(800, 400);
+                okno.setLocationRelativeTo(null);
+                okno.setVisible(true);
             }
         });
 

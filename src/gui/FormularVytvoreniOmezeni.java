@@ -158,6 +158,11 @@ class FormularVytvoreniOmezeni extends JDialog
                 mainPanel.remove(btnAdd);
                 setSize(windowWidth,windowHeight);
 
+                cboxColumns.removeAllItems();
+                for(Sloupec s : strukturaPohledu.get(cboxTables.getSelectedItem())){
+                    cboxColumns.addItem(s.getName());
+                }
+
                 attributeList.clear();
                 attributePanels.clear();
 //                strukturaPohledu.get(cboxTables.getSelectedItem());
