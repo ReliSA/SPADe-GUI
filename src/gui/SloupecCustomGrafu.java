@@ -13,8 +13,6 @@ import java.util.List;
 
 public class SloupecCustomGrafu extends JPanel {
     private JLabel lblNazev = new JLabel(); // popisek název
-    private JLabel lblBarva = new JLabel();// popisek barva
-    private JLabel lblTyp = new JLabel(); // popisek typ grafu
     private int index;
     private List<String> data = new ArrayList<>();
     private JCheckBox useColumn = new JCheckBox();
@@ -96,9 +94,8 @@ public class SloupecCustomGrafu extends JPanel {
             this.add(tfValue, "grow, span 3, wrap, gapy 5");
             this.add(this.lblNazev, "grow, span 3, wrap");
         } else {
-            this.add(this.lblNazev, "grow, span 3, wrap, gapy 53");
+            this.add(this.lblNazev, "grow, span 3, wrap, gapy 58");
         }
-
 
 
         this.lblNazev.setBorder(new MatteBorder(1,0,1,0, Color.BLACK));
@@ -121,7 +118,7 @@ public class SloupecCustomGrafu extends JPanel {
             case "=":
                 for (String data : getData()) {
                     Double temp = Double.parseDouble(data);
-                    if (temp == userInput) {
+                    if (temp.compareTo(userInput) == 0) {
                         tempDetect.add(true);
                     } else {
                         tempDetect.add(false);
@@ -171,7 +168,7 @@ public class SloupecCustomGrafu extends JPanel {
             case "!=":
                 for (String data : getData()) {
                     Double temp = Double.parseDouble(data);
-                    if (temp != userInput) {
+                    if (temp.compareTo(userInput) != 0) {
                         tempDetect.add(true);
                     } else {
                         tempDetect.add(false);
@@ -193,10 +190,6 @@ public class SloupecCustomGrafu extends JPanel {
 
     public String getDetectedValue(){
         return this.tfValue.getText();
-    }
-
-    public int getIndex(){
-        return this.index;
     }
 
     public String getOperator(){

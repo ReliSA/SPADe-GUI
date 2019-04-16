@@ -48,11 +48,6 @@ public class PohledDAO {
             pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, name, pass);
             stmt = pripojeni.prepareStatement(query);
 
-//            rs = stmt.executeQuery();
-//            while(rs.next()){
-//
-//            }
-
             boolean isResultSet = stmt.execute();
             while (true) {
                 if (isResultSet) {
@@ -69,7 +64,6 @@ public class PohledDAO {
                     
                     while(rs.next()) {
                         for (int i = 1; i <= columnsNumber; i++) {
-//                        data.addNazvySloupcu(rs.getString(i));
                             System.out.println(rs.getString(i));
                             if(rs.getString(i) != null) {
                                 if (rs.getString(i).equals("")) {
@@ -82,7 +76,6 @@ public class PohledDAO {
                             }
                         }
                         System.out.println("------------------------------");
-//                    data = new CustomGraf(columnsNumber);
                     }
 
                     for(String s : firstColumn) {
@@ -164,11 +157,71 @@ public class PohledDAO {
         ResultSet rs = null;
         try {
             pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, name, pass);
-            stmt = pripojeni.prepareStatement("SELECT DISTINCT personName FROM personView where projectId = " + projektId);
+            stmt = pripojeni.prepareStatement("SELECT DISTINCT personName FROM personView where projectId = " + projektId + " ORDER BY personName ASC");
 
             rs = stmt.executeQuery();
             while(rs.next()){
                 result.add(rs.getString("personName"));
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null , "Chyba při spuštění skriptu větví nebo tagů konfigurací!");
+            e.printStackTrace();
+        } catch (Exception e){
+            JOptionPane.showMessageDialog(null , "Chyba při výběru dat větví nebo tagů konfigurací z databáze!");
+            e.printStackTrace();
+        } finally {
+            try {
+                rs.close();
+                stmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
+    }
+
+    public ArrayList<String> nactiIteraceProProjekt(int projektId){
+        ArrayList<String> result = new ArrayList<>();
+        Connection pripojeni;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try {
+            pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, name, pass);
+            stmt = pripojeni.prepareStatement("SELECT name FROM iteration WHERE superProjectId = " + projektId + " ORDER BY name ASC");
+
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                result.add(rs.getString("name"));
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null , "Chyba při spuštění skriptu větví nebo tagů konfigurací!");
+            e.printStackTrace();
+        } catch (Exception e){
+            JOptionPane.showMessageDialog(null , "Chyba při výběru dat větví nebo tagů konfigurací z databáze!");
+            e.printStackTrace();
+        } finally {
+            try {
+                rs.close();
+                stmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
+    }
+
+    public ArrayList<String> nactiDataProProjekt(int projektId){
+        ArrayList<String> result = new ArrayList<>();
+        Connection pripojeni;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try {
+            pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, name, pass);
+            stmt = pripojeni.prepareStatement("SELECT name FROM iteration WHERE superProjectId = " + projektId + " ORDER BY name ASC");
+
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                result.add(rs.getString("name"));
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null , "Chyba při spuštění skriptu větví nebo tagů konfigurací!");

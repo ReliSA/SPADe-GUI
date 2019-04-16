@@ -26,33 +26,19 @@ class FormularVytvoreniOmezeni extends JDialog
     private JButton btnSubmit = new JButton("OK");
     private JButton btnClose = new JButton("CANCEL");
     private JButton btnAdd = new JButton("Add");
-    private JTextField tfAttribute = new JTextField();
     private boolean closed = true;
     private List<Atribut> attributeList = new ArrayList<>();
     private List<AttributePanel> attributePanels = new ArrayList<>();
-    private boolean validForm = false;
     private JPanel mainPanel = new JPanel();
-    private final JScrollPane scrollPane = new JScrollPane();
     private int heightDifference = 30;
     private int attributeCount = 1;
     private int windowHeight = 240;
     private int windowWidth = 600;
 
-    private JLabel lblTable = new JLabel("Table");
-    private JLabel lblColumn = new JLabel("Column");
-    private JLabel lblCondition = new JLabel("Condition");
-    private JLabel lblAggregate = new JLabel("Aggregate");
     private ButtonGroup btnGroupAggregate = new ButtonGroup();
-    private JRadioButton radioSum = new JRadioButton("SUM");
-    private JRadioButton radioAvg = new JRadioButton("AVG");
-    private JRadioButton radioMin = new JRadioButton("MIN");
-    private JRadioButton radioMax = new JRadioButton("MAX");
-    private JRadioButton radioCount = new JRadioButton("COUNT");
     private JComboBox cboxTables = new JComboBox();
     private JComboBox cboxColumns = new JComboBox();
     private JTextField tfAttValue = new JTextField("Value");
-    private JLabel lblDateHint = new JLabel("*Only DD-MM-YYYY format for dates is supported");
-    private JLabel lblWarningText = new JLabel("*Value in red text are in wrong format.");
 
     private FormularVytvoreniOmezeni parentForm;
 
@@ -62,6 +48,19 @@ class FormularVytvoreniOmezeni extends JDialog
         // TODO - cancel on close - don't know how
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         String tableName = "";
+        JLabel lblTable = new JLabel("Table");
+        JLabel lblColumn = new JLabel("Column");
+        JLabel lblCondition = new JLabel("Condition");
+        JLabel lblAggregate = new JLabel("Aggregate");
+        JTextField tfAttribute = new JTextField();
+        JRadioButton radioSum = new JRadioButton("SUM");
+        JRadioButton radioAvg = new JRadioButton("AVG");
+        JRadioButton radioMin = new JRadioButton("MIN");
+        JRadioButton radioMax = new JRadioButton("MAX");
+        JRadioButton radioCount = new JRadioButton("COUNT");
+        JLabel lblDateHint = new JLabel("*Only DD-MM-YYYY format for dates is supported");
+        JLabel lblWarningText = new JLabel("*Value in red text are in wrong format.");
+
         parentForm = this;
         boolean isFirst = true;
         mainPanel.setLayout(new MigLayout());
@@ -100,45 +99,45 @@ class FormularVytvoreniOmezeni extends JDialog
         btnAdd.setPreferredSize(new Dimension(60,28));
 
         btnSubmit.addActionListener(new ActionListener(){
-                                        public void actionPerformed(ActionEvent e){
-                                            if(validateForm(attributePanels)){
-                                                closed = false;
-                                                dispose();
-                                            }
-                                        }
-                                    }
+                public void actionPerformed(ActionEvent e){
+                    if(validateForm(attributePanels)){
+                        closed = false;
+                        dispose();
+                    }
+                }
+            }
         );
 
         btnClose.addActionListener(new ActionListener(){
-                                       public void actionPerformed(ActionEvent e){
-                                           dispose();
-                                       }
-                                   }
+               public void actionPerformed(ActionEvent e){
+                   dispose();
+               }
+           }
         );
 
         btnAdd.addActionListener(new ActionListener(){
-                                     public void actionPerformed(ActionEvent e){
-                                         tfAttValue = new JTextField("Value");
+                 public void actionPerformed(ActionEvent e){
+                     tfAttValue = new JTextField("Value");
 
-                                         if(getHeight() <= 400) {
-                                             setSize(getWidth(), getHeight() + heightDifference);
-                                         }
-                                         mainPanel.remove(btnClose);
-                                         mainPanel.remove(btnSubmit);
-                                         mainPanel.remove(btnAdd);
+                     if(getHeight() <= 400) {
+                         setSize(getWidth(), getHeight() + heightDifference);
+                     }
+                     mainPanel.remove(btnClose);
+                     mainPanel.remove(btnSubmit);
+                     mainPanel.remove(btnAdd);
 
-                                         AttributePanel attributePanel = new AttributePanel(strukturaPohledu.get((String) cboxTables.getSelectedItem()), variableValues, parentForm, false);
-                                         mainPanel.add(attributePanel, "gapleft 65, span 2, wrap");
-                                         attributePanels.add(attributePanel);
-                                         attributeList.add(attributePanel.getAtribut());
-                                         mainPanel.add(btnAdd);
-                                         mainPanel.add(btnSubmit, "split 2");
-                                         mainPanel.add(btnClose);
-                                         scroll(scrollPane, ScrollDirection.DOWN);
-                                         mainPanel.revalidate();
-                                         attributeCount++;
-                                     }
-                                 }
+                     AttributePanel attributePanel = new AttributePanel(strukturaPohledu.get((String) cboxTables.getSelectedItem()), variableValues, parentForm, false);
+                     mainPanel.add(attributePanel, "gapleft 65, span 2, wrap");
+                     attributePanels.add(attributePanel);
+                     attributeList.add(attributePanel.getAtribut());
+                     mainPanel.add(btnAdd);
+                     mainPanel.add(btnSubmit, "split 2");
+                     mainPanel.add(btnClose);
+                     scroll(scrollPane, ScrollDirection.DOWN);
+                     mainPanel.revalidate();
+                     attributeCount++;
+                 }
+             }
         );
 
         cboxTables.addActionListener (new ActionListener () {
@@ -165,7 +164,6 @@ class FormularVytvoreniOmezeni extends JDialog
 
                 attributeList.clear();
                 attributePanels.clear();
-//                strukturaPohledu.get(cboxTables.getSelectedItem());
                 AttributePanel attributePanel = new AttributePanel(null, strukturaPohledu.get(cboxTables.getSelectedItem()), variableValues, parentForm, true);
                 mainPanel.add(attributePanel, "wrap");
                 attributePanels.add(attributePanel);
@@ -182,7 +180,6 @@ class FormularVytvoreniOmezeni extends JDialog
             cboxColumns.addItem(s.getName());
         }
 
-//        this.setLayout(new MigLayout());
         mainPanel.add(lblDateHint, "wrap, span 3");
         mainPanel.add(lblWarningText, "wrap, span 3");
         mainPanel.add(lblTable, "w 50");
@@ -487,7 +484,7 @@ class FormularVytvoreniOmezeni extends JDialog
                         atribut.setValue(tfValue.getText());
                     }
                 }
-
+                //kdyby bylo potřeba použít
 //                public void warn() {
 //                    if (Integer.parseInt(tfValue.getText())<=0){
 //                        JOptionPane.showMessageDialog(null,
