@@ -20,6 +20,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,7 +54,11 @@ public class OknoMigLayout extends JFrame{
     private static JPanel bottomPanel = new JPanel(new MigLayout());
     private static JPanel axisPanel = new JPanel(new MigLayout());
     private static JLabel lblName = new JLabel("Name");
+    private static JLabel lblFromDate = new JLabel("From:");
+    private static JLabel lblToDate = new JLabel("To:");
     private static JTextField varOrQueryNameTf = new JTextField(10);
+    private JDatePickerImpl dpDatumOD;			//datum od
+    private JDatePickerImpl dpDatumDO;			//datum do
     private static List<Iterace> iteraceList = new ArrayList<>();
     private static final JFileChooser fileChooser = new JFileChooser();
     private static final Map<String, List<Sloupec>> strukturyPohledu = new TreeMap<>();
@@ -331,10 +336,12 @@ public class OknoMigLayout extends JFrame{
 
         JComboBox<String> cboxAxisOptions = new JComboBox<String>();
         cboxAxisOptions.addItem("Person");
+        cboxAxisOptions.addItem("Day");
+        cboxAxisOptions.addItem("Between");
         for(Iterace iterace : iteraceList){
             cboxAxisOptions.addItem(iterace.getName());
         }
-        axisPanel.add(cboxAxisOptions, "width 90%, wrap");
+        axisPanel.add(cboxAxisOptions, "width 90%, wrap, span 3");
 
         UtilDateModel modelDatumOD = new UtilDateModel();
         UtilDateModel modelDatumDO = new UtilDateModel();
@@ -345,14 +352,28 @@ public class OknoMigLayout extends JFrame{
 
         JDatePanelImpl datumODPanel = new JDatePanelImpl(modelDatumOD, p);
         JDatePanelImpl datumDOPanel = new JDatePanelImpl(modelDatumDO, p);
-        JDatePickerImpl dpDatumOD = new JDatePickerImpl(datumODPanel, new DateComponentFormatter());
-        JDatePickerImpl dpDatumDO = new JDatePickerImpl(datumDOPanel, new DateComponentFormatter());
+        dpDatumOD = new JDatePickerImpl(datumODPanel, new DateComponentFormatter());
+        dpDatumDO = new JDatePickerImpl(datumDOPanel, new DateComponentFormatter());
 
-        axisPanel.add(dpDatumOD);
-//        axisPanel.add(dpDatumDO);
-
-
-
+        cboxAxisOptions.addActionListener (new ActionListener () {
+            public void actionPerformed(ActionEvent e) {
+                axisPanel.remove(lblFromDate);
+                axisPanel.remove(dpDatumOD);
+                axisPanel.remove(lblToDate);
+                axisPanel.remove(dpDatumDO);
+                if(cboxAxisOptions.getSelectedItem().equals("Day")){
+                    axisPanel.add(lblFromDate);
+                    axisPanel.add(dpDatumOD);
+                }else if(cboxAxisOptions.getSelectedItem().equals("Between")){
+                    axisPanel.add(lblFromDate);
+                    axisPanel.add(dpDatumOD, "wrap");
+                    axisPanel.add(lblToDate);
+                    axisPanel.add(dpDatumDO);
+                }
+                axisPanel.revalidate();
+                axisPanel.repaint();
+            }
+        });
 
         bottomPanel.setBackground(Color.GRAY);
 
@@ -524,8 +545,33 @@ public class OknoMigLayout extends JFrame{
                     for(String s : firstColumn){
                         graphData.addDatum(s);
                     }
-                } else if (axisTable.equals("date")) {
-                    firstColumn = pohledDAO.nactiDataProProjekt(projekt.getID());
+                } else if (axisTable.equals("Day")) {
+                    LocalDate datum;
+                    if(dpDatumOD.getModel().getValue() != null){
+                        datum = ((Date)dpDatumOD.getModel().getValue()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                        firstColumn.add(datum.toString());
+                    } else {
+                        firstColumn.add(LocalDate.now().toString());
+                    }
+
+                    for(String s : firstColumn){
+                        graphData.addDatum(s);
+                    }
+                } else if (axisTable.equals("Between")) {
+                    LocalDate datumOd = null;
+                    LocalDate datumDo = null;
+                    if(dpDatumOD.getModel().getValue() != null){
+                        datumOd = ((Date)dpDatumOD.getModel().getValue()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                    } else {
+                        datumOd = LocalDate.now();
+                    }
+                    if(dpDatumDO.getModel().getValue() != null){
+                        datumDo = ((Date)dpDatumDO.getModel().getValue()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                    } else {
+                        datumDo = LocalDate.now().plusDays(1);
+                    }
+                    firstColumn = prepareDatesBetween(datumOd, datumDo);
+
                     for(String s : firstColumn){
                         graphData.addDatum(s);
                     }
@@ -719,6 +765,15 @@ public class OknoMigLayout extends JFrame{
         while (!start.isAfter(end)) {
             totalDates.add(start.toString());
             start = start.plusDays(1);
+        }
+        return totalDates;
+    }
+
+    private List<String> prepareDatesBetween(LocalDate datumOd, LocalDate datumDo){
+        List<String> totalDates = new ArrayList<>();
+        while (!datumOd.isAfter(datumDo)) {
+            totalDates.add(datumOd.toString());
+            datumOd = datumOd.plusDays(1);
         }
         return totalDates;
     }
