@@ -5,6 +5,7 @@ import ostatni.*;
 
 import javax.swing.*;
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +34,7 @@ public class PohledDAO {
         return totalRows ;
     }
 
-    public SloupecCustomGrafu dotaz(String query, List<ComboBoxItem> preparedVariableValues, List<String> firstColumn){
+    public SloupecCustomGrafu dotaz(String query, List<ComboBoxItem> preparedVariableValues, List<String> firstColumn, boolean isDate){
         Connection pripojeni;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -43,6 +44,8 @@ public class PohledDAO {
         SloupecCustomGrafu sloupec = null;
         List<String> values = new ArrayList<>();
         boolean found = false;
+        SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.s");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
         try {
             pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, name, pass);
@@ -65,17 +68,17 @@ public class PohledDAO {
                     while(rs.next()) {
                         for (int i = 1; i <= columnsNumber; i++) {
                             System.out.println(rs.getString(i));
-                            if(rs.getString(i) != null) {
-                                if (rs.getString(i).equals("")) {
-                                    data.get(i - 1).add("N/A");
-                                } else {
-                                    data.get(i - 1).add(rs.getString(i));
-                                }
-                            } else {
-                                data.get(i - 1).add("N/A");
-                            }
+                            data.get(i - 1).add(rs.getString(i));
                         }
                         System.out.println("------------------------------");
+                    }
+
+                    if(isDate) {
+                        if(data.get(0).get(0).contains(" ")) {
+                            for (int i = 0; i < data.get(0).size(); i++) {
+                                data.get(0).set(i, data.get(0).get(i).substring(0, data.get(0).get(i).indexOf(' ')));
+                            }
+                        }
                     }
 
                     for(String s : firstColumn) {
@@ -180,18 +183,18 @@ public class PohledDAO {
         return result;
     }
 
-    public ArrayList<String> nactiIteraceProProjekt(int projektId){
-        ArrayList<String> result = new ArrayList<>();
+    public ArrayList<Iterace> nactiIteraceProProjekt(int projektId){
+        ArrayList<Iterace> result = new ArrayList<>();
         Connection pripojeni;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, name, pass);
-            stmt = pripojeni.prepareStatement("SELECT name FROM iteration WHERE superProjectId = " + projektId + " ORDER BY name ASC");
+            stmt = pripojeni.prepareStatement("SELECT startDate, endDate, name FROM iteration WHERE superProjectId = " + projektId + " ORDER BY name ASC");
 
             rs = stmt.executeQuery();
             while(rs.next()){
-                result.add(rs.getString("name"));
+                result.add(new Iterace(rs.getDate("startDate"), rs.getDate("endDate"), rs.getString("name")));
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null , "Chyba při spuštění skriptu větví nebo tagů konfigurací!");

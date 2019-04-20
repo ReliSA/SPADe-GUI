@@ -5,6 +5,10 @@ import data.custom.CustomGraf;
 import databaze.PohledDAO;
 import net.miginfocom.swing.MigLayout;
 import org.apache.commons.io.FileUtils;
+import org.jdatepicker.impl.DateComponentFormatter;
+import org.jdatepicker.impl.JDatePanelImpl;
+import org.jdatepicker.impl.JDatePickerImpl;
+import org.jdatepicker.impl.UtilDateModel;
 import ostatni.*;
 
 import javax.imageio.ImageIO;
@@ -15,6 +19,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,6 +54,7 @@ public class OknoMigLayout extends JFrame{
     private static JPanel axisPanel = new JPanel(new MigLayout());
     private static JLabel lblName = new JLabel("Name");
     private static JTextField varOrQueryNameTf = new JTextField(10);
+    private static List<Iterace> iteraceList = new ArrayList<>();
     private static final JFileChooser fileChooser = new JFileChooser();
     private static final Map<String, List<Sloupec>> strukturyPohledu = new TreeMap<>();
     private static List<ComboBoxItem> preparedVariableValues = new ArrayList<>();
@@ -60,7 +66,7 @@ public class OknoMigLayout extends JFrame{
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    OknoMigLayout frame = new OknoMigLayout(new Projekt(1, null, null ,null));
+                    OknoMigLayout frame = new OknoMigLayout(new Projekt(12, null, null ,null));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -89,6 +95,8 @@ public class OknoMigLayout extends JFrame{
             sloupce = pohledDAO.nactecniStrukturyPohledu(pohled.getViewName());
             strukturyPohledu.put(pohled.getViewName(), sloupce);
         }
+
+        iteraceList = pohledDAO.nactiIteraceProProjekt(projekt.getID());
 
 //        List<ArtifactView> artifactViews = pohledDAO.nactiArtifactView();
 //        List<CommitedConfigView> commitedConfigViews = pohledDAO.nactiCommitedConfigView();
@@ -321,9 +329,29 @@ public class OknoMigLayout extends JFrame{
 
         axisPanel.setBackground(new Color(168, 79, 25));
 
-        String[] axisOptions = { "Person", "Iteration"};
-        JComboBox cboxAxisOptions = new JComboBox(axisOptions);
-        axisPanel.add(cboxAxisOptions, "width 90%");
+        JComboBox<String> cboxAxisOptions = new JComboBox<String>();
+        cboxAxisOptions.addItem("Person");
+        for(Iterace iterace : iteraceList){
+            cboxAxisOptions.addItem(iterace.getName());
+        }
+        axisPanel.add(cboxAxisOptions, "width 90%, wrap");
+
+        UtilDateModel modelDatumOD = new UtilDateModel();
+        UtilDateModel modelDatumDO = new UtilDateModel();
+        Properties p = new Properties();
+        p.put("text.today", "Today");
+        p.put("text.month", "Month");
+        p.put("text.year", "Year");
+
+        JDatePanelImpl datumODPanel = new JDatePanelImpl(modelDatumOD, p);
+        JDatePanelImpl datumDOPanel = new JDatePanelImpl(modelDatumDO, p);
+        JDatePickerImpl dpDatumOD = new JDatePickerImpl(datumODPanel, new DateComponentFormatter());
+        JDatePickerImpl dpDatumDO = new JDatePickerImpl(datumDOPanel, new DateComponentFormatter());
+
+        axisPanel.add(dpDatumOD);
+//        axisPanel.add(dpDatumDO);
+
+
 
 
         bottomPanel.setBackground(Color.GRAY);
@@ -469,6 +497,7 @@ public class OknoMigLayout extends JFrame{
                 String condition = "";
                 String axisTable = "";
                 List<String> firstColumn = new ArrayList<>();
+                boolean isDate = true;
 
                 Component[] components = centerPanel.getComponents();
                 for(Component comp : components){
@@ -490,18 +519,27 @@ public class OknoMigLayout extends JFrame{
                 graphData.addNazvySloupcu("osa X");
 
                 if(axisTable.equals("Person")){
+                    isDate = false;
                     firstColumn = pohledDAO.nactiOsobyProProjekt(projekt.getID());
-                    for(String s : firstColumn){
-                        graphData.addDatum(s);
-                    }
-                } else if (axisTable.equals("Iteration")) {
-                    firstColumn = pohledDAO.nactiIteraceProProjekt(projekt.getID());
                     for(String s : firstColumn){
                         graphData.addDatum(s);
                     }
                 } else if (axisTable.equals("date")) {
                     firstColumn = pohledDAO.nactiDataProProjekt(projekt.getID());
                     for(String s : firstColumn){
+                        graphData.addDatum(s);
+                    }
+                } else {
+                    Iterace temp = null;
+                    for(Iterace iterace : iteraceList){
+                        if (iterace.getName().equals(axisTable)){
+                            temp = iterace;
+                            break;
+                        }
+                    }
+
+                    firstColumn = prepareDatesForIteration(temp);
+                    for (String s : firstColumn) {
                         graphData.addDatum(s);
                     }
                 }
@@ -520,7 +558,24 @@ public class OknoMigLayout extends JFrame{
                     String tableName = object.getString("table");
                     String aggregate = object.getString("aggregate");
                     String column = object.getString("column");
-                    String query = "SELECT personName, " + aggregate + "(" + column + ") FROM " + tableName + " WHERE ";
+                    String selection = "";
+
+//                    den, týden, měsíc, kvartál, rok - den - 1 date picker; týden a měsíc ne - 2 date pickery od do a je to; kavartál a rok nevím
+                    if(axisTable.equals("Person")) {
+                        selection = "personName";
+                    } else if(axisTable.equals("Day")){
+
+                    } else {
+                        List<Sloupec> sloupce = strukturyPohledu.get(tableName);
+                        for(Sloupec sloupec : sloupce){
+                            if(sloupec.getType().equals("datetime") || sloupec.getType().equals("date") ){
+                                selection = sloupec.getName();
+                                break;
+                            }
+                        }
+                    }
+
+                    String query = "SELECT " + selection + ", " + aggregate + "(" + column + ") FROM " + tableName + " WHERE ";
 
                     JSONArray atts = (JSONArray) object.get("attributes");
 
@@ -539,7 +594,7 @@ public class OknoMigLayout extends JFrame{
                         query += condition;
                     }
                     query += " AND projectId = " + projekt.getID();
-                    query += " GROUP BY personName;";
+                    query += " GROUP BY " + selection + ";";
 
 //                    switch(tableName){
 //                        case "artifactView":
@@ -565,7 +620,7 @@ public class OknoMigLayout extends JFrame{
 //                            break;
 //                    }
                     System.out.println(query);
-                    SloupecCustomGrafu sloupec = pohledDAO.dotaz(query, preparedVariableValues, firstColumn);
+                    SloupecCustomGrafu sloupec = pohledDAO.dotaz(query, preparedVariableValues, firstColumn, isDate);
                     graphData.addNazvySloupcu(sloupec.getName());
 
                     for(String s : sloupec.getData()){
@@ -655,6 +710,17 @@ public class OknoMigLayout extends JFrame{
         bottomPanel.add(saveBtn);
         bottomPanel.add(cancelBtn);
         bottomPanel.add(runQueryBtn);
+    }
+
+    private List<String> prepareDatesForIteration(Iterace iterace){
+        List<String> totalDates = new ArrayList<>();
+        LocalDate start = LocalDate.parse(iterace.getStartDate().toString());
+        LocalDate end = LocalDate.parse(iterace.getEndDate().toString());
+        while (!start.isAfter(end)) {
+            totalDates.add(start.toString());
+            start = start.plusDays(1);
+        }
+        return totalDates;
     }
 
     private JButton createButtonWithImage(String buttonOperation){
