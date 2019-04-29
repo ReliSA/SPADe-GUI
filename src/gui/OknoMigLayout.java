@@ -18,9 +18,15 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.*;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalField;
+import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,38 +44,51 @@ public class OknoMigLayout extends JFrame{
     private static String constantFolderPath = "zdroje\\konstanty\\";
     private static String queryFolderPath = "zdroje\\dotazy\\";
     private static String variableFolderPath = "zdroje\\promenne\\";
-    private static JButton addConstantBtn = new JButton("Add constant");
-    private static JButton addVariableBtn = new JButton("Add variable");
-    private static JButton addConstraintBtn = new JButton("Add constraint");
-    private static JButton createQueryBtn = new JButton("Create query");
-    private static JButton loadQueryBtn = new JButton("Load query");
-    private static JButton testVarQueryBtn = new JButton("Test query");
-    private static JButton runQueryBtn = new JButton("Run");
-    private static JButton goBackBtn = new JButton("Back");
-    private static JButton detectBtn = new JButton("Detect");
-    private static JButton showGraphBtn = new JButton("Show graph");
-    private static JPanel centerNorthPanel = new JPanel(new MigLayout());
-    private static JPanel centerPanel = new JPanel(new MigLayout("ins 0"));
-    private static JPanel centerTablePanel = new JPanel(new MigLayout("gap rel 0, ins 0"));
-    private static JPanel bottomPanel = new JPanel(new MigLayout());
-    private static JPanel axisPanel = new JPanel(new MigLayout());
+    private static JButton addConstantBtn;
+    private static JButton addVariableBtn;
+    private static JButton addConstraintBtn;
+    private static JButton createQueryBtn;
+    private static JButton loadQueryBtn;
+    private static JButton testVarQueryBtn;
+    private static JButton runQueryBtn;
+    private static JButton goBackBtn;
+    private static JButton detectBtn;
+    private static JButton showGraphBtn;
+    private static JButton saveBtn;
+    private static JButton cancelBtn;
+    private static JPanel centerNorthPanel;
+    private static JPanel centerPanel;
+    private static JPanel centerTablePanel;
+    private static JPanel bottomPanel;
+    private static JPanel axisPanel;
     private static JLabel lblName = new JLabel("Name");
     private static JLabel lblFromDate = new JLabel("From:");
     private static JLabel lblToDate = new JLabel("To:");
+    private static PohledDAO pohledDAO = new PohledDAO();
+    private static JPanel constantsPanel;
+    private static JPanel variablesPanel;
     private static JTextField varOrQueryNameTf = new JTextField(10);
     private JDatePickerImpl dpDatumOD;			//datum od
     private JDatePickerImpl dpDatumDO;			//datum do
+    private static JComboBox<String> cboxAxisOptions;
     private static List<Iterace> iteraceList = new ArrayList<>();
     private static final JFileChooser fileChooser = new JFileChooser();
     private static final Map<String, List<Sloupec>> strukturyPohledu = new TreeMap<>();
     private static List<ComboBoxItem> preparedVariableValues = new ArrayList<>();
     private SloupecCustomGrafu detected;
-    private List<ConstraintPanel> constraintPanels = new ArrayList<>();
+    private List<ConstraintPanel> constraintPanels;
     private int columnsNumber = 0;
 
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
+                try {
+                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(null , "Chyba");
+                    e.printStackTrace();
+                    System.exit(0);
+                }
                 try {
                     OknoMigLayout frame = new OknoMigLayout(new Projekt(12, null, null ,null));
                 } catch (Exception e) {
@@ -81,18 +100,37 @@ public class OknoMigLayout extends JFrame{
 
     public OknoMigLayout(Projekt projekt) {
 //        super(Konstanty.POPISY.getProperty("menuVytvorGraf"));
-//        if (instance != null)
-//            instance.dispose();
-//        instance = this;
+        if (instance != null)
+            instance.dispose();
+        instance = this;
         this.projekt = projekt;
 
         mainFrame = new JFrame();
         mainFrame.setLayout(new MigLayout());
         mainFrame.setBounds(100,100,1600,800);
         mainFrame.setVisible(true);
-        mainFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        PohledDAO pohledDAO = new PohledDAO();
+        addConstantBtn = new JButton("Add constant");
+        addVariableBtn = new JButton("Add variable");
+        addConstraintBtn = new JButton("Add constraint");
+        createQueryBtn = new JButton("Create query");
+        loadQueryBtn = new JButton("Load query");
+        testVarQueryBtn = new JButton("Test query");
+        runQueryBtn = new JButton("Run");
+        goBackBtn = new JButton("Back");
+        detectBtn = new JButton("Detect");
+        showGraphBtn = new JButton("Show graph");
+        saveBtn = new JButton("Save");
+        cancelBtn = new JButton("Cancel");
+        centerNorthPanel = new JPanel(new MigLayout());
+        centerPanel = new JPanel(new MigLayout("ins 0"));
+        centerTablePanel = new JPanel(new MigLayout("gap rel 0, ins 0"));
+        bottomPanel = new JPanel(new MigLayout());
+        axisPanel = new JPanel(new MigLayout());
+        constraintPanels = new ArrayList<>();
+        constantsPanel = new JPanel(new MigLayout());
+        variablesPanel = new JPanel(new MigLayout());
+
         PohledEnum[] pohledy = PohledEnum.values();
         List<Sloupec> sloupce;
 
@@ -110,9 +148,7 @@ public class OknoMigLayout extends JFrame{
 //        List<FieldChangeView> fieldChangeViews = pohledDAO.nactiFieldChangeView();
 //        List<WorkUnitView> workUnitViews = pohledDAO.nactiWorkUnitView();
 
-        JPanel constantsPanel = new JPanel(new MigLayout());
         constantsPanel.setBackground(Color.cyan);
-
         constantsPanel.add(addConstantBtn);
 
         File queryFolder = new File(queryFolderPath);
@@ -142,37 +178,8 @@ public class OknoMigLayout extends JFrame{
             }
         }
 
-        addConstantBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                FormularVytvoreniKonstanty constForm = new FormularVytvoreniKonstanty();
-                if(!constForm.wasCancelled()) {
-                    ComboBoxItem comboBoxItem = new ComboBoxItem(constForm.getConstName(), "konstanta",constForm.getConstValue());
-                    preparedVariableValues.add(comboBoxItem);
-                    System.out.println(preparedVariableValues);
-                    ConstantPanel constPanel = new ConstantPanel(constForm.getConstName(), constForm.getConstValue());
-                    String jsonString = new JSONObject()
-                            .put("name", constForm.getConstName())
-                            .put("value", constForm.getConstValue()).toString(2);
-                    Writer writer = null;
-                    try {
-                        writer = new BufferedWriter(new OutputStreamWriter(
-                                new FileOutputStream(constantFolderPath + constForm.getConstName() + ".json"), "utf-8"));
-                        writer.write(jsonString);
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    } finally {
-                        try {writer.close();} catch (Exception ex) {/*ignore*/}
-                    }
-                    constantsPanel.add(constPanel);
-                    constantsPanel.revalidate();
-                    constantsPanel.repaint();
-                }
-            }
-        });
-
         mainFrame.add(constantsPanel,"dock north");
 
-        JPanel variablesPanel = new JPanel(new MigLayout());
         variablesPanel.add(addVariableBtn);
 
         File variableFolder = new File(variableFolderPath);
@@ -198,29 +205,6 @@ public class OknoMigLayout extends JFrame{
             }
         }
 
-        addVariableBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                variableCreation = true;
-                centerPanel.removeAll();
-                centerNorthPanel.removeAll();
-
-                centerNorthPanel.add(addConstraintBtn);
-                centerNorthPanel.add(lblName);
-                centerNorthPanel.add(varOrQueryNameTf);
-                centerNorthPanel.add(testVarQueryBtn);
-
-                bottomPanel.remove(runQueryBtn);
-                bottomPanel.remove(detectBtn);
-                bottomPanel.remove(showGraphBtn);
-                mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
-
-                centerPanel.add(centerNorthPanel, "dock north, width 100%");
-
-                mainFrame.revalidate();
-                mainFrame.repaint();
-            }
-        });
-
         mainFrame.add(variablesPanel,"dock north");
 
         centerPanel.setBackground(Color.PINK);
@@ -230,117 +214,18 @@ public class OknoMigLayout extends JFrame{
         mainFrame.add(scrollFrame, "dock center");
 
         centerNorthPanel.setBackground(Color.orange);
-
-        addConstraintBtn.addActionListener(new ActionListener(){
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                FormularVytvoreniOmezeni constraintForm = new FormularVytvoreniOmezeni(strukturyPohledu, null, preparedVariableValues);
-                JSONObject attributes = constraintForm.getFormData();
-                if (!attributes.isEmpty()) {
-                    centerPanel.add(new ConstraintPanel(attributes, false), "dock west, height 800, width " + constraintPanelWidth);
-                    centerPanel.revalidate();
-                }
-            }
-        });
-
-        testVarQueryBtn.addActionListener(new ActionListener(){
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                testQuery();
-            }
-        });
-
-        createQueryBtn.addActionListener(new ActionListener(){
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                centerPanel.removeAll();
-                centerNorthPanel.removeAll();
-
-                centerNorthPanel.add(addConstraintBtn);
-                centerNorthPanel.add(lblName);
-                centerNorthPanel.add(varOrQueryNameTf);
-
-                centerPanel.add(centerNorthPanel, "dock north, width 100%");
-                centerPanel.add(axisPanel, "dock west, height 800, width " + constraintPanelWidth);
-
-                bottomPanel.add(runQueryBtn);
-                mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
-
-                mainFrame.revalidate();
-                mainFrame.repaint();
-            }
-        });
-
-        loadQueryBtn.addActionListener(new ActionListener(){
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                fileChooser.setCurrentDirectory(new File(queryFolderPath));
-                int returnVal = fileChooser.showOpenDialog(centerNorthPanel);
-
-                if (returnVal == JFileChooser.APPROVE_OPTION) {
-                    File file = fileChooser.getSelectedFile();
-
-                    centerPanel.removeAll();
-                    centerNorthPanel.removeAll();
-
-                    centerNorthPanel.add(addConstraintBtn);
-                    varOrQueryNameTf.setText(file.getName().substring(0, file.getName().indexOf('.')));
-                    centerNorthPanel.add(varOrQueryNameTf);
-
-                    centerPanel.add(centerNorthPanel, "dock north, width 100%");
-                    centerPanel.add(axisPanel, "dock west, height 800, width " + constraintPanelWidth);
-
-                    try {
-                        String content = FileUtils.readFileToString(file, "utf-8");
-                        JSONObject obj = new JSONObject(content);
-
-                        JComboBox axisCBox = (JComboBox) axisPanel.getComponent(0);
-                        axisCBox.setSelectedItem(obj.getString("axis"));
-
-                        JSONArray constraints = (JSONArray) obj.get("constraints");
-                        for (Object cons : constraints)
-                        {
-                            JSONObject object = (JSONObject) cons;
-                            ConstraintPanel panel = new ConstraintPanel(object, false);
-                            centerPanel.add(panel, "dock west, height 800, width " + constraintPanelWidth);
-                            centerPanel.revalidate();
-                            centerPanel.repaint();
-                        }
-                    } catch(IOException ex) {
-                        ex.printStackTrace();
-                    }
-
-                    bottomPanel.add(runQueryBtn);
-                    mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
-
-                    mainFrame.revalidate();
-                    mainFrame.repaint();
-                } else {
-                    // user cancelled the action - nothing happens
-                }
-            }
-
-        });
-
         centerNorthPanel.add(createQueryBtn);
         centerNorthPanel.add(loadQueryBtn);
-
         centerPanel.add(centerNorthPanel, "dock north, width 100%");
-
-
         axisPanel.setBackground(new Color(168, 79, 25));
 
-        JComboBox<String> cboxAxisOptions = new JComboBox<String>();
+        cboxAxisOptions = new JComboBox<String>();
         cboxAxisOptions.addItem("Person");
+        cboxAxisOptions.addItem("Iteration");
         cboxAxisOptions.addItem("Day");
-        cboxAxisOptions.addItem("Between");
-        for(Iterace iterace : iteraceList){
-            cboxAxisOptions.addItem(iterace.getName());
-        }
+        cboxAxisOptions.addItem("Week");
+        cboxAxisOptions.addItem("Month");
+        cboxAxisOptions.addItem("Year");
         axisPanel.add(cboxAxisOptions, "width 90%, wrap, span 3");
 
         UtilDateModel modelDatumOD = new UtilDateModel();
@@ -355,16 +240,45 @@ public class OknoMigLayout extends JFrame{
         dpDatumOD = new JDatePickerImpl(datumODPanel, new DateComponentFormatter());
         dpDatumDO = new JDatePickerImpl(datumDOPanel, new DateComponentFormatter());
 
+        bottomPanel.setBackground(Color.GRAY);
+        bottomPanel.add(saveBtn);
+        bottomPanel.add(cancelBtn);
+        bottomPanel.add(runQueryBtn);
+
+        nastavAkce();
+    }
+
+    private void nastavAkce(){
+        /* Akce pro zrušení rozdělané práce a vrácení se na defaultní obrazovku */
+        cancelBtn.addActionListener(new ActionListener(){
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                centerNorthPanel.removeAll();
+                centerPanel.removeAll();
+                bottomPanel.removeAll();
+                bottomPanel.add(cancelBtn);
+                bottomPanel.add(saveBtn);
+                mainFrame.remove(bottomPanel);
+
+                varOrQueryNameTf.setText("");
+                centerNorthPanel.add(createQueryBtn);
+                centerNorthPanel.add(loadQueryBtn);
+                centerPanel.add(centerNorthPanel, "dock north, width 100%");
+
+                mainFrame.revalidate();
+                mainFrame.repaint();
+            }
+        });
+
+        /* Akce měnící možnosti na ose X */
         cboxAxisOptions.addActionListener (new ActionListener () {
             public void actionPerformed(ActionEvent e) {
                 axisPanel.remove(lblFromDate);
                 axisPanel.remove(dpDatumOD);
                 axisPanel.remove(lblToDate);
                 axisPanel.remove(dpDatumDO);
-                if(cboxAxisOptions.getSelectedItem().equals("Day")){
-                    axisPanel.add(lblFromDate);
-                    axisPanel.add(dpDatumOD);
-                }else if(cboxAxisOptions.getSelectedItem().equals("Between")){
+                if(!cboxAxisOptions.getSelectedItem().equals("Person") && !cboxAxisOptions.getSelectedItem().equals("Iteration")){
                     axisPanel.add(lblFromDate);
                     axisPanel.add(dpDatumOD, "wrap");
                     axisPanel.add(lblToDate);
@@ -372,12 +286,36 @@ public class OknoMigLayout extends JFrame{
                 }
                 axisPanel.revalidate();
                 axisPanel.repaint();
+                if(constraintPanels.size() > 0) {
+                    JOptionPane.showMessageDialog(mainFrame, "Changing this may cause problem with joining columns", "Warning", JOptionPane.WARNING_MESSAGE);
+                }
             }
         });
 
-        bottomPanel.setBackground(Color.GRAY);
+        /* Akce pro vrácení se na vytváření dotazu */
+        goBackBtn.addActionListener(new ActionListener() {
 
-        JButton saveBtn = new JButton("Save");
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                centerPanel.remove(centerTablePanel);
+                centerPanel.add(axisPanel, "dock west, height 800");
+
+                for(ConstraintPanel panel : constraintPanels){
+                    centerPanel.add(panel, "dock west, width " + constraintPanelWidth);
+                }
+                constraintPanels.clear();
+
+                bottomPanel.remove(detectBtn);
+                bottomPanel.remove(showGraphBtn);
+                bottomPanel.remove(goBackBtn);
+                bottomPanel.add(runQueryBtn);
+
+                mainFrame.revalidate();
+                mainFrame.repaint();
+            }
+        });
+
+        /* Akce pro uložení dotazu do souboru */
         saveBtn.addActionListener(new ActionListener(){
 
             @Override
@@ -387,6 +325,20 @@ public class OknoMigLayout extends JFrame{
                 if (!variableCreation) {
                     file = new File(queryFolderPath + varOrQueryNameTf.getText() + ".json");
                     jsonObject.put("axis", (String) cboxAxisOptions.getSelectedItem());
+                    LocalDate datumOd;
+                    LocalDate datumDo;
+                    if(dpDatumOD.getModel().getValue() != null){
+                        datumOd = ((Date)dpDatumOD.getModel().getValue()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                    } else {
+                        datumOd = projekt.getDatumPocatku();
+                    }
+                    if(dpDatumDO.getModel().getValue() != null){
+                        datumDo = ((Date)dpDatumDO.getModel().getValue()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                    } else {
+                        datumDo = LocalDate.now();
+                    }
+                    jsonObject.put("dateFrom", datumOd);
+                    jsonObject.put("dateTo", datumDo);
                 } else {
                     file = new File(variableFolderPath + varOrQueryNameTf.getText() + ".json");
                 }
@@ -463,21 +415,99 @@ public class OknoMigLayout extends JFrame{
                 JOptionPane.showMessageDialog(null, "Save successful");
             }
         });
-        JButton cancelBtn = new JButton("Cancel");
-        cancelBtn.addActionListener(new ActionListener(){
+
+        /* Akce pro načtení uloženého dotazu ze souboru */
+        loadQueryBtn.addActionListener(new ActionListener(){
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                centerNorthPanel.removeAll();
-                centerPanel.removeAll();
-                bottomPanel.removeAll();
-                bottomPanel.add(cancelBtn);
-                bottomPanel.add(saveBtn);
-                mainFrame.remove(bottomPanel);
 
-                varOrQueryNameTf.setText("");
-                centerNorthPanel.add(createQueryBtn);
-                centerNorthPanel.add(loadQueryBtn);
+                fileChooser.setCurrentDirectory(new File(queryFolderPath));
+                int returnVal = fileChooser.showOpenDialog(centerNorthPanel);
+
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    File file = fileChooser.getSelectedFile();
+
+                    centerPanel.removeAll();
+                    centerNorthPanel.removeAll();
+
+                    centerNorthPanel.add(addConstraintBtn);
+                    varOrQueryNameTf.setText(file.getName().substring(0, file.getName().indexOf('.')));
+                    centerNorthPanel.add(varOrQueryNameTf);
+
+                    centerPanel.add(centerNorthPanel, "dock north, width 100%");
+                    centerPanel.add(axisPanel, "dock west, height 800, width " + constraintPanelWidth);
+
+                    try {
+                        String content = FileUtils.readFileToString(file, "utf-8");
+                        JSONObject obj = new JSONObject(content);
+
+                        JComboBox axisCBox = (JComboBox) axisPanel.getComponent(0);
+                        String axis = obj.getString("axis");
+                        String dateTo = obj.getString("dateTo");
+                        String dateFrom = obj.getString("dateFrom");
+                        axisCBox.setSelectedItem(axis);
+                        if(!axis.equals("Person") && !axis.equals("Iteration")){
+                            axisPanel.add(lblFromDate);
+                            axisPanel.add(dpDatumOD, "wrap");
+                            axisPanel.add(lblToDate);
+                            axisPanel.add(dpDatumDO);
+                            Integer year = Integer.parseInt(dateTo.substring(0, dateTo.indexOf('-')));
+                            Integer month = Integer.parseInt(dateTo.substring(dateTo.indexOf('-') + 1, dateTo.lastIndexOf('-')));
+                            Integer day = Integer.parseInt(dateTo.substring(dateTo.lastIndexOf('-') + 1, dateTo.length()));
+                            dpDatumOD.getModel().setDate(year, month - 1, day);
+                            dpDatumOD.getModel().setSelected(true);
+                            year = Integer.parseInt(dateFrom.substring(0, dateFrom.indexOf('-')));
+                            month = Integer.parseInt(dateFrom.substring(dateFrom.indexOf('-') + 1, dateFrom.lastIndexOf('-')));
+                            day = Integer.parseInt(dateFrom.substring(dateFrom.lastIndexOf('-') + 1, dateFrom.length()));
+                            dpDatumDO.getModel().setDate(year,month - 1 ,day);
+                            dpDatumDO.getModel().setSelected(true);
+                        }
+
+                        constraintPanels.clear();
+                        JSONArray constraints = (JSONArray) obj.get("constraints");
+                        for (Object cons : constraints)
+                        {
+                            JSONObject object = (JSONObject) cons;
+                            ConstraintPanel panel = new ConstraintPanel(object, false);
+                            constraintPanels.add(panel);
+                            centerPanel.add(panel, "dock west, height 800, width " + constraintPanelWidth);
+                            centerPanel.revalidate();
+                            centerPanel.repaint();
+                        }
+                    } catch(IOException ex) {
+                        ex.printStackTrace();
+                    }
+
+                    bottomPanel.add(runQueryBtn);
+                    mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
+
+                    mainFrame.revalidate();
+                    mainFrame.repaint();
+                } else {
+                    // user cancelled the action - nothing happens
+                }
+            }
+
+        });
+
+        /* Akce pro vytvoření proměnné */
+        addVariableBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                variableCreation = true;
+                centerPanel.removeAll();
+                centerNorthPanel.removeAll();
+
+                centerNorthPanel.add(addConstraintBtn);
+                centerNorthPanel.add(lblName);
+                centerNorthPanel.add(varOrQueryNameTf);
+                centerNorthPanel.add(testVarQueryBtn);
+
+                bottomPanel.remove(runQueryBtn);
+                bottomPanel.remove(detectBtn);
+                bottomPanel.remove(showGraphBtn);
+                mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
+
                 centerPanel.add(centerNorthPanel, "dock north, width 100%");
 
                 mainFrame.revalidate();
@@ -485,29 +515,83 @@ public class OknoMigLayout extends JFrame{
             }
         });
 
-        goBackBtn.addActionListener(new ActionListener() {
+        /* Akce pro vytvoření konstanty */
+        addConstantBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                FormularVytvoreniKonstanty constForm = new FormularVytvoreniKonstanty();
+                if(!constForm.wasCancelled()) {
+                    ComboBoxItem comboBoxItem = new ComboBoxItem(constForm.getConstName(), "konstanta",constForm.getConstValue());
+                    preparedVariableValues.add(comboBoxItem);
+                    System.out.println(preparedVariableValues);
+                    ConstantPanel constPanel = new ConstantPanel(constForm.getConstName(), constForm.getConstValue());
+                    String jsonString = new JSONObject()
+                            .put("name", constForm.getConstName())
+                            .put("value", constForm.getConstValue()).toString(2);
+                    Writer writer = null;
+                    try {
+                        writer = new BufferedWriter(new OutputStreamWriter(
+                                new FileOutputStream(constantFolderPath + constForm.getConstName() + ".json"), "utf-8"));
+                        writer.write(jsonString);
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    } finally {
+                        try {writer.close();} catch (Exception ex) {/*ignore*/}
+                    }
+                    constantsPanel.add(constPanel);
+                    constantsPanel.revalidate();
+                    constantsPanel.repaint();
+                }
+            }
+        });
+
+        /* Akce pro přidání omezení k dotazu */
+        addConstraintBtn.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                FormularVytvoreniOmezeni constraintForm = new FormularVytvoreniOmezeni(strukturyPohledu, null, preparedVariableValues);
+                JSONObject attributes = constraintForm.getFormData();
+                if (!attributes.isEmpty()) {
+                    ConstraintPanel constraintPanel = new ConstraintPanel(attributes, false);
+                    centerPanel.add(constraintPanel, "dock west, height 800, width " + constraintPanelWidth);
+                    constraintPanels.add(constraintPanel);
+                    centerPanel.revalidate();
+                }
+            }
+        });
+
+        /* Akce pro otestování vrácené hodnoty při vytváření proměnné */
+        testVarQueryBtn.addActionListener(new ActionListener(){
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                centerPanel.remove(centerTablePanel);
-                centerPanel.add(axisPanel, "dock west, height 800");
+                testQuery();
+            }
+        });
 
-                for(ConstraintPanel panel : constraintPanels){
-                    centerPanel.add(panel, "dock west, width " + constraintPanelWidth);
-                }
-                constraintPanels.clear();
+        /* Akce pro vytvoření nového dotazu */
+        createQueryBtn.addActionListener(new ActionListener(){
 
-                bottomPanel.remove(detectBtn);
-                bottomPanel.remove(showGraphBtn);
-                bottomPanel.remove(goBackBtn);
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                centerPanel.removeAll();
+                centerNorthPanel.removeAll();
+
+                centerNorthPanel.add(addConstraintBtn);
+                centerNorthPanel.add(lblName);
+                centerNorthPanel.add(varOrQueryNameTf);
+
+                centerPanel.add(centerNorthPanel, "dock north, width 100%");
+                centerPanel.add(axisPanel, "dock west, height 800, width " + constraintPanelWidth);
+
                 bottomPanel.add(runQueryBtn);
+                mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
 
                 mainFrame.revalidate();
                 mainFrame.repaint();
             }
         });
 
-
+        /* Akce pro spuštění dotazu a načtení dat do tabulky */
         runQueryBtn.addActionListener(new ActionListener(){
 
             @Override
@@ -515,10 +599,9 @@ public class OknoMigLayout extends JFrame{
                 int index = 2;
                 columnsNumber = 0;
                 constraintPanels.clear();
-                String condition = "";
+                String condition;
                 String axisTable = "";
                 List<String> firstColumn = new ArrayList<>();
-                boolean isDate = true;
 
                 Component[] components = centerPanel.getComponents();
                 for(Component comp : components){
@@ -537,91 +620,26 @@ public class OknoMigLayout extends JFrame{
 
 
                 graphData = new CustomGraf(constraintPanels.size() + 1);
-                graphData.addNazvySloupcu("osa X");
+                graphData.addNazvySloupcu(axisTable);
 
-                if(axisTable.equals("Person")){
-                    isDate = false;
-                    firstColumn = pohledDAO.nactiOsobyProProjekt(projekt.getID());
-                    for(String s : firstColumn){
-                        graphData.addDatum(s);
-                    }
-                } else if (axisTable.equals("Day")) {
-                    LocalDate datum;
-                    if(dpDatumOD.getModel().getValue() != null){
-                        datum = ((Date)dpDatumOD.getModel().getValue()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                        firstColumn.add(datum.toString());
-                    } else {
-                        firstColumn.add(LocalDate.now().toString());
-                    }
+                firstColumn = prepareGraphsFirstColumn(axisTable);
 
-                    for(String s : firstColumn){
-                        graphData.addDatum(s);
-                    }
-                } else if (axisTable.equals("Between")) {
-                    LocalDate datumOd = null;
-                    LocalDate datumDo = null;
-                    if(dpDatumOD.getModel().getValue() != null){
-                        datumOd = ((Date)dpDatumOD.getModel().getValue()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                    } else {
-                        datumOd = LocalDate.now();
-                    }
-                    if(dpDatumDO.getModel().getValue() != null){
-                        datumDo = ((Date)dpDatumDO.getModel().getValue()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                    } else {
-                        datumDo = LocalDate.now().plusDays(1);
-                    }
-                    firstColumn = prepareDatesBetween(datumOd, datumDo);
-
-                    for(String s : firstColumn){
-                        graphData.addDatum(s);
-                    }
-                } else {
-                    Iterace temp = null;
-                    for(Iterace iterace : iteraceList){
-                        if (iterace.getName().equals(axisTable)){
-                            temp = iterace;
-                            break;
-                        }
-                    }
-
-                    firstColumn = prepareDatesForIteration(temp);
-                    for (String s : firstColumn) {
-                        graphData.addDatum(s);
-                    }
-                }
-
-                SloupecCustomGrafu sl = new SloupecCustomGrafu(axisTable + " name", firstColumn, -1, preparedVariableValues, false);
+                SloupecCustomGrafu sl = new SloupecCustomGrafu(axisTable, firstColumn, -1, preparedVariableValues, false);
                 centerPanel.removeAll();
                 centerTablePanel.removeAll();
                 centerPanel.add(centerNorthPanel, "dock north");
                 centerTablePanel.add(sl, "dock west, grow");
                 columnsNumber++;
 
-                // dotaz nad jednou tabulkou bez ohledu na osu zatím - vytváření proměnných
                 for(ConstraintPanel panel : constraintPanels) {
                     columnsNumber++;
                     JSONObject object = panel.getJsonConstraint();
                     String tableName = object.getString("table");
                     String aggregate = object.getString("aggregate");
-                    String column = object.getString("column");
-                    String selection = "";
+                    String agrColumn = object.getString("agrColumn");
+                    String joinColumn = prepareDateFormat(axisTable, object.getString("joinColumn"));
 
-//                    den, týden, měsíc, kvartál, rok - den - 1 date picker; týden a měsíc ne - 2 date pickery od do a je to; kavartál a rok nevím
-                    if(axisTable.equals("Person")) {
-                        selection = "personName";
-                    } else if(axisTable.equals("Day")){
-
-                    } else {
-                        List<Sloupec> sloupce = strukturyPohledu.get(tableName);
-                        for(Sloupec sloupec : sloupce){
-                            if(sloupec.getType().equals("datetime") || sloupec.getType().equals("date") ){
-                                selection = sloupec.getName();
-                                break;
-                            }
-                        }
-                    }
-
-                    String query = "SELECT " + selection + ", " + aggregate + "(" + column + ") FROM " + tableName + " WHERE ";
+                    String query = "SELECT " + joinColumn + ", " + aggregate + "(" + agrColumn + ") FROM " + tableName + " WHERE ";
 
                     JSONArray atts = (JSONArray) object.get("attributes");
 
@@ -640,33 +658,16 @@ public class OknoMigLayout extends JFrame{
                         query += condition;
                     }
                     query += " AND projectId = " + projekt.getID();
-                    query += " GROUP BY " + selection + ";";
+                    query += " GROUP BY " + joinColumn + ";";
 
-//                    switch(tableName){
-//                        case "artifactView":
-//                            List<ArtifactView> artifactViews = pohledDAO.nactiArtifactView(query);
-//                            break;
-//                        case "configurationView":
-//                            List<ConfigurationView> configurationViews = pohledDAO.nactiConfigurationView(query);
-//                            break;
-//                        case "commitedConfigView":
-//                            List<CommitedConfigView> commitedConfigViews = pohledDAO.nactiCommitedConfigView(query);
-//                            break;
-//                        case "commitView":
-//                            List<CommitView> commitViews = pohledDAO.nactiCommitView(query);
-//                            break;
-//                        case "workUnitView":
-//                            List<WorkUnitView> workUnitViews = pohledDAO.nactiWorkUnitView(query);
-//                            break;
-//                        case "fieldChangeView":
-//                            List<FieldChangeView> fieldChangeViews = pohledDAO.nactiFieldChangeView(query);
-//                            break;
-//                        case "personView":
-//                            List<PersonView> personViews = pohledDAO.nactiPersonView(query);
-//                            break;
-//                    }
                     System.out.println(query);
-                    SloupecCustomGrafu sloupec = pohledDAO.dotaz(query, preparedVariableValues, firstColumn, isDate);
+                    List<List<String>> data = pohledDAO.dotaz(query, preparedVariableValues, firstColumn);
+                    SloupecCustomGrafu sloupec;
+                    if(axisTable.equals("Iteration")) {
+                        sloupec = mapData(data, firstColumn, tableName + "-(" + aggregate + ")" + agrColumn, true);
+                    } else {
+                        sloupec = mapData(data, firstColumn, tableName + "-(" + aggregate + ")" + agrColumn, false);
+                    }
                     graphData.addNazvySloupcu(sloupec.getName());
 
                     for(String s : sloupec.getData()){
@@ -693,6 +694,7 @@ public class OknoMigLayout extends JFrame{
 
         });
 
+        /* Akce pro detekci podle zadaných kritérií */
         detectBtn.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -702,7 +704,10 @@ public class OknoMigLayout extends JFrame{
                 Component[] components = centerTablePanel.getComponents();
                 for(Component comp : components){
                     if(comp instanceof SloupecCustomGrafu){
-                        sloupce.add((SloupecCustomGrafu) comp);
+                        SloupecCustomGrafu temp = (SloupecCustomGrafu) comp;
+                        if(temp.useColum() && temp.getDetectedValue().length() != 0) {
+                            sloupce.add(temp);
+                        }
                     }
                 }
                 if(!sloupce.isEmpty()){
@@ -728,6 +733,7 @@ public class OknoMigLayout extends JFrame{
                     detected = new SloupecCustomGrafu("detected", columnData, columnsNumber, preparedVariableValues, false);
                     centerTablePanel.add(detected, "dock west, grow");
 
+                    graphData.getDataSloupec(columnsNumber - 2).clear();
                     for(String s : columnData){
                         graphData.addData(columnsNumber, Double.parseDouble(s));
                     }
@@ -743,19 +749,119 @@ public class OknoMigLayout extends JFrame{
             }
         });
 
+        /* Akce pro zobrazení grafu */
         showGraphBtn.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                OknoCustomGraf okno = new OknoCustomGraf(graphData, projekt);
-                okno.setSize(800, 400);
-                okno.setLocationRelativeTo(null);
-                okno.setVisible(true);
+                if(detected.getData().size() == 0){
+                    JOptionPane.showMessageDialog(mainFrame,
+                            "You have to detect something.",
+                            "Warning",
+                            JOptionPane.WARNING_MESSAGE);
+                } else {
+                    OknoCustomGraf okno = new OknoCustomGraf(graphData, projekt);
+                    okno.setSize(800, 400);
+                    okno.setLocationRelativeTo(null);
+                    okno.setVisible(true);
+                }
             }
         });
+    }
 
-        bottomPanel.add(saveBtn);
-        bottomPanel.add(cancelBtn);
-        bottomPanel.add(runQueryBtn);
+    private SloupecCustomGrafu mapData(List<List<String>> data, List<String> firstColumn, String columnName, boolean iteration){
+        List<String> values = new ArrayList<>();
+        boolean found = false;
+
+        if(iteration) {
+            for (Iterace iterace : iteraceList) {
+                Integer sum = 0;
+                for (int i = 0; i < data.get(0).size(); i++) {
+                    LocalDate temp = LocalDate.parse(data.get(0).get(i));
+                    if (!temp.isBefore(iterace.getStartDate()) && !temp.isAfter(iterace.getEndDate())) {
+                        sum += Integer.parseInt(data.get(1).get(i));
+                    }
+                }
+                values.add(sum.toString());
+            }
+        } else {
+            for (String s : firstColumn) {
+                for (int i = 0; i < data.get(0).size(); i++) {
+                    if (s.equals(data.get(0).get(i))) {
+                        values.add(data.get(1).get(i));
+                        found = true;
+                    }
+                }
+                if (!found) {
+                    values.add("0");
+                }
+                found = false;
+            }
+        }
+        return new SloupecCustomGrafu(columnName, values, 1, preparedVariableValues, true);
+    }
+
+    private List<String> prepareGraphsFirstColumn(String axisTable) {
+        List<String> firstColumn = new ArrayList<>();
+        LocalDate datumOd;
+        LocalDate datumDo;
+        if (dpDatumOD.getModel().getValue() != null) {
+            datumOd = ((Date) dpDatumOD.getModel().getValue()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        } else {
+            datumOd = projekt.getDatumPocatku();
+        }
+        if (dpDatumDO.getModel().getValue() != null) {
+            datumDo = ((Date) dpDatumDO.getModel().getValue()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        } else {
+            datumDo = LocalDate.now();
+        }
+        switch (axisTable) {
+            case "Person":
+                firstColumn = pohledDAO.nactiOsobyProProjekt(projekt.getID());
+                break;
+            case "Iteration":
+                for (Iterace iterace : iteraceList) {
+                    firstColumn.add(iterace.getName());
+                }
+                break;
+            case "Day":
+                firstColumn = prepareDatesBetween(datumOd, datumDo);
+                break;
+            case "Week":
+                firstColumn = prepareWeeksBetween(datumOd, datumDo);
+                break;
+            case "Month":
+                firstColumn = prepareMonthsBetween(datumOd, datumDo);
+                break;
+            case "Year":
+                firstColumn = prepareYearBetween(datumOd, datumDo);
+                break;
+        }
+        for (String s : firstColumn) {
+            graphData.addDatum(s);
+        }
+
+        return firstColumn;
+    }
+
+    private String prepareDateFormat(String axisTable, String joinColumn) {
+        if(!axisTable.equals("Person")){
+            switch (axisTable){
+                case "Iteration":
+                case "Day":
+                    joinColumn = "DATE_FORMAT(" + joinColumn + ",\"%Y-%m-%d\")";
+                    break;
+                case "Week":
+                    joinColumn = "DATE_FORMAT(" + joinColumn + ",\"%Y-%u\")";
+                    break;
+                case "Month":
+                    joinColumn = "DATE_FORMAT(" + joinColumn + ",\"%Y-%m\")";
+                    break;
+                case "Year":
+                    joinColumn = "DATE_FORMAT(" + joinColumn + ",\"%Y\")";
+                    break;
+            }
+        }
+        return joinColumn;
     }
 
     private List<String> prepareDatesForIteration(Iterace iterace){
@@ -776,6 +882,50 @@ public class OknoMigLayout extends JFrame{
             datumOd = datumOd.plusDays(1);
         }
         return totalDates;
+    }
+
+    private List<String> prepareWeeksBetween(LocalDate dateFrom, LocalDate dateTo){
+        List<String> totalMonths = new ArrayList<>();
+        long weekCount = ChronoUnit.WEEKS.between(dateFrom, dateTo);
+
+        TemporalField woy = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
+        int week = dateFrom.get(woy);
+        int year = dateFrom.getYear();
+        while (weekCount >= 0) {
+            if(week == 53){
+                week = 1;
+                year++;
+            }
+            totalMonths.add(year + "-" + week);
+            week++;
+            weekCount--;
+        }
+        return totalMonths;
+    }
+
+    private List<String> prepareMonthsBetween(LocalDate dateFrom, LocalDate dateTo){
+        List<String> totalMonths = new ArrayList<>();
+        long monthCount = ChronoUnit.MONTHS.between(YearMonth.from(dateFrom), YearMonth.from(dateTo));
+        int month = dateFrom.getMonthValue();
+        int year = dateFrom.getYear();
+        while (monthCount > 0) {
+            if(month == 13){
+                month = 1;
+                year++;
+            }
+            totalMonths.add(year + "-" + month);
+            month++;
+            monthCount--;
+        }
+        return totalMonths;
+    }
+
+    private List<String> prepareYearBetween(LocalDate yearFrom, LocalDate yearTo){
+        List<String> totalYears = new ArrayList<>();
+        for (int i = yearFrom.getYear(); i <= yearTo.getYear(); i++){
+            totalYears.add(""+i);
+        }
+        return totalYears;
     }
 
     private JButton createButtonWithImage(String buttonOperation){
@@ -837,7 +987,7 @@ public class OknoMigLayout extends JFrame{
 
             String function = object.getString("aggregate");
             String tableName = object.getString("table");
-            String selectedColumn = object.getString("column");
+            String selectedColumn = object.getString("agrColumn");
             String query = "select " + function + "(" + selectedColumn + ") from " + tableName + " where ";
 
             JSONArray atts = (JSONArray) object.get("attributes");
@@ -1090,7 +1240,7 @@ public class OknoMigLayout extends JFrame{
                             JSONArray atts = (JSONArray) attributes.get("attributes");
                             for (Object attribute : atts) {
                                 JSONObject jsonObject = (JSONObject) attribute;
-                                JLabel lblName = new JLabel(jsonObject.getString("name") + jsonObject.getString("operator") + jsonObject.getString("value"));
+                                JLabel lblName = new JLabel(jsonObject.getString("name") + " " + jsonObject.getString("operator") + " " + jsonObject.getString("value"));
                                 add(lblName, "wrap, dock north");
                             }
                         }
@@ -1109,6 +1259,7 @@ public class OknoMigLayout extends JFrame{
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     thisPanel.getParent().remove(thisPanel);
+                    constraintPanels.remove(thisPanel);
                     mainFrame.revalidate();
                     mainFrame.repaint();
                 }

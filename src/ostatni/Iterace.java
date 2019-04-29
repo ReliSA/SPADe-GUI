@@ -4,29 +4,29 @@ import java.time.LocalDate;
 import java.util.Date;
 
 public class Iterace {
-    private Date startDate;
-    private Date endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private String name;
 
-    public Iterace(Date startDate, Date endDate, String name) {
+    public Iterace(LocalDate startDate, LocalDate endDate, String name) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.name = name;
     }
 
-    public Date getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 

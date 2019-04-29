@@ -34,18 +34,11 @@ public class PohledDAO {
         return totalRows ;
     }
 
-    public SloupecCustomGrafu dotaz(String query, List<ComboBoxItem> preparedVariableValues, List<String> firstColumn, boolean isDate){
+    public List<List<String>> dotaz(String query, List<ComboBoxItem> preparedVariableValues, List<String> firstColumn){
         Connection pripojeni;
         PreparedStatement stmt = null;
         ResultSet rs = null;
-        ArrayList<ArrayList<String>> data = new ArrayList<>();
-        List<String> nazvySloupcu = new ArrayList<>();
-        List<String> typySloupcu = new ArrayList<>();
-        SloupecCustomGrafu sloupec = null;
-        List<String> values = new ArrayList<>();
-        boolean found = false;
-        SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.s");
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        List<List<String>> data = new ArrayList<>();
 
         try {
             pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, name, pass);
@@ -57,10 +50,6 @@ public class PohledDAO {
                     rs = stmt.getResultSet();
                     ResultSetMetaData rsmd = rs.getMetaData();
                     int columnsNumber = rsmd.getColumnCount();
-                    for (int i = 1; i <= columnsNumber; i++) {
-                        nazvySloupcu.add(rsmd.getColumnName(i));
-                        typySloupcu.add(rsmd.getColumnTypeName(i));
-                    }
                     for (int i = 0; i < columnsNumber; i++) {
                         data.add(new ArrayList<String>());
                     }
@@ -73,27 +62,6 @@ public class PohledDAO {
                         System.out.println("------------------------------");
                     }
 
-                    if(isDate) {
-                        if(data.get(0).get(0).contains(" ")) {
-                            for (int i = 0; i < data.get(0).size(); i++) {
-                                data.get(0).set(i, data.get(0).get(i).substring(0, data.get(0).get(i).indexOf(' ')));
-                            }
-                        }
-                    }
-
-                    for(String s : firstColumn) {
-                        for(int i = 0; i < data.get(0).size(); i++){
-                            if(s.equals(data.get(0).get(i))){
-                                values.add(data.get(1).get(i));
-                                found = true;
-                            }
-                        }
-                        if(!found) {
-                            values.add("0");
-                        }
-                        found = false;
-                    }
-                    sloupec = new SloupecCustomGrafu(nazvySloupcu.get(1), values, 1, preparedVariableValues, true);
                     rs.close();
                 } else {
                     if (stmt.getUpdateCount() == -1) {
@@ -117,7 +85,7 @@ public class PohledDAO {
                 e.printStackTrace();
             }
         }
-        return sloupec;
+        return data;
     }
 
     public Long createVariable(String query){
@@ -194,7 +162,7 @@ public class PohledDAO {
 
             rs = stmt.executeQuery();
             while(rs.next()){
-                result.add(new Iterace(rs.getDate("startDate"), rs.getDate("endDate"), rs.getString("name")));
+                result.add(new Iterace(rs.getDate("startDate").toLocalDate(), rs.getDate("endDate").toLocalDate(), rs.getString("name")));
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null , "Chyba při spuštění skriptu větví nebo tagů konfigurací!");

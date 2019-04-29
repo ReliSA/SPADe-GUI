@@ -32,12 +32,13 @@ class FormularVytvoreniOmezeni extends JDialog
     private JPanel mainPanel = new JPanel();
     private int heightDifference = 30;
     private int attributeCount = 1;
-    private int windowHeight = 240;
+    private int windowHeight = 270;
     private int windowWidth = 600;
 
     private ButtonGroup btnGroupAggregate = new ButtonGroup();
     private JComboBox cboxTables = new JComboBox();
     private JComboBox cboxColumns = new JComboBox();
+    private JComboBox cboxJoinColumn = new JComboBox();
     private JTextField tfAttValue = new JTextField("Value");
 
     private FormularVytvoreniOmezeni parentForm;
@@ -49,7 +50,8 @@ class FormularVytvoreniOmezeni extends JDialog
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         String tableName = "";
         JLabel lblTable = new JLabel("Table");
-        JLabel lblColumn = new JLabel("Column");
+        JLabel lblAgrColumn = new JLabel("Agr Col");
+        JLabel lblJoinColumn = new JLabel("Join Col");
         JLabel lblCondition = new JLabel("Condition");
         JLabel lblAggregate = new JLabel("Aggregate");
         JTextField tfAttribute = new JTextField();
@@ -158,8 +160,14 @@ class FormularVytvoreniOmezeni extends JDialog
                 setSize(windowWidth,windowHeight);
 
                 cboxColumns.removeAllItems();
+                cboxJoinColumn.removeAllItems();
+                // join pres Person
+                cboxJoinColumn.addItem("personName");
                 for(Sloupec s : strukturaPohledu.get(cboxTables.getSelectedItem())){
                     cboxColumns.addItem(s.getName());
+                    if(s.getType().equals("datetime") || s.getType().equals("date")){
+                        cboxJoinColumn.addItem(s.getName());
+                    }
                 }
 
                 attributeList.clear();
@@ -176,15 +184,21 @@ class FormularVytvoreniOmezeni extends JDialog
             }
         });
 
+        cboxJoinColumn.addItem("personName");
         for (Sloupec s : strukturaPohledu.get(cboxTables.getSelectedItem())){
             cboxColumns.addItem(s.getName());
+            if(s.getType().equals("datetime") || s.getType().equals("date")){
+                cboxJoinColumn.addItem(s.getName());
+            }
         }
 
         mainPanel.add(lblDateHint, "wrap, span 3");
         mainPanel.add(lblWarningText, "wrap, span 3");
         mainPanel.add(lblTable, "w 50");
         mainPanel.add(cboxTables, "w 150, wrap");
-        mainPanel.add(lblColumn, "w 50");
+        mainPanel.add(lblJoinColumn, "w 50");
+        mainPanel.add(cboxJoinColumn, "w 150, wrap");
+        mainPanel.add(lblAgrColumn, "w 50");
         mainPanel.add(cboxColumns, "w 150, wrap");
         mainPanel.add(lblAggregate, "w 50");
         mainPanel.add(radioSum, "split 5");
@@ -202,7 +216,8 @@ class FormularVytvoreniOmezeni extends JDialog
                 }
             }
 
-            cboxColumns.setSelectedItem((String) constraint.getString("column"));
+            cboxJoinColumn.setSelectedItem((String) constraint.getString("joinColumn"));
+            cboxColumns.setSelectedItem((String) constraint.getString("agrColumn"));
 
             JSONArray atts = (JSONArray) constraint.get("attributes");
             for (Object attribute : atts) {
@@ -273,7 +288,8 @@ class FormularVytvoreniOmezeni extends JDialog
         JSONObject jsonConstraint = new JSONObject();
         if(!closed) {
             jsonConstraint.put("table", (String) cboxTables.getSelectedItem());
-            jsonConstraint.put("column", (String) cboxColumns.getSelectedItem());
+            jsonConstraint.put("joinColumn", (String) cboxJoinColumn.getSelectedItem());
+            jsonConstraint.put("agrColumn", (String) cboxColumns.getSelectedItem());
             for (Enumeration<AbstractButton> buttons = btnGroupAggregate.getElements(); buttons.hasMoreElements();) {
                 AbstractButton button = buttons.nextElement();
                 if (button.isSelected()) {
@@ -605,6 +621,10 @@ class FormularVytvoreniOmezeni extends JDialog
 
         public void setUseVariables(boolean useVariables) {
             this.useVariables = useVariables;
+        }
+
+        public String getJoinColumn(){
+            return (String) cboxJoinColumn.getSelectedItem();
         }
     }
 }

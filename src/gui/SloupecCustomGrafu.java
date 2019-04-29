@@ -14,7 +14,7 @@ import java.util.List;
 public class SloupecCustomGrafu extends JPanel {
     private JLabel lblNazev = new JLabel(); // popisek název
     private int index;
-    private List<String> data = new ArrayList<>();
+    private List<String> data;
     private JCheckBox useColumn = new JCheckBox();
     private JCheckBox useVariable = new JCheckBox();
     private JComboBox<String> operators = new JComboBox<>();
@@ -54,10 +54,10 @@ public class SloupecCustomGrafu extends JPanel {
         useVariable.addItemListener(new ItemListener() {
 
             public void itemStateChanged(ItemEvent e) {
+                remove(useColumn);
+                remove(useVariable);
+                remove(operators);
                 if(useVariable.isSelected()){
-                    remove(useColumn);
-                    remove(useVariable);
-                    remove(operators);
                     remove(tfValue);
                     remove(lblNazev);
                     add(useColumn);
@@ -68,22 +68,17 @@ public class SloupecCustomGrafu extends JPanel {
                     }
                     add(cboxVariableValues,"grow, span 3, wrap");
                     add(lblNazev, "grow, span 3, wrap");
-                    revalidate();
-                    repaint();
                 } else {
-                    remove(useColumn);
-                    remove(useVariable);
-                    remove(operators);
                     remove(cboxVariableValues);
                     tfValue.setText("");
                     add(useColumn);
                     add(useVariable);
                     add(operators, "wrap");
-                    add(tfValue, "grow, span 3, wrap, gapy 5");
+                    add(tfValue, "grow, span 3, wrap, gapy 9");
                     add(lblNazev, "grow, span 3, wrap");
-                    revalidate();
-                    repaint();
                 }
+                revalidate();
+                repaint();
             }
         });
 
@@ -91,7 +86,7 @@ public class SloupecCustomGrafu extends JPanel {
             this.add(useColumn);
             this.add(useVariable);
             this.add(operators, "wrap");
-            this.add(tfValue, "grow, span 3, wrap, gapy 5");
+            this.add(tfValue, "grow, span 3, wrap, gapy 9");
             this.add(this.lblNazev, "grow, span 3, wrap");
         } else {
             this.add(this.lblNazev, "grow, span 3, wrap, gapy 58");
