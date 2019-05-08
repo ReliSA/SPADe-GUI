@@ -81,7 +81,7 @@ class FormularVytvoreniDotazu extends JDialog
 
         this.add(scrollPane);
 
-        this.setSize(windowWidth,windowHeight);
+        this.setSize(windowWidth, windowHeight);
         this.setLocationRelativeTo(null);
         this.setTitle("Attributes");
 

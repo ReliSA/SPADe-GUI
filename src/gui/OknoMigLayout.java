@@ -73,7 +73,7 @@ public class OknoMigLayout extends JFrame{
     private static List<Iterace> iteraceList = new ArrayList<>();
     private static final JFileChooser fileChooser = new JFileChooser();
     private static final Map<String, List<Sloupec>> strukturyPohledu = new TreeMap<>();
-    private static List<ComboBoxItem> preparedVariableValues = new ArrayList<>();
+    private static List<ComboBoxItem> preparedVariableValues;
     private SloupecCustomGrafu detected;
     private List<ConstraintPanel> constraintPanels;
     private int columnsNumber = 0;
@@ -129,6 +129,7 @@ public class OknoMigLayout extends JFrame{
         constraintPanels = new ArrayList<>();
         constantsPanel = new JPanel(new MigLayout());
         variablesPanel = new JPanel(new MigLayout());
+        preparedVariableValues = new ArrayList<>();
 
         PohledEnum[] pohledy = PohledEnum.values();
         List<Sloupec> sloupce;
@@ -190,10 +191,11 @@ public class OknoMigLayout extends JFrame{
                 try {
                     String content = FileUtils.readFileToString(file, "utf-8");
                     String varName = file.getName().substring(0, file.getName().indexOf('.'));
-                    VariablePanel varPanel = new VariablePanel(varName, content);
                     JSONObject obj = new JSONObject(content);
-                    ComboBoxItem comboBoxItem = new ComboBoxItem(varName, "promenna", obj.getString("queryResult"));
+                    Long variableValue = testQuery(obj);
+                    ComboBoxItem comboBoxItem = new ComboBoxItem(varName, "promenna", variableValue + "");
                     preparedVariableValues.add(comboBoxItem);
+                    VariablePanel varPanel = new VariablePanel(varName, variableValue, content);
                     System.out.println(preparedVariableValues);
                     variablesPanel.add(varPanel);
                     variablesPanel.revalidate();
@@ -242,7 +244,6 @@ public class OknoMigLayout extends JFrame{
         bottomPanel.setBackground(Color.GRAY);
         bottomPanel.add(saveBtn);
         bottomPanel.add(cancelBtn);
-        bottomPanel.add(runQueryBtn);
 
         nastavAkce();
     }
@@ -253,6 +254,7 @@ public class OknoMigLayout extends JFrame{
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                constraintPanels.clear();
                 centerNorthPanel.removeAll();
                 centerPanel.removeAll();
                 bottomPanel.removeAll();
@@ -360,13 +362,36 @@ public class OknoMigLayout extends JFrame{
                     List<JSONObject> constList = new ArrayList<>();
 
                     int panelCount = 1;
+                    Long variableValue = null;
+
                     for (ConstraintPanel constPanel : constraintPanels) {
                         JSONObject jsonConstraint = constPanel.getJsonConstraint();
                         String columnName = constPanel.getColumnName().equals("") ? "Col" + panelCount : constPanel.getColumnName();
                         jsonConstraint.put("columnName", columnName);
                         if (variableCreation) {
-                            jsonObject = writeQueryResult(jsonObject);
-                            ComboBoxItem comboBoxItem = new ComboBoxItem(fileName, "promenna", jsonObject.getString("queryResult"));
+                            Component[] components = variablesPanel.getComponents();
+                            variableValue = testQuery(jsonConstraint);
+                            ComboBoxItem temp = null;
+
+                            for(Component comp : components){
+                                if(comp instanceof VariablePanel){
+                                    VariablePanel tempPanel = (VariablePanel) comp;
+                                    if(tempPanel.getName().equals(fileName)){
+                                        tempPanel.setLabel(fileName + " : " + variableValue);
+                                    }
+                                }
+                            }
+
+                            for(ComboBoxItem cbi : preparedVariableValues){
+                                if(cbi.getName().equals(fileName)){
+                                    temp = cbi;
+                                }
+                            }
+                            if(temp != null){
+                                preparedVariableValues.remove(temp);
+                            }
+
+                            ComboBoxItem comboBoxItem = new ComboBoxItem(fileName, "promenna", variableValue + "");
                             preparedVariableValues.add(comboBoxItem);
                             System.out.println(preparedVariableValues);
                         }
@@ -386,7 +411,7 @@ public class OknoMigLayout extends JFrame{
                                     .map(f -> f.getName().substring(0, f.getName().indexOf('.')))
                                     .collect(Collectors.toList());
                             if (!fileNames.contains(fileName)) {
-                                VariablePanel varPanel = new VariablePanel(fileName, result);
+                                VariablePanel varPanel = new VariablePanel(fileName, variableValue, result);
                                 variablesPanel.add(varPanel);
                                 variablesPanel.revalidate();
                                 variablesPanel.repaint();
@@ -419,6 +444,8 @@ public class OknoMigLayout extends JFrame{
                     centerNorthPanel.removeAll();
                     centerPanel.removeAll();
                     mainFrame.remove(bottomPanel);
+
+                    constraintPanels.clear();
 
                     varOrQueryNameTf.setText("");
                     centerNorthPanel.add(createQueryBtn);
@@ -579,10 +606,14 @@ public class OknoMigLayout extends JFrame{
 
         /* Akce pro otestování vrácené hodnoty při vytváření proměnné */
         testVarQueryBtn.addActionListener(new ActionListener(){
-
             @Override
             public void actionPerformed(ActionEvent e) {
-                testQuery();
+                if(constraintPanels.size() == 1) {
+                    Long result = testQuery(constraintPanels.get(0).getJsonConstraint());
+                    JOptionPane.showMessageDialog(mainFrame, "Query result is " + result, "Info", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(mainFrame, "There can be only 1 query for variable creation.", "Warning", JOptionPane.WARNING_MESSAGE);
+                }
             }
         });
 
@@ -616,6 +647,8 @@ public class OknoMigLayout extends JFrame{
             public void actionPerformed(ActionEvent e) {
                 if (!haveSameColumnNames(constraintPanels)) {
                     JOptionPane.showMessageDialog(mainFrame, "Every column has to have an unique name.", "Warning", JOptionPane.WARNING_MESSAGE);
+                } else if (constraintPanels.isEmpty()){
+                    JOptionPane.showMessageDialog(mainFrame, "There has to be at least 1 query to run.", "Warning", JOptionPane.WARNING_MESSAGE);
                 } else {
                     int index = 2;
                     columnsNumber = 0;
@@ -992,71 +1025,44 @@ public class OknoMigLayout extends JFrame{
         return button;
     }
 
-    private JSONObject writeQueryResult(JSONObject jsonConstraint){
-        Long result = testQuery();
-        if(result == null) {
-            jsonConstraint.put("queryResult", "NULL");
-        } else {
-            jsonConstraint.put("queryResult", result.toString());
-        }
-
-        return jsonConstraint;
-    }
-
-    private Long testQuery(){
+    private Long testQuery(JSONObject constraint){
         PohledDAO pohledDAO = new PohledDAO();
         String condition;
-        Long result = null;
-        Component[] components = centerPanel.getComponents();
-        List<ConstraintPanel> constraintPanels = new ArrayList<>();
-        for(Component comp : components){
-            if(comp instanceof ConstraintPanel){
-                constraintPanels.add((ConstraintPanel) comp);
-            }
-        }
-        // dotaz nad jednou tabulkou bez ohledu na osu - vytváření proměnných
-        if(constraintPanels.size() == 1) {
-            ConstraintPanel constraintPanel = constraintPanels.iterator().next();
-            JSONObject object = constraintPanel.getJsonConstraint();
+        Long result;
+        JSONObject object;
 
-            String function = object.getString("aggregate");
-            String tableName = object.getString("table");
-            String selectedColumn = object.getString("agrColumn");
-            String query = "select " + function + "(" + selectedColumn + ") from " + tableName + " where ";
-
-            JSONArray atts = (JSONArray) object.get("attributes");
-
-            Iterator<Object> iterator = atts.iterator();
-            while(iterator.hasNext()) {
-                JSONObject jsonObject = (JSONObject) iterator.next();
-                condition = jsonObject.getString("name") + " " + jsonObject.getString("operator") + " ";
-                if(jsonObject.getString("operator").equals("like")){
-                    condition += "\"" + jsonObject.getString("value") + "\"";
-                } else {
-                    condition += jsonObject.getString("value") ;
-                }
-                if (iterator.hasNext()) {
-                    condition += " AND ";
-                }
-                query += condition;
-            }
-            result = pohledDAO.createVariable(query);
-            if( result == null ) {
-                JOptionPane.showMessageDialog(mainFrame,
-                        "Query result is NULL",
-                        "Warning",
-                        JOptionPane.WARNING_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(mainFrame,
-                        "Query result is " + result);
-            }
-
+        if(constraint.has("constraints")) {
+            JSONArray constraintArray = constraint.getJSONArray("constraints");
+            Iterator<Object> objectIterator = constraintArray.iterator();
+            object = (JSONObject) objectIterator.next();
         } else {
-            JOptionPane.showMessageDialog(mainFrame,
-                    "Only 1 table queries are supported now.",
-                    "Warning",
-                    JOptionPane.WARNING_MESSAGE);
+            object = constraint;
         }
+
+        String function = object.getString("aggregate");
+        String tableName = object.getString("table");
+        String selectedColumn = object.getString("agrColumn");
+        String query = "select " + function + "(" + selectedColumn + ") from " + tableName + " where ";
+
+        JSONArray atts = (JSONArray) object.get("attributes");
+
+        Iterator<Object> iterator = atts.iterator();
+        while(iterator.hasNext()) {
+            JSONObject jsonObject = (JSONObject) iterator.next();
+            condition = jsonObject.getString("name") + " " + jsonObject.getString("operator") + " ";
+            if(jsonObject.getString("operator").equals("like")){
+                condition += "\"" + jsonObject.getString("value") + "\"";
+            } else {
+                condition += jsonObject.getString("value") ;
+            }
+            if (iterator.hasNext()) {
+                condition += " AND ";
+            }
+            query += condition;
+        }
+        query += " AND projectId = " + projekt.getID();
+        result = pohledDAO.createVariable(query);
+
         return result;
     }
 
@@ -1144,15 +1150,18 @@ public class OknoMigLayout extends JFrame{
     private class VariablePanel extends JPanel{
         VariablePanel thisPanel;
         String name;
+        Long value;
         String content;
+        JLabel label;
 
-        public VariablePanel(String varName, String varContent) {
+        public VariablePanel(String varName, Long varValue, String varContent) {
             super();
             thisPanel = this;
             name = varName;
+            value = varValue;
             content = varContent;
             this.setLayout(new MigLayout());
-            JLabel label = new JLabel(name);
+            label = new JLabel(name + " : " + varValue);
             this.add(label);
 
             Border border = BorderFactory.createLineBorder(Color.BLACK, 1);
@@ -1183,6 +1192,7 @@ public class OknoMigLayout extends JFrame{
                         JSONObject object = (JSONObject) cons;
 
                         ConstraintPanel panel = new ConstraintPanel(object, true);
+                        constraintPanels.add(panel);
                         centerPanel.add(panel, "dock west, height 100%, width " + constraintPanelWidth);
                     }
 
@@ -1220,6 +1230,10 @@ public class OknoMigLayout extends JFrame{
             return this.name;
         }
 
+        public void setLabel(String label){
+            this.label.setText(label);
+        }
+
         public void setContent(String content){
             this.content = content;
         }
@@ -1230,6 +1244,8 @@ public class OknoMigLayout extends JFrame{
         ConstraintPanel thisPanel;
         JSONObject constraints;
         JTextField columName;
+        JButton removeBtn;
+        JButton editBtn;
 
         public ConstraintPanel(JSONObject constraints, boolean editing) {
             super();
@@ -1264,32 +1280,47 @@ public class OknoMigLayout extends JFrame{
                 this.add(lblName, "wrap");
             }
 
-            JButton editBtn = new JButton("Edit");
+            editBtn = new JButton("Edit");
             editBtn.addActionListener(new ActionListener(){
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     JSONObject constraint = getJsonConstraint();
                     FormularVytvoreniDotazu form = new FormularVytvoreniDotazu(strukturyPohledu, constraint, preparedVariableValues);
-
+                    JSONObject attributes = form.getFormData();
+                    String columnName;
+                    if(constraint.has("columnName")) {
+                        columnName = constraint.getString("columnName");
+                        attributes.put("columnName", columnName);
+                    } else {
+                        columnName = "";
+                    }
                     if(!form.wasClosed()) {
-                        Component[] components = getComponents();
-                        for (int i = 0; i < components.length; i++) {
-                            if (components[i] instanceof JLabel) {
-                                remove(components[i]);
-                            }
-                        }
-                        JSONObject attributes = form.getFormData();
+                        thisPanel.removeAll();
+                        String tableName = attributes.getString("table");
+                        String agrColumn = attributes.getString("agrColumn");
+                        String aggregate = attributes.getString("aggregate");
+
+                        columName = new JTextField(columnName);
+                        add(columName, "wrap, width 100%");
+
+                        JLabel label1 = new JLabel("SELECT " + aggregate + "(" + agrColumn + ")");
+                        add(label1, "wrap");
+                        JLabel label2 = new JLabel("FROM " + tableName);
+                        add(label2, "wrap");
+                        JLabel label3 = new JLabel("WHERE");
+                        add(label3, "wrap");
+
                         if (!attributes.isEmpty()) {
-                            JLabel label = new JLabel(attributes.getString("table").toUpperCase());
-                            add(label, "wrap, dock north");
                             setAttributes(attributes);
                             JSONArray atts = (JSONArray) attributes.get("attributes");
                             for (Object attribute : atts) {
                                 JSONObject jsonObject = (JSONObject) attribute;
                                 JLabel lblName = new JLabel(jsonObject.getString("name") + " " + jsonObject.getString("operator") + " " + jsonObject.getString("value"));
-                                add(lblName, "wrap, dock north");
+                                add(lblName, "wrap");
                             }
                         }
+                        add(editBtn, "wrap");
+                        add(removeBtn);
                     }
                     setBorder(new EmptyBorder(10, 10, 10, 10));
                     centerPanel.revalidate();
@@ -1298,9 +1329,8 @@ public class OknoMigLayout extends JFrame{
                 }
 
             });
-            this.add(editBtn, "wrap");
 
-            JButton removeBtn = new JButton("Remove");
+            removeBtn = new JButton("Remove");
             removeBtn.addActionListener(new ActionListener(){
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -1311,6 +1341,8 @@ public class OknoMigLayout extends JFrame{
                 }
 
             });
+
+            this.add(editBtn, "wrap");
             this.add(removeBtn);
         }
 

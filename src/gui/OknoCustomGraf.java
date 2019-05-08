@@ -192,6 +192,10 @@ public class OknoCustomGraf extends JFrame {
 		lblOsoba.setHorizontalAlignment(JLabel.CENTER);
 		lblSql.setHorizontalAlignment(JLabel.CENTER);
 
+		controlPanel.removeAll();
+		controlPanel.add(lblNazevGrafu);
+		controlPanel.add(tfNazev);
+
 		this.add(controlPanel, BorderLayout.NORTH);
 		this.add(scrollDataPanel, BorderLayout.CENTER);
 
