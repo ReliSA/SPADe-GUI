@@ -319,110 +319,117 @@ public class OknoMigLayout extends JFrame{
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                File file;
-                String fileName = varOrQueryNameTf.getText();
-                if(fileName.equals("")){
-                    if(variableCreation){
-                        fileName = "Variable_";
-                    } else {
-                        fileName = "Query_";
-                    }
-                }
-                fileName += LocalDateTime.now();
-                fileName = fileName.replaceAll(":", "-");
-
-                JSONObject jsonObject = new JSONObject();
-                if (!variableCreation) {
-                    file = new File(queryFolderPath + fileName + ".json");
-                    jsonObject.put("axis", (String) cboxAxisOptions.getSelectedItem());
-                    LocalDate datumOd;
-                    LocalDate datumDo;
-                    if(dpDatumOD.getModel().getValue() != null){
-                        datumOd = ((Date)dpDatumOD.getModel().getValue()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                    } else {
-                        datumOd = projekt.getDatumPocatku();
-                    }
-                    if(dpDatumDO.getModel().getValue() != null){
-                        datumDo = ((Date)dpDatumDO.getModel().getValue()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                    } else {
-                        datumDo = LocalDate.now();
-                    }
-                    jsonObject.put("dateFrom", datumOd);
-                    jsonObject.put("dateTo", datumDo);
+                if (!haveSameColumnNames(constraintPanels)) {
+                    JOptionPane.showMessageDialog(mainFrame, "Every column has to have an unique name.", "Warning", JOptionPane.WARNING_MESSAGE);
                 } else {
-                    file = new File(variableFolderPath + fileName + ".json");
-                }
+                    File file;
+                    String fileName = varOrQueryNameTf.getText();
+                    if (fileName.equals("")) {
+                        if (variableCreation) {
+                            fileName = "Variable_";
+                        } else {
+                            fileName = "Query_";
+                        }
+                        fileName += LocalDateTime.now();
+                        fileName = fileName.replaceAll(":", "-");
+                    }
 
-                Component centerComponents[] = centerPanel.getComponents();
-                List<JSONObject> constList = new ArrayList<>();
+                    JSONObject jsonObject = new JSONObject();
+                    if (!variableCreation) {
+                        file = new File(queryFolderPath + fileName + ".json");
+                        jsonObject.put("axis", (String) cboxAxisOptions.getSelectedItem());
+                        LocalDate datumOd;
+                        LocalDate datumDo;
+                        if (dpDatumOD.getModel().getValue() != null) {
+                            datumOd = ((Date) dpDatumOD.getModel().getValue()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                        } else {
+                            datumOd = projekt.getDatumPocatku();
+                        }
+                        if (dpDatumDO.getModel().getValue() != null) {
+                            datumDo = ((Date) dpDatumDO.getModel().getValue()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                        } else {
+                            datumDo = LocalDate.now();
+                        }
+                        jsonObject.put("dateFrom", datumOd);
+                        jsonObject.put("dateTo", datumDo);
+                    } else {
+                        file = new File(variableFolderPath + fileName + ".json");
+                    }
 
-                for (Component component: centerComponents) {
-                    if(component instanceof ConstraintPanel) {
-                        ConstraintPanel constPanel = (ConstraintPanel) component;
+                    Component centerComponents[] = centerPanel.getComponents();
+                    List<JSONObject> constList = new ArrayList<>();
+
+                    int panelCount = 1;
+                    for (ConstraintPanel constPanel : constraintPanels) {
                         JSONObject jsonConstraint = constPanel.getJsonConstraint();
-                        if(variableCreation){
+                        String columnName = constPanel.getColumnName().equals("") ? "Col" + panelCount : constPanel.getColumnName();
+                        jsonConstraint.put("columnName", columnName);
+                        if (variableCreation) {
                             jsonObject = writeQueryResult(jsonObject);
                             ComboBoxItem comboBoxItem = new ComboBoxItem(fileName, "promenna", jsonObject.getString("queryResult"));
                             preparedVariableValues.add(comboBoxItem);
                             System.out.println(preparedVariableValues);
                         }
                         constList.add(jsonConstraint);
+                        panelCount++;
                     }
-                }
-                JSONObject[] constArray = new JSONObject[constList.size()];
-                constArray = constList.toArray(constArray);
-                jsonObject.put("constraints", constArray);
-                String result = jsonObject.toString(2);
-                if(variableCreation){
-                    File variableFolder = new File(variableFolderPath);
-                    File[] files = variableFolder.listFiles();
-                    if (files != null) {
-                        List<String> fileNames = Arrays.asList(files)
-                                .stream()
-                                .map(f -> f.getName().substring(0, f.getName().indexOf('.')))
-                                .collect(Collectors.toList());
-                        if(!fileNames.contains(fileName)){
-                            VariablePanel varPanel = new VariablePanel(fileName, result);
-                            variablesPanel.add(varPanel);
-                            variablesPanel.revalidate();
-                            variablesPanel.repaint();
-                        } else {
-                            Component[] components = variablesPanel.getComponents();
-                            for(Component comp :  components){
-                                if(comp instanceof VariablePanel){
-                                    VariablePanel varPanel = (VariablePanel) comp;
-                                    if(varPanel.getName().equals(varOrQueryNameTf.getText())) {
-                                        varPanel.setContent(result);
+                    JSONObject[] constArray = new JSONObject[constList.size()];
+                    constArray = constList.toArray(constArray);
+                    jsonObject.put("constraints", constArray);
+                    String result = jsonObject.toString(2);
+                    if (variableCreation) {
+                        File variableFolder = new File(variableFolderPath);
+                        File[] files = variableFolder.listFiles();
+                        if (files != null) {
+                            List<String> fileNames = Arrays.asList(files)
+                                    .stream()
+                                    .map(f -> f.getName().substring(0, f.getName().indexOf('.')))
+                                    .collect(Collectors.toList());
+                            if (!fileNames.contains(fileName)) {
+                                VariablePanel varPanel = new VariablePanel(fileName, result);
+                                variablesPanel.add(varPanel);
+                                variablesPanel.revalidate();
+                                variablesPanel.repaint();
+                            } else {
+                                Component[] components = variablesPanel.getComponents();
+                                for (Component comp : components) {
+                                    if (comp instanceof VariablePanel) {
+                                        VariablePanel varPanel = (VariablePanel) comp;
+                                        if (varPanel.getName().equals(varOrQueryNameTf.getText())) {
+                                            varPanel.setContent(result);
+                                        }
                                     }
                                 }
                             }
                         }
+                        variableCreation = false;
                     }
-                    variableCreation = false;
+                    Writer writer = null;
+                    try {
+                        writer = new BufferedWriter(new OutputStreamWriter(
+                                new FileOutputStream(file), "utf-8"));
+                        writer.write(result);
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    } finally {
+                        try {
+                            writer.close();
+                        } catch (Exception ex) {/*ignore*/}
+                    }
+                    centerNorthPanel.removeAll();
+                    centerPanel.removeAll();
+                    mainFrame.remove(bottomPanel);
+
+                    varOrQueryNameTf.setText("");
+                    centerNorthPanel.add(createQueryBtn);
+                    centerNorthPanel.add(loadQueryBtn);
+                    centerPanel.add(centerNorthPanel, "dock north, width 100%");
+
+                    mainFrame.revalidate();
+                    mainFrame.repaint();
+
+                    JOptionPane.showMessageDialog(null, "Save successful");
                 }
-                Writer writer = null;
-                try {
-                    writer = new BufferedWriter(new OutputStreamWriter(
-                            new FileOutputStream(file), "utf-8"));
-                    writer.write(result);
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                } finally {
-                    try {writer.close();} catch (Exception ex) {/*ignore*/}
-                }
-                centerNorthPanel.removeAll();
-                centerPanel.removeAll();
-                mainFrame.remove(bottomPanel);
-
-                varOrQueryNameTf.setText("");
-                centerNorthPanel.add(createQueryBtn);
-                centerNorthPanel.add(loadQueryBtn);
-                centerPanel.add(centerNorthPanel, "dock north, width 100%");
-
-                mainFrame.revalidate();
-                mainFrame.repaint();
-
-                JOptionPane.showMessageDialog(null, "Save successful");
             }
         });
 
@@ -607,102 +614,106 @@ public class OknoMigLayout extends JFrame{
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                int index = 2;
-                columnsNumber = 0;
-                constraintPanels.clear();
-                String condition;
-                String axisTable = "";
-                List<String> firstColumn = new ArrayList<>();
+                if (!haveSameColumnNames(constraintPanels)) {
+                    JOptionPane.showMessageDialog(mainFrame, "Every column has to have an unique name.", "Warning", JOptionPane.WARNING_MESSAGE);
+                } else {
+                    int index = 2;
+                    columnsNumber = 0;
+                    constraintPanels.clear();
+                    String condition;
+                    String axisTable = "";
+                    List<String> firstColumn = new ArrayList<>();
 
-                Component[] components = centerPanel.getComponents();
-                for(Component comp : components){
-                    if(comp instanceof ConstraintPanel){
-                        constraintPanels.add((ConstraintPanel) comp);
-                    } else if (comp instanceof JPanel) {
-                        JPanel axisPanel = (JPanel) comp;
-                        for(Component component : axisPanel.getComponents()){
-                            if(component instanceof JComboBox){
-                                JComboBox cBox = (JComboBox) component;
-                                axisTable = ((String) cBox.getSelectedItem());
+                    Component[] components = centerPanel.getComponents();
+                    for (Component comp : components) {
+                        if (comp instanceof ConstraintPanel) {
+                            constraintPanels.add((ConstraintPanel) comp);
+                        } else if (comp instanceof JPanel) {
+                            JPanel axisPanel = (JPanel) comp;
+                            for (Component component : axisPanel.getComponents()) {
+                                if (component instanceof JComboBox) {
+                                    JComboBox cBox = (JComboBox) component;
+                                    axisTable = ((String) cBox.getSelectedItem());
+                                }
                             }
                         }
                     }
-                }
 
 
-                graphData = new CustomGraf(constraintPanels.size() + 1);
-                graphData.addNazvySloupcu(axisTable);
+                    graphData = new CustomGraf(constraintPanels.size() + 1);
+                    graphData.addNazvySloupcu(axisTable);
 
-                firstColumn = prepareGraphsFirstColumn(axisTable);
+                    firstColumn = prepareGraphsFirstColumn(axisTable);
 
-                SloupecCustomGrafu sl = new SloupecCustomGrafu(axisTable, firstColumn, -1, preparedVariableValues, false);
-                centerPanel.removeAll();
-                centerTablePanel.removeAll();
-                centerPanel.add(centerNorthPanel, "dock north");
-                centerTablePanel.add(sl, "dock west, grow");
-                columnsNumber++;
-
-                for(ConstraintPanel panel : constraintPanels) {
+                    SloupecCustomGrafu sl = new SloupecCustomGrafu(axisTable, firstColumn, -1, preparedVariableValues, false);
+                    centerPanel.removeAll();
+                    centerTablePanel.removeAll();
+                    centerPanel.add(centerNorthPanel, "dock north");
+                    centerTablePanel.add(sl, "dock west, grow");
                     columnsNumber++;
-                    JSONObject object = panel.getJsonConstraint();
-                    String tableName = object.getString("table");
-                    String aggregate = object.getString("aggregate");
-                    String agrColumn = object.getString("agrColumn");
-                    String joinColumn = prepareDateFormat(axisTable, object.getString("joinColumn"));
 
-                    String query = "SELECT " + joinColumn + ", " + aggregate + "(" + agrColumn + ") FROM " + tableName + " WHERE ";
+                    for (ConstraintPanel panel : constraintPanels) {
+                        columnsNumber++;
+                        JSONObject object = panel.getJsonConstraint();
+                        String tableName = object.getString("table");
+                        String aggregate = object.getString("aggregate");
+                        String agrColumn = object.getString("agrColumn");
+                        String joinColumn = prepareDateFormat(axisTable, object.getString("joinColumn"));
 
-                    JSONArray atts = (JSONArray) object.get("attributes");
+                        String query = "SELECT " + joinColumn + ", " + aggregate + "(" + agrColumn + ") FROM " + tableName + " WHERE ";
 
-                    Iterator<Object> iterator = atts.iterator();
-                    while(iterator.hasNext()) {
-                        JSONObject jsonObject = (JSONObject) iterator.next();
-                        condition = jsonObject.getString("name") + " " + jsonObject.getString("operator") + " ";
-                        if(jsonObject.getString("operator").equals("like")){
-                            condition += "\"" + jsonObject.getString("value") + "\"";
+                        JSONArray atts = (JSONArray) object.get("attributes");
+
+                        Iterator<Object> iterator = atts.iterator();
+                        while (iterator.hasNext()) {
+                            JSONObject jsonObject = (JSONObject) iterator.next();
+                            condition = jsonObject.getString("name") + " " + jsonObject.getString("operator") + " ";
+                            if (jsonObject.getString("operator").equals("like")) {
+                                condition += "\"" + jsonObject.getString("value") + "\"";
+                            } else {
+                                condition += jsonObject.getString("value");
+                            }
+                            if (iterator.hasNext()) {
+                                condition += " AND ";
+                            }
+                            query += condition;
+                        }
+                        query += " AND projectId = " + projekt.getID();
+                        query += " GROUP BY " + joinColumn + ";";
+
+                        System.out.println(query);
+                        List<List<String>> data = pohledDAO.dotaz(query, preparedVariableValues, firstColumn);
+                        String columnName = panel.getColumnName().equals("") ? "Col" + columnsNumber : panel.getColumnName();
+                        SloupecCustomGrafu sloupec;
+                        if (axisTable.equals("Iteration")) {
+                            sloupec = mapData(data, firstColumn, columnName, true);
                         } else {
-                            condition += jsonObject.getString("value") ;
+                            sloupec = mapData(data, firstColumn, columnName, false);
                         }
-                        if (iterator.hasNext()) {
-                            condition += " AND ";
+                        graphData.addNazvySloupcu(columnName);
+
+                        for (String s : sloupec.getData()) {
+                            graphData.addData(index, Double.parseDouble(s));
                         }
-                        query += condition;
-                    }
-                    query += " AND projectId = " + projekt.getID();
-                    query += " GROUP BY " + joinColumn + ";";
+                        index++;
 
-                    System.out.println(query);
-                    List<List<String>> data = pohledDAO.dotaz(query, preparedVariableValues, firstColumn);
-                    SloupecCustomGrafu sloupec;
-                    if(axisTable.equals("Iteration")) {
-                        sloupec = mapData(data, firstColumn, tableName + "-(" + aggregate + ")" + agrColumn, true);
-                    } else {
-                        sloupec = mapData(data, firstColumn, tableName + "-(" + aggregate + ")" + agrColumn, false);
+                        centerTablePanel.add(sloupec, "dock west, grow");
                     }
-                    graphData.addNazvySloupcu("col"+columnsNumber);
+                    columnsNumber++;
+                    detected = new SloupecCustomGrafu("detected", new ArrayList<>(), columnsNumber, preparedVariableValues, false);
+                    centerTablePanel.add(detected, "dock west, grow");
 
-                    for(String s : sloupec.getData()){
-                        graphData.addData(index, Double.parseDouble(s));
-                    }
-                    index++;
+                    graphData.addNazvySloupcu("detected");
 
-                    centerTablePanel.add(sloupec, "dock west, grow");
+                    centerPanel.add(centerTablePanel, "grow");
+                    bottomPanel.remove(runQueryBtn);
+                    bottomPanel.add(detectBtn);
+                    bottomPanel.add(goBackBtn);
+                    bottomPanel.add(showGraphBtn);
+                    mainFrame.revalidate();
+                    mainFrame.repaint();
                 }
-                columnsNumber++;
-                detected = new SloupecCustomGrafu("detected", new ArrayList<>(), columnsNumber, preparedVariableValues, false);
-                centerTablePanel.add(detected, "dock west, grow");
-
-                graphData.addNazvySloupcu("detected");
-
-                centerPanel.add(centerTablePanel, "grow");
-                bottomPanel.remove(runQueryBtn);
-                bottomPanel.add(detectBtn);
-                bottomPanel.add(goBackBtn);
-                bottomPanel.add(showGraphBtn);
-                mainFrame.revalidate();
-                mainFrame.repaint();
             }
-
         });
 
         /* Akce pro detekci podle zadaných kritérií */
@@ -777,6 +788,18 @@ public class OknoMigLayout extends JFrame{
                 }
             }
         });
+    }
+
+    private boolean haveSameColumnNames(List<ConstraintPanel> panels){
+        Set<String> nameSet = new HashSet<>();
+        boolean result = true;
+        for(ConstraintPanel panel : panels){
+            nameSet.add(panel.getColumnName().trim());
+        }
+        if(nameSet.size() < panels.size()){
+            result = false;
+        }
+        return result;
     }
 
     private SloupecCustomGrafu mapData(List<List<String>> data, List<String> firstColumn, String columnName, boolean iteration){
@@ -1206,21 +1229,38 @@ public class OknoMigLayout extends JFrame{
 
         ConstraintPanel thisPanel;
         JSONObject constraints;
+        JTextField columName;
 
         public ConstraintPanel(JSONObject constraints, boolean editing) {
             super();
             thisPanel = this;
             this.constraints = constraints;
-            String tableName = constraints.getString("table");
-
             this.setLayout(new MigLayout());
-            JLabel label = new JLabel(tableName.toUpperCase());
-            this.add(label, "wrap");
+
+            String tableName = constraints.getString("table");
+            String agrColumn = constraints.getString("agrColumn");
+            String aggregate = constraints.getString("aggregate");
+            String columnName;
+            if(constraints.has("columnName")) {
+                columnName = constraints.getString("columnName");
+            } else {
+                columnName = "";
+            }
+
+            columName = new JTextField(columnName);
+            this.add(columName, "wrap, width 100%");
+
+            JLabel label1 = new JLabel("SELECT " + aggregate + "(" + agrColumn + ")");
+            this.add(label1, "wrap");
+            JLabel label2 = new JLabel("FROM " + tableName);
+            this.add(label2, "wrap");
+            JLabel label3 = new JLabel("WHERE");
+            this.add(label3, "wrap");
 
             JSONArray attributes = (JSONArray) constraints.get("attributes");
             for(Object attribute: attributes){
                 JSONObject jsonObject = (JSONObject) attribute;
-                JLabel lblName = new JLabel(jsonObject.getString("name") + jsonObject.getString("operator") + jsonObject.getString("value"));
+                JLabel lblName = new JLabel(jsonObject.getString("name") + " " + jsonObject.getString("operator") + " " + jsonObject.getString("value"));
                 this.add(lblName, "wrap");
             }
 
@@ -1280,6 +1320,10 @@ public class OknoMigLayout extends JFrame{
 
         public JSONObject getJsonConstraint() {
             return this.constraints;
+        }
+
+        public String getColumnName(){
+            return columName.getText();
         }
     }
 }
