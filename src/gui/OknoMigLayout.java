@@ -35,7 +35,7 @@ import org.json.*;
 public class OknoMigLayout extends JFrame{
 
     public static OknoMigLayout instance;
-    private static int constraintPanelWidth = 200;
+    private static int queryPanelWidth = 200;
     private static boolean variableCreation = false;
     private static JFrame mainFrame;
     private Projekt projekt;
@@ -45,7 +45,7 @@ public class OknoMigLayout extends JFrame{
     private static String variableFolderPath = "zdroje\\promenne\\";
     private static JButton addConstantBtn;
     private static JButton addVariableBtn;
-    private static JButton addConstraintBtn;
+    private static JButton addQueryBtn;
     private static JButton createQueryBtn;
     private static JButton loadQueryBtn;
     private static JButton testVarQueryBtn;
@@ -75,7 +75,7 @@ public class OknoMigLayout extends JFrame{
     private static final Map<String, List<Sloupec>> strukturyPohledu = new TreeMap<>();
     private static List<ComboBoxItem> preparedVariableValues;
     private SloupecCustomGrafu detected;
-    private List<ConstraintPanel> constraintPanels;
+    private List<QueryPanel> queryPanels;
     private int columnsNumber = 0;
 
     public static void main(String[] args) {
@@ -111,7 +111,7 @@ public class OknoMigLayout extends JFrame{
 
         addConstantBtn = new JButton("Add constant");
         addVariableBtn = new JButton("Add variable");
-        addConstraintBtn = new JButton("Add constraint");
+        addQueryBtn = new JButton("Add query");
         createQueryBtn = new JButton("Create query");
         loadQueryBtn = new JButton("Load query");
         testVarQueryBtn = new JButton("Test query");
@@ -126,7 +126,7 @@ public class OknoMigLayout extends JFrame{
         centerTablePanel = new JPanel(new MigLayout("gap rel 0, ins 0"));
         bottomPanel = new JPanel(new MigLayout());
         axisPanel = new JPanel(new MigLayout());
-        constraintPanels = new ArrayList<>();
+        queryPanels = new ArrayList<>();
         constantsPanel = new JPanel(new MigLayout());
         variablesPanel = new JPanel(new MigLayout());
         preparedVariableValues = new ArrayList<>();
@@ -254,7 +254,7 @@ public class OknoMigLayout extends JFrame{
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                constraintPanels.clear();
+                queryPanels.clear();
                 centerNorthPanel.removeAll();
                 centerPanel.removeAll();
                 bottomPanel.removeAll();
@@ -287,7 +287,7 @@ public class OknoMigLayout extends JFrame{
                 }
                 axisPanel.revalidate();
                 axisPanel.repaint();
-                if(constraintPanels.size() > 0) {
+                if(queryPanels.size() > 0) {
                     JOptionPane.showMessageDialog(mainFrame, "Changing this may cause problem with joining columns", "Warning", JOptionPane.WARNING_MESSAGE);
                 }
             }
@@ -301,10 +301,10 @@ public class OknoMigLayout extends JFrame{
                 centerPanel.remove(centerTablePanel);
                 centerPanel.add(axisPanel, "dock west, height 800");
 
-                for(ConstraintPanel panel : constraintPanels){
-                    centerPanel.add(panel, "dock west, width " + constraintPanelWidth);
+                for(QueryPanel panel : queryPanels){
+                    centerPanel.add(panel, "dock west, width " + queryPanelWidth);
                 }
-                constraintPanels.clear();
+                queryPanels.clear();
 
                 bottomPanel.remove(detectBtn);
                 bottomPanel.remove(showGraphBtn);
@@ -321,7 +321,7 @@ public class OknoMigLayout extends JFrame{
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (!haveSameColumnNames(constraintPanels)) {
+                if (!haveSameColumnNames(queryPanels)) {
                     JOptionPane.showMessageDialog(mainFrame, "Every column has to have an unique name.", "Warning", JOptionPane.WARNING_MESSAGE);
                 } else {
                     File file;
@@ -364,13 +364,13 @@ public class OknoMigLayout extends JFrame{
                     int panelCount = 1;
                     Long variableValue = null;
 
-                    for (ConstraintPanel constPanel : constraintPanels) {
-                        JSONObject jsonConstraint = constPanel.getJsonConstraint();
-                        String columnName = constPanel.getColumnName().equals("") ? "Col" + panelCount : constPanel.getColumnName();
-                        jsonConstraint.put("columnName", columnName);
+                    for (QueryPanel queryPanel : queryPanels) {
+                        JSONObject query  = queryPanel.getQuery();
+                        String columnName = queryPanel.getColumnName().equals("") ? "Col" + panelCount : queryPanel.getColumnName();
+                        query.put("columnName", columnName);
                         if (variableCreation) {
                             Component[] components = variablesPanel.getComponents();
-                            variableValue = testQuery(jsonConstraint);
+                            variableValue = testQuery(query);
                             ComboBoxItem temp = null;
 
                             for(Component comp : components){
@@ -395,12 +395,12 @@ public class OknoMigLayout extends JFrame{
                             preparedVariableValues.add(comboBoxItem);
                             System.out.println(preparedVariableValues);
                         }
-                        constList.add(jsonConstraint);
+                        constList.add(query);
                         panelCount++;
                     }
                     JSONObject[] constArray = new JSONObject[constList.size()];
                     constArray = constList.toArray(constArray);
-                    jsonObject.put("constraints", constArray);
+                    jsonObject.put("queries", constArray);
                     String result = jsonObject.toString(2);
                     if (variableCreation) {
                         File variableFolder = new File(variableFolderPath);
@@ -445,7 +445,7 @@ public class OknoMigLayout extends JFrame{
                     centerPanel.removeAll();
                     mainFrame.remove(bottomPanel);
 
-                    constraintPanels.clear();
+                    queryPanels.clear();
 
                     varOrQueryNameTf.setText("");
                     centerNorthPanel.add(createQueryBtn);
@@ -475,12 +475,12 @@ public class OknoMigLayout extends JFrame{
                     centerPanel.removeAll();
                     centerNorthPanel.removeAll();
 
-                    centerNorthPanel.add(addConstraintBtn);
+                    centerNorthPanel.add(addQueryBtn);
                     varOrQueryNameTf.setText(file.getName().substring(0, file.getName().indexOf('.')));
                     centerNorthPanel.add(varOrQueryNameTf);
 
                     centerPanel.add(centerNorthPanel, "dock north, width 100%");
-                    centerPanel.add(axisPanel, "dock west, height 800, width " + constraintPanelWidth);
+                    centerPanel.add(axisPanel, "dock west, height 800, width " + queryPanelWidth);
 
                     try {
                         String content = FileUtils.readFileToString(file, "utf-8");
@@ -508,14 +508,14 @@ public class OknoMigLayout extends JFrame{
                             dpDatumOD.getModel().setSelected(true);
                         }
 
-                        constraintPanels.clear();
-                        JSONArray constraints = (JSONArray) obj.get("constraints");
-                        for (Object cons : constraints)
+                        queryPanels.clear();
+                        JSONArray queries = (JSONArray) obj.get("queries");
+                        for (Object object : queries)
                         {
-                            JSONObject object = (JSONObject) cons;
-                            ConstraintPanel panel = new ConstraintPanel(object, false);
-                            constraintPanels.add(panel);
-                            centerPanel.add(panel, "dock west, height 800, width " + constraintPanelWidth);
+                            JSONObject query = (JSONObject) object;
+                            QueryPanel panel = new QueryPanel(query, false);
+                            queryPanels.add(panel);
+                            centerPanel.add(panel, "dock west, height 800, width " + queryPanelWidth);
                             centerPanel.revalidate();
                             centerPanel.repaint();
                         }
@@ -542,7 +542,7 @@ public class OknoMigLayout extends JFrame{
                 centerPanel.removeAll();
                 centerNorthPanel.removeAll();
 
-                centerNorthPanel.add(addConstraintBtn);
+                centerNorthPanel.add(addQueryBtn);
                 centerNorthPanel.add(lblName);
                 centerNorthPanel.add(varOrQueryNameTf);
                 centerNorthPanel.add(testVarQueryBtn);
@@ -590,15 +590,15 @@ public class OknoMigLayout extends JFrame{
         });
 
         /* Akce pro přidání omezení k dotazu */
-        addConstraintBtn.addActionListener(new ActionListener(){
+        addQueryBtn.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                FormularVytvoreniDotazu constraintForm = new FormularVytvoreniDotazu(strukturyPohledu, null, preparedVariableValues);
-                JSONObject attributes = constraintForm.getFormData();
-                if (!attributes.isEmpty()) {
-                    ConstraintPanel constraintPanel = new ConstraintPanel(attributes, false);
-                    centerPanel.add(constraintPanel, "dock west, height 800, width " + constraintPanelWidth);
-                    constraintPanels.add(constraintPanel);
+                FormularVytvoreniDotazu queryForm = new FormularVytvoreniDotazu(strukturyPohledu, null, preparedVariableValues);
+                JSONObject conditions = queryForm.getFormData();
+                if (!conditions.isEmpty()) {
+                    QueryPanel queryPanel = new QueryPanel(conditions, false);
+                    centerPanel.add(queryPanel, "dock west, height 800, width " + queryPanelWidth);
+                    queryPanels.add(queryPanel);
                     centerPanel.revalidate();
                 }
             }
@@ -608,8 +608,8 @@ public class OknoMigLayout extends JFrame{
         testVarQueryBtn.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(constraintPanels.size() == 1) {
-                    Long result = testQuery(constraintPanels.get(0).getJsonConstraint());
+                if(queryPanels.size() == 1) {
+                    Long result = testQuery(queryPanels.get(0).getQuery());
                     JOptionPane.showMessageDialog(mainFrame, "Query result is " + result, "Info", JOptionPane.INFORMATION_MESSAGE);
                 } else {
                     JOptionPane.showMessageDialog(mainFrame, "There can be only 1 query for variable creation.", "Warning", JOptionPane.WARNING_MESSAGE);
@@ -625,12 +625,12 @@ public class OknoMigLayout extends JFrame{
                 centerPanel.removeAll();
                 centerNorthPanel.removeAll();
 
-                centerNorthPanel.add(addConstraintBtn);
+                centerNorthPanel.add(addQueryBtn);
                 centerNorthPanel.add(lblName);
                 centerNorthPanel.add(varOrQueryNameTf);
 
                 centerPanel.add(centerNorthPanel, "dock north, width 100%");
-                centerPanel.add(axisPanel, "dock west, height 800, width " + constraintPanelWidth);
+                centerPanel.add(axisPanel, "dock west, height 800, width " + queryPanelWidth);
 
                 bottomPanel.add(runQueryBtn);
                 mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
@@ -645,22 +645,22 @@ public class OknoMigLayout extends JFrame{
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (!haveSameColumnNames(constraintPanels)) {
+                if (!haveSameColumnNames(queryPanels)) {
                     JOptionPane.showMessageDialog(mainFrame, "Every column has to have an unique name.", "Warning", JOptionPane.WARNING_MESSAGE);
-                } else if (constraintPanels.isEmpty()){
+                } else if (queryPanels.isEmpty()){
                     JOptionPane.showMessageDialog(mainFrame, "There has to be at least 1 query to run.", "Warning", JOptionPane.WARNING_MESSAGE);
                 } else {
                     int index = 2;
                     columnsNumber = 0;
-                    constraintPanels.clear();
+                    queryPanels.clear();
                     String condition;
                     String axisTable = "";
                     List<String> firstColumn = new ArrayList<>();
 
                     Component[] components = centerPanel.getComponents();
                     for (Component comp : components) {
-                        if (comp instanceof ConstraintPanel) {
-                            constraintPanels.add((ConstraintPanel) comp);
+                        if (comp instanceof QueryPanel) {
+                            queryPanels.add((QueryPanel) comp);
                         } else if (comp instanceof JPanel) {
                             JPanel axisPanel = (JPanel) comp;
                             for (Component component : axisPanel.getComponents()) {
@@ -673,7 +673,7 @@ public class OknoMigLayout extends JFrame{
                     }
 
 
-                    graphData = new CustomGraf(constraintPanels.size() + 1);
+                    graphData = new CustomGraf(queryPanels.size() + 1);
                     graphData.addNazvySloupcu(axisTable);
 
                     firstColumn = prepareGraphsFirstColumn(axisTable);
@@ -685,19 +685,19 @@ public class OknoMigLayout extends JFrame{
                     centerTablePanel.add(sl, "dock west, grow");
                     columnsNumber++;
 
-                    for (ConstraintPanel panel : constraintPanels) {
+                    for (QueryPanel panel : queryPanels) {
                         columnsNumber++;
-                        JSONObject object = panel.getJsonConstraint();
-                        String tableName = object.getString("table");
-                        String aggregate = object.getString("aggregate");
-                        String agrColumn = object.getString("agrColumn");
-                        String joinColumn = prepareDateFormat(axisTable, object.getString("joinColumn"));
+                        JSONObject queryJson = panel.getQuery();
+                        String tableName = queryJson.getString("table");
+                        String aggregate = queryJson.getString("aggregate");
+                        String agrColumn = queryJson.getString("agrColumn");
+                        String joinColumn = prepareDateFormat(axisTable, queryJson.getString("joinColumn"));
 
                         String query = "SELECT " + joinColumn + ", " + aggregate + "(" + agrColumn + ") FROM " + tableName + " WHERE ";
 
-                        JSONArray atts = (JSONArray) object.get("attributes");
+                        JSONArray conditions = (JSONArray) queryJson.get("conditions");
 
-                        Iterator<Object> iterator = atts.iterator();
+                        Iterator<Object> iterator = conditions.iterator();
                         while (iterator.hasNext()) {
                             JSONObject jsonObject = (JSONObject) iterator.next();
                             condition = jsonObject.getString("name") + " " + jsonObject.getString("operator") + " ";
@@ -823,10 +823,10 @@ public class OknoMigLayout extends JFrame{
         });
     }
 
-    private boolean haveSameColumnNames(List<ConstraintPanel> panels){
+    private boolean haveSameColumnNames(List<QueryPanel> panels){
         Set<String> nameSet = new HashSet<>();
         boolean result = true;
-        for(ConstraintPanel panel : panels){
+        for(QueryPanel panel : panels){
             nameSet.add(panel.getColumnName().trim());
         }
         if(nameSet.size() < panels.size()){
@@ -1025,28 +1025,28 @@ public class OknoMigLayout extends JFrame{
         return button;
     }
 
-    private Long testQuery(JSONObject constraint){
+    private Long testQuery(JSONObject object){
         PohledDAO pohledDAO = new PohledDAO();
         String condition;
         Long result;
-        JSONObject object;
+        JSONObject queryObject;
 
-        if(constraint.has("constraints")) {
-            JSONArray constraintArray = constraint.getJSONArray("constraints");
-            Iterator<Object> objectIterator = constraintArray.iterator();
-            object = (JSONObject) objectIterator.next();
+        if(object.has("queries")) {
+            JSONArray queryArray = object.getJSONArray("queries");
+            Iterator<Object> objectIterator = queryArray.iterator();
+            queryObject = (JSONObject) objectIterator.next();
         } else {
-            object = constraint;
+            queryObject = object;
         }
 
-        String function = object.getString("aggregate");
-        String tableName = object.getString("table");
-        String selectedColumn = object.getString("agrColumn");
+        String function = queryObject.getString("aggregate");
+        String tableName = queryObject.getString("table");
+        String selectedColumn = queryObject.getString("agrColumn");
         String query = "select " + function + "(" + selectedColumn + ") from " + tableName + " where ";
 
-        JSONArray atts = (JSONArray) object.get("attributes");
+        JSONArray conditions = (JSONArray) queryObject.get("conditions");
 
-        Iterator<Object> iterator = atts.iterator();
+        Iterator<Object> iterator = conditions.iterator();
         while(iterator.hasNext()) {
             JSONObject jsonObject = (JSONObject) iterator.next();
             condition = jsonObject.getString("name") + " " + jsonObject.getString("operator") + " ";
@@ -1175,7 +1175,7 @@ public class OknoMigLayout extends JFrame{
                     centerPanel.removeAll();
                     centerNorthPanel.removeAll();
 
-                    centerNorthPanel.add(addConstraintBtn);
+                    centerNorthPanel.add(addQueryBtn);
                     varOrQueryNameTf.setText(name);
                     centerNorthPanel.add(varOrQueryNameTf);
                     centerNorthPanel.add(testVarQueryBtn);
@@ -1186,14 +1186,14 @@ public class OknoMigLayout extends JFrame{
 
                     JSONObject jsonObject = new JSONObject(content);
 
-                    JSONArray constraints = (JSONArray) jsonObject.get("constraints");
-                    for (Object cons : constraints)
+                    JSONArray queries = (JSONArray) jsonObject.get("queries");
+                    for (Object queryObj : queries)
                     {
-                        JSONObject object = (JSONObject) cons;
+                        JSONObject query = (JSONObject) queryObj;
 
-                        ConstraintPanel panel = new ConstraintPanel(object, true);
-                        constraintPanels.add(panel);
-                        centerPanel.add(panel, "dock west, height 100%, width " + constraintPanelWidth);
+                        QueryPanel panel = new QueryPanel(query, true);
+                        queryPanels.add(panel);
+                        centerPanel.add(panel, "dock west, height 100%, width " + queryPanelWidth);
                     }
 
                     mainFrame.revalidate();
@@ -1239,26 +1239,26 @@ public class OknoMigLayout extends JFrame{
         }
     }
 
-    private class ConstraintPanel extends JPanel {
+    private class QueryPanel extends JPanel {
 
-        ConstraintPanel thisPanel;
-        JSONObject constraints;
+        QueryPanel thisPanel;
+        JSONObject query;
         JTextField columName;
         JButton removeBtn;
         JButton editBtn;
 
-        public ConstraintPanel(JSONObject constraints, boolean editing) {
+        public QueryPanel(JSONObject query, boolean editing) {
             super();
             thisPanel = this;
-            this.constraints = constraints;
+            this.query = query;
             this.setLayout(new MigLayout());
 
-            String tableName = constraints.getString("table");
-            String agrColumn = constraints.getString("agrColumn");
-            String aggregate = constraints.getString("aggregate");
+            String tableName = query.getString("table");
+            String agrColumn = query.getString("agrColumn");
+            String aggregate = query.getString("aggregate");
             String columnName;
-            if(constraints.has("columnName")) {
-                columnName = constraints.getString("columnName");
+            if(query.has("columnName")) {
+                columnName = query.getString("columnName");
             } else {
                 columnName = "";
             }
@@ -1273,10 +1273,10 @@ public class OknoMigLayout extends JFrame{
             JLabel label3 = new JLabel("WHERE");
             this.add(label3, "wrap");
 
-            JSONArray attributes = (JSONArray) constraints.get("attributes");
-            for(Object attribute: attributes){
-                JSONObject jsonObject = (JSONObject) attribute;
-                JLabel lblName = new JLabel(jsonObject.getString("name") + " " + jsonObject.getString("operator") + " " + jsonObject.getString("value"));
+            JSONArray conditions = (JSONArray) query.get("conditions");
+            for(Object object: conditions){
+                JSONObject condition = (JSONObject) object;
+                JLabel lblName = new JLabel(condition.getString("name") + " " + condition.getString("operator") + " " + condition.getString("value"));
                 this.add(lblName, "wrap");
             }
 
@@ -1284,21 +1284,21 @@ public class OknoMigLayout extends JFrame{
             editBtn.addActionListener(new ActionListener(){
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    JSONObject constraint = getJsonConstraint();
-                    FormularVytvoreniDotazu form = new FormularVytvoreniDotazu(strukturyPohledu, constraint, preparedVariableValues);
-                    JSONObject attributes = form.getFormData();
+                    JSONObject tempQuery = getQuery();
+                    FormularVytvoreniDotazu form = new FormularVytvoreniDotazu(strukturyPohledu, tempQuery, preparedVariableValues);
+                    JSONObject query = form.getFormData();
                     String columnName;
-                    if(constraint.has("columnName")) {
-                        columnName = constraint.getString("columnName");
-                        attributes.put("columnName", columnName);
+                    if(tempQuery.has("columnName")) {
+                        columnName = tempQuery.getString("columnName");
+                        query.put("columnName", columnName);
                     } else {
                         columnName = "";
                     }
                     if(!form.wasClosed()) {
                         thisPanel.removeAll();
-                        String tableName = attributes.getString("table");
-                        String agrColumn = attributes.getString("agrColumn");
-                        String aggregate = attributes.getString("aggregate");
+                        String tableName = query.getString("table");
+                        String agrColumn = query.getString("agrColumn");
+                        String aggregate = query.getString("aggregate");
 
                         columName = new JTextField(columnName);
                         add(columName, "wrap, width 100%");
@@ -1310,12 +1310,12 @@ public class OknoMigLayout extends JFrame{
                         JLabel label3 = new JLabel("WHERE");
                         add(label3, "wrap");
 
-                        if (!attributes.isEmpty()) {
-                            setAttributes(attributes);
-                            JSONArray atts = (JSONArray) attributes.get("attributes");
-                            for (Object attribute : atts) {
-                                JSONObject jsonObject = (JSONObject) attribute;
-                                JLabel lblName = new JLabel(jsonObject.getString("name") + " " + jsonObject.getString("operator") + " " + jsonObject.getString("value"));
+                        if (!query.isEmpty()) {
+                            setQuery(query);
+                            JSONArray conditions = (JSONArray) query.get("conditions");
+                            for (Object coditionObject : conditions) {
+                                JSONObject condition = (JSONObject) coditionObject;
+                                JLabel lblName = new JLabel(condition.getString("name") + " " + condition.getString("operator") + " " + condition.getString("value"));
                                 add(lblName, "wrap");
                             }
                         }
@@ -1335,7 +1335,7 @@ public class OknoMigLayout extends JFrame{
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     thisPanel.getParent().remove(thisPanel);
-                    constraintPanels.remove(thisPanel);
+                    queryPanels.remove(thisPanel);
                     mainFrame.revalidate();
                     mainFrame.repaint();
                 }
@@ -1346,12 +1346,12 @@ public class OknoMigLayout extends JFrame{
             this.add(removeBtn);
         }
 
-        public void setAttributes(JSONObject constraints){
-            this.constraints = constraints;
+        public void setQuery(JSONObject query){
+            this.query = query;
         }
 
-        public JSONObject getJsonConstraint() {
-            return this.constraints;
+        public JSONObject getQuery() {
+            return this.query;
         }
 
         public String getColumnName(){

@@ -1,15 +1,15 @@
 package ostatni;
 
-public class Atribut {
+public class Condition {
     private String name;
     private String operator;
     private String value;
     private String type;
     private boolean valid;
 
-    public Atribut(){}
+    public Condition(){}
 
-    public Atribut(String name, String operator, String value, String type) {
+    public Condition(String name, String operator, String value, String type) {
         this.name = name;
         this.operator = operator;
         this.value = value;
