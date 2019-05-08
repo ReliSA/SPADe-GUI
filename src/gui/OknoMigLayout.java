@@ -18,10 +18,9 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -321,9 +320,20 @@ public class OknoMigLayout extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 File file;
+                String fileName = varOrQueryNameTf.getText();
+                if(fileName.equals("")){
+                    if(variableCreation){
+                        fileName = "Variable_";
+                    } else {
+                        fileName = "Query_";
+                    }
+                }
+                fileName += LocalDateTime.now();
+                fileName = fileName.replaceAll(":", "-");
+
                 JSONObject jsonObject = new JSONObject();
                 if (!variableCreation) {
-                    file = new File(queryFolderPath + varOrQueryNameTf.getText() + ".json");
+                    file = new File(queryFolderPath + fileName + ".json");
                     jsonObject.put("axis", (String) cboxAxisOptions.getSelectedItem());
                     LocalDate datumOd;
                     LocalDate datumDo;
@@ -340,7 +350,7 @@ public class OknoMigLayout extends JFrame{
                     jsonObject.put("dateFrom", datumOd);
                     jsonObject.put("dateTo", datumDo);
                 } else {
-                    file = new File(variableFolderPath + varOrQueryNameTf.getText() + ".json");
+                    file = new File(variableFolderPath + fileName + ".json");
                 }
 
                 Component centerComponents[] = centerPanel.getComponents();
@@ -352,7 +362,7 @@ public class OknoMigLayout extends JFrame{
                         JSONObject jsonConstraint = constPanel.getJsonConstraint();
                         if(variableCreation){
                             jsonObject = writeQueryResult(jsonObject);
-                            ComboBoxItem comboBoxItem = new ComboBoxItem(varOrQueryNameTf.getText(), "promenna", jsonObject.getString("queryResult"));
+                            ComboBoxItem comboBoxItem = new ComboBoxItem(fileName, "promenna", jsonObject.getString("queryResult"));
                             preparedVariableValues.add(comboBoxItem);
                             System.out.println(preparedVariableValues);
                         }
@@ -371,8 +381,8 @@ public class OknoMigLayout extends JFrame{
                                 .stream()
                                 .map(f -> f.getName().substring(0, f.getName().indexOf('.')))
                                 .collect(Collectors.toList());
-                        if(!fileNames.contains(varOrQueryNameTf.getText())){
-                            VariablePanel varPanel = new VariablePanel(varOrQueryNameTf.getText(), result);
+                        if(!fileNames.contains(fileName)){
+                            VariablePanel varPanel = new VariablePanel(fileName, result);
                             variablesPanel.add(varPanel);
                             variablesPanel.revalidate();
                             variablesPanel.repaint();
@@ -455,13 +465,13 @@ public class OknoMigLayout extends JFrame{
                             Integer year = Integer.parseInt(dateTo.substring(0, dateTo.indexOf('-')));
                             Integer month = Integer.parseInt(dateTo.substring(dateTo.indexOf('-') + 1, dateTo.lastIndexOf('-')));
                             Integer day = Integer.parseInt(dateTo.substring(dateTo.lastIndexOf('-') + 1, dateTo.length()));
-                            dpDatumOD.getModel().setDate(year, month - 1, day);
-                            dpDatumOD.getModel().setSelected(true);
+                            dpDatumDO.getModel().setDate(year, month - 1, day);
+                            dpDatumDO.getModel().setSelected(true);
                             year = Integer.parseInt(dateFrom.substring(0, dateFrom.indexOf('-')));
                             month = Integer.parseInt(dateFrom.substring(dateFrom.indexOf('-') + 1, dateFrom.lastIndexOf('-')));
                             day = Integer.parseInt(dateFrom.substring(dateFrom.lastIndexOf('-') + 1, dateFrom.length()));
-                            dpDatumDO.getModel().setDate(year,month - 1 ,day);
-                            dpDatumDO.getModel().setSelected(true);
+                            dpDatumOD.getModel().setDate(year,month - 1 ,day);
+                            dpDatumOD.getModel().setSelected(true);
                         }
 
                         constraintPanels.clear();
@@ -520,17 +530,18 @@ public class OknoMigLayout extends JFrame{
             public void actionPerformed(ActionEvent arg0) {
                 FormularVytvoreniKonstanty constForm = new FormularVytvoreniKonstanty();
                 if(!constForm.wasCancelled()) {
-                    ComboBoxItem comboBoxItem = new ComboBoxItem(constForm.getConstName(), "konstanta",constForm.getConstValue());
+                    String constName = constForm.getConstName().equals("") ? "Constant_" + LocalDateTime.now().toString().replaceAll(":", "-") : constForm.getConstName();
+                    ComboBoxItem comboBoxItem = new ComboBoxItem(constName, "konstanta",constForm.getConstValue());
                     preparedVariableValues.add(comboBoxItem);
                     System.out.println(preparedVariableValues);
-                    ConstantPanel constPanel = new ConstantPanel(constForm.getConstName(), constForm.getConstValue());
+                    ConstantPanel constPanel = new ConstantPanel(constName, constForm.getConstValue());
                     String jsonString = new JSONObject()
-                            .put("name", constForm.getConstName())
+                            .put("name", constName)
                             .put("value", constForm.getConstValue()).toString(2);
                     Writer writer = null;
                     try {
                         writer = new BufferedWriter(new OutputStreamWriter(
-                                new FileOutputStream(constantFolderPath + constForm.getConstName() + ".json"), "utf-8"));
+                                new FileOutputStream(constantFolderPath + constName + ".json"), "utf-8"));
                         writer.write(jsonString);
                     } catch (IOException ex) {
                         ex.printStackTrace();
@@ -548,7 +559,7 @@ public class OknoMigLayout extends JFrame{
         addConstraintBtn.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                FormularVytvoreniOmezeni constraintForm = new FormularVytvoreniOmezeni(strukturyPohledu, null, preparedVariableValues);
+                FormularVytvoreniDotazu constraintForm = new FormularVytvoreniDotazu(strukturyPohledu, null, preparedVariableValues);
                 JSONObject attributes = constraintForm.getFormData();
                 if (!attributes.isEmpty()) {
                     ConstraintPanel constraintPanel = new ConstraintPanel(attributes, false);
@@ -668,7 +679,7 @@ public class OknoMigLayout extends JFrame{
                     } else {
                         sloupec = mapData(data, firstColumn, tableName + "-(" + aggregate + ")" + agrColumn, false);
                     }
-                    graphData.addNazvySloupcu(sloupec.getName());
+                    graphData.addNazvySloupcu("col"+columnsNumber);
 
                     for(String s : sloupec.getData()){
                         graphData.addData(index, Double.parseDouble(s));
@@ -774,11 +785,11 @@ public class OknoMigLayout extends JFrame{
 
         if(iteration) {
             for (Iterace iterace : iteraceList) {
-                Integer sum = 0;
+                Double sum = 0.0;
                 for (int i = 0; i < data.get(0).size(); i++) {
                     LocalDate temp = LocalDate.parse(data.get(0).get(i));
                     if (!temp.isBefore(iterace.getStartDate()) && !temp.isAfter(iterace.getEndDate())) {
-                        sum += Integer.parseInt(data.get(1).get(i));
+                        sum += Double.parseDouble(data.get(1).get(i));
                     }
                 }
                 values.add(sum.toString());
@@ -833,7 +844,7 @@ public class OknoMigLayout extends JFrame{
                 firstColumn = prepareMonthsBetween(datumOd, datumDo);
                 break;
             case "Year":
-                firstColumn = prepareYearBetween(datumOd, datumDo);
+                firstColumn = prepareYearsBetween(datumOd, datumDo);
                 break;
         }
         for (String s : firstColumn) {
@@ -920,7 +931,7 @@ public class OknoMigLayout extends JFrame{
         return totalMonths;
     }
 
-    private List<String> prepareYearBetween(LocalDate yearFrom, LocalDate yearTo){
+    private List<String> prepareYearsBetween(LocalDate yearFrom, LocalDate yearTo){
         List<String> totalYears = new ArrayList<>();
         for (int i = yearFrom.getYear(); i <= yearTo.getYear(); i++){
             totalYears.add(""+i);
@@ -1141,12 +1152,6 @@ public class OknoMigLayout extends JFrame{
 
                     centerPanel.add(centerNorthPanel, "dock north, width 100%");
 
-                    centerPanel.revalidate();
-                    centerPanel.repaint();
-
-                    centerNorthPanel.revalidate();
-                    centerNorthPanel.repaint();
-
                     JSONObject jsonObject = new JSONObject(content);
 
                     JSONArray constraints = (JSONArray) jsonObject.get("constraints");
@@ -1156,9 +1161,10 @@ public class OknoMigLayout extends JFrame{
 
                         ConstraintPanel panel = new ConstraintPanel(object, true);
                         centerPanel.add(panel, "dock west, height 100%, width " + constraintPanelWidth);
-                        centerPanel.revalidate();
-                        centerPanel.repaint();
                     }
+
+                    mainFrame.revalidate();
+                    mainFrame.repaint();
                 }
 
             });
@@ -1223,7 +1229,7 @@ public class OknoMigLayout extends JFrame{
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     JSONObject constraint = getJsonConstraint();
-                    FormularVytvoreniOmezeni form = new FormularVytvoreniOmezeni(strukturyPohledu, constraint, preparedVariableValues);
+                    FormularVytvoreniDotazu form = new FormularVytvoreniDotazu(strukturyPohledu, constraint, preparedVariableValues);
 
                     if(!form.wasClosed()) {
                         Component[] components = getComponents();

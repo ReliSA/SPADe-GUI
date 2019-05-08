@@ -20,7 +20,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 
-class FormularVytvoreniOmezeni extends JDialog
+class FormularVytvoreniDotazu extends JDialog
 {
     private static final long serialVersionUID = -8229943813762614201L;
     private JButton btnSubmit = new JButton("OK");
@@ -36,14 +36,14 @@ class FormularVytvoreniOmezeni extends JDialog
     private int windowWidth = 600;
 
     private ButtonGroup btnGroupAggregate = new ButtonGroup();
-    private JComboBox cboxTables = new JComboBox();
-    private JComboBox cboxColumns = new JComboBox();
-    private JComboBox cboxJoinColumn = new JComboBox();
+    private JComboBox<String> cboxTables = new JComboBox<>();
+    private JComboBox<String> cboxColumns = new JComboBox<>();
+    private JComboBox<String> cboxJoinColumn = new JComboBox<>();
     private JTextField tfAttValue = new JTextField("Value");
 
-    private FormularVytvoreniOmezeni parentForm;
+    private FormularVytvoreniDotazu parentForm;
 
-    public FormularVytvoreniOmezeni(Map<String, List<Sloupec>> strukturaPohledu, JSONObject constraint, List<ComboBoxItem> variableValues){
+    public FormularVytvoreniDotazu(Map<String, List<Sloupec>> strukturaPohledu, JSONObject constraint, List<ComboBoxItem> variableValues){
         this.setModal(true);
         this.setLocation(400,300);
         // TODO - cancel on close - don't know how
@@ -105,6 +105,8 @@ class FormularVytvoreniOmezeni extends JDialog
                     if(validateForm(attributePanels)){
                         closed = false;
                         dispose();
+                    } else {
+                        JOptionPane.showMessageDialog(parentForm, "You have 1 or more wrong values.", "Warning", JOptionPane.WARNING_MESSAGE);
                     }
                 }
             }
@@ -216,8 +218,8 @@ class FormularVytvoreniOmezeni extends JDialog
                 }
             }
 
-            cboxJoinColumn.setSelectedItem((String) constraint.getString("joinColumn"));
-            cboxColumns.setSelectedItem((String) constraint.getString("agrColumn"));
+            cboxJoinColumn.setSelectedItem(constraint.getString("joinColumn"));
+            cboxColumns.setSelectedItem(constraint.getString("agrColumn"));
 
             JSONArray atts = (JSONArray) constraint.get("attributes");
             for (Object attribute : atts) {
@@ -287,13 +289,13 @@ class FormularVytvoreniOmezeni extends JDialog
     {
         JSONObject jsonConstraint = new JSONObject();
         if(!closed) {
-            jsonConstraint.put("table", (String) cboxTables.getSelectedItem());
-            jsonConstraint.put("joinColumn", (String) cboxJoinColumn.getSelectedItem());
-            jsonConstraint.put("agrColumn", (String) cboxColumns.getSelectedItem());
+            jsonConstraint.put("table", cboxTables.getSelectedItem());
+            jsonConstraint.put("joinColumn", cboxJoinColumn.getSelectedItem());
+            jsonConstraint.put("agrColumn", cboxColumns.getSelectedItem());
             for (Enumeration<AbstractButton> buttons = btnGroupAggregate.getElements(); buttons.hasMoreElements();) {
                 AbstractButton button = buttons.nextElement();
                 if (button.isSelected()) {
-                    jsonConstraint.put("aggregate", (String) button.getText());
+                    jsonConstraint.put("aggregate", button.getText());
                 }
             }
 
@@ -353,18 +355,18 @@ class FormularVytvoreniOmezeni extends JDialog
         JComboBox<ComboBoxItem> cboxVariableValues = new JComboBox();
         JTextField tfValue = new JTextField();
         JCheckBox checkBoxUseVariable = new JCheckBox();
-        FormularVytvoreniOmezeni parentForm;
+        FormularVytvoreniDotazu parentForm;
         boolean useVariables = false;
 
-        public AttributePanel(List<Sloupec> sloupce, List<ComboBoxItem> variableValues, FormularVytvoreniOmezeni parentForm, boolean isFirst) {
+        public AttributePanel(List<Sloupec> sloupce, List<ComboBoxItem> variableValues, FormularVytvoreniDotazu parentForm, boolean isFirst) {
             this(null, sloupce, variableValues, parentForm, isFirst);
         }
 
-        public AttributePanel(String name, String operator, String value, String type, List<Sloupec> sloupce, List<ComboBoxItem> variableValues, FormularVytvoreniOmezeni parentForm, boolean isFirst) {
+        public AttributePanel(String name, String operator, String value, String type, List<Sloupec> sloupce, List<ComboBoxItem> variableValues, FormularVytvoreniDotazu parentForm, boolean isFirst) {
             this(new Atribut(name, operator, value, type), sloupce, variableValues, parentForm, isFirst);
         }
 
-        public AttributePanel(Atribut newAtribut, List<Sloupec> sloupce, List<ComboBoxItem> variableValues, FormularVytvoreniOmezeni parentForm, boolean isFirst){
+        public AttributePanel(Atribut newAtribut, List<Sloupec> sloupce, List<ComboBoxItem> variableValues, FormularVytvoreniDotazu parentForm, boolean isFirst){
             super();
             thisPanel = this;
             this.parentForm = parentForm;
@@ -520,7 +522,7 @@ class FormularVytvoreniOmezeni extends JDialog
             this.add(cboxOperators, "w 50");
             this.add(tfValue, "w 150");
             this.add(checkBoxUseVariable);
-            // TODO - vyresit resizing a povolit
+
             if(!isFirst) {
                 this.add(removeBtn);
             }

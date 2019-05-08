@@ -24,7 +24,7 @@ class FormularVytvoreniKonstanty extends JDialog
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-        this.setTitle("Create constants");
+        this.setTitle("Create constant");
 
         JLabel lblName = new JLabel("Name");
         JLabel lblValue = new JLabel("Value");

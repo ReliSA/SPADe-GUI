@@ -66,7 +66,7 @@ public class SloupecCustomGrafu extends JPanel {
                     if(!variableValues.isEmpty()) {
                         cboxVariableValues.setSelectedIndex(0);
                     }
-                    add(cboxVariableValues,"grow, span 3, wrap");
+                    add(cboxVariableValues,"grow, span 3, wrap, gapy 9");
                     add(lblNazev, "grow, span 3, wrap");
                 } else {
                     remove(cboxVariableValues);
