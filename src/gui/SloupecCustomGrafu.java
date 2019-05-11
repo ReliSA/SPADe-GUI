@@ -2,6 +2,7 @@ package gui;
 
 import net.miginfocom.swing.MigLayout;
 import ostatni.ComboBoxItem;
+import ostatni.CustomComboBoxEditor;
 
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
@@ -14,12 +15,11 @@ import java.util.List;
 public class SloupecCustomGrafu extends JPanel {
     private JLabel lblNazev = new JLabel(); // popisek název
     private int index;
+    private boolean valid;
     private List<String> data;
     private JCheckBox useColumn = new JCheckBox();
-    private JCheckBox useVariable = new JCheckBox();
     private JComboBox<String> operators = new JComboBox<>();
     private JComboBox<ComboBoxItem> cboxVariableValues = new JComboBox();
-    private JTextField tfValue = new JTextField();
     private List<Boolean> detectedValues = new ArrayList<>();
 
     /**
@@ -32,6 +32,7 @@ public class SloupecCustomGrafu extends JPanel {
         this.data = data;
         this.index = index;
         this.setBackground(Color.white);
+        this.setSize(100, this.getHeight());
 
         this.setLayout(new MigLayout("ins 0"));
         this.lblNazev.setText(nazev);
@@ -39,9 +40,13 @@ public class SloupecCustomGrafu extends JPanel {
         this.lblNazev.setFont(font);
         this.lblNazev.setHorizontalAlignment(SwingConstants.CENTER);
 
+        cboxVariableValues.setEditor(new CustomComboBoxEditor());
+        cboxVariableValues.setEditable(true);
+
         for(ComboBoxItem varValue : variableValues){
             cboxVariableValues.addItem(varValue);
         }
+        cboxVariableValues.setSelectedIndex(-1);
 
         operators.addItem("=");
         operators.addItem("<=");
@@ -49,44 +54,12 @@ public class SloupecCustomGrafu extends JPanel {
         operators.addItem("<");
         operators.addItem(">");
         operators.addItem("!=");
-
-        useVariable.setToolTipText("Use variables");
-        useVariable.addItemListener(new ItemListener() {
-
-            public void itemStateChanged(ItemEvent e) {
-                remove(useColumn);
-                remove(useVariable);
-                remove(operators);
-                if(useVariable.isSelected()){
-                    remove(tfValue);
-                    remove(lblNazev);
-                    add(useColumn);
-                    add(useVariable);
-                    add(operators,"wrap");
-                    if(!variableValues.isEmpty()) {
-                        cboxVariableValues.setSelectedIndex(0);
-                    }
-                    add(cboxVariableValues,"grow, span 3, wrap, gapy 9");
-                    add(lblNazev, "grow, span 3, wrap");
-                } else {
-                    remove(cboxVariableValues);
-                    tfValue.setText("");
-                    add(useColumn);
-                    add(useVariable);
-                    add(operators, "wrap");
-                    add(tfValue, "grow, span 3, wrap, gapy 9");
-                    add(lblNazev, "grow, span 3, wrap");
-                }
-                revalidate();
-                repaint();
-            }
-        });
+//        operators.addItem("between");
 
         if(includeHeader) {
             this.add(useColumn);
-            this.add(useVariable);
             this.add(operators, "wrap");
-            this.add(tfValue, "grow, span 3, wrap, gapy 9");
+            this.add(cboxVariableValues, "grow, span 3, wrap, gapy 9");
             this.add(this.lblNazev, "grow, span 3, wrap");
         } else {
             this.add(this.lblNazev, "grow, span 3, wrap, gapy 58");
@@ -103,6 +76,27 @@ public class SloupecCustomGrafu extends JPanel {
             lblHodnota.setHorizontalAlignment(SwingConstants.CENTER);
             this.add(lblHodnota, "grow, span 3, wrap, dock south");
         }
+    }
+
+    public boolean validateInput(){
+        String value = getDetectedValue();
+        try { Float.parseFloat(value);
+        } catch(NumberFormatException e) {
+            try { Double.parseDouble(value);
+            } catch(NumberFormatException e1) {
+                try { Integer.parseInt(value);
+                } catch(NumberFormatException e2) {
+                    try { Long.parseLong(value);
+                    } catch(NumberFormatException e3) {
+                        System.out.println(e3);
+                        setValid(false);
+                        return false;
+                    }
+                }
+            }
+        }
+        setValid(true);
+        return true;
     }
     
     public List<Boolean> detectValues(){
@@ -175,16 +169,34 @@ public class SloupecCustomGrafu extends JPanel {
         return tempDetect;
     }
 
+    public void changeValueBackground(Color color){
+        ((CustomComboBoxEditor) cboxVariableValues.getEditor()).changeBackground(color);
+    }
+
     public boolean useColum(){
         return this.useColumn.isSelected();
     }
 
-    public boolean useVariable(){
-        return this.useVariable.isSelected();
+    public String getDetectedValue(){
+        String value;
+        if(cboxVariableValues.getEditor().getItem() instanceof ComboBoxItem){
+            value = ((ComboBoxItem) cboxVariableValues.getSelectedItem()).getValue();
+        } else {
+            try {
+                value = cboxVariableValues.getEditor().getItem().toString();
+            } catch (NullPointerException e) {
+                value = "";
+            }
+        }
+        return value;
     }
 
-    public String getDetectedValue(){
-        return this.tfValue.getText();
+    public void setCboxVariableValuesOk(){
+        ((CustomComboBoxEditor) cboxVariableValues.getEditor()).changeBackground(null);
+    }
+
+    public void setCboxVariableValuesWarning(){
+        ((CustomComboBoxEditor) cboxVariableValues.getEditor()).changeBackground(Color.PINK);
     }
 
     public String getOperator(){
@@ -197,5 +209,13 @@ public class SloupecCustomGrafu extends JPanel {
 
     public String getName(){
         return lblNazev.getText();
+    }
+
+    public boolean isValid() {
+        return valid;
+    }
+
+    public void setValid(boolean valid) {
+        this.valid = valid;
     }
 }

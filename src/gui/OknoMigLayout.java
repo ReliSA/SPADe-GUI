@@ -766,35 +766,43 @@ public class OknoMigLayout extends JFrame{
                     }
                 }
                 if(!sloupce.isEmpty()){
-                    for(SloupecCustomGrafu sloupec : sloupce) {
-                        if (sloupec.useColum()) {
-                            detectionValues.add(sloupec.detectValues());
+                    boolean valid = validateInputs(sloupce);
+                    if(valid) {
+                        for (SloupecCustomGrafu sloupec : sloupce) {
+                            if (sloupec.useColum()) {
+                                detectionValues.add(sloupec.detectValues());
+                            }
                         }
-                    }
 
-                    for (int i = 0; i < detectionValues.get(0).size(); i++) {
-                        Boolean val = true;
-                        for (int j = 0; j < detectionValues.size(); j++) {
-                            val &= detectionValues.get(j).get(i);
+                        for (int i = 0; i < detectionValues.get(0).size(); i++) {
+                            Boolean val = true;
+                            for (int j = 0; j < detectionValues.size(); j++) {
+                                val &= detectionValues.get(j).get(i);
+                            }
+                            if (val) {
+                                columnData.add("1");
+                            } else {
+                                columnData.add("0");
+                            }
                         }
-                        if(val){
-                            columnData.add("1");
-                        } else {
-                            columnData.add("0");
+                        centerTablePanel.remove(centerTablePanel.getComponentCount() - 1);
+
+                        detected = new SloupecCustomGrafu("detected", columnData, columnsNumber, preparedVariableValues, false);
+                        centerTablePanel.add(detected, "dock west, grow");
+
+                        graphData.getDataSloupec(columnsNumber - 2).clear();
+                        for (String s : columnData) {
+                            graphData.addData(columnsNumber, Double.parseDouble(s));
                         }
+
+                        centerTablePanel.revalidate();
+                        centerTablePanel.repaint();
+                    } else {
+                        JOptionPane.showMessageDialog(mainFrame,
+                                "1 or more values and invalid.",
+                                "Warning",
+                                JOptionPane.WARNING_MESSAGE);
                     }
-                    centerTablePanel.remove(centerTablePanel.getComponentCount() - 1);
-
-                    detected = new SloupecCustomGrafu("detected", columnData, columnsNumber, preparedVariableValues, false);
-                    centerTablePanel.add(detected, "dock west, grow");
-
-                    graphData.getDataSloupec(columnsNumber - 2).clear();
-                    for(String s : columnData){
-                        graphData.addData(columnsNumber, Double.parseDouble(s));
-                    }
-
-                    centerTablePanel.revalidate();
-                    centerTablePanel.repaint();
                 } else {
                     JOptionPane.showMessageDialog(mainFrame,
                             "No column for detection selected.",
@@ -821,6 +829,20 @@ public class OknoMigLayout extends JFrame{
                 }
             }
         });
+    }
+
+    private boolean validateInputs(List<SloupecCustomGrafu> sloupce){
+        boolean result = true;
+        for(SloupecCustomGrafu sloupec : sloupce){
+            boolean valid = sloupec.validateInput();
+            if(valid){
+                sloupec.setCboxVariableValuesOk();
+            } else {
+                sloupec.setCboxVariableValuesWarning();
+                result = false;
+            }
+        }
+        return result;
     }
 
     private boolean haveSameColumnNames(List<QueryPanel> panels){

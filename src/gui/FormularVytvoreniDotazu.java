@@ -3,10 +3,7 @@ package gui;
 import net.miginfocom.swing.MigLayout;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import ostatni.ComboBoxItem;
-import ostatni.Condition;
-import ostatni.Konstanty;
-import ostatni.Sloupec;
+import ostatni.*;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -255,12 +252,7 @@ class FormularVytvoreniDotazu extends JDialog
                 conditionPanel.setCboxValuesOk();
             } else {
                 conditionPanel.setCboxValuesWarning();
-            }
-        }
-        for(ConditionPanel conditionPanel : conditionPanels){
-            if(!conditionPanel.getCondition().isValid()){
                 validForm = false;
-                break;
             }
         }
         return validForm;
@@ -355,13 +347,12 @@ class FormularVytvoreniDotazu extends JDialog
             this.parentForm = parentForm;
             this.setLayout(new MigLayout("insets 0"));
 
-            cboxVariableValues.setEditor(new MyComboBoxEditor());
+            cboxVariableValues.setEditor(new CustomComboBoxEditor());
             cboxVariableValues.setEditable(true);
 
             for(ComboBoxItem varValue : variableValues){
                 cboxVariableValues.addItem(varValue);
             }
-
             cboxVariableValues.setSelectedIndex(-1);
 
             for(Sloupec sloupec : sloupce){
@@ -447,11 +438,11 @@ class FormularVytvoreniDotazu extends JDialog
         }
 
         private void setCboxValuesOk(){
-            ((MyComboBoxEditor) cboxVariableValues.getEditor()).changeBackground(null);
+            ((CustomComboBoxEditor) cboxVariableValues.getEditor()).changeBackground(null);
         }
 
         private void setCboxValuesWarning(){
-            ((MyComboBoxEditor) cboxVariableValues.getEditor()).changeBackground(Color.PINK);
+            ((CustomComboBoxEditor) cboxVariableValues.getEditor()).changeBackground(Color.PINK);
         }
 
         private List<String> getOperatorForConditionType(String attType){
@@ -541,18 +532,4 @@ class FormularVytvoreniDotazu extends JDialog
             return (String) cboxJoinColumn.getSelectedItem();
         }
     }
-}
-
-class MyComboBoxEditor extends BasicComboBoxEditor {
-
-    public Component getEditorComponent(){
-        Component comp = super.getEditorComponent();
-        return comp;
-    }
-
-    public void changeBackground(Color color){
-        Component comp = super.getEditorComponent();
-        comp.setBackground(color);
-    }
-
 }
