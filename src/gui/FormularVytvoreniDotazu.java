@@ -10,8 +10,7 @@ import ostatni.Sloupec;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+import javax.swing.plaf.basic.BasicComboBoxEditor;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -27,7 +26,6 @@ class FormularVytvoreniDotazu extends JDialog
     private JButton btnClose = new JButton("CANCEL");
     private JButton btnAdd = new JButton("Add");
     private boolean closed = true;
-    private List<Condition> conditionList = new ArrayList<>();
     private List<ConditionPanel> conditionPanels = new ArrayList<>();
     private JPanel mainPanel = new JPanel();
     private int heightDifference = 30;
@@ -133,7 +131,6 @@ class FormularVytvoreniDotazu extends JDialog
                      ConditionPanel conditionPanel = new ConditionPanel(strukturaPohledu.get((String) cboxTables.getSelectedItem()), variableValues, parentForm, false);
                      mainPanel.add(conditionPanel, "gapleft 65, span 2, wrap");
                      conditionPanels.add(conditionPanel);
-                     conditionList.add(conditionPanel.getCondition());
                      mainPanel.add(btnAdd);
                      mainPanel.add(btnSubmit, "split 2");
                      mainPanel.add(btnClose);
@@ -172,12 +169,10 @@ class FormularVytvoreniDotazu extends JDialog
                     }
                 }
 
-                conditionList.clear();
                 conditionPanels.clear();
                 ConditionPanel conditionPanel = new ConditionPanel(null, strukturaPohledu.get(cboxTables.getSelectedItem()), variableValues, parentForm, true);
                 mainPanel.add(conditionPanel, "wrap");
                 conditionPanels.add(conditionPanel);
-                conditionList.add(conditionPanel.getCondition());
                 mainPanel.add(btnAdd);
                 mainPanel.add(btnSubmit, "split 2");
                 mainPanel.add(btnClose);
@@ -238,13 +233,11 @@ class FormularVytvoreniDotazu extends JDialog
                     mainPanel.add(conditionPanel, "gapleft 65, span 2, wrap");
                 }
                 conditionPanels.add(conditionPanel);
-                conditionList.add(conditionPanel.getCondition());
             }
         } else {
             ConditionPanel conditionPanel = new ConditionPanel(strukturaPohledu.get((String) cboxTables.getSelectedItem()), variableValues, parentForm, true);
             mainPanel.add(conditionPanel, "w 400, wrap");
             conditionPanels.add(conditionPanel);
-            conditionList.add(conditionPanel.getCondition());
         }
 
         mainPanel.add(btnAdd);
@@ -259,17 +252,9 @@ class FormularVytvoreniDotazu extends JDialog
         for(ConditionPanel conditionPanel : conditionPanels){
             boolean valid = conditionPanel.getCondition().validate();
             if(valid){
-                if(conditionPanel.useVariables()){
-                    conditionPanel.setCboxValuesOk();
-                } else {
-                    conditionPanel.setFieldOk();
-                }
+                conditionPanel.setCboxValuesOk();
             } else {
-                if(conditionPanel.useVariables()){
-                    conditionPanel.setCboxValuesWarning();
-                } else {
-                    conditionPanel.setFieldWarning();
-                }
+                conditionPanel.setCboxValuesWarning();
             }
         }
         for(ConditionPanel conditionPanel : conditionPanels){
@@ -301,7 +286,8 @@ class FormularVytvoreniDotazu extends JDialog
 
             JSONArray conditions = new JSONArray();
 
-            for (Condition condition : conditionList) {
+            for (ConditionPanel conditionPanel : conditionPanels) {
+                Condition condition = conditionPanel.getCondition();
                 JSONObject conditionObject = new JSONObject();
                 conditionObject.put("name", condition.getName());
                 conditionObject.put("operator", condition.getOperator());
@@ -315,12 +301,12 @@ class FormularVytvoreniDotazu extends JDialog
         return jsonConstraint;
     }
 
-    public void resizeComponent(Condition condition){
+    public void resizeComponent(ConditionPanel conditionPanel){
         if(conditionCount < 8) {
             setSize(getWidth(), getHeight() - heightDifference);
         }
         conditionCount--;
-        conditionList.remove(condition);
+        conditionPanels.remove(conditionPanel);
         mainPanel.revalidate();
         mainPanel.repaint();
     }
@@ -353,10 +339,7 @@ class FormularVytvoreniDotazu extends JDialog
         JComboBox<String> cboxAttributes = new JComboBox<>();
         JComboBox<String> cboxOperators = new JComboBox<>();
         JComboBox<ComboBoxItem> cboxVariableValues = new JComboBox();
-        JTextField tfValue = new JTextField();
-        JCheckBox checkBoxUseVariable = new JCheckBox();
         FormularVytvoreniDotazu parentForm;
-        boolean useVariables = false;
 
         public ConditionPanel(List<Sloupec> sloupce, List<ComboBoxItem> variableValues, FormularVytvoreniDotazu parentForm, boolean isFirst) {
             this(null, sloupce, variableValues, parentForm, isFirst);
@@ -372,9 +355,15 @@ class FormularVytvoreniDotazu extends JDialog
             this.parentForm = parentForm;
             this.setLayout(new MigLayout("insets 0"));
 
+            cboxVariableValues.setEditor(new MyComboBoxEditor());
+            cboxVariableValues.setEditable(true);
+
             for(ComboBoxItem varValue : variableValues){
                 cboxVariableValues.addItem(varValue);
             }
+
+            cboxVariableValues.setSelectedIndex(-1);
+
             for(Sloupec sloupec : sloupce){
                 cboxAttributes.addItem(sloupec.getName());
             }
@@ -397,7 +386,8 @@ class FormularVytvoreniDotazu extends JDialog
                 }
                 cboxAttributes.setSelectedItem(condition.getName());
                 cboxOperators.setSelectedItem(condition.getOperator());
-                tfValue.setText(condition.getValue());
+//                tfValue.setText(condition.getValue());
+                cboxVariableValues.getEditor().setItem(condition.getValue());
             }
 
             JButton removeBtn = new JButton();
@@ -420,7 +410,7 @@ class FormularVytvoreniDotazu extends JDialog
             removeBtn.addActionListener(new ActionListener(){
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    parentForm.resizeComponent(condition);
+                    parentForm.resizeComponent(thisPanel);
                     thisPanel.getParent().remove(thisPanel);
                 }
             });
@@ -445,83 +435,10 @@ class FormularVytvoreniDotazu extends JDialog
                     condition.setOperator((String) cboxOperators.getSelectedItem());
                 }
             });
-            checkBoxUseVariable.setToolTipText("Use variables");
-            checkBoxUseVariable.addItemListener(new ItemListener() {
-
-                public void itemStateChanged(ItemEvent e) {
-                    if(checkBoxUseVariable.isSelected()){
-                        thisPanel.remove(tfValue);
-                        thisPanel.remove(checkBoxUseVariable);
-                        thisPanel.remove(removeBtn);
-                        thisPanel.add(cboxVariableValues, "w 150");
-                        if(!variableValues.isEmpty()) {
-                            cboxVariableValues.setSelectedIndex(0);
-                        }
-                        thisPanel.add(checkBoxUseVariable);
-                        if(!isFirst) {
-                            thisPanel.add(removeBtn);
-                        }
-                        thisPanel.setUseVariables(true);
-                        revalidate();
-                        repaint();
-                    } else {
-                        thisPanel.remove(cboxVariableValues);
-                        thisPanel.remove(checkBoxUseVariable);
-                        thisPanel.add(tfValue, "w 150");
-                        tfValue.setText("");
-                        thisPanel.add(checkBoxUseVariable);
-                        if(!isFirst) {
-                            thisPanel.add(removeBtn);
-                        }
-                        thisPanel.setUseVariables(false);
-                        revalidate();
-                        repaint();
-                    }
-                }
-            });
-
-            tfValue.getDocument().addDocumentListener(new DocumentListener() {
-                public void changedUpdate(DocumentEvent e) {
-                    if(checkBoxUseVariable.isSelected()) {
-                        condition.setValue(((ComboBoxItem) cboxVariableValues.getSelectedItem()).getValue());
-                    } else {
-                        condition.setValue(tfValue.getText());
-                    }
-                }
-                public void removeUpdate(DocumentEvent e) {
-                    if(checkBoxUseVariable.isSelected()) {
-                        condition.setValue(((ComboBoxItem) cboxVariableValues.getSelectedItem()).getValue());
-                    } else {
-                        condition.setValue(tfValue.getText());
-                    }
-                }
-                public void insertUpdate(DocumentEvent e) {
-                    if(checkBoxUseVariable.isSelected()) {
-                        condition.setValue(((ComboBoxItem) cboxVariableValues.getSelectedItem()).getValue());
-                    } else {
-                        condition.setValue(tfValue.getText());
-                    }
-                }
-                //kdyby bylo potřeba použít
-//                public void warn() {
-//                    if (Integer.parseInt(tfValue.getText())<=0){
-//                        JOptionPane.showMessageDialog(null,
-//                                "Error: Please enter number bigger than 0", "Error Massage",
-//                                JOptionPane.ERROR_MESSAGE);
-//                    }
-//                }
-            });
-
-            cboxVariableValues.addActionListener (new ActionListener () {
-                public void actionPerformed(ActionEvent e) {
-                    condition.setValue(((ComboBoxItem) cboxVariableValues.getSelectedItem()).getValue());
-                }
-            });
 
             this.add(cboxAttributes, "w 150");
             this.add(cboxOperators, "w 50");
-            this.add(tfValue, "w 150");
-            this.add(checkBoxUseVariable);
+            this.add(cboxVariableValues, "w 150");
 
             if(!isFirst) {
                 this.add(removeBtn);
@@ -530,19 +447,11 @@ class FormularVytvoreniDotazu extends JDialog
         }
 
         private void setCboxValuesOk(){
-            cboxVariableValues.setForeground(Color.BLACK);
+            ((MyComboBoxEditor) cboxVariableValues.getEditor()).changeBackground(null);
         }
 
         private void setCboxValuesWarning(){
-            cboxVariableValues.setForeground(Color.RED);
-        }
-
-        private void setFieldOk(){
-            tfValue.setForeground(Color.BLACK);
-        }
-
-        private void setFieldWarning(){
-            tfValue.setForeground(Color.RED);
+            ((MyComboBoxEditor) cboxVariableValues.getEditor()).changeBackground(Color.PINK);
         }
 
         private List<String> getOperatorForConditionType(String attType){
@@ -610,23 +519,40 @@ class FormularVytvoreniDotazu extends JDialog
         }
 
         public String getValue() {
-            return tfValue.getText();
+            String value;
+            if(cboxVariableValues.getEditor().getItem() instanceof ComboBoxItem){
+                value = ((ComboBoxItem) cboxVariableValues.getSelectedItem()).getValue();
+            } else {
+                try {
+                    value = cboxVariableValues.getEditor().getItem().toString();
+                } catch (NullPointerException e) {
+                    value = "";
+                }
+            }
+            return value;
         }
 
         public Condition getCondition() {
+            condition.setValue(getValue());
             return condition;
-        }
-
-        public boolean useVariables() {
-            return useVariables;
-        }
-
-        public void setUseVariables(boolean useVariables) {
-            this.useVariables = useVariables;
         }
 
         public String getJoinColumn(){
             return (String) cboxJoinColumn.getSelectedItem();
         }
     }
+}
+
+class MyComboBoxEditor extends BasicComboBoxEditor {
+
+    public Component getEditorComponent(){
+        Component comp = super.getEditorComponent();
+        return comp;
+    }
+
+    public void changeBackground(Color color){
+        Component comp = super.getEditorComponent();
+        comp.setBackground(color);
+    }
+
 }
