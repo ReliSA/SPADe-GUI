@@ -1,6 +1,5 @@
 package gui;
 
-import javafx.scene.control.ComboBox;
 import net.miginfocom.swing.MigLayout;
 import ostatni.ComboBoxItem;
 import ostatni.CustomComboBoxEditor;
@@ -22,12 +21,15 @@ public class SloupecCustomGrafu extends JPanel {
     private boolean thirdValid;
     private boolean fourthValid;
     private List<String> data;
-    private JCheckBox useColumn;
+    private JCheckBox checkBoxUseColumn;
+    private JCheckBox checkBoxCompareColumns;
     private JComboBox<String> operators;
     private JComboBox<ComboBoxItem> cboxVariableValues;
     private JComboBox<ComboBoxItem> cboxVariableValues2;
     private JComboBox<ComboBoxItem> cboxVariableValues3;
     private JComboBox<ComboBoxItem> cboxVariableValues4;
+    private JComboBox<String> cboxColumns;
+    private JComboBox<String> cboxColumns2;
     private JComboBox<String> cboxAritmethics;
     private JComboBox<String> cboxAritmethics2;
     private List<Boolean> detectedValues = new ArrayList<>();
@@ -51,7 +53,8 @@ public class SloupecCustomGrafu extends JPanel {
                 try {
 
                     SloupecCustomGrafu graf = new SloupecCustomGrafu("ColumnName", new ArrayList<>(Arrays.asList("1","2","3")), 0,
-                            new ArrayList<>(Arrays.asList(new ComboBoxItem("jmeno", "text", "name"), new ComboBoxItem("cislo","number","5"))), true);
+                            new ArrayList<>(Arrays.asList(new ComboBoxItem("jmeno", "text", "name"), new ComboBoxItem("cislo","number","5"))),
+                            true, new ArrayList<>(Arrays.asList("col1","col2","col3")));
 
                     mainFrame = new JFrame();
                     mainFrame.setLayout(new MigLayout("ins 0"));
@@ -75,18 +78,21 @@ public class SloupecCustomGrafu extends JPanel {
      * @param nazev název dat
      * @param data datumy k zobrazení
      */
-    public SloupecCustomGrafu(String nazev, List<String> data, int index, List<ComboBoxItem> variableValues, boolean includeHeader) {
+    public SloupecCustomGrafu(String nazev, List<String> data, int index, List<ComboBoxItem> variableValues, boolean includeHeader, List<String> columnNames) {
         this.data = data;
         this.index = index;
         setBackground(Color.white);
         setLayout(new MigLayout("ins 0"));
 
-        useColumn = new JCheckBox();
+        checkBoxUseColumn = new JCheckBox("Detect");
+        checkBoxCompareColumns = new JCheckBox("Com. col.");
         operators = new JComboBox<>();
         cboxVariableValues = new JComboBox<ComboBoxItem>();
         cboxVariableValues2 = new JComboBox<ComboBoxItem>();
         cboxVariableValues3 = new JComboBox<ComboBoxItem>();
         cboxVariableValues4 = new JComboBox<ComboBoxItem>();
+        cboxColumns = new JComboBox<>();
+        cboxColumns2 = new JComboBox<>();
         cboxAritmethics = new JComboBox<>();
         cboxAritmethics2 = new JComboBox<>();
         detectedValues = new ArrayList<>();
@@ -103,6 +109,11 @@ public class SloupecCustomGrafu extends JPanel {
         Font font = new Font("Courier", Font.BOLD, 12);
         this.lblNazev.setFont(font);
         this.lblNazev.setHorizontalAlignment(SwingConstants.CENTER);
+
+        for(String columnName : columnNames){
+            cboxColumns.addItem(columnName);
+            cboxColumns2.addItem(columnName);
+        }
 
         cboxVariableValues.setEditor(new CustomComboBoxEditor());
         cboxVariableValues.setEditable(true);
@@ -144,10 +155,18 @@ public class SloupecCustomGrafu extends JPanel {
         operators.addActionListener (new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if(operators.getSelectedItem().toString().equals("between")){
-                    headerPanel.add(inputPanel2, "span 2");
+                    if(checkBoxCompareColumns.isSelected()){
+                        headerPanel.add(cboxColumns2, "span 3, width 50%");
+                    } else {
+                        headerPanel.add(inputPanel2, "span 3");
+                    }
                     between = true;
                 } else {
-                    headerPanel.remove(inputPanel2);
+                    if(checkBoxCompareColumns.isSelected()){
+                        headerPanel.remove(cboxColumns2);
+                    } else {
+                        headerPanel.remove(inputPanel2);
+                    }
                     between = false;
                 }
                 revalidate();
@@ -179,20 +198,43 @@ public class SloupecCustomGrafu extends JPanel {
             }
         });
 
+        checkBoxCompareColumns.addActionListener (new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if(checkBoxCompareColumns.isSelected()){
+                    headerPanel.remove(inputPanel);
+                    headerPanel.remove(inputPanel2);
+                    headerPanel.add(cboxColumns, "span 3, wrap, width 50%");
+                    if(operators.getSelectedItem().toString().equals("between")){
+                        headerPanel.add(cboxColumns2, "span 3, width 50%");
+                    }
+                } else {
+                    headerPanel.remove(cboxColumns);
+                    headerPanel.remove(cboxColumns2);
+                    headerPanel.add(inputPanel, "span 3, wrap");
+                    if(operators.getSelectedItem().toString().equals("between")){
+                        headerPanel.add(inputPanel2, "span 3");
+                    }
+                }
+                revalidate();
+                repaint();
+            }
+        });
+
         if(includeHeader) {
-            headerPanel.add(useColumn);
-            headerPanel.add(operators, "wrap");
+            headerPanel.add(operators);
+            headerPanel.add(checkBoxUseColumn);
+            headerPanel.add(checkBoxCompareColumns, "wrap");
             inputPanel.add(cboxVariableValues);
             inputPanel.add(cboxAritmethics);
             inputPanel2.add(cboxVariableValues3);
             inputPanel2.add(cboxAritmethics2);
-            headerPanel.add(inputPanel, "span 2, wrap");
+            headerPanel.add(inputPanel, "span 3, wrap");
             headerPanel.setBorder(new MatteBorder(0,0,1,0, Color.BLACK));
             headerPanel.setSize(300, 500);
             add(headerPanel, "width 100%, height 80, wrap, dock north");
-            this.add(this.lblNazev, "grow, span 2, wrap, dock north");
+            this.add(this.lblNazev, "grow, span 3, wrap, dock north");
         } else {
-            this.add(this.lblNazev, "grow, span 2, wrap, gapy 70");
+            this.add(this.lblNazev, "grow, span 3, wrap, gapy 70");
         }
 
         this.lblNazev.setBorder(new MatteBorder(1,0,1,0, Color.BLACK));
@@ -211,91 +253,108 @@ public class SloupecCustomGrafu extends JPanel {
     }
 
     public boolean validateInput(){
-        String value = getDetectedValue(cboxVariableValues);
-        String value2 = null;
-        String value3 = null;
-        String value4 = null;
-        if(!cboxAritmethics.getSelectedItem().toString().equals("")) {
-            value2 = getDetectedValue(cboxVariableValues2);
-        }
-        if(between) {
-            value3 = getDetectedValue(cboxVariableValues3);
-            if(!cboxAritmethics2.getSelectedItem().toString().equals("")) {
-                value4 = getDetectedValue(cboxVariableValues4);
+        this.firstValid = true;
+        this.secondValid = true;
+        this.thirdValid = true;
+        this.fourthValid = true;
+        if(!compareColumns()) {
+            String value = getDetectedValue(cboxVariableValues);
+            String value2 = null;
+            String value3 = null;
+            String value4 = null;
+            if (!cboxAritmethics.getSelectedItem().toString().equals("")) {
+                value2 = getDetectedValue(cboxVariableValues2);
             }
-        }
-
-        setFirstValid(true);
-        setSecondValid(true);
-        setThirdValid(true);
-        setFourthValid(true);
-
-        setCboxVariableValuesOk(cboxVariableValues);
-        setCboxVariableValuesOk(cboxVariableValues2);
-        setCboxVariableValuesOk(cboxVariableValues3);
-        setCboxVariableValuesOk(cboxVariableValues4);
-
-        try { Float.parseFloat(value);
-        } catch(NumberFormatException e) {
-            try { Double.parseDouble(value);
-            } catch(NumberFormatException e1) {
-                try { Integer.parseInt(value);
-                } catch(NumberFormatException e2) {
-                    try { Long.parseLong(value);
-                    } catch(NumberFormatException e3) {
-                        System.out.println(e3);
-                        setFirstValid(false);
-                        setCboxVariableValuesWarning(cboxVariableValues);
-                    }
+            if (between) {
+                value3 = getDetectedValue(cboxVariableValues3);
+                if (!cboxAritmethics2.getSelectedItem().toString().equals("")) {
+                    value4 = getDetectedValue(cboxVariableValues4);
                 }
             }
-        }
-        if(value2 != null){
-            try { Float.parseFloat(value2);
-            } catch(NumberFormatException e) {
-                try { Double.parseDouble(value2);
-                } catch(NumberFormatException e1) {
-                    try { Integer.parseInt(value2);
-                    } catch(NumberFormatException e2) {
-                        try { Long.parseLong(value2);
-                        } catch(NumberFormatException e3) {
+
+            setCboxVariableValuesOk(cboxVariableValues);
+            setCboxVariableValuesOk(cboxVariableValues2);
+            setCboxVariableValuesOk(cboxVariableValues3);
+            setCboxVariableValuesOk(cboxVariableValues4);
+
+            try {
+                Float.parseFloat(value);
+            } catch (NumberFormatException e) {
+                try {
+                    Double.parseDouble(value);
+                } catch (NumberFormatException e1) {
+                    try {
+                        Integer.parseInt(value);
+                    } catch (NumberFormatException e2) {
+                        try {
+                            Long.parseLong(value);
+                        } catch (NumberFormatException e3) {
                             System.out.println(e3);
-                            setSecondValid(false);
-                            setCboxVariableValuesWarning(cboxVariableValues2);
+                            setFirstValid(false);
+                            setCboxVariableValuesWarning(cboxVariableValues);
                         }
                     }
                 }
             }
-        }
-        if(value3 != null){
-            try { Float.parseFloat(value3);
-            } catch(NumberFormatException e) {
-                try { Double.parseDouble(value3);
-                } catch(NumberFormatException e1) {
-                    try { Integer.parseInt(value3);
-                    } catch(NumberFormatException e2) {
-                        try { Long.parseLong(value3);
-                        } catch(NumberFormatException e3) {
-                            System.out.println(e3);
-                            setThirdValid(false);
-                            setCboxVariableValuesWarning(cboxVariableValues3);
+            if (value2 != null) {
+                try {
+                    Float.parseFloat(value2);
+                } catch (NumberFormatException e) {
+                    try {
+                        Double.parseDouble(value2);
+                    } catch (NumberFormatException e1) {
+                        try {
+                            Integer.parseInt(value2);
+                        } catch (NumberFormatException e2) {
+                            try {
+                                Long.parseLong(value2);
+                            } catch (NumberFormatException e3) {
+                                System.out.println(e3);
+                                setSecondValid(false);
+                                setCboxVariableValuesWarning(cboxVariableValues2);
+                            }
                         }
                     }
                 }
             }
-        }
-        if(value4 != null){
-            try { Float.parseFloat(value4);
-            } catch(NumberFormatException e) {
-                try { Double.parseDouble(value4);
-                } catch(NumberFormatException e1) {
-                    try { Integer.parseInt(value4);
-                    } catch(NumberFormatException e2) {
-                        try { Long.parseLong(value4);
-                        } catch(NumberFormatException e3) {
-                            System.out.println(e3);
-                            setFourthValid(false);
-                            setCboxVariableValuesWarning(cboxVariableValues4);
+            if (value3 != null) {
+                try {
+                    Float.parseFloat(value3);
+                } catch (NumberFormatException e) {
+                    try {
+                        Double.parseDouble(value3);
+                    } catch (NumberFormatException e1) {
+                        try {
+                            Integer.parseInt(value3);
+                        } catch (NumberFormatException e2) {
+                            try {
+                                Long.parseLong(value3);
+                            } catch (NumberFormatException e3) {
+                                System.out.println(e3);
+                                setThirdValid(false);
+                                setCboxVariableValuesWarning(cboxVariableValues3);
+                            }
+                        }
+                    }
+                }
+            }
+            if (value4 != null) {
+                try {
+                    Float.parseFloat(value4);
+                } catch (NumberFormatException e) {
+                    try {
+                        Double.parseDouble(value4);
+                    } catch (NumberFormatException e1) {
+                        try {
+                            Integer.parseInt(value4);
+                        } catch (NumberFormatException e2) {
+                            try {
+                                Long.parseLong(value4);
+                            } catch (NumberFormatException e3) {
+                                System.out.println(e3);
+                                setFourthValid(false);
+                                setCboxVariableValuesWarning(cboxVariableValues4);
+                            }
                         }
                     }
                 }
@@ -304,125 +363,223 @@ public class SloupecCustomGrafu extends JPanel {
         return isFirstValid() && isSecondValid() && isThirdValid() && isFourthValid();
     }
     
-    public List<Boolean> detectValues(){
-        Double userInput = Double.parseDouble(getDetectedValue(cboxVariableValues));
-        Double userInput2;
-        Double userInput3;
-        Double userInput4;
-
-        Double resultValue = userInput;
-        Double resultValue2 = null;
-        if(!cboxAritmethics.getSelectedItem().toString().equals("")) {
-            userInput2 = Double.parseDouble(getDetectedValue(cboxVariableValues2));
-            switch (cboxAritmethics.getSelectedItem().toString()){
-                case "+":
-                    resultValue += userInput2;
+    public List<Boolean> detectValues(List<SloupecCustomGrafu> sloupce){
+        List<Boolean> tempDetect = new ArrayList<>();
+        String operator = getOperator();
+        if(compareColumns()){
+            SloupecCustomGrafu sloupec1 = null;
+            SloupecCustomGrafu sloupec2 = null;
+            List<String> columnData = getData();
+            for(SloupecCustomGrafu sloupec : sloupce){
+                if(sloupec.getName().equals(cboxColumns.getSelectedItem().toString())){
+                    sloupec1 = sloupec;
+                } else if (sloupec.getName().equals(cboxColumns2.getSelectedItem().toString())){
+                    sloupec2 = sloupec;
+                }
+            }
+            switch (operator) {
+                case "=":
+                    for (int i = 0; i < columnData.size(); i++) {
+                        Double temp = Double.parseDouble(columnData.get(i));
+                        Double temp2 = Double.parseDouble(sloupec1.getData().get(i));
+                        if (temp.compareTo(temp2) == 0) {
+                            tempDetect.add(true);
+                        } else {
+                            tempDetect.add(false);
+                        }
+                    }
                     break;
-                case "-":
-                    resultValue -= userInput2;
+                case "<":
+                    for (int i = 0; i < columnData.size(); i++) {
+                        Double temp = Double.parseDouble(columnData.get(i));
+                        Double temp2 = Double.parseDouble(sloupec1.getData().get(i));
+                        if (temp < temp2) {
+                            tempDetect.add(true);
+                        } else {
+                            tempDetect.add(false);
+                        }
+                    }
+                    break;
+                case ">":
+                    for (int i = 0; i < columnData.size(); i++) {
+                        Double temp = Double.parseDouble(columnData.get(i));
+                        Double temp2 = Double.parseDouble(sloupec1.getData().get(i));
+                        if (temp > temp2) {
+                            tempDetect.add(true);
+                        } else {
+                            tempDetect.add(false);
+                        }
+                    }
+                    break;
+                case ">=":
+                    for (int i = 0; i < columnData.size(); i++) {
+                        Double temp = Double.parseDouble(columnData.get(i));
+                        Double temp2 = Double.parseDouble(sloupec1.getData().get(i));
+                        if (temp >= temp2) {
+                            tempDetect.add(true);
+                        } else {
+                            tempDetect.add(false);
+                        }
+                    }
+                    break;
+                case "<=":
+                    for (int i = 0; i < columnData.size(); i++) {
+                        Double temp = Double.parseDouble(columnData.get(i));
+                        Double temp2 = Double.parseDouble(sloupec1.getData().get(i));
+                        if (temp <= temp2) {
+                            tempDetect.add(true);
+                        } else {
+                            tempDetect.add(false);
+                        }
+                    }
+                    break;
+                case "!=":
+                    for (int i = 0; i < columnData.size(); i++) {
+                        Double temp = Double.parseDouble(columnData.get(i));
+                        Double temp2 = Double.parseDouble(sloupec1.getData().get(i));
+                        if (temp.compareTo(temp2) != 0) {
+                            tempDetect.add(true);
+                        } else {
+                            tempDetect.add(false);
+                        }
+                    }
+                    break;
+                case "between":
+                    for (int i = 0; i < columnData.size(); i++) {
+                        Double temp = Double.parseDouble(columnData.get(i));
+                        Double temp2 = Double.parseDouble(sloupec1.getData().get(i));
+                        Double temp3 = Double.parseDouble(sloupec2.getData().get(i));
+                        Double change = temp2;
+                        if (change > temp3) {
+                            temp2 = temp3;
+                            temp3 = change;
+                        }
+                        if (temp > temp2 && temp < temp3) {
+                            tempDetect.add(true);
+                        } else {
+                            tempDetect.add(false);
+                        }
+                    }
                     break;
             }
-        }
-        if(between) {
-            userInput3 = Double.parseDouble(getDetectedValue(cboxVariableValues3));
-            resultValue2 = userInput3;
-            if(!cboxAritmethics2.getSelectedItem().toString().equals("")) {
-                userInput4 = Double.parseDouble(getDetectedValue(cboxVariableValues4));
-                switch (cboxAritmethics2.getSelectedItem().toString()){
+        } else {
+            Double userInput = Double.parseDouble(getDetectedValue(cboxVariableValues));
+            Double userInput2;
+            Double userInput3;
+            Double userInput4;
+
+            Double resultValue = userInput;
+            Double resultValue2 = null;
+            if (!cboxAritmethics.getSelectedItem().toString().equals("")) {
+                userInput2 = Double.parseDouble(getDetectedValue(cboxVariableValues2));
+                switch (cboxAritmethics.getSelectedItem().toString()) {
                     case "+":
-                        resultValue2 += userInput4;
+                        resultValue += userInput2;
                         break;
                     case "-":
-                        resultValue2 -= userInput4;
+                        resultValue -= userInput2;
                         break;
                 }
             }
-        }
-        String operator = getOperator();
-        List<Boolean> tempDetect = new ArrayList<>();
-        switch (operator) {
-            case "=":
-                for (String data : getData()) {
-                    Double temp = Double.parseDouble(data);
-                    if (temp.compareTo(resultValue) == 0) {
-                        tempDetect.add(true);
-                    } else {
-                        tempDetect.add(false);
+            if (between) {
+                userInput3 = Double.parseDouble(getDetectedValue(cboxVariableValues3));
+                resultValue2 = userInput3;
+                if (!cboxAritmethics2.getSelectedItem().toString().equals("")) {
+                    userInput4 = Double.parseDouble(getDetectedValue(cboxVariableValues4));
+                    switch (cboxAritmethics2.getSelectedItem().toString()) {
+                        case "+":
+                            resultValue2 += userInput4;
+                            break;
+                        case "-":
+                            resultValue2 -= userInput4;
+                            break;
                     }
                 }
-                break;
-            case "<":
-                for (String data : getData()) {
-                    Double temp = Double.parseDouble(data);
-                    if (temp < resultValue) {
-                        tempDetect.add(true);
-                    } else {
-                        tempDetect.add(false);
+            }
+            switch (operator) {
+                case "=":
+                    for (String data : getData()) {
+                        Double temp = Double.parseDouble(data);
+                        if (temp.compareTo(resultValue) == 0) {
+                            tempDetect.add(true);
+                        } else {
+                            tempDetect.add(false);
+                        }
                     }
-                }
-                break;
-            case ">":
-                for (String data : getData()) {
-                    Double temp = Double.parseDouble(data);
-                    if (temp > resultValue) {
-                        tempDetect.add(true);
-                    } else {
-                        tempDetect.add(false);
+                    break;
+                case "<":
+                    for (String data : getData()) {
+                        Double temp = Double.parseDouble(data);
+                        if (temp < resultValue) {
+                            tempDetect.add(true);
+                        } else {
+                            tempDetect.add(false);
+                        }
                     }
-                }
-                break;
-            case ">=":
-                for (String data : getData()) {
-                    Double temp = Double.parseDouble(data);
-                    if (temp >= resultValue) {
-                        tempDetect.add(true);
-                    } else {
-                        tempDetect.add(false);
+                    break;
+                case ">":
+                    for (String data : getData()) {
+                        Double temp = Double.parseDouble(data);
+                        if (temp > resultValue) {
+                            tempDetect.add(true);
+                        } else {
+                            tempDetect.add(false);
+                        }
                     }
-                }
-                break;
-            case "<=":
-                for (String data : getData()) {
-                    Double temp = Double.parseDouble(data);
-                    if (temp <= resultValue) {
-                        tempDetect.add(true);
-                    } else {
-                        tempDetect.add(false);
+                    break;
+                case ">=":
+                    for (String data : getData()) {
+                        Double temp = Double.parseDouble(data);
+                        if (temp >= resultValue) {
+                            tempDetect.add(true);
+                        } else {
+                            tempDetect.add(false);
+                        }
                     }
-                }
-                break;
-            case "!=":
-                for (String data : getData()) {
-                    Double temp = Double.parseDouble(data);
-                    if (temp.compareTo(resultValue) != 0) {
-                        tempDetect.add(true);
-                    } else {
-                        tempDetect.add(false);
+                    break;
+                case "<=":
+                    for (String data : getData()) {
+                        Double temp = Double.parseDouble(data);
+                        if (temp <= resultValue) {
+                            tempDetect.add(true);
+                        } else {
+                            tempDetect.add(false);
+                        }
                     }
-                }
-                break;
-            case "between":
-                for (String data : getData()) {
-                    Double temp = Double.parseDouble(data);
-                    Double change = resultValue;
-                    if(change > resultValue2){
-                        resultValue = resultValue2;
-                        resultValue2 = change;
+                    break;
+                case "!=":
+                    for (String data : getData()) {
+                        Double temp = Double.parseDouble(data);
+                        if (temp.compareTo(resultValue) != 0) {
+                            tempDetect.add(true);
+                        } else {
+                            tempDetect.add(false);
+                        }
                     }
-                    if (temp > resultValue && temp < resultValue2) {
-                        tempDetect.add(true);
-                    } else {
-                        tempDetect.add(false);
+                    break;
+                case "between":
+                    for (String data : getData()) {
+                        Double temp = Double.parseDouble(data);
+                        Double change = resultValue;
+                        if (change > resultValue2) {
+                            resultValue = resultValue2;
+                            resultValue2 = change;
+                        }
+                        if (temp > resultValue && temp < resultValue2) {
+                            tempDetect.add(true);
+                        } else {
+                            tempDetect.add(false);
+                        }
                     }
-                }
-                break;
+                    break;
+            }
         }
         this.detectedValues = tempDetect;
         return tempDetect;
     }
 
     public boolean useColum(){
-        return this.useColumn.isSelected();
+        return this.checkBoxUseColumn.isSelected();
     }
 
     public String getDetectedValue(JComboBox comboBox){
@@ -497,5 +654,9 @@ public class SloupecCustomGrafu extends JPanel {
 
     public void setBetween(boolean between){
         this.between = between;
+    }
+
+    public boolean compareColumns(){
+        return checkBoxCompareColumns.isSelected();
     }
 }

@@ -657,6 +657,7 @@ public class OknoMigLayout extends JFrame{
                     String condition;
                     String axisTable = "";
                     List<String> firstColumn = new ArrayList<>();
+                    List<String> columnNames = new ArrayList<>();
 
                     Component[] components = centerPanel.getComponents();
                     for (Component comp : components) {
@@ -673,13 +674,16 @@ public class OknoMigLayout extends JFrame{
                         }
                     }
 
+                    for(QueryPanel panel : queryPanels){
+                        columnNames.add(panel.getColumnName());
+                    }
 
                     graphData = new CustomGraf(queryPanels.size() + 1);
                     graphData.addNazvySloupcu(axisTable);
 
                     firstColumn = prepareGraphsFirstColumn(axisTable);
 
-                    SloupecCustomGrafu sl = new SloupecCustomGrafu(axisTable, firstColumn, -1, preparedVariableValues, false);
+                    SloupecCustomGrafu sl = new SloupecCustomGrafu(axisTable, firstColumn, -1, preparedVariableValues, false, columnNames);
                     centerPanel.removeAll();
                     centerTablePanel.removeAll();
                     centerPanel.add(centerNorthPanel, "dock north, width 100%");
@@ -720,9 +724,9 @@ public class OknoMigLayout extends JFrame{
                         String columnName = panel.getColumnName().equals("") ? "Col" + columnsNumber : panel.getColumnName();
                         SloupecCustomGrafu sloupec;
                         if (axisTable.equals("Iteration")) {
-                            sloupec = mapData(data, firstColumn, columnName, true);
+                            sloupec = mapData(data, firstColumn, columnName, true, columnNames);
                         } else {
-                            sloupec = mapData(data, firstColumn, columnName, false);
+                            sloupec = mapData(data, firstColumn, columnName, false, columnNames);
                         }
                         graphData.addNazvySloupcu(columnName);
 
@@ -734,7 +738,7 @@ public class OknoMigLayout extends JFrame{
                         centerTablePanel.add(sloupec, "dock west, width 240");
                     }
                     columnsNumber++;
-                    detected = new SloupecCustomGrafu("detected", new ArrayList<>(), columnsNumber, preparedVariableValues, false);
+                    detected = new SloupecCustomGrafu("detected", new ArrayList<>(), columnsNumber, preparedVariableValues, false, columnNames);
                     centerTablePanel.add(detected, "dock west, grow");
 
                     graphData.addNazvySloupcu("detected");
@@ -756,22 +760,28 @@ public class OknoMigLayout extends JFrame{
             public void actionPerformed(ActionEvent e) {
                 ArrayList<String> columnData = new ArrayList<>();
                 List<List<Boolean>> detectionValues = new ArrayList<>();
-                List<SloupecCustomGrafu> sloupce = new ArrayList<>();
+                List<SloupecCustomGrafu> columnsToDetect = new ArrayList<>();
+                List<SloupecCustomGrafu> allColumns = new ArrayList<>();
+                List<String> columnNames = new ArrayList<>();
+                for(QueryPanel panel : queryPanels){
+                    columnNames.add(panel.getColumnName());
+                }
                 Component[] components = centerTablePanel.getComponents();
                 for(Component comp : components){
                     if(comp instanceof SloupecCustomGrafu){
                         SloupecCustomGrafu temp = (SloupecCustomGrafu) comp;
+                        allColumns.add(temp);
                         if(temp.useColum()) {
-                            sloupce.add(temp);
+                            columnsToDetect.add(temp);
                         }
                     }
                 }
-                if(!sloupce.isEmpty()){
-                    boolean valid = validateInputs(sloupce);
+                if(!columnsToDetect.isEmpty()){
+                    boolean valid = validateInputs(columnsToDetect);
                     if(valid) {
-                        for (SloupecCustomGrafu sloupec : sloupce) {
+                        for (SloupecCustomGrafu sloupec : columnsToDetect) {
                             if (sloupec.useColum()) {
-                                detectionValues.add(sloupec.detectValues());
+                                detectionValues.add(sloupec.detectValues(allColumns));
                             }
                         }
 
@@ -788,7 +798,7 @@ public class OknoMigLayout extends JFrame{
                         }
                         centerTablePanel.remove(centerTablePanel.getComponentCount() - 1);
 
-                        detected = new SloupecCustomGrafu("detected", columnData, columnsNumber, preparedVariableValues, false);
+                        detected = new SloupecCustomGrafu("detected", columnData, columnsNumber, preparedVariableValues, false, columnNames);
                         centerTablePanel.add(detected, "dock west, grow");
 
                         graphData.getDataSloupec(columnsNumber - 2).clear();
@@ -853,7 +863,7 @@ public class OknoMigLayout extends JFrame{
         return result;
     }
 
-    private SloupecCustomGrafu mapData(List<List<String>> data, List<String> firstColumn, String columnName, boolean iteration){
+    private SloupecCustomGrafu mapData(List<List<String>> data, List<String> firstColumn, String columnName, boolean iteration, List<String> columnNames){
         List<String> values = new ArrayList<>();
         boolean found = false;
 
@@ -882,7 +892,7 @@ public class OknoMigLayout extends JFrame{
                 found = false;
             }
         }
-        return new SloupecCustomGrafu(columnName, values, 1, preparedVariableValues, true);
+        return new SloupecCustomGrafu(columnName, values, 1, preparedVariableValues, true, columnNames);
     }
 
     private List<String> prepareGraphsFirstColumn(String axisTable) {
