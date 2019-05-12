@@ -78,6 +78,7 @@ public class OknoMigLayout extends JFrame{
     private List<QueryPanel> queryPanels;
     private int columnsNumber = 0;
 
+    /* For testing only - remove in final version*/
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -304,7 +305,7 @@ public class OknoMigLayout extends JFrame{
                 for(QueryPanel panel : queryPanels){
                     centerPanel.add(panel, "dock west, width " + queryPanelWidth);
                 }
-                queryPanels.clear();
+//                queryPanels.clear();
 
                 bottomPanel.remove(detectBtn);
                 bottomPanel.remove(showGraphBtn);
@@ -681,7 +682,7 @@ public class OknoMigLayout extends JFrame{
                     SloupecCustomGrafu sl = new SloupecCustomGrafu(axisTable, firstColumn, -1, preparedVariableValues, false);
                     centerPanel.removeAll();
                     centerTablePanel.removeAll();
-                    centerPanel.add(centerNorthPanel, "dock north");
+                    centerPanel.add(centerNorthPanel, "dock north, width 100%");
                     centerTablePanel.add(sl, "dock west, grow");
                     columnsNumber++;
 
@@ -730,7 +731,7 @@ public class OknoMigLayout extends JFrame{
                         }
                         index++;
 
-                        centerTablePanel.add(sloupec, "dock west, grow");
+                        centerTablePanel.add(sloupec, "dock west, width 240");
                     }
                     columnsNumber++;
                     detected = new SloupecCustomGrafu("detected", new ArrayList<>(), columnsNumber, preparedVariableValues, false);
@@ -760,7 +761,7 @@ public class OknoMigLayout extends JFrame{
                 for(Component comp : components){
                     if(comp instanceof SloupecCustomGrafu){
                         SloupecCustomGrafu temp = (SloupecCustomGrafu) comp;
-                        if(temp.useColum() && temp.getDetectedValue().length() != 0) {
+                        if(temp.useColum()) {
                             sloupce.add(temp);
                         }
                     }
@@ -835,12 +836,7 @@ public class OknoMigLayout extends JFrame{
         boolean result = true;
         for(SloupecCustomGrafu sloupec : sloupce){
             boolean valid = sloupec.validateInput();
-            if(valid){
-                sloupec.setCboxVariableValuesOk();
-            } else {
-                sloupec.setCboxVariableValuesWarning();
-                result = false;
-            }
+            result &= valid;
         }
         return result;
     }
