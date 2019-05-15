@@ -1,6 +1,7 @@
 package gui;
 
 import net.miginfocom.swing.MigLayout;
+import org.json.JSONObject;
 import ostatni.ComboBoxItem;
 import ostatni.CustomComboBoxEditor;
 
@@ -52,9 +53,33 @@ public class SloupecCustomGrafu extends JPanel {
                 }
                 try {
 
+                    JSONObject detection = new JSONObject();
+//                    detection.put("operator", "between");
+//                    detection.put("detect", "true");
+//                    detection.put("compareColumns", "false");
+//                    JSONObject firstInput = new JSONObject();
+//                    firstInput.put("value1", "1");
+//                    firstInput.put("arithmetic", "+");
+//                    firstInput.put("value2", "2");
+//                    detection.put("firstInput", firstInput);
+//                    JSONObject secondInput = new JSONObject();
+//                    secondInput.put("value1", "3");
+//                    secondInput.put("arithmetic", "-");
+//                    secondInput.put("value2", "4");
+//                    detection.put("secondInput", secondInput);
+
+                    detection.put("operator", "between");
+                    detection.put("detect", "true");
+                    detection.put("compareColumns", "true");
+                    detection.put("column1", "col1");
+                    detection.put("column2", "col2");
+
+                    JSONObject object = new JSONObject();
+                    object.put("detection", detection);
+
                     SloupecCustomGrafu graf = new SloupecCustomGrafu("ColumnName", new ArrayList<>(Arrays.asList("1","2","3")), 0,
                             new ArrayList<>(Arrays.asList(new ComboBoxItem("jmeno", "text", "name"), new ComboBoxItem("cislo","number","5"))),
-                            true, new ArrayList<>(Arrays.asList("col1","col2","col3")));
+                            true, new ArrayList<>(Arrays.asList("col1","col2","col3")), object);
 
                     mainFrame = new JFrame();
                     mainFrame.setLayout(new MigLayout("ins 0"));
@@ -78,7 +103,7 @@ public class SloupecCustomGrafu extends JPanel {
      * @param nazev název dat
      * @param data datumy k zobrazení
      */
-    public SloupecCustomGrafu(String nazev, List<String> data, int index, List<ComboBoxItem> variableValues, boolean includeHeader, List<String> columnNames) {
+    public SloupecCustomGrafu(String nazev, List<String> data, int index, List<ComboBoxItem> variableValues, boolean includeHeader, List<String> columnNames, JSONObject query) {
         this.data = data;
         this.index = index;
         setBackground(Color.white);
@@ -235,6 +260,52 @@ public class SloupecCustomGrafu extends JPanel {
             this.add(this.lblNazev, "grow, span 3, wrap, dock north");
         } else {
             this.add(this.lblNazev, "grow, span 3, wrap, gapy 70");
+        }
+
+        if(query != null){
+            if(query.has("detection")) {
+                JSONObject detection = query.getJSONObject("detection");
+                String operator = detection.getString("operator");
+                operators.setSelectedItem(operator);
+                boolean detect = detection.getBoolean("detect");
+                if (detect) {
+                    checkBoxUseColumn.setSelected(true);
+                } else {
+                    checkBoxUseColumn.setSelected(false);
+                }
+                boolean compareColumns = detection.getBoolean("compareColumns");
+                if (!compareColumns) {
+                    checkBoxCompareColumns.setSelected(false);
+                    JSONObject firstInput = detection.getJSONObject("firstInput");
+                    String value1 = firstInput.getString("value1");
+                    cboxVariableValues.setSelectedItem(value1);
+                    if (firstInput.has("arithmetic")) {
+                        String arithmetic = firstInput.getString("arithmetic");
+                        cboxAritmethics.setSelectedItem(arithmetic);
+                        String value2 = firstInput.getString("value2");
+                        cboxVariableValues2.setSelectedItem(value2);
+                    }
+                    if (operator.equals("between")) {
+                        JSONObject secondInput = detection.getJSONObject("secondInput");
+                        String value3 = secondInput.getString("value1");
+                        cboxVariableValues3.setSelectedItem(value3);
+                        if (secondInput.has("arithmetic")) {
+                            String arithmetic = secondInput.getString("arithmetic");
+                            cboxAritmethics2.setSelectedItem(arithmetic);
+                            String value4 = secondInput.getString("value2");
+                            cboxVariableValues4.setSelectedItem(value4);
+                        }
+                    }
+                } else {
+                    checkBoxCompareColumns.doClick();
+                    String column1 = detection.getString("column1");
+                    cboxColumns.setSelectedItem(column1);
+                    if (operator.equals("between")) {
+                        String column2 = detection.getString("column2");
+                        cboxColumns2.setSelectedItem(column2);
+                    }
+                }
+            }
         }
 
         this.lblNazev.setBorder(new MatteBorder(1,0,1,0, Color.BLACK));
@@ -578,6 +649,24 @@ public class SloupecCustomGrafu extends JPanel {
         return tempDetect;
     }
 
+    public String getComboBoxValue(JComboBox comboBox) {
+        String value;
+        if(comboBox.getEditor().getItem() instanceof ComboBoxItem){
+            value = ((ComboBoxItem) comboBox.getSelectedItem()).getValue();
+        } else {
+            try {
+                value = comboBox.getEditor().getItem().toString();
+            } catch (NullPointerException e) {
+                value = "";
+            }
+        }
+        return value;
+    }
+
+    public String getArithmeticOperator(JComboBox comboBox) {
+        return comboBox.getSelectedItem().toString();
+    }
+
     public boolean useColum(){
         return this.checkBoxUseColumn.isSelected();
     }
@@ -652,11 +741,39 @@ public class SloupecCustomGrafu extends JPanel {
         return between;
     }
 
-    public void setBetween(boolean between){
-        this.between = between;
-    }
-
     public boolean compareColumns(){
         return checkBoxCompareColumns.isSelected();
+    }
+
+    public JComboBox<ComboBoxItem> getCboxVariableValues() {
+        return cboxVariableValues;
+    }
+
+    public JComboBox<ComboBoxItem> getCboxVariableValues2() {
+        return cboxVariableValues2;
+    }
+
+    public JComboBox<ComboBoxItem> getCboxVariableValues3() {
+        return cboxVariableValues3;
+    }
+
+    public JComboBox<ComboBoxItem> getCboxVariableValues4() {
+        return cboxVariableValues4;
+    }
+
+    public JComboBox<String> getCboxColumns() {
+        return cboxColumns;
+    }
+
+    public JComboBox<String> getCboxColumns2() {
+        return cboxColumns2;
+    }
+
+    public JComboBox<String> getCboxAritmethics() {
+        return cboxAritmethics;
+    }
+
+    public JComboBox<String> getCboxAritmethics2() {
+        return cboxAritmethics2;
     }
 }

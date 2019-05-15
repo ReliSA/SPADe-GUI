@@ -128,11 +128,11 @@ public class PohledDAO {
         ResultSet rs = null;
         try {
             pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, name, pass);
-            stmt = pripojeni.prepareStatement("SELECT DISTINCT personName FROM personView where projectId = " + projektId + " ORDER BY personName ASC");
+            stmt = pripojeni.prepareStatement("SELECT DISTINCT name FROM personView where projectId = " + projektId + " ORDER BY name ASC");
 
             rs = stmt.executeQuery();
             while(rs.next()){
-                result.add(rs.getString("personName"));
+                result.add(rs.getString("name"));
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null , "Chyba při spuštění skriptu větví nebo tagů konfigurací!");

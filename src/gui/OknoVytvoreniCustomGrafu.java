@@ -32,9 +32,9 @@ import java.util.stream.Collectors;
 
 import org.json.*;
 
-public class OknoMigLayout extends JFrame{
+public class OknoVytvoreniCustomGrafu extends JFrame{
 
-    public static OknoMigLayout instance;
+    public static OknoVytvoreniCustomGrafu instance;
     private static int queryPanelWidth = 200;
     private static boolean variableCreation = false;
     private static JFrame mainFrame;
@@ -76,6 +76,7 @@ public class OknoMigLayout extends JFrame{
     private static List<ComboBoxItem> preparedVariableValues;
     private SloupecCustomGrafu detected;
     private List<QueryPanel> queryPanels;
+    private List<SloupecCustomGrafu> sloupceCustomGrafu;
     private int columnsNumber = 0;
 
     /* For testing only - remove in final version*/
@@ -90,7 +91,7 @@ public class OknoMigLayout extends JFrame{
                     System.exit(0);
                 }
                 try {
-                    OknoMigLayout frame = new OknoMigLayout(new Projekt(12, null, null ,null));
+                    OknoVytvoreniCustomGrafu frame = new OknoVytvoreniCustomGrafu(new Projekt(12, null, null ,null));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -98,7 +99,7 @@ public class OknoMigLayout extends JFrame{
         });
     }
 
-    public OknoMigLayout(Projekt projekt) {
+    public OknoVytvoreniCustomGrafu(Projekt projekt) {
 //        super(Konstanty.POPISY.getProperty("menuVytvorGraf"));
         if (instance != null)
             instance.dispose();
@@ -131,6 +132,7 @@ public class OknoMigLayout extends JFrame{
         constantsPanel = new JPanel(new MigLayout());
         variablesPanel = new JPanel(new MigLayout());
         preparedVariableValues = new ArrayList<>();
+        sloupceCustomGrafu = new ArrayList<>();
 
         PohledEnum[] pohledy = PohledEnum.values();
         List<Sloupec> sloupce;
@@ -243,7 +245,6 @@ public class OknoMigLayout extends JFrame{
         dpDatumDO = new JDatePickerImpl(datumDOPanel, new DateComponentFormatter());
 
         bottomPanel.setBackground(Color.GRAY);
-        bottomPanel.add(saveBtn);
         bottomPanel.add(cancelBtn);
 
         nastavAkce();
@@ -260,7 +261,6 @@ public class OknoMigLayout extends JFrame{
                 centerPanel.removeAll();
                 bottomPanel.removeAll();
                 bottomPanel.add(cancelBtn);
-                bottomPanel.add(saveBtn);
                 mainFrame.remove(bottomPanel);
 
                 varOrQueryNameTf.setText("");
@@ -307,9 +307,8 @@ public class OknoMigLayout extends JFrame{
                 }
 //                queryPanels.clear();
 
-                bottomPanel.remove(detectBtn);
-                bottomPanel.remove(showGraphBtn);
-                bottomPanel.remove(goBackBtn);
+                bottomPanel.removeAll();
+                bottomPanel.add(cancelBtn);
                 bottomPanel.add(runQueryBtn);
 
                 mainFrame.revalidate();
@@ -360,14 +359,14 @@ public class OknoMigLayout extends JFrame{
                     }
 
                     Component centerComponents[] = centerPanel.getComponents();
-                    List<JSONObject> constList = new ArrayList<>();
+                    List<JSONObject> queryList = new ArrayList<>();
 
                     int panelCount = 1;
                     Long variableValue = null;
 
                     for (QueryPanel queryPanel : queryPanels) {
                         JSONObject query  = queryPanel.getQuery();
-                        String columnName = queryPanel.getColumnName().equals("") ? "Col" + panelCount : queryPanel.getColumnName();
+                        final String columnName = queryPanel.getColumnName().equals("") ? "Col" + panelCount : queryPanel.getColumnName();
                         query.put("columnName", columnName);
                         if (variableCreation) {
                             Component[] components = variablesPanel.getComponents();
@@ -396,12 +395,45 @@ public class OknoMigLayout extends JFrame{
                             preparedVariableValues.add(comboBoxItem);
                             System.out.println(preparedVariableValues);
                         }
-                        constList.add(query);
+
+                        SloupecCustomGrafu sloupec = sloupceCustomGrafu.stream()
+                                .filter(sl -> columnName.equals(sl.getName())).findAny().orElse(null);
+                        JSONObject detection = new JSONObject();
+                        detection.put("operator", sloupec.getOperator());
+                        detection.put("detect", sloupec.useColum());
+                        detection.put("compareColumns", sloupec.compareColumns());
+                        if(sloupec.compareColumns()){
+                            detection.put("column1", sloupec.getCboxColumns().getSelectedItem());
+                            if(sloupec.isBetween()){
+                                detection.put("column2", sloupec.getCboxColumns2().getSelectedItem());
+                            }
+                        } else {
+                            JSONObject firstInput = new JSONObject();
+                            firstInput.put("value1", sloupec.getComboBoxValue(sloupec.getCboxVariableValues()));
+                            if(!sloupec.getArithmeticOperator(sloupec.getCboxAritmethics()).equals("")){
+                                firstInput.put("arithmetic", sloupec.getArithmeticOperator(sloupec.getCboxAritmethics()));
+                                firstInput.put("value2", sloupec.getComboBoxValue(sloupec.getCboxVariableValues2()));
+                            }
+                            detection.put("firstInput", firstInput);
+                            if(sloupec.isBetween()){
+                                JSONObject secondInput = new JSONObject();
+                                secondInput.put("value1", sloupec.getComboBoxValue(sloupec.getCboxVariableValues3()));
+                                if(!sloupec.getArithmeticOperator(sloupec.getCboxAritmethics2()).equals("")){
+                                    secondInput.put("arithmetic", sloupec.getArithmeticOperator(sloupec.getCboxAritmethics2()));
+                                    secondInput.put("value2", sloupec.getComboBoxValue(sloupec.getCboxVariableValues4()));
+                                }
+                                detection.put("secondInput", secondInput);
+                            }
+                        }
+
+                        query.put("detection", detection);
+                        queryList.add(query);
                         panelCount++;
                     }
-                    JSONObject[] constArray = new JSONObject[constList.size()];
-                    constArray = constList.toArray(constArray);
-                    jsonObject.put("queries", constArray);
+                    JSONObject[] queryArray = new JSONObject[queryList.size()];
+                    queryArray = queryList.toArray(queryArray);
+                    jsonObject.put("queries", queryArray);
+
                     String result = jsonObject.toString(2);
                     if (variableCreation) {
                         File variableFolder = new File(variableFolderPath);
@@ -444,6 +476,7 @@ public class OknoMigLayout extends JFrame{
                     }
                     centerNorthPanel.removeAll();
                     centerPanel.removeAll();
+                    bottomPanel.removeAll();
                     mainFrame.remove(bottomPanel);
 
                     queryPanels.clear();
@@ -478,7 +511,7 @@ public class OknoMigLayout extends JFrame{
 
                     centerNorthPanel.add(addQueryBtn);
                     varOrQueryNameTf.setText(file.getName().substring(0, file.getName().indexOf('.')));
-                    centerNorthPanel.add(varOrQueryNameTf);
+                    centerNorthPanel.add(varOrQueryNameTf, "width 10%");
 
                     centerPanel.add(centerNorthPanel, "dock north, width 100%");
                     centerPanel.add(axisPanel, "dock west, height 800, width " + queryPanelWidth);
@@ -524,6 +557,7 @@ public class OknoMigLayout extends JFrame{
                         ex.printStackTrace();
                     }
 
+                    bottomPanel.add(cancelBtn);
                     bottomPanel.add(runQueryBtn);
                     mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
 
@@ -545,12 +579,13 @@ public class OknoMigLayout extends JFrame{
 
                 centerNorthPanel.add(addQueryBtn);
                 centerNorthPanel.add(lblName);
-                centerNorthPanel.add(varOrQueryNameTf);
+                centerNorthPanel.add(varOrQueryNameTf, "width 10%");
                 centerNorthPanel.add(testVarQueryBtn);
 
                 bottomPanel.remove(runQueryBtn);
                 bottomPanel.remove(detectBtn);
                 bottomPanel.remove(showGraphBtn);
+                bottomPanel.add(saveBtn);
                 mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
 
                 centerPanel.add(centerNorthPanel, "dock north, width 100%");
@@ -628,11 +663,12 @@ public class OknoMigLayout extends JFrame{
 
                 centerNorthPanel.add(addQueryBtn);
                 centerNorthPanel.add(lblName);
-                centerNorthPanel.add(varOrQueryNameTf);
+                centerNorthPanel.add(varOrQueryNameTf, "width 10%");
 
                 centerPanel.add(centerNorthPanel, "dock north, width 100%");
                 centerPanel.add(axisPanel, "dock west, height 800, width " + queryPanelWidth);
 
+                bottomPanel.add(cancelBtn);
                 bottomPanel.add(runQueryBtn);
                 mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
 
@@ -683,7 +719,7 @@ public class OknoMigLayout extends JFrame{
 
                     firstColumn = prepareGraphsFirstColumn(axisTable);
 
-                    SloupecCustomGrafu sl = new SloupecCustomGrafu(axisTable, firstColumn, -1, preparedVariableValues, false, columnNames);
+                    SloupecCustomGrafu sl = new SloupecCustomGrafu(axisTable, firstColumn, -1, preparedVariableValues, false, columnNames, null);
                     centerPanel.removeAll();
                     centerTablePanel.removeAll();
                     centerPanel.add(centerNorthPanel, "dock north, width 100%");
@@ -724,11 +760,13 @@ public class OknoMigLayout extends JFrame{
                         String columnName = panel.getColumnName().equals("") ? "Col" + columnsNumber : panel.getColumnName();
                         SloupecCustomGrafu sloupec;
                         if (axisTable.equals("Iteration")) {
-                            sloupec = mapData(data, firstColumn, columnName, true, columnNames);
+                            sloupec = mapData(data, firstColumn, columnName, true, columnNames, panel.getQuery());
                         } else {
-                            sloupec = mapData(data, firstColumn, columnName, false, columnNames);
+                            sloupec = mapData(data, firstColumn, columnName, false, columnNames, panel.getQuery());
                         }
                         graphData.addNazvySloupcu(columnName);
+
+                        sloupceCustomGrafu.add(sloupec);
 
                         for (String s : sloupec.getData()) {
                             graphData.addData(index, Double.parseDouble(s));
@@ -738,7 +776,7 @@ public class OknoMigLayout extends JFrame{
                         centerTablePanel.add(sloupec, "dock west, width 240");
                     }
                     columnsNumber++;
-                    detected = new SloupecCustomGrafu("detected", new ArrayList<>(), columnsNumber, preparedVariableValues, false, columnNames);
+                    detected = new SloupecCustomGrafu("detected", new ArrayList<>(), columnsNumber, preparedVariableValues, false, columnNames, null);
                     centerTablePanel.add(detected, "dock west, grow");
 
                     graphData.addNazvySloupcu("detected");
@@ -748,6 +786,7 @@ public class OknoMigLayout extends JFrame{
                     bottomPanel.add(detectBtn);
                     bottomPanel.add(goBackBtn);
                     bottomPanel.add(showGraphBtn);
+                    bottomPanel.add(saveBtn);
                     mainFrame.revalidate();
                     mainFrame.repaint();
                 }
@@ -798,7 +837,7 @@ public class OknoMigLayout extends JFrame{
                         }
                         centerTablePanel.remove(centerTablePanel.getComponentCount() - 1);
 
-                        detected = new SloupecCustomGrafu("detected", columnData, columnsNumber, preparedVariableValues, false, columnNames);
+                        detected = new SloupecCustomGrafu("detected", columnData, columnsNumber, preparedVariableValues, false, columnNames, null);
                         centerTablePanel.add(detected, "dock west, grow");
 
                         graphData.getDataSloupec(columnsNumber - 2).clear();
@@ -863,7 +902,7 @@ public class OknoMigLayout extends JFrame{
         return result;
     }
 
-    private SloupecCustomGrafu mapData(List<List<String>> data, List<String> firstColumn, String columnName, boolean iteration, List<String> columnNames){
+    private SloupecCustomGrafu mapData(List<List<String>> data, List<String> firstColumn, String columnName, boolean iteration, List<String> columnNames, JSONObject query){
         List<String> values = new ArrayList<>();
         boolean found = false;
 
@@ -892,7 +931,7 @@ public class OknoMigLayout extends JFrame{
                 found = false;
             }
         }
-        return new SloupecCustomGrafu(columnName, values, 1, preparedVariableValues, true, columnNames);
+        return new SloupecCustomGrafu(columnName, values, 1, preparedVariableValues, true, columnNames, query);
     }
 
     private List<String> prepareGraphsFirstColumn(String axisTable) {
@@ -1078,6 +1117,7 @@ public class OknoMigLayout extends JFrame{
         while(iterator.hasNext()) {
             JSONObject jsonObject = (JSONObject) iterator.next();
             condition = jsonObject.getString("name") + " " + jsonObject.getString("operator") + " ";
+            condition = jsonObject.getString("name") + " " + jsonObject.getString("operator") + " ";
             if(jsonObject.getString("operator").equals("like")){
                 condition += "\"" + jsonObject.getString("value") + "\"";
             } else {
@@ -1205,7 +1245,7 @@ public class OknoMigLayout extends JFrame{
 
                     centerNorthPanel.add(addQueryBtn);
                     varOrQueryNameTf.setText(name);
-                    centerNorthPanel.add(varOrQueryNameTf);
+                    centerNorthPanel.add(varOrQueryNameTf, "width 10%");
                     centerNorthPanel.add(testVarQueryBtn);
 
                     mainFrame.add(bottomPanel, "dock south, height 40, width 100%");

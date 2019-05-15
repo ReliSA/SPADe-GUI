@@ -157,10 +157,11 @@ class FormularVytvoreniDotazu extends JDialog
 
                 cboxColumns.removeAllItems();
                 cboxJoinColumn.removeAllItems();
-                // join pres Person
-                cboxJoinColumn.addItem("personName");
                 for(Sloupec s : strukturaPohledu.get(cboxTables.getSelectedItem())){
                     cboxColumns.addItem(s.getName());
+                    if(s.getName().equals("authorName") || s.getName().equals("relatedName") || s.getName().equals("assigneeName")){
+                        cboxJoinColumn.addItem(s.getName());
+                    }
                     if(s.getType().equals("datetime") || s.getType().equals("date")){
                         cboxJoinColumn.addItem(s.getName());
                     }
