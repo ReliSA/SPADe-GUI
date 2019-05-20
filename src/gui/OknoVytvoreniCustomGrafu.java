@@ -56,6 +56,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
     private static JButton showGraphBtn;
     private static JButton saveBtn;
     private static JButton cancelBtn;
+    private static JButton exportBtn;
     private static JPanel centerNorthPanel;
     private static JPanel centerPanel;
     private static JPanel centerTablePanel;
@@ -126,6 +127,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         showGraphBtn = new JButton("Show graph");
         saveBtn = new JButton("Save");
         cancelBtn = new JButton("Cancel");
+        exportBtn = new JButton("Export to CSV");
         centerNorthPanel = new JPanel(new MigLayout());
         centerPanel = new JPanel(new MigLayout("ins 0"));
         centerTablePanel = new JPanel(new MigLayout("gap rel 0, ins 0"));
@@ -267,6 +269,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                 mainFrame.remove(bottomPanel);
 
                 varOrQueryNameTf.setText("");
+                sloupceCustomGrafu.clear();
                 centerNorthPanel.add(createQueryBtn);
                 centerNorthPanel.add(loadQueryBtn);
                 centerPanel.add(centerNorthPanel, "dock north, width 100%");
@@ -309,6 +312,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                     centerPanel.add(panel, "dock west, width " + queryPanelWidth);
                 }
 //                queryPanels.clear();
+                sloupceCustomGrafu.clear();
 
                 bottomPanel.removeAll();
                 bottomPanel.add(cancelBtn);
@@ -790,6 +794,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                     bottomPanel.add(goBackBtn);
                     bottomPanel.add(showGraphBtn);
                     bottomPanel.add(saveBtn);
+                    bottomPanel.add(exportBtn);
                     mainFrame.revalidate();
                     mainFrame.repaint();
                 }
@@ -862,6 +867,67 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                             "Warning",
                             JOptionPane.WARNING_MESSAGE);
                 }
+            }
+        });
+
+        /* Akce pro detekci podle zadaných kritérií */
+        exportBtn.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                File file;
+                Writer writer = null;
+                boolean first = true;
+                List<List<String>> values = new ArrayList<>();
+                String completePath = "C:\\Temp\\";
+                String fileName = "export";
+                fileName += LocalDateTime.now();
+                fileName = fileName.replaceAll(":", "-");
+                completePath += fileName;
+
+                StringBuilder sb = new StringBuilder();
+                for (SloupecCustomGrafu sloupec : sloupceCustomGrafu) {
+                    if (!first) {
+                        sb.append(',');
+                    }
+                    sb.append(sloupec.getName());
+                    values.add(sloupec.getData());
+
+                    first = false;
+                }
+                sb.append("\n");
+
+                first = true;
+                for(int i = 0; i < values.get(0).size(); i++){
+                    for (int j = 0; j < values.size(); j++){
+                        if (!first) {
+                            sb.append(',');
+                        }
+                        sb.append(values.get(j).get(i));
+
+                        first = false;
+                    }
+                    sb.append("\n");
+                    first = true;
+                }
+
+                try {
+                    file = new File(completePath + ".csv");
+                    writer = new BufferedWriter(new OutputStreamWriter(
+                            new FileOutputStream(file), "utf-8"));
+                    writer.write(sb.toString());
+                    JOptionPane.showMessageDialog(mainFrame,
+                            "Export successful.",
+                            "Info",
+                            JOptionPane.INFORMATION_MESSAGE);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                } finally {
+                    try {
+                        writer.close();
+                    } catch (Exception ex) {/*ignore*/}
+                }
+//                sb.setLength(0);
+//                values.clear();
             }
         });
 
