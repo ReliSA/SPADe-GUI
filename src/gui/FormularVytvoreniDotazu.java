@@ -1,13 +1,13 @@
 package gui;
 
 import net.miginfocom.swing.MigLayout;
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import ostatni.*;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.plaf.basic.BasicComboBoxEditor;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -35,6 +35,7 @@ class FormularVytvoreniDotazu extends JDialog
     private JComboBox<String> cboxColumns = new JComboBox<>();
     private JComboBox<String> cboxJoinColumn = new JComboBox<>();
     private JTextField tfAttValue = new JTextField("Value");
+    static Logger log = Logger.getLogger(FormularVytvoreniDotazu.class);
 
     private FormularVytvoreniDotazu parentForm;
 
@@ -397,7 +398,7 @@ class FormularVytvoreniDotazu extends JDialog
                 removeBtn.setFocusPainted(false);
                 removeBtn.setOpaque(false);
             } catch (Exception ex) {
-                System.out.println(ex);
+                log.error(ex);
             }
             removeBtn.addActionListener(new ActionListener(){
                 @Override

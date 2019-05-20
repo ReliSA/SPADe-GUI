@@ -292,7 +292,6 @@ public class UkolDAO implements IUkolDAO {
 			} 
 			
 			rs = stmt.executeQuery();
-			//System.out.println(rs.getStatement());
 			while(rs.next()){				
 				Ukol ukol = new Ukol(rs.getInt("id"),
 									 rs.getString("name"),

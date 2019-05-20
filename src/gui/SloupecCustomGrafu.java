@@ -1,6 +1,7 @@
 package gui;
 
 import net.miginfocom.swing.MigLayout;
+import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import ostatni.ComboBoxItem;
 import ostatni.CustomComboBoxEditor;
@@ -39,6 +40,7 @@ public class SloupecCustomGrafu extends JPanel {
     private JPanel inputPanel2;
     private static JFrame mainFrame;
     private boolean between;
+    static Logger log = Logger.getLogger(SloupecCustomGrafu.class);
 
     /* For testing only - remove in final version*/
     public static void main(String[] args) {
@@ -163,9 +165,13 @@ public class SloupecCustomGrafu extends JPanel {
         cboxAritmethics.addItem("");
         cboxAritmethics.addItem("+");
         cboxAritmethics.addItem("-");
+        cboxAritmethics.addItem("*");
+        cboxAritmethics.addItem("/");
         cboxAritmethics2.addItem("");
         cboxAritmethics2.addItem("+");
         cboxAritmethics2.addItem("-");
+        cboxAritmethics2.addItem("*");
+        cboxAritmethics2.addItem("/");
 
         operators.addItem("=");
         operators.addItem("<=");
@@ -174,12 +180,13 @@ public class SloupecCustomGrafu extends JPanel {
         operators.addItem(">");
         operators.addItem("!=");
         operators.addItem("between");
+        operators.addItem("not between");
 
         between = false;
 
         operators.addActionListener (new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if(operators.getSelectedItem().toString().equals("between")){
+                if(operators.getSelectedItem().toString().equals("between") || operators.getSelectedItem().toString().equals("not between")){
                     if(checkBoxCompareColumns.isSelected()){
                         headerPanel.add(cboxColumns2, "span 3, width 50%");
                     } else {
@@ -229,14 +236,14 @@ public class SloupecCustomGrafu extends JPanel {
                     headerPanel.remove(inputPanel);
                     headerPanel.remove(inputPanel2);
                     headerPanel.add(cboxColumns, "span 3, wrap, width 50%");
-                    if(operators.getSelectedItem().toString().equals("between")){
+                    if(operators.getSelectedItem().toString().equals("between") || operators.getSelectedItem().toString().equals("not between")){
                         headerPanel.add(cboxColumns2, "span 3, width 50%");
                     }
                 } else {
                     headerPanel.remove(cboxColumns);
                     headerPanel.remove(cboxColumns2);
                     headerPanel.add(inputPanel, "span 3, wrap");
-                    if(operators.getSelectedItem().toString().equals("between")){
+                    if(operators.getSelectedItem().toString().equals("between") || operators.getSelectedItem().toString().equals("not between")){
                         headerPanel.add(inputPanel2, "span 3");
                     }
                 }
@@ -285,7 +292,7 @@ public class SloupecCustomGrafu extends JPanel {
                         String value2 = firstInput.getString("value2");
                         cboxVariableValues2.setSelectedItem(value2);
                     }
-                    if (operator.equals("between")) {
+                    if (operator.equals("between") || operator.equals("not between")) {
                         JSONObject secondInput = detection.getJSONObject("secondInput");
                         String value3 = secondInput.getString("value1");
                         cboxVariableValues3.setSelectedItem(value3);
@@ -300,7 +307,7 @@ public class SloupecCustomGrafu extends JPanel {
                     checkBoxCompareColumns.doClick();
                     String column1 = detection.getString("column1");
                     cboxColumns.setSelectedItem(column1);
-                    if (operator.equals("between")) {
+                    if (operator.equals("between") || operator.equals("not between")) {
                         String column2 = detection.getString("column2");
                         cboxColumns2.setSelectedItem(column2);
                     }
@@ -360,7 +367,7 @@ public class SloupecCustomGrafu extends JPanel {
                         try {
                             Long.parseLong(value);
                         } catch (NumberFormatException e3) {
-                            System.out.println(e3);
+                            log.warn(e3);
                             setFirstValid(false);
                             setCboxVariableValuesWarning(cboxVariableValues);
                         }
@@ -380,7 +387,7 @@ public class SloupecCustomGrafu extends JPanel {
                             try {
                                 Long.parseLong(value2);
                             } catch (NumberFormatException e3) {
-                                System.out.println(e3);
+                                log.warn(e3);
                                 setSecondValid(false);
                                 setCboxVariableValuesWarning(cboxVariableValues2);
                             }
@@ -401,7 +408,7 @@ public class SloupecCustomGrafu extends JPanel {
                             try {
                                 Long.parseLong(value3);
                             } catch (NumberFormatException e3) {
-                                System.out.println(e3);
+                                log.warn(e3);
                                 setThirdValid(false);
                                 setCboxVariableValuesWarning(cboxVariableValues3);
                             }
@@ -422,7 +429,7 @@ public class SloupecCustomGrafu extends JPanel {
                             try {
                                 Long.parseLong(value4);
                             } catch (NumberFormatException e3) {
-                                System.out.println(e3);
+                                log.warn(e3);
                                 setFourthValid(false);
                                 setCboxVariableValuesWarning(cboxVariableValues4);
                             }
@@ -526,6 +533,23 @@ public class SloupecCustomGrafu extends JPanel {
                             temp3 = change;
                         }
                         if (temp > temp2 && temp < temp3) {
+                            tempDetect.add(true);
+                        } else {
+                            tempDetect.add(false);
+                        }
+                    }
+                    break;
+                case "not between":
+                    for (int i = 0; i < columnData.size(); i++) {
+                        Double temp = Double.parseDouble(columnData.get(i));
+                        Double temp2 = Double.parseDouble(sloupec1.getData().get(i));
+                        Double temp3 = Double.parseDouble(sloupec2.getData().get(i));
+                        Double change = temp2;
+                        if (change > temp3) {
+                            temp2 = temp3;
+                            temp3 = change;
+                        }
+                        if (temp < temp2 || temp > temp3) {
                             tempDetect.add(true);
                         } else {
                             tempDetect.add(false);
@@ -637,6 +661,21 @@ public class SloupecCustomGrafu extends JPanel {
                             resultValue2 = change;
                         }
                         if (temp > resultValue && temp < resultValue2) {
+                            tempDetect.add(true);
+                        } else {
+                            tempDetect.add(false);
+                        }
+                    }
+                    break;
+                case "not between":
+                    for (String data : getData()) {
+                        Double temp = Double.parseDouble(data);
+                        Double change = resultValue;
+                        if (change > resultValue2) {
+                            resultValue = resultValue2;
+                            resultValue2 = change;
+                        }
+                        if (temp < resultValue || temp > resultValue2) {
                             tempDetect.add(true);
                         } else {
                             tempDetect.add(false);

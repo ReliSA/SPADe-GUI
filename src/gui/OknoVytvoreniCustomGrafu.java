@@ -5,6 +5,7 @@ import data.custom.CustomGraf;
 import databaze.PohledDAO;
 import net.miginfocom.swing.MigLayout;
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 import org.jdatepicker.impl.DateComponentFormatter;
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
@@ -78,9 +79,11 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
     private List<QueryPanel> queryPanels;
     private List<SloupecCustomGrafu> sloupceCustomGrafu;
     private int columnsNumber = 0;
+    static Logger log = Logger.getLogger(OknoVytvoreniCustomGrafu.class);
 
     /* For testing only - remove in final version*/
     public static void main(String[] args) {
+
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
@@ -172,7 +175,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                     constantsPanel.add(constPanel);
                     ComboBoxItem comboBoxItem = new ComboBoxItem(obj.getString("name"), "konstanta", obj.getString("value"));
                     preparedVariableValues.add(comboBoxItem);
-                    System.out.println(preparedVariableValues);
+                    log.debug(preparedVariableValues);
                     constantsPanel.revalidate();
                     constantsPanel.repaint();
                 } catch(IOException e) {
@@ -199,7 +202,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                     ComboBoxItem comboBoxItem = new ComboBoxItem(varName, "promenna", variableValue + "");
                     preparedVariableValues.add(comboBoxItem);
                     VariablePanel varPanel = new VariablePanel(varName, variableValue, content);
-                    System.out.println(preparedVariableValues);
+                    log.debug(preparedVariableValues);
                     variablesPanel.add(varPanel);
                     variablesPanel.revalidate();
                     variablesPanel.repaint();
@@ -393,7 +396,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
 
                             ComboBoxItem comboBoxItem = new ComboBoxItem(fileName, "promenna", variableValue + "");
                             preparedVariableValues.add(comboBoxItem);
-                            System.out.println(preparedVariableValues);
+                            log.debug(preparedVariableValues);
                         }
 
                         SloupecCustomGrafu sloupec = sloupceCustomGrafu.stream()
@@ -603,7 +606,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                     String constName = constForm.getConstName().equals("") ? "Constant_" + LocalDateTime.now().toString().replaceAll(":", "-") : constForm.getConstName();
                     ComboBoxItem comboBoxItem = new ComboBoxItem(constName, "konstanta",constForm.getConstValue());
                     preparedVariableValues.add(comboBoxItem);
-                    System.out.println(preparedVariableValues);
+                    log.debug(preparedVariableValues);
                     ConstantPanel constPanel = new ConstantPanel(constName, constForm.getConstValue());
                     String jsonString = new JSONObject()
                             .put("name", constName)
@@ -755,7 +758,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                         query += " AND projectId = " + projekt.getID();
                         query += " GROUP BY " + joinColumn + ";";
 
-                        System.out.println(query);
+                        log.info(query);
                         List<List<String>> data = pohledDAO.dotaz(query, preparedVariableValues, firstColumn);
                         String columnName = panel.getColumnName().equals("") ? "Col" + columnsNumber : panel.getColumnName();
                         SloupecCustomGrafu sloupec;
@@ -1087,7 +1090,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
             button.setFocusPainted(false);
             button.setOpaque(false);
         } catch (Exception ex) {
-            System.out.println(ex);
+            log.error(ex);
         }
         return button;
     }
@@ -1156,7 +1159,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     preparedVariableValues.removeIf(item -> item.getName().equals(name));
-                    System.out.println(preparedVariableValues);
+                    log.debug(preparedVariableValues);
                     FormularVytvoreniKonstanty constantsForm = new FormularVytvoreniKonstanty(name, value);
                     String oldName = name;
                     name = constantsForm.getConstName();
@@ -1164,7 +1167,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                     label.setText(constantsForm.getConstName() + ":" + constantsForm.getConstValue());
                     ComboBoxItem comboBoxItem = new ComboBoxItem(constantsForm.getConstName(), "konstanta",constantsForm.getConstValue());
                     preparedVariableValues.add(comboBoxItem);
-                    System.out.println(preparedVariableValues);
+                    log.debug(preparedVariableValues);
                     mainFrame.revalidate();
                     mainFrame.repaint();
                     File oldFile = new File(constantFolderPath + oldName + ".json");
@@ -1196,12 +1199,12 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     preparedVariableValues.removeIf(item -> item.getName().equals(name));
-                    System.out.println(preparedVariableValues);
+                    log.debug(preparedVariableValues);
                     thisPanel.getParent().remove(thisPanel);
                     try {
                         File file = new File(constantFolderPath + name + ".json");
                         if( !file.delete() ){
-                            System.out.println("Delete operation failed.");
+                            log.warn("Delete operation failed.");
                         }
                     } catch(Exception ex){
                         ex.printStackTrace();
@@ -1276,12 +1279,12 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     preparedVariableValues.removeIf(item -> item.getName().equals(name));
-                    System.out.println(preparedVariableValues);
+                    log.debug(preparedVariableValues);
                     thisPanel.getParent().remove(thisPanel);
                     try {
                         File file = new File(variableFolderPath + name + ".json");
                         if( !file.delete() ){
-                            System.out.println("Delete operation failed.");
+                            log.warn("Delete operation failed.");
                         }
                     } catch(Exception ex){
                         ex.printStackTrace();

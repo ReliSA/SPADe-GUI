@@ -1,6 +1,7 @@
 package gui;
 
 import net.miginfocom.swing.MigLayout;
+import org.apache.log4j.Logger;
 import ostatni.Konstanty;
 
 import javax.swing.*;
@@ -16,6 +17,7 @@ class FormularVytvoreniKonstanty extends JDialog
     private String constName;
     private String constValue;
     private boolean cancelled = false;
+    static Logger log = Logger.getLogger(FormularVytvoreniKonstanty.class);
 
     public FormularVytvoreniKonstanty(String name, String value){
         setModal(true);

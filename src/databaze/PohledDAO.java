@@ -1,11 +1,10 @@
 package databaze;
 
-import gui.SloupecCustomGrafu;
+import org.apache.log4j.Logger;
 import ostatni.*;
 
 import javax.swing.*;
 import java.sql.*;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +15,7 @@ public class PohledDAO {
     private Connection pripojeni;					//připojení k databázi
     private static String name = "";
     private static String pass = "";
+    static Logger log = Logger.getLogger(PohledDAO.class);
 
     public PohledDAO(){
         this.pripojeni = Konstanty.PRIPOJENI;		//nastaví připojení uložené ve třídě Konstanty
@@ -56,10 +56,10 @@ public class PohledDAO {
                     
                     while(rs.next()) {
                         for (int i = 1; i <= columnsNumber; i++) {
-                            System.out.println(rs.getString(i));
+                            log.debug(rs.getString(i));
                             data.get(i - 1).add(rs.getString(i));
                         }
-                        System.out.println("------------------------------");
+                        log.debug("------------------------------");
                     }
 
                     rs.close();

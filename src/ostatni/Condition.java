@@ -1,11 +1,14 @@
 package ostatni;
 
+import org.apache.log4j.Logger;
+
 public class Condition {
     private String name;
     private String operator;
     private String value;
     private String type;
     private boolean valid;
+    static Logger log = Logger.getLogger(Condition.class);
 
     public Condition(){}
 
@@ -68,7 +71,7 @@ public class Condition {
                         } catch(NumberFormatException e2) {
                             try { Long.parseLong(value);
                             } catch(NumberFormatException e3) {
-                                System.out.println(e3);
+                                log.warn(e3);
                                 setValid(false);
                                 return false;
                             }
