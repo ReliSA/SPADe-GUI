@@ -13,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class SloupecCustomGrafu extends JPanel {
@@ -25,6 +26,7 @@ public class SloupecCustomGrafu extends JPanel {
     private List<String> data;
     private JCheckBox checkBoxUseColumn;
     private JCheckBox checkBoxCompareColumns;
+    private JCheckBox checkBoxInvertValues;
     private JComboBox<String> operators;
     private JComboBox<ComboBoxItem> cboxVariableValues;
     private JComboBox<ComboBoxItem> cboxVariableValues2;
@@ -79,9 +81,9 @@ public class SloupecCustomGrafu extends JPanel {
                     JSONObject object = new JSONObject();
                     object.put("detection", detection);
 
-                    SloupecCustomGrafu graf = new SloupecCustomGrafu("ColumnName", new ArrayList<>(Arrays.asList("1","2","3")), 0,
+                    SloupecCustomGrafu graf = new SloupecCustomGrafu("ColumnName", new ArrayList<>(Arrays.asList("1","0","1")), 0,
                             new ArrayList<>(Arrays.asList(new ComboBoxItem("jmeno", "text", "name"), new ComboBoxItem("cislo","number","5"))),
-                            true, new ArrayList<>(Arrays.asList("col1","col2","col3")), object);
+                            false, new ArrayList<>(Arrays.asList("col1","col2","col3")), object, true);
 
                     mainFrame = new JFrame();
                     mainFrame.setLayout(new MigLayout("ins 0"));
@@ -105,14 +107,15 @@ public class SloupecCustomGrafu extends JPanel {
      * @param nazev název dat
      * @param data datumy k zobrazení
      */
-    public SloupecCustomGrafu(String nazev, List<String> data, int index, List<ComboBoxItem> variableValues, boolean includeHeader, List<String> columnNames, JSONObject query) {
+    public SloupecCustomGrafu(String nazev, List<String> data, int index, List<ComboBoxItem> variableValues, boolean includeHeader, List<String> columnNames, JSONObject query, boolean isDetectionColumn) {
         this.data = data;
         this.index = index;
         setBackground(Color.white);
-        setLayout(new MigLayout("ins 0"));
+        setLayout(new MigLayout("ins 0, gap rel 0"));
 
         checkBoxUseColumn = new JCheckBox("Detect");
         checkBoxCompareColumns = new JCheckBox("Com. col.");
+        checkBoxInvertValues = new JCheckBox("Invert values");
         operators = new JComboBox<>();
         cboxVariableValues = new JComboBox<ComboBoxItem>();
         cboxVariableValues2 = new JComboBox<ComboBoxItem>();
@@ -252,6 +255,27 @@ public class SloupecCustomGrafu extends JPanel {
             }
         });
 
+        checkBoxInvertValues.addActionListener (new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Collections.replaceAll(data, "0","2");
+                Collections.replaceAll(data, "1","0");
+                Collections.replaceAll(data, "2","1");
+                removeAll();
+                add(checkBoxInvertValues, "grow, span 3, wrap, gapy 57");
+
+                add(lblNazev, "grow, span 3, wrap");
+                JLabel lblHodnota;
+                for (String hodnota : data) {
+                    lblHodnota = new JLabel(hodnota);
+                    lblHodnota.setBorder(new MatteBorder(1,0,1,0, Color.BLACK));
+                    lblHodnota.setHorizontalAlignment(SwingConstants.CENTER);
+                    add(lblHodnota, "grow, span 4, wrap");
+                }
+                revalidate();
+                repaint();
+            }
+        });
+
         if(includeHeader) {
             headerPanel.add(operators);
             headerPanel.add(checkBoxUseColumn);
@@ -262,11 +286,14 @@ public class SloupecCustomGrafu extends JPanel {
             inputPanel2.add(cboxAritmethics2);
             headerPanel.add(inputPanel, "span 3, wrap");
             headerPanel.setBorder(new MatteBorder(0,0,1,0, Color.BLACK));
-            headerPanel.setSize(300, 500);
-            add(headerPanel, "width 100%, height 80, wrap, dock north");
-            this.add(this.lblNazev, "grow, span 3, wrap, dock north");
+//            headerPanel.setSize(300, 500);
+            add(headerPanel, "width 100%, height 80, wrap");
+            this.add(this.lblNazev, "grow, span 3, wrap");
+        } else if (isDetectionColumn) {
+            this.add(checkBoxInvertValues, "grow, span 3, wrap, gapy 57");
+            this.add(this.lblNazev, "grow, span 3, wrap");
         } else {
-            this.add(this.lblNazev, "grow, span 3, wrap, gapy 70");
+            this.add(this.lblNazev, "grow, span 3, wrap, gapy 80");
         }
 
         if(query != null){
@@ -323,7 +350,7 @@ public class SloupecCustomGrafu extends JPanel {
             lblHodnota = new JLabel(hodnota);
             lblHodnota.setBorder(new MatteBorder(1,0,1,0, Color.BLACK));
             lblHodnota.setHorizontalAlignment(SwingConstants.CENTER);
-            this.add(lblHodnota, "grow, span 4, wrap, dock south");
+            this.add(lblHodnota, "grow, span 4, wrap");
         }
 
         revalidate();

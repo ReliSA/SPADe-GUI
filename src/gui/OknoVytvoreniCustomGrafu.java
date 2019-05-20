@@ -722,7 +722,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
 
                     firstColumn = prepareGraphsFirstColumn(axisTable);
 
-                    SloupecCustomGrafu sl = new SloupecCustomGrafu(axisTable, firstColumn, -1, preparedVariableValues, false, columnNames, null);
+                    SloupecCustomGrafu sl = new SloupecCustomGrafu(axisTable, firstColumn, -1, preparedVariableValues, false, columnNames, null, false);
                     centerPanel.removeAll();
                     centerTablePanel.removeAll();
                     centerPanel.add(centerNorthPanel, "dock north, width 100%");
@@ -779,7 +779,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                         centerTablePanel.add(sloupec, "dock west, width 240");
                     }
                     columnsNumber++;
-                    detected = new SloupecCustomGrafu("detected", new ArrayList<>(), columnsNumber, preparedVariableValues, false, columnNames, null);
+                    detected = new SloupecCustomGrafu("detected", new ArrayList<>(), columnsNumber, preparedVariableValues, false, columnNames, null, true);
                     centerTablePanel.add(detected, "dock west, grow");
 
                     graphData.addNazvySloupcu("detected");
@@ -840,7 +840,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                         }
                         centerTablePanel.remove(centerTablePanel.getComponentCount() - 1);
 
-                        detected = new SloupecCustomGrafu("detected", columnData, columnsNumber, preparedVariableValues, false, columnNames, null);
+                        detected = new SloupecCustomGrafu("detected", columnData, columnsNumber, preparedVariableValues, false, columnNames, null, true);
                         centerTablePanel.add(detected, "dock west, grow");
 
                         graphData.getDataSloupec(columnsNumber - 2).clear();
@@ -934,7 +934,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                 found = false;
             }
         }
-        return new SloupecCustomGrafu(columnName, values, 1, preparedVariableValues, true, columnNames, query);
+        return new SloupecCustomGrafu(columnName, values, 1, preparedVariableValues, true, columnNames, query, false);
     }
 
     private List<String> prepareGraphsFirstColumn(String axisTable) {
