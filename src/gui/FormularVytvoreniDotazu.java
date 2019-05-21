@@ -19,9 +19,9 @@ import java.util.Map;
 class FormularVytvoreniDotazu extends JDialog
 {
     private static final long serialVersionUID = -8229943813762614201L;
-    private JButton btnSubmit = new JButton("OK");
-    private JButton btnClose = new JButton("CANCEL");
-    private JButton btnAdd = new JButton("Add");
+    private JButton btnSubmit = new JButton(Konstanty.POPISY.getProperty("tlacitkoOk"));
+    private JButton btnClose = new JButton(Konstanty.POPISY.getProperty("tlacitkoZrusit"));
+    private JButton btnAdd = new JButton(Konstanty.POPISY.getProperty("pridej"));
     private boolean closed = true;
     private List<ConditionPanel> conditionPanels = new ArrayList<>();
     private JPanel mainPanel = new JPanel();
@@ -34,7 +34,7 @@ class FormularVytvoreniDotazu extends JDialog
     private JComboBox<String> cboxTables = new JComboBox<>();
     private JComboBox<String> cboxColumns = new JComboBox<>();
     private JComboBox<String> cboxJoinColumn = new JComboBox<>();
-    private JTextField tfAttValue = new JTextField("Value");
+    private JTextField tfAttValue = new JTextField(Konstanty.POPISY.getProperty("popisHodnota"));
     static Logger log = Logger.getLogger(FormularVytvoreniDotazu.class);
 
     private FormularVytvoreniDotazu parentForm;
@@ -45,19 +45,19 @@ class FormularVytvoreniDotazu extends JDialog
         // TODO - cancel on close - don't know how
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         String tableName = "";
-        JLabel lblTable = new JLabel("Table");
-        JLabel lblAgrColumn = new JLabel("Agr Col");
-        JLabel lblJoinColumn = new JLabel("Join Col");
-        JLabel lblCondition = new JLabel("Condition");
-        JLabel lblAggregate = new JLabel("Aggregate");
+        JLabel lblTable = new JLabel(Konstanty.POPISY.getProperty("popisTabulka"));
+        JLabel lblAgrColumn = new JLabel(Konstanty.POPISY.getProperty("sloupecAgr"));
+        JLabel lblJoinColumn = new JLabel(Konstanty.POPISY.getProperty("sloupecJoin"));
+        JLabel lblCondition = new JLabel(Konstanty.POPISY.getProperty("popisPodminka"));
+        JLabel lblAggregate = new JLabel(Konstanty.POPISY.getProperty("agregace"));
         JTextField tfAttribute = new JTextField();
         JRadioButton radioSum = new JRadioButton("SUM");
         JRadioButton radioAvg = new JRadioButton("AVG");
         JRadioButton radioMin = new JRadioButton("MIN");
         JRadioButton radioMax = new JRadioButton("MAX");
         JRadioButton radioCount = new JRadioButton("COUNT");
-        JLabel lblDateHint = new JLabel("*Only DD-MM-YYYY format for dates is supported");
-        JLabel lblWarningText = new JLabel("*Value in red text are in wrong format.");
+        JLabel lblDateHint = new JLabel(Konstanty.POPISY.getProperty("textFormatDatumu"));
+        JLabel lblWarningText = new JLabel(Konstanty.POPISY.getProperty("textSpatnyFormat"));
 
         parentForm = this;
         boolean isFirst = true;
@@ -79,7 +79,7 @@ class FormularVytvoreniDotazu extends JDialog
 
         this.setSize(windowWidth, windowHeight);
         this.setLocationRelativeTo(null);
-        this.setTitle("Query creation");
+        this.setTitle(Konstanty.POPISY.getProperty("textVytvoreniDotazu"));
 
         for(Map.Entry<String, List<Sloupec>> entry : strukturaPohledu.entrySet()) {
             cboxTables.addItem(entry.getKey());
@@ -102,7 +102,7 @@ class FormularVytvoreniDotazu extends JDialog
                         closed = false;
                         dispose();
                     } else {
-                        JOptionPane.showMessageDialog(parentForm, "You have 1 or more wrong values.", "Warning", JOptionPane.WARNING_MESSAGE);
+                        JOptionPane.showMessageDialog(parentForm, Konstanty.POPISY.getProperty("textNevalidniHodnoty"), Konstanty.POPISY.getProperty("upozorneni"), JOptionPane.WARNING_MESSAGE);
                     }
                 }
             }

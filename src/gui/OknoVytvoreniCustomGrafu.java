@@ -62,9 +62,9 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
     private static JPanel centerTablePanel;
     private static JPanel bottomPanel;
     private static JPanel axisPanel;
-    private static JLabel lblName = new JLabel("Name");
-    private static JLabel lblFromDate = new JLabel("From:");
-    private static JLabel lblToDate = new JLabel("To:");
+    private static JLabel lblName = new JLabel(Konstanty.POPISY.getProperty("popisNazev"));
+    private static JLabel lblFromDate = new JLabel(Konstanty.POPISY.getProperty("popisOd"));
+    private static JLabel lblToDate = new JLabel(Konstanty.POPISY.getProperty("popisDo"));
     private static PohledDAO pohledDAO = new PohledDAO();
     private static JPanel constantsPanel;
     private static JPanel variablesPanel;
@@ -72,7 +72,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
     private JDatePickerImpl dpDatumOD;			//datum od
     private JDatePickerImpl dpDatumDO;			//datum do
     private static JComboBox<String> cboxAxisOptions;
-    private static List<Iterace> iteraceList = new ArrayList<>();
+    private static List<Iteration> iterationList = new ArrayList<>();
     private static final JFileChooser fileChooser = new JFileChooser();
     private static final Map<String, List<Sloupec>> strukturyPohledu = new TreeMap<>();
     private static List<ComboBoxItem> preparedVariableValues;
@@ -104,7 +104,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
     }
 
     public OknoVytvoreniCustomGrafu(Projekt projekt) {
-//        super(Konstanty.POPISY.getProperty("menuVytvorGraf"));
+        super(Konstanty.POPISY.getProperty("menuVytvorGraf"));
         if (instance != null)
             instance.dispose();
         instance = this;
@@ -115,19 +115,19 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         mainFrame.setBounds(100,100,1600,800);
         mainFrame.setVisible(true);
 
-        addConstantBtn = new JButton("Add constant");
-        addVariableBtn = new JButton("Add variable");
-        addQueryBtn = new JButton("Add query");
-        createQueryBtn = new JButton("Create query");
-        loadQueryBtn = new JButton("Load query");
-        testVarQueryBtn = new JButton("Test query");
-        runQueryBtn = new JButton("Run");
-        goBackBtn = new JButton("Back");
-        detectBtn = new JButton("Detect");
-        showGraphBtn = new JButton("Show graph");
-        saveBtn = new JButton("Save");
-        cancelBtn = new JButton("Cancel");
-        exportBtn = new JButton("Export to CSV");
+        addConstantBtn = new JButton(Konstanty.POPISY.getProperty("pridejKonstantu"));
+        addVariableBtn = new JButton(Konstanty.POPISY.getProperty("pridejPromennou"));
+        addQueryBtn = new JButton(Konstanty.POPISY.getProperty("pridejDotaz"));
+        createQueryBtn = new JButton(Konstanty.POPISY.getProperty("vytvorDotaz"));
+        loadQueryBtn = new JButton(Konstanty.POPISY.getProperty("nactiDotaz"));
+        testVarQueryBtn = new JButton(Konstanty.POPISY.getProperty("otestujDotaz"));
+        runQueryBtn = new JButton(Konstanty.POPISY.getProperty("spust"));
+        goBackBtn = new JButton(Konstanty.POPISY.getProperty("zpet"));
+        detectBtn = new JButton(Konstanty.POPISY.getProperty("detekuj"));
+        showGraphBtn = new JButton(Konstanty.POPISY.getProperty("ukazGraf"));
+        saveBtn = new JButton(Konstanty.POPISY.getProperty("uloz"));
+        cancelBtn = new JButton(Konstanty.POPISY.getProperty("tlacitkoZrusit"));
+        exportBtn = new JButton(Konstanty.POPISY.getProperty("exportCSV"));
         centerNorthPanel = new JPanel(new MigLayout());
         centerPanel = new JPanel(new MigLayout("ins 0"));
         centerTablePanel = new JPanel(new MigLayout("gap rel 0, ins 0"));
@@ -143,11 +143,11 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         List<Sloupec> sloupce;
 
         for(PohledEnum pohled : pohledy){
-            sloupce = pohledDAO.nactecniStrukturyPohledu(pohled.getViewName());
+            sloupce = pohledDAO.getViewStructure(pohled.getViewName());
             strukturyPohledu.put(pohled.getViewName(), sloupce);
         }
 
-        iteraceList = pohledDAO.nactiIteraceProProjekt(projekt.getID());
+        iterationList = pohledDAO.getIterationsForProject(projekt.getID());
 
 //        List<ArtifactView> artifactViews = pohledDAO.nactiArtifactView();
 //        List<CommitedConfigView> commitedConfigViews = pohledDAO.nactiCommitedConfigView();
@@ -295,7 +295,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                 axisPanel.revalidate();
                 axisPanel.repaint();
                 if(queryPanels.size() > 0) {
-                    JOptionPane.showMessageDialog(mainFrame, "Changing this may cause problem with joining columns", "Warning", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(mainFrame, Konstanty.POPISY.getProperty("textZmenaOsy"), Konstanty.POPISY.getProperty("upozorneni"), JOptionPane.WARNING_MESSAGE);
                 }
             }
         });
@@ -329,7 +329,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!haveSameColumnNames(queryPanels)) {
-                    JOptionPane.showMessageDialog(mainFrame, "Every column has to have an unique name.", "Warning", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(mainFrame, Konstanty.POPISY.getProperty("textUnikatniNazev"), Konstanty.POPISY.getProperty("upozorneni"), JOptionPane.WARNING_MESSAGE);
                 } else {
                     File file;
                     String fileName = varOrQueryNameTf.getText();
@@ -496,7 +496,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                     mainFrame.revalidate();
                     mainFrame.repaint();
 
-                    JOptionPane.showMessageDialog(null, "Save successful");
+                    JOptionPane.showMessageDialog(null, Konstanty.POPISY.getProperty("uspesneUlozeno"));
                 }
             }
         });
@@ -653,9 +653,9 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
             public void actionPerformed(ActionEvent e) {
                 if(queryPanels.size() == 1) {
                     Long result = testQuery(queryPanels.get(0).getQuery());
-                    JOptionPane.showMessageDialog(mainFrame, "Query result is " + result, "Info", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(mainFrame, Konstanty.POPISY.getProperty("textVysledekDotazu") + result, Konstanty.POPISY.getProperty("info"), JOptionPane.INFORMATION_MESSAGE);
                 } else {
-                    JOptionPane.showMessageDialog(mainFrame, "There can be only 1 query for variable creation.", "Warning", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(mainFrame, Konstanty.POPISY.getProperty("textPouzeJedenDotaz"), Konstanty.POPISY.getProperty("upozorneni"), JOptionPane.WARNING_MESSAGE);
                 }
             }
         });
@@ -690,9 +690,9 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!haveSameColumnNames(queryPanels)) {
-                    JOptionPane.showMessageDialog(mainFrame, "Every column has to have an unique name.", "Warning", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(mainFrame, Konstanty.POPISY.getProperty("textUnikatniNazev"), Konstanty.POPISY.getProperty("upozorneni"), JOptionPane.WARNING_MESSAGE);
                 } else if (queryPanels.isEmpty()){
-                    JOptionPane.showMessageDialog(mainFrame, "There has to be at least 1 query to run.", "Warning", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(mainFrame, Konstanty.POPISY.getProperty("textAlesponJedenDotaz"), Konstanty.POPISY.getProperty("upozorneni"), JOptionPane.WARNING_MESSAGE);
                 } else {
                     int index = 2;
                     columnsNumber = 0;
@@ -857,14 +857,14 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                         centerTablePanel.repaint();
                     } else {
                         JOptionPane.showMessageDialog(mainFrame,
-                                "1 or more values and invalid.",
-                                "Warning",
+                                Konstanty.POPISY.getProperty("textNevalidniHodnoty"),
+                                Konstanty.POPISY.getProperty("upozorneni"),
                                 JOptionPane.WARNING_MESSAGE);
                     }
                 } else {
                     JOptionPane.showMessageDialog(mainFrame,
-                            "No column for detection selected.",
-                            "Warning",
+                            Konstanty.POPISY.getProperty("textZvoleniSloupce"),
+                            Konstanty.POPISY.getProperty("upozorneni"),
                             JOptionPane.WARNING_MESSAGE);
                 }
             }
@@ -916,8 +916,8 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                             new FileOutputStream(file), "utf-8"));
                     writer.write(sb.toString());
                     JOptionPane.showMessageDialog(mainFrame,
-                            "Export successful.",
-                            "Info",
+                            Konstanty.POPISY.getProperty("textUspesnyExport"),
+                            Konstanty.POPISY.getProperty("info"),
                             JOptionPane.INFORMATION_MESSAGE);
                 } catch (IOException ex) {
                     ex.printStackTrace();
@@ -926,8 +926,6 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                         writer.close();
                     } catch (Exception ex) {/*ignore*/}
                 }
-//                sb.setLength(0);
-//                values.clear();
             }
         });
 
@@ -937,8 +935,8 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
             public void actionPerformed(ActionEvent e) {
                 if(detected.getData().size() == 0){
                     JOptionPane.showMessageDialog(mainFrame,
-                            "You have to detect something.",
-                            "Warning",
+                            Konstanty.POPISY.getProperty("textNutnaDetekce"),
+                            Konstanty.POPISY.getProperty("upozorneni"),
                             JOptionPane.WARNING_MESSAGE);
                 } else {
                     OknoCustomGraf okno = new OknoCustomGraf(graphData, projekt);
@@ -971,16 +969,16 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         return result;
     }
 
-    private SloupecCustomGrafu mapData(List<List<String>> data, List<String> firstColumn, String columnName, boolean iteration, List<String> columnNames, JSONObject query){
+    private SloupecCustomGrafu mapData(List<List<String>> data, List<String> firstColumn, String columnName, boolean isIteration, List<String> columnNames, JSONObject query){
         List<String> values = new ArrayList<>();
         boolean found = false;
 
-        if(iteration) {
-            for (Iterace iterace : iteraceList) {
+        if(isIteration) {
+            for (Iteration iteration : iterationList) {
                 Double sum = 0.0;
                 for (int i = 0; i < data.get(0).size(); i++) {
                     LocalDate temp = LocalDate.parse(data.get(0).get(i));
-                    if (!temp.isBefore(iterace.getStartDate()) && !temp.isAfter(iterace.getEndDate())) {
+                    if (!temp.isBefore(iteration.getStartDate()) && !temp.isAfter(iteration.getEndDate())) {
                         sum += Double.parseDouble(data.get(1).get(i));
                     }
                 }
@@ -1019,10 +1017,10 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         }
         switch (axisTable) {
             case "Person":
-                firstColumn = pohledDAO.nactiOsobyProProjekt(projekt.getID());
+                firstColumn = pohledDAO.getPeopleForProject(projekt.getID());
                 break;
             case "Iteration":
-                for (Iterace iterace : iteraceList) {
+                for (Iteration iterace : iterationList) {
                     firstColumn.add(iterace.getName());
                 }
                 break;
@@ -1067,10 +1065,10 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         return joinColumn;
     }
 
-    private List<String> prepareDatesForIteration(Iterace iterace){
+    private List<String> prepareDatesForIteration(Iteration iteration){
         List<String> totalDates = new ArrayList<>();
-        LocalDate start = LocalDate.parse(iterace.getStartDate().toString());
-        LocalDate end = LocalDate.parse(iterace.getEndDate().toString());
+        LocalDate start = LocalDate.parse(iteration.getStartDate().toString());
+        LocalDate end = LocalDate.parse(iteration.getEndDate().toString());
         while (!start.isAfter(end)) {
             totalDates.add(start.toString());
             start = start.plusDays(1);
@@ -1186,7 +1184,6 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         while(iterator.hasNext()) {
             JSONObject jsonObject = (JSONObject) iterator.next();
             condition = jsonObject.getString("name") + " " + jsonObject.getString("operator") + " ";
-            condition = jsonObject.getString("name") + " " + jsonObject.getString("operator") + " ";
             if(jsonObject.getString("operator").equals("like")){
                 condition += "\"" + jsonObject.getString("value") + "\"";
             } else {
@@ -1198,7 +1195,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
             query += condition;
         }
         query += " AND projectId = " + projekt.getID();
-        result = pohledDAO.createVariable(query);
+        result = pohledDAO.testVariable(query);
 
         return result;
     }
@@ -1467,7 +1464,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
 
             });
 
-            removeBtn = new JButton("Remove");
+            removeBtn = new JButton(Konstanty.POPISY.getProperty("odstranit"));
             removeBtn.addActionListener(new ActionListener(){
                 @Override
                 public void actionPerformed(ActionEvent e) {

@@ -1,14 +1,13 @@
 package ostatni;
 
 import java.time.LocalDate;
-import java.util.Date;
 
-public class Iterace {
+public class Iteration {
     private LocalDate startDate;
     private LocalDate endDate;
     private String name;
 
-    public Iterace(LocalDate startDate, LocalDate endDate, String name) {
+    public Iteration(LocalDate startDate, LocalDate endDate, String name) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.name = name;

@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import ostatni.ComboBoxItem;
 import ostatni.CustomComboBoxEditor;
+import ostatni.Konstanty;
 
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
@@ -113,9 +114,9 @@ public class SloupecCustomGrafu extends JPanel {
         setBackground(Color.white);
         setLayout(new MigLayout("ins 0, gap rel 0"));
 
-        checkBoxUseColumn = new JCheckBox("Detect");
-        checkBoxCompareColumns = new JCheckBox("Com. col.");
-        checkBoxInvertValues = new JCheckBox("Invert values");
+        checkBoxUseColumn = new JCheckBox(Konstanty.POPISY.getProperty("pouzit"));
+        checkBoxCompareColumns = new JCheckBox(Konstanty.POPISY.getProperty("porovnatSloupce"));
+        checkBoxInvertValues = new JCheckBox(Konstanty.POPISY.getProperty("invertovatHodnoty"));
         operators = new JComboBox<>();
         cboxVariableValues = new JComboBox<ComboBoxItem>();
         cboxVariableValues2 = new JComboBox<ComboBoxItem>();

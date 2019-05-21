@@ -10,8 +10,8 @@ import java.awt.event.ActionListener;
 
 class FormularVytvoreniKonstanty extends JDialog
 {
-    private JButton btnOk = new JButton("OK");
-    private JButton btnCancel = new JButton("Cancel");
+    private JButton btnOk = new JButton(Konstanty.POPISY.getProperty("tlacitkoOk"));
+    private JButton btnCancel = new JButton(Konstanty.POPISY.getProperty("tlacitkoZrusit"));
     private JTextField tfName = new JTextField();
     private JTextField tfValue = new JTextField();
     private String constName;
@@ -26,10 +26,10 @@ class FormularVytvoreniKonstanty extends JDialog
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-        this.setTitle("Create constant");
+        this.setTitle(Konstanty.POPISY.getProperty("vytvorKonstantu"));
 
-        JLabel lblName = new JLabel("Name");
-        JLabel lblValue = new JLabel("Value");
+        JLabel lblName = new JLabel(Konstanty.POPISY.getProperty("popisNazev"));
+        JLabel lblValue = new JLabel(Konstanty.POPISY.getProperty("popisHodnota"));
 
         tfName.setPreferredSize(Konstanty.VELIKOST_CELA_SIRKA);
         tfValue.setPreferredSize(Konstanty.VELIKOST_CELA_SIRKA);
