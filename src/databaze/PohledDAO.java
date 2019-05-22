@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Třída vrací struktury databázových pohledů a implementuje rozhraní IPohledDAO
+ * Třída poskytující data z pohledů, implementuje rozhraní IPohledDAO
  */
-public class PohledDAO {
+public class PohledDAO implements IPohledDAO{
     private Connection pripojeni;					//připojení k databázi
     private static String name = "";
     private static String pass = "";
@@ -34,7 +34,7 @@ public class PohledDAO {
         return totalRows ;
     }
 
-    public List<List<String>> dotaz(String query, List<ComboBoxItem> preparedVariableValues, List<String> firstColumn){
+    public List<List<String>> runQuery(String query){
         Connection pripojeni;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -126,9 +126,12 @@ public class PohledDAO {
         Connection pripojeni;
         PreparedStatement stmt = null;
         ResultSet rs = null;
+        String query;
         try {
             pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, name, pass);
-            stmt = pripojeni.prepareStatement("SELECT DISTINCT name FROM personView where projectId = " + projektId + " ORDER BY name ASC");
+            query = "SELECT DISTINCT name FROM personView where projectId = " + projektId + " ORDER BY name ASC";
+            log.info(query);
+            stmt = pripojeni.prepareStatement(query);
 
             rs = stmt.executeQuery();
             while(rs.next()){
@@ -156,9 +159,12 @@ public class PohledDAO {
         Connection pripojeni;
         PreparedStatement stmt = null;
         ResultSet rs = null;
+        String query;
         try {
             pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, name, pass);
-            stmt = pripojeni.prepareStatement("SELECT startDate, endDate, name FROM iteration WHERE superProjectId = " + projektId + " ORDER BY name ASC");
+            query = "SELECT startDate, endDate, name FROM iteration WHERE superProjectId = " + projektId + " ORDER BY name ASC";
+            log.info(query);
+            stmt = pripojeni.prepareStatement(query);
 
             rs = stmt.executeQuery();
             while(rs.next()){
@@ -186,9 +192,12 @@ public class PohledDAO {
         Connection pripojeni;
         PreparedStatement stmt = null;
         ResultSet rs = null;
+        String query;
         try {
             pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, name, pass);
-            stmt = pripojeni.prepareStatement("SELECT COLUMN_NAME, DATA_TYPE from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME='" + viewName + "'");
+            query = "SELECT COLUMN_NAME, DATA_TYPE from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME='" + viewName + "'";
+            log.info(query);
+            stmt = pripojeni.prepareStatement(query);
 
             rs = stmt.executeQuery();
             while(rs.next()){

@@ -2,6 +2,7 @@ package gui;
 
 import data.Projekt;
 import data.custom.CustomGraf;
+import databaze.IPohledDAO;
 import databaze.PohledDAO;
 import net.miginfocom.swing.MigLayout;
 import org.apache.commons.io.FileUtils;
@@ -33,6 +34,9 @@ import java.util.stream.Collectors;
 
 import org.json.*;
 
+/**
+ * Okno pro vytváření grafů
+ */
 public class OknoVytvoreniCustomGrafu extends JFrame{
 
     public static OknoVytvoreniCustomGrafu instance;
@@ -65,7 +69,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
     private static JLabel lblName = new JLabel(Konstanty.POPISY.getProperty("popisNazev"));
     private static JLabel lblFromDate = new JLabel(Konstanty.POPISY.getProperty("popisOd"));
     private static JLabel lblToDate = new JLabel(Konstanty.POPISY.getProperty("popisDo"));
-    private static PohledDAO pohledDAO = new PohledDAO();
+    private static IPohledDAO pohledDAO = new PohledDAO();
     private static JPanel constantsPanel;
     private static JPanel variablesPanel;
     private static JTextField varOrQueryNameTf = new JTextField(10);
@@ -103,6 +107,10 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         });
     }
 
+    /**
+     * Konstruktor hlavního okna
+     * @param projekt zvolený projekt
+     */
     public OknoVytvoreniCustomGrafu(Projekt projekt) {
         super(Konstanty.POPISY.getProperty("menuVytvorGraf"));
         if (instance != null)
@@ -178,12 +186,12 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                     ComboBoxItem comboBoxItem = new ComboBoxItem(obj.getString("name"), "konstanta", obj.getString("value"));
                     preparedVariableValues.add(comboBoxItem);
                     log.debug(preparedVariableValues);
-                    constantsPanel.revalidate();
-                    constantsPanel.repaint();
                 } catch(IOException e) {
                     e.printStackTrace();
                 }
             }
+            constantsPanel.revalidate();
+            constantsPanel.repaint();
         }
 
         mainFrame.add(constantsPanel,"dock north");
@@ -255,6 +263,9 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         nastavAkce();
     }
 
+    /**
+     * Nastavení akcí pro ovládací prvky
+     */
     private void nastavAkce(){
         /* Akce pro zrušení rozdělané práce a vrácení se na defaultní obrazovku */
         cancelBtn.addActionListener(new ActionListener(){
@@ -763,7 +774,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                         query += " GROUP BY " + joinColumn + ";";
 
                         log.info(query);
-                        List<List<String>> data = pohledDAO.dotaz(query, preparedVariableValues, firstColumn);
+                        List<List<String>> data = pohledDAO.runQuery(query);
                         String columnName = panel.getColumnName().equals("") ? "Col" + columnsNumber : panel.getColumnName();
                         SloupecCustomGrafu sloupec;
                         if (axisTable.equals("Iteration")) {
@@ -948,6 +959,11 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         });
     }
 
+    /**
+     * Zvaliduje uživatelské vstupy při zadávání kritérií pro detekce
+     * @param sloupce seznam sloupců v tabulce hodnot
+     * @return true pokud mají sloupce validní vstupy
+     */
     private boolean validateInputs(List<SloupecCustomGrafu> sloupce){
         boolean result = true;
         for(SloupecCustomGrafu sloupec : sloupce){
@@ -957,6 +973,11 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         return result;
     }
 
+    /**
+     * Kontrola jestli mají sloupce unikátní jména
+     * @param panels seznam panelů s vytvořenými dotazy
+     * @return true pokud mají sloupce unikátní jména
+     */
     private boolean haveSameColumnNames(List<QueryPanel> panels){
         Set<String> nameSet = new HashSet<>();
         boolean result = true;
@@ -969,6 +990,16 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         return result;
     }
 
+    /**
+     * Mapuje data podle osy X, pro následné vykreslení do grafu
+     * @param data seznam s daty
+     * @param firstColumn první sloupec, na který se budou data mapovat
+     * @param columnName název vytvářeného sloupce
+     * @param isIteration true pokud jsou na ose X iterace
+     * @param columnNames názvy všech sloupců
+     * @param query object s dotazem
+     * @return nový sloupec do tabulky s daty
+     */
     private SloupecCustomGrafu mapData(List<List<String>> data, List<String> firstColumn, String columnName, boolean isIteration, List<String> columnNames, JSONObject query){
         List<String> values = new ArrayList<>();
         boolean found = false;
@@ -1001,6 +1032,11 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         return new SloupecCustomGrafu(columnName, values, 1, preparedVariableValues, true, columnNames, query, false);
     }
 
+    /**
+     * Připraví data pro osu podle zadaných kritérií
+     * @param axisTable měřítko pro osu X
+     * @return data pro osu X
+     */
     private List<String> prepareGraphsFirstColumn(String axisTable) {
         List<String> firstColumn = new ArrayList<>();
         LocalDate datumOd;
@@ -1044,6 +1080,12 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         return firstColumn;
     }
 
+    /**
+     * Připraví formát datumů pro mapovací sloupec
+     * @param axisTable měřítko pro osu X
+     * @param joinColumn mapovací sloupec
+     * @return mapovací sloupec v požadovaném formátu
+     */
     private String prepareDateFormat(String axisTable, String joinColumn) {
         if(!axisTable.equals("Person")){
             switch (axisTable){
@@ -1065,6 +1107,11 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         return joinColumn;
     }
 
+    /**
+     * Připraví datumy, po které iterace běžela
+     * @param iteration iterace projektu
+     * @return seznam datumů pro iteraci
+     */
     private List<String> prepareDatesForIteration(Iteration iteration){
         List<String> totalDates = new ArrayList<>();
         LocalDate start = LocalDate.parse(iteration.getStartDate().toString());
@@ -1076,15 +1123,27 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         return totalDates;
     }
 
-    private List<String> prepareDatesBetween(LocalDate datumOd, LocalDate datumDo){
+    /**
+     * Připraví datumy mezi zadaným intervalem
+     * @param dateFrom datum začátku intervalu
+     * @param dateTo datum konce intervalu
+     * @return seznam datumů
+     */
+    private List<String> prepareDatesBetween(LocalDate dateFrom, LocalDate dateTo){
         List<String> totalDates = new ArrayList<>();
-        while (!datumOd.isAfter(datumDo)) {
-            totalDates.add(datumOd.toString());
-            datumOd = datumOd.plusDays(1);
+        while (!dateFrom.isAfter(dateTo)) {
+            totalDates.add(dateFrom.toString());
+            dateFrom = dateFrom.plusDays(1);
         }
         return totalDates;
     }
 
+    /**
+     * Připraví týdny v čísleném vyjádření mezi zadaným intervalem
+     * @param dateFrom datum začátku intervalu
+     * @param dateTo datum konce intervalu
+     * @return seznam týdnů
+     */
     private List<String> prepareWeeksBetween(LocalDate dateFrom, LocalDate dateTo){
         List<String> totalMonths = new ArrayList<>();
         long weekCount = ChronoUnit.WEEKS.between(dateFrom, dateTo);
@@ -1104,6 +1163,12 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         return totalMonths;
     }
 
+    /**
+     * Připraví měsíce v číselném vyjádření mezi zadaným intervalem
+     * @param dateFrom datum začátku intervalu
+     * @param dateTo datum konce intervalu
+     * @return seznam měsíců
+     */
     private List<String> prepareMonthsBetween(LocalDate dateFrom, LocalDate dateTo){
         List<String> totalMonths = new ArrayList<>();
         long monthCount = ChronoUnit.MONTHS.between(YearMonth.from(dateFrom), YearMonth.from(dateTo));
@@ -1121,6 +1186,12 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         return totalMonths;
     }
 
+    /**
+     * Připraví roky v číselném vyjádření mezi zadaným intervalem
+     * @param yearFrom datum začátku intervalu
+     * @param yearTo datum konce intervalu
+     * @return seznam roků
+     */
     private List<String> prepareYearsBetween(LocalDate yearFrom, LocalDate yearTo){
         List<String> totalYears = new ArrayList<>();
         for (int i = yearFrom.getYear(); i <= yearTo.getYear(); i++){
@@ -1129,6 +1200,11 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         return totalYears;
     }
 
+    /**
+     * Vytvoří objekt tlačítka s obrázkem
+     * @param buttonOperation operace vykonávaná tlačítkem
+     * @return object tlačítka
+     */
     private JButton createButtonWithImage(String buttonOperation){
         JButton button = new JButton();
         Image img = null;
@@ -1159,6 +1235,11 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         return button;
     }
 
+    /**
+     * Spustí zadaný dotaz a vrátí výslednou hodnotu
+     * @param object SQL dotaz v JSON
+     * @return výsledná hodnota
+     */
     private Long testQuery(JSONObject object){
         PohledDAO pohledDAO = new PohledDAO();
         String condition;
@@ -1176,7 +1257,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         String function = queryObject.getString("aggregate");
         String tableName = queryObject.getString("table");
         String selectedColumn = queryObject.getString("agrColumn");
-        String query = "select " + function + "(" + selectedColumn + ") from " + tableName + " where ";
+        String query = "SELECT " + function + "(" + selectedColumn + ") from " + tableName + " where ";
 
         JSONArray conditions = (JSONArray) queryObject.get("conditions");
 
@@ -1196,15 +1277,24 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         }
         query += " AND projectId = " + projekt.getID();
         result = pohledDAO.testVariable(query);
+        log.info(query);
 
         return result;
     }
 
+    /**
+     * Vnitřní třída zobrazující vytvořené konstanty v hlavním okně
+     */
     private class ConstantPanel extends JPanel{
         ConstantPanel thisPanel;
         String name;
         String value;
 
+        /**
+         * Konstruktor panelu
+         * @param constName název konstanty
+         * @param constValue hodnota konstanty
+         */
         public ConstantPanel(String constName, String constValue) {
             super();
             thisPanel = this;
@@ -1281,6 +1371,9 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         }
     }
 
+    /**
+     * Vnitřní třída zobrazující vytvořené proměnné v hlavním okně
+     */
     private class VariablePanel extends JPanel{
         VariablePanel thisPanel;
         String name;
@@ -1288,6 +1381,12 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         String content;
         JLabel label;
 
+        /**
+         * Konstruktor okna
+         * @param varName název proměnné
+         * @param varValue hodnota proměnné
+         * @param varContent zápis proměnné v JSON
+         */
         public VariablePanel(String varName, Long varValue, String varContent) {
             super();
             thisPanel = this;
@@ -1360,19 +1459,34 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
             this.add(removeBtn);
         }
 
+        /**
+         * Vrací název proměnné
+         * @return
+         */
         public String getName(){
             return this.name;
         }
 
+        /**
+         * Nastaví zobrazený název proměnné v hlavním okně
+         * @param label
+         */
         public void setLabel(String label){
             this.label.setText(label);
         }
 
+        /**
+         * Nastaví zápis promměné v JSON
+         * @param content zápis proměnné v JSON
+         */
         public void setContent(String content){
             this.content = content;
         }
     }
 
+    /**
+     * Vnitřní třída zobrazující vytvořené panely s dotazy v hlavním okně
+     */
     private class QueryPanel extends JPanel {
 
         QueryPanel thisPanel;
@@ -1381,6 +1495,11 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         JButton removeBtn;
         JButton editBtn;
 
+        /**
+         * Konstrukor panelu pro zobrazení vytvořeného dotazu
+         * @param query SQL dotaz v JSON
+         * @param editing true pokud se dotaz edituje
+         */
         public QueryPanel(JSONObject query, boolean editing) {
             super();
             thisPanel = this;
@@ -1480,14 +1599,26 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
             this.add(removeBtn);
         }
 
+        /**
+         * Nastaví SQL zapsaný v JSON
+         * @param query SQL v JSON podobě
+         */
         public void setQuery(JSONObject query){
             this.query = query;
         }
 
+        /**
+         * Vrací SQL zapsaný v JSON
+         * @return JSON s SQL dotazem
+         */
         public JSONObject getQuery() {
             return this.query;
         }
 
+        /**
+         * Vrací název sloupce
+         * @return název sloupce
+         */
         public String getColumnName(){
             return columName.getText();
         }

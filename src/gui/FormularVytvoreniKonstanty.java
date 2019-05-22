@@ -8,6 +8,9 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * Okno pro vytvoření konstanty
+ */
 class FormularVytvoreniKonstanty extends JDialog
 {
     private JButton btnOk = new JButton(Konstanty.POPISY.getProperty("tlacitkoOk"));
@@ -19,6 +22,18 @@ class FormularVytvoreniKonstanty extends JDialog
     private boolean cancelled = false;
     static Logger log = Logger.getLogger(FormularVytvoreniKonstanty.class);
 
+    /**
+     * Konstruktor okna
+     */
+    public FormularVytvoreniKonstanty() {
+        this("","");
+    }
+
+    /**
+     * Konstruktor okna
+     * @param name název konstanty
+     * @param value hodnota konstanty
+     */
     public FormularVytvoreniKonstanty(String name, String value){
         setModal(true);
 
@@ -54,10 +69,10 @@ class FormularVytvoreniKonstanty extends JDialog
         this.setVisible(true);
     }
 
-    public FormularVytvoreniKonstanty() {
-        this("","");
-    }
-
+    /**
+     * Vrací název konstany
+     * @return název konstanty
+     */
     public String getConstName(){
         String returnValue = this.constName;
         if(!cancelled){
@@ -66,6 +81,10 @@ class FormularVytvoreniKonstanty extends JDialog
         return returnValue;
     }
 
+    /**
+     * Vrací hodnotu konstanty
+     * @return hodnotu konstanty
+     */
     public String getConstValue(){
         String returnValue = this.constValue;
         if(!cancelled){
@@ -74,10 +93,17 @@ class FormularVytvoreniKonstanty extends JDialog
         return returnValue;
     }
 
+    /**
+     * Vrací informaci jestli byl formulář potvrzen nebo zrušen
+     * @return true pokud nebyl formulář potvrzen
+     */
     public boolean wasCancelled(){
         return cancelled;
     }
 
+    /**
+     * Nastavení akcí pro ovládací prvky
+     */
     private void nastavAkce(){
         /*akce po kliknutí na tlačítko přihlásit*/
         ActionListener actOk = new ActionListener() {

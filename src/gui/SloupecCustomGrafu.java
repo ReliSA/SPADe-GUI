@@ -17,6 +17,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Panel zobrazující data v tabulce výsledků
+ */
 public class SloupecCustomGrafu extends JPanel {
     private JLabel lblNazev = new JLabel(); // popisek název
     private int index;
@@ -103,10 +106,15 @@ public class SloupecCustomGrafu extends JPanel {
 
 
     /**
-     * Konstruktor panelu pro první sloupec s časovou osou
-     *
-     * @param nazev název dat
-     * @param data datumy k zobrazení
+     * Konstruktor panelu
+     * @param nazev název sloupce
+     * @param data seznam s daty
+     * @param index pořadí sloupce
+     * @param variableValues hodnoty vytvořených konstant a proměnných
+     * @param includeHeader true pokud chceme v panelu záhlaví s ovládacími prvky
+     * @param columnNames názvy všech sloupců
+     * @param query SQL dotaz zapsaný v JSON
+     * @param isDetectionColumn true pokud se jedná o sloupce s hodnotami detekce
      */
     public SloupecCustomGrafu(String nazev, List<String> data, int index, List<ComboBoxItem> variableValues, boolean includeHeader, List<String> columnNames, JSONObject query, boolean isDetectionColumn) {
         this.data = data;
@@ -358,23 +366,27 @@ public class SloupecCustomGrafu extends JPanel {
         repaint();
     }
 
+    /**
+     * Zvaliduje uživatelské vstupy
+     * @return true pokud jsou zadané vstupy validní
+     */
     public boolean validateInput(){
         this.firstValid = true;
         this.secondValid = true;
         this.thirdValid = true;
         this.fourthValid = true;
         if(!compareColumns()) {
-            String value = getDetectedValue(cboxVariableValues);
+            String value = getComboBoxValue(cboxVariableValues);
             String value2 = null;
             String value3 = null;
             String value4 = null;
             if (!cboxAritmethics.getSelectedItem().toString().equals("")) {
-                value2 = getDetectedValue(cboxVariableValues2);
+                value2 = getComboBoxValue(cboxVariableValues2);
             }
             if (between) {
-                value3 = getDetectedValue(cboxVariableValues3);
+                value3 = getComboBoxValue(cboxVariableValues3);
                 if (!cboxAritmethics2.getSelectedItem().toString().equals("")) {
-                    value4 = getDetectedValue(cboxVariableValues4);
+                    value4 = getComboBoxValue(cboxVariableValues4);
                 }
             }
 
@@ -468,7 +480,12 @@ public class SloupecCustomGrafu extends JPanel {
         }
         return isFirstValid() && isSecondValid() && isThirdValid() && isFourthValid();
     }
-    
+
+    /**
+     * Provede detekci podle zadaných kritérií
+     * @param sloupce seznam sloupců pro detekce
+     * @return seznam výsledků validací
+     */
     public List<Boolean> detectValues(List<SloupecCustomGrafu> sloupce){
         List<Boolean> tempDetect = new ArrayList<>();
         String operator = getOperator();
@@ -586,7 +603,7 @@ public class SloupecCustomGrafu extends JPanel {
                     break;
             }
         } else {
-            Double userInput = Double.parseDouble(getDetectedValue(cboxVariableValues));
+            Double userInput = Double.parseDouble(getComboBoxValue(cboxVariableValues));
             Double userInput2;
             Double userInput3;
             Double userInput4;
@@ -594,7 +611,7 @@ public class SloupecCustomGrafu extends JPanel {
             Double resultValue = userInput;
             Double resultValue2 = null;
             if (!cboxAritmethics.getSelectedItem().toString().equals("")) {
-                userInput2 = Double.parseDouble(getDetectedValue(cboxVariableValues2));
+                userInput2 = Double.parseDouble(getComboBoxValue(cboxVariableValues2));
                 switch (cboxAritmethics.getSelectedItem().toString()) {
                     case "+":
                         resultValue += userInput2;
@@ -605,10 +622,10 @@ public class SloupecCustomGrafu extends JPanel {
                 }
             }
             if (between) {
-                userInput3 = Double.parseDouble(getDetectedValue(cboxVariableValues3));
+                userInput3 = Double.parseDouble(getComboBoxValue(cboxVariableValues3));
                 resultValue2 = userInput3;
                 if (!cboxAritmethics2.getSelectedItem().toString().equals("")) {
-                    userInput4 = Double.parseDouble(getDetectedValue(cboxVariableValues4));
+                    userInput4 = Double.parseDouble(getComboBoxValue(cboxVariableValues4));
                     switch (cboxAritmethics2.getSelectedItem().toString()) {
                         case "+":
                             resultValue2 += userInput4;
@@ -716,6 +733,11 @@ public class SloupecCustomGrafu extends JPanel {
         return tempDetect;
     }
 
+    /**
+     * Vrátí hodnotu z ComboBoxu
+     * @param comboBox objekt ComboBoxu
+     * @return hodnota v ComboBoxu
+     */
     public String getComboBoxValue(JComboBox comboBox) {
         String value;
         if(comboBox.getEditor().getItem() instanceof ComboBoxItem){
@@ -730,46 +752,77 @@ public class SloupecCustomGrafu extends JPanel {
         return value;
     }
 
+    /**
+     * Vrátí aritmetický operátor
+     * @param comboBox ComboBox s operátory
+     * @return aritmetický operátor
+     */
     public String getArithmeticOperator(JComboBox comboBox) {
         return comboBox.getSelectedItem().toString();
     }
 
+    /**
+     * Vrací rozhodnutí o tom, jestli je chceme použít sloupec při detekci
+     * @return true pokud se má sloupec použít při detekci
+     */
     public boolean useColum(){
         return this.checkBoxUseColumn.isSelected();
     }
 
-    public String getDetectedValue(JComboBox comboBox){
-        String value;
-        if(comboBox.getEditor().getItem() instanceof ComboBoxItem){
-            value = ((ComboBoxItem) comboBox.getSelectedItem()).getValue();
-        } else {
-            try {
-                value = comboBox.getEditor().getItem().toString();
-            } catch (NullPointerException e) {
-                value = "";
-            }
-        }
-        return value;
-    }
-
+    /**
+     * Obarví pozadí ComboBoxu na neutrální barvu
+     * @param comboBox ComboBox pro obarvení
+     */
     public void setCboxVariableValuesOk(JComboBox comboBox){
         ((CustomComboBoxEditor) comboBox.getEditor()).changeBackground(null);
     }
 
+    /**
+     * Obarví pozadí ComboBoxu na řůžovou barvu
+     * @param comboBox ComboBox pro obarvení
+     */
     public void setCboxVariableValuesWarning(JComboBox comboBox){
         ((CustomComboBoxEditor) comboBox.getEditor()).changeBackground(Color.PINK);
     }
 
+    /**
+     * Vrací aritmetický operátor pro detekci
+     * @return operátor
+     */
     public String getOperator(){
         return (String) this.operators.getSelectedItem();
     }
 
+    /**
+     * Vrací data sloupce
+     * @return seznam dat
+     */
     public List<String> getData(){
         return this.data;
     }
 
+    /**
+     * Vrací název sloupce
+     * @return název sloupce
+     */
     public String getName(){
         return lblNazev.getText();
+    }
+
+    /**
+     * Vrací rozhodnutí jestli se má provádět porovnání sloupců při detekce
+     * @return true pokud se má provést porovnání sloupců při detekc
+     */
+    public boolean compareColumns(){
+        return checkBoxCompareColumns.isSelected();
+    }
+
+    /**
+     * Vrací rozhodnutí jestli se má provádět intervalová detekce
+     * @return true pokud se má provést intervalová detekc
+     */
+    public boolean isBetween(){
+        return between;
     }
 
     public boolean isFirstValid() {
@@ -802,14 +855,6 @@ public class SloupecCustomGrafu extends JPanel {
 
     public void setFourthValid(boolean fourthValid) {
         this.fourthValid = fourthValid;
-    }
-
-    public boolean isBetween(){
-        return between;
-    }
-
-    public boolean compareColumns(){
-        return checkBoxCompareColumns.isSelected();
     }
 
     public JComboBox<ComboBoxItem> getCboxVariableValues() {
