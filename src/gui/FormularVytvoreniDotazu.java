@@ -180,9 +180,11 @@ class FormularVytvoreniDotazu extends JDialog
             }
         });
 
-        cboxJoinColumn.addItem("personName");
         for (Sloupec s : strukturaPohledu.get(cboxTables.getSelectedItem())){
             cboxColumns.addItem(s.getName());
+            if(s.getName().equals("authorName") || s.getName().equals("assigneeName")){
+                cboxJoinColumn.addItem(s.getName());
+            }
             if(s.getType().equals("datetime") || s.getType().equals("date")){
                 cboxJoinColumn.addItem(s.getName());
             }
@@ -460,6 +462,7 @@ class FormularVytvoreniDotazu extends JDialog
                     break;
                 case "text":
                     operators.add("like");
+                    operators.add("not like");
                     break;
                 case "boolean":
                     operators.add("=");
@@ -484,6 +487,7 @@ class FormularVytvoreniDotazu extends JDialog
                 case "varchar":
                 case "longtext":
                     operators.add("like");
+                    operators.add("not like");
                     condition.setType("text");
                     break;
                 case "bit":

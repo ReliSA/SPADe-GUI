@@ -760,7 +760,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                         while (iterator.hasNext()) {
                             JSONObject jsonObject = (JSONObject) iterator.next();
                             condition = jsonObject.getString("name") + " " + jsonObject.getString("operator") + " ";
-                            if (jsonObject.getString("operator").equals("like")) {
+                            if (jsonObject.getString("operator").equals("like") || jsonObject.getString("operator").equals("not like")) {
                                 condition += "\"" + jsonObject.getString("value") + "\"";
                             } else {
                                 condition += jsonObject.getString("value");
