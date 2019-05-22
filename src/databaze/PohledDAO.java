@@ -13,8 +13,6 @@ import java.util.List;
  */
 public class PohledDAO implements IPohledDAO{
     private Connection pripojeni;					//připojení k databázi
-    private static String name = "";
-    private static String pass = "";
     static Logger log = Logger.getLogger(PohledDAO.class);
 
     public PohledDAO(){
@@ -35,13 +33,11 @@ public class PohledDAO implements IPohledDAO{
     }
 
     public List<List<String>> runQuery(String query){
-        Connection pripojeni;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         List<List<String>> data = new ArrayList<>();
 
         try {
-            pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, name, pass);
             stmt = pripojeni.prepareStatement(query);
 
             boolean isResultSet = stmt.execute();
@@ -90,11 +86,9 @@ public class PohledDAO implements IPohledDAO{
 
     public Long testVariable(String query){
         Long result = null;
-        Connection pripojeni;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
-            pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, name, pass);
             stmt = pripojeni.prepareStatement(query);
 
             rs = stmt.executeQuery();
@@ -123,12 +117,10 @@ public class PohledDAO implements IPohledDAO{
 
     public ArrayList<String> getPeopleForProject(int projektId){
         ArrayList<String> result = new ArrayList<>();
-        Connection pripojeni;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         String query;
         try {
-            pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, name, pass);
             query = "SELECT DISTINCT name FROM personView where projectId = " + projektId + " ORDER BY name ASC";
             log.info(query);
             stmt = pripojeni.prepareStatement(query);
@@ -156,12 +148,10 @@ public class PohledDAO implements IPohledDAO{
 
     public ArrayList<Iteration> getIterationsForProject(int projektId){
         ArrayList<Iteration> result = new ArrayList<>();
-        Connection pripojeni;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         String query;
         try {
-            pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, name, pass);
             query = "SELECT startDate, endDate, name FROM iteration WHERE superProjectId = " + projektId + " ORDER BY name ASC";
             log.info(query);
             stmt = pripojeni.prepareStatement(query);
@@ -189,12 +179,10 @@ public class PohledDAO implements IPohledDAO{
 
     public List<Sloupec> getViewStructure(String viewName){
         List<Sloupec> sloupce = new ArrayList<>();
-        Connection pripojeni;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         String query;
         try {
-            pripojeni = DriverManager.getConnection(Konstanty.CESTA_K_DATABAZI, name, pass);
             query = "SELECT COLUMN_NAME, DATA_TYPE from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME='" + viewName + "'";
             log.info(query);
             stmt = pripojeni.prepareStatement(query);
