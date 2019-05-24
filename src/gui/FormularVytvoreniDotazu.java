@@ -25,10 +25,10 @@ class FormularVytvoreniDotazu extends JDialog
     private boolean closed = true;
     private List<ConditionPanel> conditionPanels = new ArrayList<>();
     private JPanel mainPanel = new JPanel();
-    private int heightDifference = 30;
+    private int heightDifference = 28;
     private int conditionCount = 1;
-    private int windowHeight = 270;
-    private int windowWidth = 600;
+    private int windowHeight = 250;
+    private int windowWidth = 700;
 
     private ButtonGroup btnGroupAggregate = new ButtonGroup();
     private JComboBox<String> cboxTables = new JComboBox<>();
@@ -127,7 +127,7 @@ class FormularVytvoreniDotazu extends JDialog
                      mainPanel.remove(btnAdd);
 
                      ConditionPanel conditionPanel = new ConditionPanel(strukturaPohledu.get((String) cboxTables.getSelectedItem()), variableValues, parentForm, false);
-                     mainPanel.add(conditionPanel, "gapleft 65, span 2, wrap");
+                     mainPanel.add(conditionPanel, "gapleft 64, span 2, wrap");
                      conditionPanels.add(conditionPanel);
                      mainPanel.add(btnAdd);
                      mainPanel.add(btnSubmit, "split 2");
@@ -223,17 +223,20 @@ class FormularVytvoreniDotazu extends JDialog
                 ConditionPanel conditionPanel;
                 if(isFirst){
                     conditionPanel = new ConditionPanel(condition.getString("name"), condition.getString("operator"), condition.getString("value"), condition.getString("type"), strukturaPohledu.get((tableName)), variableValues, parentForm, true);
-                    mainPanel.add(conditionPanel, "w 400, wrap");
+                    mainPanel.add(conditionPanel, "wrap");
                     isFirst = false;
                 } else {
                     conditionPanel = new ConditionPanel(condition.getString("name"), condition.getString("operator"), condition.getString("value"), condition.getString("type"), strukturaPohledu.get((tableName)), variableValues, parentForm, false);
-                    mainPanel.add(conditionPanel, "gapleft 65, span 2, wrap");
+                    mainPanel.add(conditionPanel, "gapleft 64, span 2, wrap");
                 }
                 conditionPanels.add(conditionPanel);
+                if(getHeight() <= 400 && conditionPanels.size() != 1) {
+                    setSize(getWidth(), getHeight() + heightDifference);
+                }
             }
         } else {
             ConditionPanel conditionPanel = new ConditionPanel(strukturaPohledu.get((String) cboxTables.getSelectedItem()), variableValues, parentForm, true);
-            mainPanel.add(conditionPanel, "w 400, wrap");
+            mainPanel.add(conditionPanel, "wrap");
             conditionPanels.add(conditionPanel);
         }
 
@@ -427,9 +430,9 @@ class FormularVytvoreniDotazu extends JDialog
                 }
             });
 
-            this.add(cboxAttributes, "w 150");
+            this.add(cboxAttributes, "w 100");
             this.add(cboxOperators, "w 70");
-            this.add(cboxVariableValues, "w 150");
+            this.add(cboxVariableValues, "w 250");
 
             if(!isFirst) {
                 this.add(removeBtn);
