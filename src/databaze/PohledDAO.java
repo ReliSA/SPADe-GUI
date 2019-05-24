@@ -120,9 +120,10 @@ public class PohledDAO implements IPohledDAO{
         PreparedStatement stmt = null;
         ResultSet rs = null;
         String query;
+        String logHeader = "\n==============================\nX axis: Person" + "\n==============================\n";
         try {
-            query = "SELECT DISTINCT name FROM personView where projectId = " + projektId + " ORDER BY name ASC";
-            log.info(query);
+            query = "SELECT\n\tDISTINCT name\nFROM\n\tpersonView\nwhere\n\tprojectId = " + projektId + "\nORDER BY\n\tname ASC";
+            log.info(logHeader + query);
             stmt = pripojeni.prepareStatement(query);
 
             rs = stmt.executeQuery();
@@ -151,9 +152,10 @@ public class PohledDAO implements IPohledDAO{
         PreparedStatement stmt = null;
         ResultSet rs = null;
         String query;
+        String logHeader = "\n==============================\nData: Iterations" + "\n==============================\n";
         try {
-            query = "SELECT startDate, endDate, name FROM iteration WHERE superProjectId = " + projektId + " ORDER BY name ASC";
-            log.info(query);
+            query = "SELECT\n\tstartDate, endDate, name\nFROM\n\titeration\nWHERE\n\tsuperProjectId = " + projektId + "\nORDER BY\n\tname ASC";
+            log.info(logHeader + query);
             stmt = pripojeni.prepareStatement(query);
 
             rs = stmt.executeQuery();
@@ -182,9 +184,10 @@ public class PohledDAO implements IPohledDAO{
         PreparedStatement stmt = null;
         ResultSet rs = null;
         String query;
+        String logHeader = "\n==============================\nData: Structure for " + viewName + "\n==============================\n";
         try {
-            query = "SELECT COLUMN_NAME, DATA_TYPE from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME='" + viewName + "'";
-            log.info(query);
+            query = "SELECT\n\tCOLUMN_NAME, DATA_TYPE\nFROM\n\tINFORMATION_SCHEMA.COLUMNS\nWHERE\n\tTABLE_NAME='" + viewName + "'";
+            log.info(logHeader + query);
             stmt = pripojeni.prepareStatement(query);
 
             rs = stmt.executeQuery();

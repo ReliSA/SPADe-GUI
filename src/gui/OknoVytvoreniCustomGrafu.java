@@ -412,41 +412,44 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                             ComboBoxItem comboBoxItem = new ComboBoxItem(fileName, "promenna", variableValue + "");
                             preparedVariableValues.add(comboBoxItem);
                             log.debug(preparedVariableValues);
-                        }
-
-                        SloupecCustomGrafu sloupec = sloupceCustomGrafu.stream()
-                                .filter(sl -> columnName.equals(sl.getName())).findAny().orElse(null);
-                        JSONObject detection = new JSONObject();
-                        detection.put("operator", sloupec.getOperator());
-                        detection.put("detect", sloupec.useColum());
-                        detection.put("compareColumns", sloupec.compareColumns());
-                        if(sloupec.compareColumns()){
-                            detection.put("column1", sloupec.getCboxColumns().getSelectedItem());
-                            if(sloupec.isBetween()){
-                                detection.put("column2", sloupec.getCboxColumns2().getSelectedItem());
-                            }
+                            queryList.add(query);
+                            panelCount++;
                         } else {
-                            JSONObject firstInput = new JSONObject();
-                            firstInput.put("value1", sloupec.getComboBoxValue(sloupec.getCboxVariableValues()));
-                            if(!sloupec.getArithmeticOperator(sloupec.getCboxAritmethics()).equals("")){
-                                firstInput.put("arithmetic", sloupec.getArithmeticOperator(sloupec.getCboxAritmethics()));
-                                firstInput.put("value2", sloupec.getComboBoxValue(sloupec.getCboxVariableValues2()));
-                            }
-                            detection.put("firstInput", firstInput);
-                            if(sloupec.isBetween()){
-                                JSONObject secondInput = new JSONObject();
-                                secondInput.put("value1", sloupec.getComboBoxValue(sloupec.getCboxVariableValues3()));
-                                if(!sloupec.getArithmeticOperator(sloupec.getCboxAritmethics2()).equals("")){
-                                    secondInput.put("arithmetic", sloupec.getArithmeticOperator(sloupec.getCboxAritmethics2()));
-                                    secondInput.put("value2", sloupec.getComboBoxValue(sloupec.getCboxVariableValues4()));
-                                }
-                                detection.put("secondInput", secondInput);
-                            }
-                        }
 
-                        query.put("detection", detection);
-                        queryList.add(query);
-                        panelCount++;
+                            SloupecCustomGrafu sloupec = sloupceCustomGrafu.stream()
+                                    .filter(sl -> columnName.equals(sl.getName())).findAny().orElse(null);
+                            JSONObject detection = new JSONObject();
+                            detection.put("operator", sloupec.getOperator());
+                            detection.put("detect", sloupec.useColum());
+                            detection.put("compareColumns", sloupec.compareColumns());
+                            if (sloupec.compareColumns()) {
+                                detection.put("column1", sloupec.getCboxColumns().getSelectedItem());
+                                if (sloupec.isBetween()) {
+                                    detection.put("column2", sloupec.getCboxColumns2().getSelectedItem());
+                                }
+                            } else {
+                                JSONObject firstInput = new JSONObject();
+                                firstInput.put("value1", sloupec.getComboBoxValue(sloupec.getCboxVariableValues()));
+                                if (!sloupec.getArithmeticOperator(sloupec.getCboxAritmethics()).equals("")) {
+                                    firstInput.put("arithmetic", sloupec.getArithmeticOperator(sloupec.getCboxAritmethics()));
+                                    firstInput.put("value2", sloupec.getComboBoxValue(sloupec.getCboxVariableValues2()));
+                                }
+                                detection.put("firstInput", firstInput);
+                                if (sloupec.isBetween()) {
+                                    JSONObject secondInput = new JSONObject();
+                                    secondInput.put("value1", sloupec.getComboBoxValue(sloupec.getCboxVariableValues3()));
+                                    if (!sloupec.getArithmeticOperator(sloupec.getCboxAritmethics2()).equals("")) {
+                                        secondInput.put("arithmetic", sloupec.getArithmeticOperator(sloupec.getCboxAritmethics2()));
+                                        secondInput.put("value2", sloupec.getComboBoxValue(sloupec.getCboxVariableValues4()));
+                                    }
+                                    detection.put("secondInput", secondInput);
+                                }
+                            }
+
+                            query.put("detection", detection);
+                            queryList.add(query);
+                            panelCount++;
+                        }
                     }
                     JSONObject[] queryArray = new JSONObject[queryList.size()];
                     queryArray = queryList.toArray(queryArray);
@@ -746,13 +749,15 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
 
                     for (QueryPanel panel : queryPanels) {
                         columnsNumber++;
+                        String logHeader = "\n==============================\ncolumn: " + panel.getName() + "\n==============================\n";
+
                         JSONObject queryJson = panel.getQuery();
                         String tableName = queryJson.getString("table");
                         String aggregate = queryJson.getString("aggregate");
                         String agrColumn = queryJson.getString("agrColumn");
                         String joinColumn = prepareDateFormat(axisTable, queryJson.getString("joinColumn"));
 
-                        String query = "SELECT " + joinColumn + ", " + aggregate + "(" + agrColumn + ") FROM " + tableName + " WHERE ";
+                        String query = "SELECT\n\t" + joinColumn + ", " + aggregate + "(" + agrColumn + ")\nFROM\n\t" + tableName + "\nWHERE\n\t";
 
                         JSONArray conditions = (JSONArray) queryJson.get("conditions");
 
@@ -771,7 +776,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                             query += condition;
                         }
                         query += " AND projectId = " + projekt.getID();
-                        query += " GROUP BY " + joinColumn + ";";
+                        query += "\nGROUP BY\n\t" + joinColumn + ";";
 
                         log.info(query);
                         List<List<String>> data = pohledDAO.runQuery(query);
@@ -1245,6 +1250,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         String condition;
         Long result;
         JSONObject queryObject;
+        String logHeader = "\n==============================\n Variable: \n==============================\n";
 
         if(object.has("queries")) {
             JSONArray queryArray = object.getJSONArray("queries");
@@ -1257,7 +1263,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         String function = queryObject.getString("aggregate");
         String tableName = queryObject.getString("table");
         String selectedColumn = queryObject.getString("agrColumn");
-        String query = "SELECT " + function + "(" + selectedColumn + ") from " + tableName + " where ";
+        String query = "SELECT\n\t" + function + "(" + selectedColumn + ")\nfrom\n\t" + tableName + "\nwhere\n\t";
 
         JSONArray conditions = (JSONArray) queryObject.get("conditions");
 
@@ -1277,7 +1283,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         }
         query += " AND projectId = " + projekt.getID();
         result = pohledDAO.testVariable(query);
-        log.info(query);
+        log.info(logHeader + query);
 
         return result;
     }
@@ -1413,6 +1419,8 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                     centerNorthPanel.add(varOrQueryNameTf, "width 10%");
                     centerNorthPanel.add(testVarQueryBtn);
 
+                    bottomPanel.add(cancelBtn);
+                    bottomPanel.add(saveBtn);
                     mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
 
                     centerPanel.add(centerNorthPanel, "dock north, width 100%");
