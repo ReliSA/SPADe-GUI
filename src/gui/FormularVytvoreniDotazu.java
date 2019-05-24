@@ -386,7 +386,7 @@ class FormularVytvoreniDotazu extends JDialog
 
             JButton removeBtn = new JButton();
             try {
-                Image img = ImageIO.read(new File("zdroje/obrazky/deleteImage.png"));
+                Image img = ImageIO.read(Toolkit.getDefaultToolkit().getClass().getResource("/res/deleteImage.png"));
                 if (img != null){
                     Image newimg = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
                     removeBtn.setIcon(new ImageIcon(newimg));

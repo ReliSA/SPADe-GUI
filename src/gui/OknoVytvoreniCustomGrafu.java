@@ -17,7 +17,7 @@ import ostatni.*;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
+import javax.swing.border.MatteBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -46,9 +46,9 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
     private static JFrame mainFrame;
     private Projekt projekt;
     private CustomGraf graphData;
-    private static String constantFolderPath = "zdroje\\konstanty\\";
-    private static String queryFolderPath = "zdroje\\dotazy\\";
-    private static String variableFolderPath = "zdroje\\promenne\\";
+    private static String constantFolderPath = "res\\konstanty\\";
+    private static String queryFolderPath = "res\\dotazy\\";
+    private static String variableFolderPath = "res\\promenne\\";
     private static JButton addConstantBtn;
     private static JButton addVariableBtn;
     private static JButton addQueryBtn;
@@ -62,6 +62,8 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
     private static JButton saveBtn;
     private static JButton cancelBtn;
     private static JButton exportBtn;
+    private static JScrollPane scrollPanelNorth;
+    private static JPanel northPanel;
     private static JPanel centerNorthPanel;
     private static JPanel centerPanel;
     private static JPanel centerTablePanel;
@@ -139,14 +141,15 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         saveBtn = new JButton(Konstanty.POPISY.getProperty("uloz"));
         cancelBtn = new JButton(Konstanty.POPISY.getProperty("tlacitkoZrusit"));
         exportBtn = new JButton(Konstanty.POPISY.getProperty("exportCSV"));
+        northPanel = new JPanel(new MigLayout("ins 0"));
         centerNorthPanel = new JPanel(new MigLayout());
         centerPanel = new JPanel(new MigLayout("ins 0"));
         centerTablePanel = new JPanel(new MigLayout("gap rel 0, ins 0"));
         bottomPanel = new JPanel(new MigLayout());
         axisPanel = new JPanel(new MigLayout());
         queryPanels = new ArrayList<>();
-        constantsPanel = new JPanel(new MigLayout());
-        variablesPanel = new JPanel(new MigLayout());
+        constantsPanel = new JPanel(new MigLayout("aligny center"));
+        variablesPanel = new JPanel(new MigLayout("aligny center"));
         preparedVariableValues = new ArrayList<>();
         sloupceCustomGrafu = new ArrayList<>();
 
@@ -167,7 +170,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
 //        List<FieldChangeView> fieldChangeViews = pohledDAO.nactiFieldChangeView();
 //        List<WorkUnitView> workUnitViews = pohledDAO.nactiWorkUnitView();
 
-        constantsPanel.setBackground(Color.cyan);
+        constantsPanel.setBorder(new MatteBorder(0,0,1,0, Color.BLACK));
         constantsPanel.add(addConstantBtn);
 
         File queryFolder = new File(queryFolderPath);
@@ -197,9 +200,10 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
             constantsPanel.repaint();
         }
 
-        mainFrame.add(constantsPanel,"dock north");
+        constantsPanel.setBorder(new MatteBorder(0,0,1,0, Color.BLACK));
+        northPanel.add(constantsPanel,"dock north, w 100%, h 55");
 
-        variablesPanel.add(addVariableBtn);
+        variablesPanel.add(addVariableBtn, "align 50% 50%");
 
         File variableFolder = new File(variableFolderPath);
         if (!variableFolder.exists()){
@@ -225,19 +229,23 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
             }
         }
 
-        mainFrame.add(variablesPanel,"dock north");
+        northPanel.add(variablesPanel,"dock north, h 60");
+        scrollPanelNorth = new JScrollPane(northPanel);
+        scrollPanelNorth.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        scrollPanelNorth.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        mainFrame.add(scrollPanelNorth, "dock north, h 125");
 
-        centerPanel.setBackground(Color.PINK);
+        JScrollPane scrollPane = new JScrollPane(centerPanel);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        mainFrame.add(scrollPane, "dock center");
 
-        JScrollPane scrollFrame = new JScrollPane(centerPanel);
-        centerPanel.setAutoscrolls(true);
-        mainFrame.add(scrollFrame, "dock center");
-
-        centerNorthPanel.setBackground(Color.orange);
+        centerNorthPanel.setBorder(new MatteBorder(0,0,2,0, Color.BLACK));
         centerNorthPanel.add(createQueryBtn);
         centerNorthPanel.add(loadQueryBtn);
         centerPanel.add(centerNorthPanel, "dock north, width 100%");
-        axisPanel.setBackground(new Color(168, 79, 25));
+        axisPanel.setBorder(new MatteBorder(0,0,0,1, Color.BLACK));
+        axisPanel.setBackground(new Color(200, 200, 200));
 
         cboxAxisOptions = new JComboBox<String>();
         cboxAxisOptions.addItem("Person");
@@ -260,7 +268,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         dpDatumOD = new JDatePickerImpl(datumODPanel, new DateComponentFormatter());
         dpDatumDO = new JDatePickerImpl(datumDOPanel, new DateComponentFormatter());
 
-        bottomPanel.setBackground(Color.GRAY);
+        bottomPanel.setBorder(new MatteBorder(2,0,0,0, Color.BLACK));
         bottomPanel.add(cancelBtn);
 
         nastavAkce();
@@ -320,10 +328,10 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 centerPanel.remove(centerTablePanel);
-                centerPanel.add(axisPanel, "dock west, height 800");
+                centerPanel.add(axisPanel, "dock west, h 555");
 
                 for(QueryPanel panel : queryPanels){
-                    centerPanel.add(panel, "dock west, width " + queryPanelWidth);
+                    centerPanel.add(panel, "dock west, h 555, width " + queryPanelWidth);
                 }
 //                queryPanels.clear();
                 sloupceCustomGrafu.clear();
@@ -539,7 +547,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                     centerNorthPanel.add(varOrQueryNameTf, "width 10%");
 
                     centerPanel.add(centerNorthPanel, "dock north, width 100%");
-                    centerPanel.add(axisPanel, "dock west, height 800, width " + queryPanelWidth);
+                    centerPanel.add(axisPanel, "dock west, h 555, width " + queryPanelWidth);
 
                     try {
                         String content = FileUtils.readFileToString(file, "utf-8");
@@ -574,8 +582,9 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                         {
                             JSONObject query = (JSONObject) object;
                             QueryPanel panel = new QueryPanel(query);
+                            panel.setBorder(new MatteBorder(0,0,0,1, Color.BLACK));
                             queryPanels.add(panel);
-                            centerPanel.add(panel, "dock west, height 800, width " + queryPanelWidth);
+                            centerPanel.add(panel, "dock west, grow, width " + queryPanelWidth);
                             centerPanel.revalidate();
                             centerPanel.repaint();
                         }
@@ -660,7 +669,8 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                 JSONObject conditions = queryForm.getFormData();
                 if (!conditions.isEmpty()) {
                     QueryPanel queryPanel = new QueryPanel(conditions);
-                    centerPanel.add(queryPanel, "dock west, height 800, width " + queryPanelWidth);
+                    queryPanel.setBorder(new MatteBorder(0,0,0,1, Color.BLACK));
+                    centerPanel.add(queryPanel, "dock west, h 555, width " + queryPanelWidth);
                     queryPanels.add(queryPanel);
                     centerPanel.revalidate();
                 }
@@ -694,7 +704,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                 centerNorthPanel.add(varOrQueryNameTf, "width 10%");
 
                 centerPanel.add(centerNorthPanel, "dock north, width 100%");
-                centerPanel.add(axisPanel, "dock west, height 800, width " + queryPanelWidth);
+                centerPanel.add(axisPanel, "dock west, h 555, width " + queryPanelWidth);
 
                 bottomPanel.add(cancelBtn);
                 bottomPanel.add(runQueryBtn);
@@ -1248,7 +1258,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         Image img = null;
         try {
             if(buttonOperation.equals("edit") || buttonOperation.equals("delete")) {
-                img = ImageIO.read(new File("zdroje/obrazky/" + buttonOperation + "Image.png"));
+                img = ImageIO.read(Toolkit.getDefaultToolkit().getClass().getResource("/res/" + buttonOperation + "Image.png"));
             }
             if (img != null){
                 Image newimg = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
@@ -1466,8 +1476,9 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                         JSONObject query = (JSONObject) queryObj;
 
                         QueryPanel panel = new QueryPanel(query);
+                        panel.setBorder(new MatteBorder(0,0,0,1, Color.BLACK));
                         queryPanels.add(panel);
-                        centerPanel.add(panel, "dock west, height 100%, width " + queryPanelWidth);
+                        centerPanel.add(panel, "dock west, height 555, width " + queryPanelWidth);
                     }
 
                     mainFrame.revalidate();
