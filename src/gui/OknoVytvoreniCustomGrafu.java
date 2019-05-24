@@ -715,6 +715,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                     String axisTable = "";
                     List<String> firstColumn = new ArrayList<>();
                     List<String> columnNames = new ArrayList<>();
+                    boolean doDetect = false;
 
                     Component[] components = centerPanel.getComponents();
                     for (Component comp : components) {
@@ -778,7 +779,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                         query += " AND projectId = " + projekt.getID();
                         query += "\nGROUP BY\n\t" + joinColumn + ";";
 
-                        log.info(query);
+                        log.info(logHeader + query);
                         List<List<String>> data = pohledDAO.runQuery(query);
                         String columnName = panel.getColumnName().equals("") ? "Col" + columnsNumber : panel.getColumnName();
                         SloupecCustomGrafu sloupec;
@@ -790,6 +791,10 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                         graphData.addNazvySloupcu(columnName);
 
                         sloupceCustomGrafu.add(sloupec);
+
+                        if (panel.getQuery().getJSONObject("detection").getBoolean("detect")){
+                            doDetect = true;
+                        }
 
                         for (String s : sloupec.getData()) {
                             graphData.addData(index, Double.parseDouble(s));
@@ -807,6 +812,9 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                     centerPanel.add(centerTablePanel, "grow");
                     bottomPanel.remove(runQueryBtn);
                     bottomPanel.add(detectBtn);
+                    if(doDetect){
+                        detectBtn.doClick();
+                    }
                     bottomPanel.add(goBackBtn);
                     bottomPanel.add(showGraphBtn);
                     bottomPanel.add(saveBtn);
