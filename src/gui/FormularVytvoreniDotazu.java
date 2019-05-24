@@ -219,10 +219,6 @@ class FormularVytvoreniDotazu extends JDialog
 
             JSONArray conditions = (JSONArray) constraint.get("conditions");
             for (Object obj : conditions) {
-                if(getHeight() <= 400) {
-                    setSize(getWidth(), getHeight() + heightDifference);
-                }
-
                 JSONObject condition = (JSONObject) obj;
                 ConditionPanel conditionPanel;
                 if(isFirst){
@@ -432,7 +428,7 @@ class FormularVytvoreniDotazu extends JDialog
             });
 
             this.add(cboxAttributes, "w 150");
-            this.add(cboxOperators, "w 50");
+            this.add(cboxOperators, "w 70");
             this.add(cboxVariableValues, "w 150");
 
             if(!isFirst) {

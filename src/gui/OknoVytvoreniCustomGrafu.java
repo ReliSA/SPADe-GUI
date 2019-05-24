@@ -1533,8 +1533,12 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         QueryPanel thisPanel;
         JSONObject query;
         JTextField columName;
+        JLabel lblSelect;
+        JLabel lblFrom;
+        JLabel lblWhere;
         JButton removeBtn;
         JButton editBtn;
+        List<JLabel> conditionLabelList;
 
         /**
          * Konstrukor panelu pro zobrazení vytvořeného dotazu
@@ -1559,18 +1563,21 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
             columName = new JTextField(columnName);
             this.add(columName, "wrap, width 100%");
 
-            JLabel label1 = new JLabel("SELECT " + aggregate + "(" + agrColumn + ")");
-            this.add(label1, "wrap");
-            JLabel label2 = new JLabel("FROM " + tableName);
-            this.add(label2, "wrap");
-            JLabel label3 = new JLabel("WHERE");
-            this.add(label3, "wrap");
+            lblSelect = new JLabel("SELECT " + aggregate + "(" + agrColumn + ")");
+            this.add(lblSelect, "wrap");
+            lblFrom = new JLabel("FROM " + tableName);
+            this.add(lblFrom, "wrap");
+            lblWhere = new JLabel("WHERE");
+            this.add(lblWhere, "wrap");
+
+            conditionLabelList = new ArrayList<>();
 
             JSONArray conditions = (JSONArray) query.get("conditions");
             for(Object object: conditions){
                 JSONObject condition = (JSONObject) object;
-                JLabel lblName = new JLabel(condition.getString("name") + " " + condition.getString("operator") + " " + condition.getString("value"));
-                this.add(lblName, "wrap");
+                JLabel label = new JLabel(condition.getString("name") + " " + condition.getString("operator") + " " + condition.getString("value"));
+                this.add(label, "wrap");
+                conditionLabelList.add(label);
             }
 
             editBtn = new JButton("Edit");
@@ -1588,37 +1595,35 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                         columnName = "";
                     }
                     if(!form.wasClosed()) {
-                        thisPanel.removeAll();
+                        for(JLabel label : conditionLabelList){
+                            remove(label);
+                        }
+                        conditionLabelList.clear();
                         String tableName = query.getString("table");
                         String agrColumn = query.getString("agrColumn");
                         String aggregate = query.getString("aggregate");
 
-                        columName = new JTextField(columnName);
-                        add(columName, "wrap, width 100%");
+                        columName.setText(columnName);
 
-                        JLabel label1 = new JLabel("SELECT " + aggregate + "(" + agrColumn + ")");
-                        add(label1, "wrap");
-                        JLabel label2 = new JLabel("FROM " + tableName);
-                        add(label2, "wrap");
-                        JLabel label3 = new JLabel("WHERE");
-                        add(label3, "wrap");
+                        lblSelect.setText("SELECT " + aggregate + "(" + agrColumn + ")");
+                        lblFrom.setText("FROM " + tableName);
+                        lblWhere.setText("WHERE");
 
                         if (!query.isEmpty()) {
                             setQuery(query);
                             JSONArray conditions = (JSONArray) query.get("conditions");
                             for (Object coditionObject : conditions) {
                                 JSONObject condition = (JSONObject) coditionObject;
-                                JLabel lblName = new JLabel(condition.getString("name") + " " + condition.getString("operator") + " " + condition.getString("value"));
-                                add(lblName, "wrap");
+                                JLabel label = new JLabel(condition.getString("name") + " " + condition.getString("operator") + " " + condition.getString("value"));
+                                add(label, "wrap");
+                                conditionLabelList.add(label);
                             }
                         }
                         add(editBtn, "wrap");
                         add(removeBtn);
                     }
-                    setBorder(new EmptyBorder(10, 10, 10, 10));
                     centerPanel.revalidate();
-                    mainFrame.revalidate();
-                    mainFrame.repaint();
+                    centerPanel.repaint();
                 }
 
             });
