@@ -19,6 +19,7 @@ public class Aplikace {
 		try {			
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());		
 			Konstanty.POPISY.load(new InputStreamReader(new FileInputStream(Konstanty.NAZEV_SOUBORU_POPISU_ENGLISH), "UTF8"));
+			Konstanty.APP.load(new InputStreamReader(new FileInputStream(Konstanty.AppSoubor), "UTF8"));
 			Konstanty.SQLs.load(new InputStreamReader(new FileInputStream(Konstanty.SQLSoubor), "UTF8"));
 			Konstanty.SQLsVar.load(new InputStreamReader(new FileInputStream(Konstanty.SQLVarSoubor), "UTF8"));
 			Locale.setDefault(new Locale ("en", "US"));

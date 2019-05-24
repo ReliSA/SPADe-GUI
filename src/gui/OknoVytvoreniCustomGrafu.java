@@ -6,6 +6,7 @@ import databaze.IPohledDAO;
 import databaze.PohledDAO;
 import net.miginfocom.swing.MigLayout;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.log4j.Logger;
 import org.jdatepicker.impl.DateComponentFormatter;
 import org.jdatepicker.impl.JDatePanelImpl;
@@ -81,6 +82,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
     private static final Map<String, List<Sloupec>> strukturyPohledu = new TreeMap<>();
     private static List<ComboBoxItem> preparedVariableValues;
     private SloupecCustomGrafu detected;
+    private SloupecCustomGrafu axisColumn;
     private List<QueryPanel> queryPanels;
     private List<SloupecCustomGrafu> sloupceCustomGrafu;
     private int columnsNumber = 0;
@@ -578,7 +580,8 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                             centerPanel.repaint();
                         }
                     } catch(IOException ex) {
-                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(mainFrame, Konstanty.POPISY.getProperty("textNelzeNacist"), Konstanty.POPISY.getProperty("upozorneni"), JOptionPane.WARNING_MESSAGE);
+                        log.warn(ex);
                     }
 
                     bottomPanel.add(cancelBtn);
@@ -745,11 +748,11 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
 
                     firstColumn = prepareGraphsFirstColumn(axisTable);
 
-                    SloupecCustomGrafu sl = new SloupecCustomGrafu(axisTable, firstColumn, -1, preparedVariableValues, false, columnNames, null, false);
+                    axisColumn = new SloupecCustomGrafu(axisTable, firstColumn, -1, preparedVariableValues, false, columnNames, null, false);
                     centerPanel.removeAll();
                     centerTablePanel.removeAll();
                     centerPanel.add(centerNorthPanel, "dock north, width 100%");
-                    centerTablePanel.add(sl, "dock west, grow");
+                    centerTablePanel.add(axisColumn, "dock west, grow");
                     columnsNumber++;
 
                     for (QueryPanel panel : queryPanels) {
@@ -796,8 +799,8 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
 
                         sloupceCustomGrafu.add(sloupec);
 
-                        if (panel.getQuery().getJSONObject("detection").getBoolean("detect")){
-                            doDetect = true;
+                        if (panel.getQuery().has("detection")) {
+                            doDetect = panel.getQuery().getJSONObject("detection").getBoolean("detect");
                         }
 
                         for (String s : sloupec.getData()) {
@@ -906,57 +909,71 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         exportBtn.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                File file;
-                Writer writer = null;
-                boolean first = true;
-                List<List<String>> values = new ArrayList<>();
-                String completePath = "C:\\Temp\\";
-                String fileName = "export";
-                fileName += LocalDateTime.now();
-                fileName = fileName.replaceAll(":", "-");
-                completePath += fileName;
-
-                StringBuilder sb = new StringBuilder();
-                for (SloupecCustomGrafu sloupec : sloupceCustomGrafu) {
-                    if (!first) {
-                        sb.append(',');
-                    }
-                    sb.append(sloupec.getName());
-                    values.add(sloupec.getData());
-
-                    first = false;
-                }
-                sb.append("\n");
-
-                first = true;
-                for(int i = 0; i < values.get(0).size(); i++){
-                    for (int j = 0; j < values.size(); j++){
-                        if (!first) {
-                            sb.append(',');
-                        }
-                        sb.append(values.get(j).get(i));
-
-                        first = false;
-                    }
-                    sb.append("\n");
-                    first = true;
-                }
-
-                try {
-                    file = new File(completePath + ".csv");
-                    writer = new BufferedWriter(new OutputStreamWriter(
-                            new FileOutputStream(file), "utf-8"));
-                    writer.write(sb.toString());
+                if (detected.getData().size() == 0) {
                     JOptionPane.showMessageDialog(mainFrame,
-                            Konstanty.POPISY.getProperty("textUspesnyExport"),
-                            Konstanty.POPISY.getProperty("info"),
-                            JOptionPane.INFORMATION_MESSAGE);
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                } finally {
+                            Konstanty.POPISY.getProperty("textNutnaDetekce"),
+                            Konstanty.POPISY.getProperty("upozorneni"),
+                            JOptionPane.WARNING_MESSAGE);
+                } else {
+                    File file;
+                    Writer writer = null;
+                    boolean first = true;
+                    List<List<String>> values = new ArrayList<>();
+                    String completePath = "";
+                    if (SystemUtils.IS_OS_WINDOWS){
+                        completePath += Konstanty.APP.getProperty("exportPathWin");
+                    } else {
+                        completePath += Konstanty.APP.getProperty("exportPathUnix");
+                    }
+                    String fileName = "export" + (varOrQueryNameTf.getText().equals("") ? "" : "_" + varOrQueryNameTf.getText() + "_");
+                    fileName += LocalDateTime.now();
+                    fileName = fileName.replaceAll(":", "-");
+                    completePath += fileName;
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(axisColumn.getName());
+                    values.add(axisColumn.getData());
+                    for (SloupecCustomGrafu sloupec : sloupceCustomGrafu) {
+                        sb.append(",").append(sloupec.getName());
+                        values.add(sloupec.getData());
+                    }
+                    sb.append(",detected\n");
+                    values.add(detected.getData());
+
+                    first = true;
+                    for (int i = 0; i < values.get(0).size(); i++) {
+                        for (int j = 0; j < values.size(); j++) {
+                            if (!first) {
+                                sb.append(',');
+                            }
+                            sb.append(values.get(j).get(i));
+
+                            first = false;
+                        }
+                        sb.append("\n");
+                        first = true;
+                    }
+
                     try {
-                        writer.close();
-                    } catch (Exception ex) {/*ignore*/}
+                        file = new File(completePath + ".csv");
+                        writer = new BufferedWriter(new OutputStreamWriter(
+                                new FileOutputStream(file), "utf-8"));
+                        writer.write(sb.toString());
+                        JOptionPane.showMessageDialog(mainFrame,
+                                Konstanty.POPISY.getProperty("textUspesnyExport"),
+                                Konstanty.POPISY.getProperty("info"),
+                                JOptionPane.INFORMATION_MESSAGE);
+                    } catch (IOException ex) {
+                        log.warn(ex);
+                        JOptionPane.showMessageDialog(mainFrame,
+                                Konstanty.POPISY.getProperty("textNeuspesnyExport"),
+                                Konstanty.POPISY.getProperty("upozorneni"),
+                                JOptionPane.WARNING_MESSAGE);
+                    } finally {
+                        try {
+                            writer.close();
+                        } catch (Exception ex) {/*ignore*/}
+                    }
                 }
             }
         });
