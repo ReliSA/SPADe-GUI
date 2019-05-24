@@ -84,6 +84,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
     private List<QueryPanel> queryPanels;
     private List<SloupecCustomGrafu> sloupceCustomGrafu;
     private int columnsNumber = 0;
+    private static boolean doInvertValues = false;
     static Logger log = Logger.getLogger(OknoVytvoreniCustomGrafu.class);
 
     /* For testing only - remove in final version*/
@@ -372,6 +373,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                         }
                         jsonObject.put("dateFrom", datumOd);
                         jsonObject.put("dateTo", datumDo);
+                        jsonObject.put("invertValues", detected.doInvertValues());
                     } else {
                         file = new File(variableFolderPath + fileName + ".json");
                     }
@@ -520,7 +522,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
 
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                doInvertValues = false;
                 fileChooser.setCurrentDirectory(new File(queryFolderPath));
                 int returnVal = fileChooser.showOpenDialog(centerNorthPanel);
 
@@ -545,6 +547,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                         String axis = obj.getString("axis");
                         String dateTo = obj.getString("dateTo");
                         String dateFrom = obj.getString("dateFrom");
+                        doInvertValues = obj.getBoolean("invertValues");
                         axisCBox.setSelectedItem(axis);
                         if(!axis.equals("Person") && !axis.equals("Iteration")){
                             axisPanel.add(lblFromDate);
@@ -568,7 +571,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                         for (Object object : queries)
                         {
                             JSONObject query = (JSONObject) object;
-                            QueryPanel panel = new QueryPanel(query, false);
+                            QueryPanel panel = new QueryPanel(query);
                             queryPanels.add(panel);
                             centerPanel.add(panel, "dock west, height 800, width " + queryPanelWidth);
                             centerPanel.revalidate();
@@ -653,7 +656,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                 FormularVytvoreniDotazu queryForm = new FormularVytvoreniDotazu(strukturyPohledu, null, preparedVariableValues);
                 JSONObject conditions = queryForm.getFormData();
                 if (!conditions.isEmpty()) {
-                    QueryPanel queryPanel = new QueryPanel(conditions, false);
+                    QueryPanel queryPanel = new QueryPanel(conditions);
                     centerPanel.add(queryPanel, "dock west, height 800, width " + queryPanelWidth);
                     queryPanels.add(queryPanel);
                     centerPanel.revalidate();
@@ -679,6 +682,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                doInvertValues = false;
                 centerPanel.removeAll();
                 centerNorthPanel.removeAll();
 
@@ -812,8 +816,12 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                     centerPanel.add(centerTablePanel, "grow");
                     bottomPanel.remove(runQueryBtn);
                     bottomPanel.add(detectBtn);
-                    if(doDetect){
+                    if (doDetect){
                         detectBtn.doClick();
+                    }
+                    if (doInvertValues){
+                        detected.invertValues();
+                        doInvertValues = false;
                     }
                     bottomPanel.add(goBackBtn);
                     bottomPanel.add(showGraphBtn);
@@ -1440,7 +1448,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                     {
                         JSONObject query = (JSONObject) queryObj;
 
-                        QueryPanel panel = new QueryPanel(query, true);
+                        QueryPanel panel = new QueryPanel(query);
                         queryPanels.add(panel);
                         centerPanel.add(panel, "dock west, height 100%, width " + queryPanelWidth);
                     }
@@ -1514,9 +1522,8 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         /**
          * Konstrukor panelu pro zobrazení vytvořeného dotazu
          * @param query SQL dotaz v JSON
-         * @param editing true pokud se dotaz edituje
          */
-        public QueryPanel(JSONObject query, boolean editing) {
+        public QueryPanel(JSONObject query) {
             super();
             thisPanel = this;
             this.query = query;

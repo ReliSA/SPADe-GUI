@@ -825,6 +825,21 @@ public class SloupecCustomGrafu extends JPanel {
         return between;
     }
 
+    /**
+     * Vrací rozhodnutí jestli se mají invertovat detekční hodnoty
+     * @return true pokud se má provést inverze detekčních hodnot
+     */
+    public boolean doInvertValues(){
+        return checkBoxInvertValues.isSelected();
+    }
+
+    /**
+     * Vykoná se kliknutí na check box pro inverzi hodnot
+     */
+    public void invertValues(){
+        checkBoxInvertValues.doClick();
+    }
+
     public boolean isFirstValid() {
         return firstValid;
     }
