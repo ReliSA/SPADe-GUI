@@ -638,6 +638,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                 boolean replace = false;
                 if(!constForm.wasCancelled()) {
                     String constName = constForm.getConstName().equals("") ? "Constant_" + LocalDateTime.now().toString().replaceAll(":", "-") : constForm.getConstName();
+                    preparedVariableValues.removeIf(item -> item.getName().equals(constName));
                     ComboBoxItem comboBoxItem = new ComboBoxItem(constName, "konstanta",constForm.getConstValue());
                     preparedVariableValues.add(comboBoxItem);
                     log.debug(preparedVariableValues);
