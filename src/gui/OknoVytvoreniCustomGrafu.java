@@ -635,6 +635,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         addConstantBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 FormularVytvoreniKonstanty constForm = new FormularVytvoreniKonstanty();
+                boolean replace = false;
                 if(!constForm.wasCancelled()) {
                     String constName = constForm.getConstName().equals("") ? "Constant_" + LocalDateTime.now().toString().replaceAll(":", "-") : constForm.getConstName();
                     ComboBoxItem comboBoxItem = new ComboBoxItem(constName, "konstanta",constForm.getConstValue());
@@ -654,7 +655,20 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                     } finally {
                         try {writer.close();} catch (Exception ex) {/*ignore*/}
                     }
-                    constantsPanel.add(constPanel);
+
+                    for(Component comp : constantsPanel.getComponents()){
+                        if(comp instanceof ConstantPanel){
+                            ConstantPanel constantPanel = (ConstantPanel) comp;
+                            if(constName.equals(constantPanel.getName())){
+                                constantPanel.setValue(constForm.getConstValue());
+                                constantPanel.repaint();
+                                replace = true;
+                            }
+                        }
+                    }
+                    if(!replace) {
+                        constantsPanel.add(constPanel);
+                    }
                     constantsPanel.revalidate();
                     constantsPanel.repaint();
                 }
@@ -1338,6 +1352,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         ConstantPanel thisPanel;
         String name;
         String value;
+        JLabel label;
 
         /**
          * Konstruktor panelu
@@ -1350,7 +1365,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
             name = constName;
             value = constValue;
             this.setLayout(new MigLayout());
-            JLabel label = new JLabel(name + ":" + value);
+            label = new JLabel(name + ":" + value);
             this.add(label);
 
             Border border = BorderFactory.createLineBorder(Color.BLACK, 1);
@@ -1417,6 +1432,26 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
 
             });
             this.add(removeBtn);
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public void setName(String name) {
+            label.setText(name + ":" + value);
+            this.name = name;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            label.setText(name + ":" + value);
+            this.value = value;
         }
     }
 

@@ -7,6 +7,8 @@ import ostatni.Konstanty;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 /**
  * Okno pro vytvoření konstanty
@@ -121,5 +123,13 @@ class FormularVytvoreniKonstanty extends JDialog
         /*připojení akcí k jednotlivým komponentám*/
         btnOk.addActionListener(actOk);
         btnCancel.addActionListener(actCancel);
+
+        this.addWindowListener(new WindowAdapter()
+        {
+            public void windowClosing(WindowEvent e)
+            {
+                cancelled = true;
+            }
+        });
     }
 }
