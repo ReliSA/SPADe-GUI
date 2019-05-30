@@ -133,7 +133,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
 
         addConstantBtn = new JButton(Konstanty.POPISY.getProperty("pridejKonstantu"));
         addVariableBtn = new JButton(Konstanty.POPISY.getProperty("pridejPromennou"));
-        addQueryBtn = new JButton(Konstanty.POPISY.getProperty("pridejDotaz"));
+        addQueryBtn = new JButton(Konstanty.POPISY.getProperty("pridejSloupec"));
         createQueryBtn = new JButton(Konstanty.POPISY.getProperty("vytvorDotaz"));
         loadQueryBtn = new JButton(Konstanty.POPISY.getProperty("nactiDotaz"));
         testVarQueryBtn = new JButton(Konstanty.POPISY.getProperty("otestujDotaz"));
@@ -250,6 +250,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         axisPanel.setBorder(new MatteBorder(0,0,0,1, Color.BLACK));
         axisPanel.setBackground(new Color(200, 200, 200));
 
+        axisPanel.add(new JLabel(Konstanty.POPISY.getProperty("osaX")), "wrap");
         cboxAxisOptions = new JComboBox<String>();
         cboxAxisOptions.addItem("Person");
         cboxAxisOptions.addItem("Iteration");
@@ -556,7 +557,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                         String content = FileUtils.readFileToString(file, "utf-8");
                         JSONObject obj = new JSONObject(content);
 
-                        JComboBox axisCBox = (JComboBox) axisPanel.getComponent(0);
+                        JComboBox axisCBox = (JComboBox) axisPanel.getComponent(1);
                         String axis = obj.getString("axis");
                         String dateTo = obj.getString("dateTo");
                         String dateFrom = obj.getString("dateFrom");
@@ -619,12 +620,12 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                 centerNorthPanel.add(addQueryBtn);
                 centerNorthPanel.add(lblName);
                 centerNorthPanel.add(varOrQueryNameTf, "width 10%");
+                varOrQueryNameTf.setText("");
                 centerNorthPanel.add(testVarQueryBtn);
 
-                bottomPanel.remove(runQueryBtn);
-                bottomPanel.remove(detectBtn);
-                bottomPanel.remove(showGraphBtn);
+                bottomPanel.removeAll();
                 bottomPanel.add(saveBtn);
+                bottomPanel.add(cancelBtn);
                 mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
 
                 centerPanel.add(centerNorthPanel, "dock north, width 100%");
@@ -724,8 +725,8 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                 centerPanel.add(centerNorthPanel, "dock north, width 100%");
                 centerPanel.add(axisPanel, "dock west, h 555, width " + queryPanelWidth);
 
-                bottomPanel.add(cancelBtn);
                 bottomPanel.add(runQueryBtn);
+                bottomPanel.add(cancelBtn);
                 mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
 
                 mainFrame.revalidate();
@@ -845,7 +846,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                     graphData.addNazvySloupcu("detected");
 
                     centerPanel.add(centerTablePanel, "grow");
-                    bottomPanel.remove(runQueryBtn);
+                    bottomPanel.removeAll();
                     bottomPanel.add(detectBtn);
                     if (doDetect){
                         detectBtn.doClick();
@@ -854,10 +855,11 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                         detected.invertValues();
                         doInvertValues = false;
                     }
-                    bottomPanel.add(goBackBtn);
-                    bottomPanel.add(showGraphBtn);
                     bottomPanel.add(saveBtn);
+                    bottomPanel.add(showGraphBtn);
                     bottomPanel.add(exportBtn);
+                    bottomPanel.add(goBackBtn);
+                    bottomPanel.add(cancelBtn);
                     mainFrame.revalidate();
                     mainFrame.repaint();
                 }
