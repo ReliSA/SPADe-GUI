@@ -6,6 +6,7 @@ import databaze.IPohledDAO;
 import databaze.PohledDAO;
 import net.miginfocom.swing.MigLayout;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.log4j.Logger;
 import org.jdatepicker.impl.DateComponentFormatter;
@@ -548,66 +549,71 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     File file = fileChooser.getSelectedFile();
 
-                    centerPanel.removeAll();
-                    centerNorthPanel.removeAll();
+                    if(!FilenameUtils.getExtension(file.getName()).equals("json")){
+                        JOptionPane.showMessageDialog(mainFrame, Konstanty.POPISY.getProperty("textSpatnaPripona"), Konstanty.POPISY.getProperty("upozorneni"), JOptionPane.WARNING_MESSAGE);
+                    } else {
+                        try {
+                            String content = FileUtils.readFileToString(file, "utf-8");
+                            JSONObject obj = new JSONObject(content);
+                            if (!obj.has("axis")) {
+                                JOptionPane.showMessageDialog(mainFrame, Konstanty.POPISY.getProperty("textSpatnySoubor"), Konstanty.POPISY.getProperty("upozorneni"), JOptionPane.WARNING_MESSAGE);
+                            } else {
+                                centerPanel.removeAll();
+                                centerNorthPanel.removeAll();
 
-                    centerNorthPanel.add(addQueryBtn);
-                    varOrQueryNameTf.setText(file.getName().substring(0, file.getName().indexOf('.')));
-                    centerNorthPanel.add(varOrQueryNameTf, "width 10%");
+                                centerNorthPanel.add(addQueryBtn);
+                                varOrQueryNameTf.setText(file.getName().substring(0, file.getName().indexOf('.')));
+                                centerNorthPanel.add(varOrQueryNameTf, "width 10%");
 
-                    centerPanel.add(centerNorthPanel, "dock north, width 100%");
-                    centerPanel.add(axisPanel, "dock west, h 555, width " + queryPanelWidth);
+                                centerPanel.add(centerNorthPanel, "dock north, width 100%");
+                                centerPanel.add(axisPanel, "dock west, h 555, width " + queryPanelWidth);
+                                JComboBox axisCBox = (JComboBox) axisPanel.getComponent(1);
+                                String axis = obj.getString("axis");
+                                String dateTo = obj.getString("dateTo");
+                                String dateFrom = obj.getString("dateFrom");
+                                doInvertValues = obj.getBoolean("invertValues");
+                                axisCBox.setSelectedItem(axis);
+                                if (!axis.equals("Person") && !axis.equals("Iteration")) {
+                                    axisPanel.add(lblFromDate);
+                                    axisPanel.add(dpDatumOD, "wrap");
+                                    axisPanel.add(lblToDate);
+                                    axisPanel.add(dpDatumDO);
+                                    Integer year = Integer.parseInt(dateTo.substring(0, dateTo.indexOf('-')));
+                                    Integer month = Integer.parseInt(dateTo.substring(dateTo.indexOf('-') + 1, dateTo.lastIndexOf('-')));
+                                    Integer day = Integer.parseInt(dateTo.substring(dateTo.lastIndexOf('-') + 1, dateTo.length()));
+                                    dpDatumDO.getModel().setDate(year, month - 1, day);
+                                    dpDatumDO.getModel().setSelected(true);
+                                    year = Integer.parseInt(dateFrom.substring(0, dateFrom.indexOf('-')));
+                                    month = Integer.parseInt(dateFrom.substring(dateFrom.indexOf('-') + 1, dateFrom.lastIndexOf('-')));
+                                    day = Integer.parseInt(dateFrom.substring(dateFrom.lastIndexOf('-') + 1, dateFrom.length()));
+                                    dpDatumOD.getModel().setDate(year, month - 1, day);
+                                    dpDatumOD.getModel().setSelected(true);
+                                }
 
-                    try {
-                        String content = FileUtils.readFileToString(file, "utf-8");
-                        JSONObject obj = new JSONObject(content);
+                                queryPanels.clear();
+                                JSONArray queries = (JSONArray) obj.get("queries");
+                                for (Object object : queries) {
+                                    JSONObject query = (JSONObject) object;
+                                    QueryPanel panel = new QueryPanel(query, true);
+                                    panel.setBorder(new MatteBorder(0, 0, 0, 1, Color.BLACK));
+                                    queryPanels.add(panel);
+                                    centerPanel.add(panel, "dock west, grow, width " + queryPanelWidth);
+                                    centerPanel.revalidate();
+                                    centerPanel.repaint();
+                                }
 
-                        JComboBox axisCBox = (JComboBox) axisPanel.getComponent(1);
-                        String axis = obj.getString("axis");
-                        String dateTo = obj.getString("dateTo");
-                        String dateFrom = obj.getString("dateFrom");
-                        doInvertValues = obj.getBoolean("invertValues");
-                        axisCBox.setSelectedItem(axis);
-                        if(!axis.equals("Person") && !axis.equals("Iteration")){
-                            axisPanel.add(lblFromDate);
-                            axisPanel.add(dpDatumOD, "wrap");
-                            axisPanel.add(lblToDate);
-                            axisPanel.add(dpDatumDO);
-                            Integer year = Integer.parseInt(dateTo.substring(0, dateTo.indexOf('-')));
-                            Integer month = Integer.parseInt(dateTo.substring(dateTo.indexOf('-') + 1, dateTo.lastIndexOf('-')));
-                            Integer day = Integer.parseInt(dateTo.substring(dateTo.lastIndexOf('-') + 1, dateTo.length()));
-                            dpDatumDO.getModel().setDate(year, month - 1, day);
-                            dpDatumDO.getModel().setSelected(true);
-                            year = Integer.parseInt(dateFrom.substring(0, dateFrom.indexOf('-')));
-                            month = Integer.parseInt(dateFrom.substring(dateFrom.indexOf('-') + 1, dateFrom.lastIndexOf('-')));
-                            day = Integer.parseInt(dateFrom.substring(dateFrom.lastIndexOf('-') + 1, dateFrom.length()));
-                            dpDatumOD.getModel().setDate(year,month - 1 ,day);
-                            dpDatumOD.getModel().setSelected(true);
+                                bottomPanel.add(cancelBtn);
+                                bottomPanel.add(runQueryBtn);
+                                mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
+
+                                mainFrame.revalidate();
+                                mainFrame.repaint();
+                            }
+                        } catch (IOException ex) {
+                            JOptionPane.showMessageDialog(mainFrame, Konstanty.POPISY.getProperty("textNelzeNacist"), Konstanty.POPISY.getProperty("upozorneni"), JOptionPane.WARNING_MESSAGE);
+                            log.warn(ex);
                         }
-
-                        queryPanels.clear();
-                        JSONArray queries = (JSONArray) obj.get("queries");
-                        for (Object object : queries)
-                        {
-                            JSONObject query = (JSONObject) object;
-                            QueryPanel panel = new QueryPanel(query, true);
-                            panel.setBorder(new MatteBorder(0,0,0,1, Color.BLACK));
-                            queryPanels.add(panel);
-                            centerPanel.add(panel, "dock west, grow, width " + queryPanelWidth);
-                            centerPanel.revalidate();
-                            centerPanel.repaint();
-                        }
-                    } catch(IOException ex) {
-                        JOptionPane.showMessageDialog(mainFrame, Konstanty.POPISY.getProperty("textNelzeNacist"), Konstanty.POPISY.getProperty("upozorneni"), JOptionPane.WARNING_MESSAGE);
-                        log.warn(ex);
                     }
-
-                    bottomPanel.add(cancelBtn);
-                    bottomPanel.add(runQueryBtn);
-                    mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
-
-                    mainFrame.revalidate();
-                    mainFrame.repaint();
                 } else {
                     // user cancelled the action - nothing happens
                 }
