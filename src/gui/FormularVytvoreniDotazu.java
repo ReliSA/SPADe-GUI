@@ -115,7 +115,6 @@ class FormularVytvoreniDotazu extends JDialog
         btnSubmit.setPreferredSize(Konstanty.VELIKOST_POLOVICNI_SIRKA);
         btnClose.setPreferredSize(Konstanty.VELIKOST_POLOVICNI_SIRKA);
         tfAttValue.setPreferredSize(Konstanty.VELIKOST_POLOVICNI_SIRKA);
-//        btnAdd.setPreferredSize(new Dimension(60,28));
 
         btnSubmit.addActionListener(new ActionListener(){
                 public void actionPerformed(ActionEvent e){
@@ -143,16 +142,15 @@ class FormularVytvoreniDotazu extends JDialog
                      if(getHeight() <= 400) {
                          setSize(getWidth(), getHeight() + heightDifference);
                      }
-                     mainPanel.remove(btnClose);
-                     mainPanel.remove(btnSubmit);
-                     mainPanel.remove(btnAdd);
+                     mainPanel.remove(bottomPanel);
 
                      ConditionPanel conditionPanel = new ConditionPanel(strukturaPohledu.get((String) cboxTables.getSelectedItem()), variableValues, parentForm, false);
-                     mainPanel.add(conditionPanel, "gapleft 64, span 2, wrap");
+                     mainPanel.add(conditionPanel, "gapleft 80, span 3, wrap");
+                     if(conditionPanels.size() == 1){
+                        conditionPanels.get(0).addRemoveButton();
+                     }
                      conditionPanels.add(conditionPanel);
-                     mainPanel.add(btnAdd);
-                     mainPanel.add(btnSubmit, "split 2");
-                     mainPanel.add(btnClose);
+                     mainPanel.add(bottomPanel, "span 3");
                      scroll(scrollPane, ScrollDirection.DOWN);
                      mainPanel.revalidate();
                      conditionCount++;
@@ -172,9 +170,7 @@ class FormularVytvoreniDotazu extends JDialog
                         }
                     }
                 }
-                mainPanel.remove(btnClose);
-                mainPanel.remove(btnSubmit);
-                mainPanel.remove(btnAdd);
+                mainPanel.remove(bottomPanel);
                 setSize(windowWidth,windowHeight);
 
                 cboxColumns.removeAllItems();
@@ -193,9 +189,7 @@ class FormularVytvoreniDotazu extends JDialog
                 ConditionPanel conditionPanel = new ConditionPanel(null, strukturaPohledu.get(cboxTables.getSelectedItem()), variableValues, parentForm, true);
                 mainPanel.add(conditionPanel, "wrap");
                 conditionPanels.add(conditionPanel);
-                mainPanel.add(btnAdd);
-                mainPanel.add(btnSubmit, "split 2");
-                mainPanel.add(btnClose);
+                mainPanel.add(bottomPanel, "span 3");
                 mainPanel.revalidate();
                 mainPanel.repaint();
             }
@@ -245,23 +239,26 @@ class FormularVytvoreniDotazu extends JDialog
                 ConditionPanel conditionPanel;
                 if(isFirst){
                     conditionPanel = new ConditionPanel(condition.getString("name"), condition.getString("operator"), condition.getString("value"), condition.getString("type"), strukturaPohledu.get((tableName)), variableValues, parentForm, true);
-                    mainPanel.add(conditionPanel, "wrap");
+                    mainPanel.add(conditionPanel, "span 3, wrap");
                     isFirst = false;
                 } else {
                     conditionPanel = new ConditionPanel(condition.getString("name"), condition.getString("operator"), condition.getString("value"), condition.getString("type"), strukturaPohledu.get((tableName)), variableValues, parentForm, false);
-                    mainPanel.add(conditionPanel, "gapleft 64, span 2, wrap");
+                    mainPanel.add(conditionPanel, "gapleft 80, span 3, wrap");
                 }
                 conditionPanels.add(conditionPanel);
                 if(getHeight() <= 400 && conditionPanels.size() != 1) {
                     setSize(getWidth(), getHeight() + heightDifference);
                 }
             }
+            if(conditionPanels.size() > 1){
+                conditionPanels.get(0).addRemoveButton();
+            }
         } else {
             ConditionPanel conditionPanel = new ConditionPanel(strukturaPohledu.get((String) cboxTables.getSelectedItem()), variableValues, parentForm, true);
-            mainPanel.add(conditionPanel, "wrap");
+            mainPanel.add(conditionPanel, "span 3, wrap");
             conditionPanels.add(conditionPanel);
         }
-        
+
         bottomPanel.add(btnSubmit);
         bottomPanel.add(btnClose);
         mainPanel.add(bottomPanel,"span 4");
@@ -328,6 +325,23 @@ class FormularVytvoreniDotazu extends JDialog
         mainPanel.repaint();
     }
 
+    public void repaintConditions(){
+        boolean first = true;
+        for(ConditionPanel conditionPanel : conditionPanels){
+            mainPanel.remove(conditionPanel);
+        }
+        mainPanel.remove(bottomPanel);
+        for(int i = 1; i < conditionPanels.size(); i++){
+            if(first){
+                mainPanel.add(conditionPanels.get(i), "span 3, wrap");
+                first = false;
+            } else {
+                mainPanel.add(conditionPanels.get(i), "gapleft 80, span 3, wrap");
+            }
+        }
+        mainPanel.add(bottomPanel, "span 3");
+    }
+
     public void scroll(JScrollPane scrollPane, ScrollDirection direction) {
         JScrollBar verticalBar = scrollPane.getVerticalScrollBar();
         int topOrBottom = direction == ScrollDirection.UP ?
@@ -357,6 +371,7 @@ class FormularVytvoreniDotazu extends JDialog
         JComboBox<String> cboxOperators = new JComboBox<>();
         JComboBox<ComboBoxItem> cboxVariableValues = new JComboBox();
         FormularVytvoreniDotazu parentForm;
+        JButton removeBtn;
 
         public ConditionPanel(List<Sloupec> sloupce, List<ComboBoxItem> variableValues, FormularVytvoreniDotazu parentForm, boolean isFirst) {
             this(null, sloupce, variableValues, parentForm, isFirst);
@@ -406,7 +421,7 @@ class FormularVytvoreniDotazu extends JDialog
                 cboxVariableValues.getEditor().setItem(condition.getValue());
             }
 
-            JButton removeBtn = new JButton();
+            removeBtn = new JButton();
             try {
                 Image img = ImageIO.read(Toolkit.getDefaultToolkit().getClass().getResource("/res/deleteImage.png"));
                 if (img != null){
@@ -426,8 +441,15 @@ class FormularVytvoreniDotazu extends JDialog
             removeBtn.addActionListener(new ActionListener(){
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    parentForm.resizeComponent(thisPanel);
                     thisPanel.getParent().remove(thisPanel);
+                    if(thisPanel.equals(conditionPanels.get(0))){
+                        parentForm.repaintConditions();
+                    }
+                    conditionPanels.remove(thisPanel);
+                    if(conditionPanels.size() == 1){
+                        conditionPanels.get(0).removeRemoveButton();
+                    }
+                    parentForm.resizeComponent(thisPanel);
                 }
             });
 
@@ -468,6 +490,14 @@ class FormularVytvoreniDotazu extends JDialog
 
         private void setCboxValuesWarning(){
             ((CustomComboBoxEditor) cboxVariableValues.getEditor()).changeBackground(Color.PINK);
+        }
+
+        private void addRemoveButton(){
+            thisPanel.add(removeBtn);
+        }
+
+        private void removeRemoveButton(){
+            thisPanel.remove(removeBtn);
         }
 
         private List<String> getOperatorForConditionType(String attType){
