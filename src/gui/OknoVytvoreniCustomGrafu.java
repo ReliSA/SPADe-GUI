@@ -406,8 +406,6 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
 
                     for (QueryPanel queryPanel : queryPanels) {
                         JSONObject query  = queryPanel.getQuery();
-                        final String columnName = queryPanel.getColumnName().equals("") ? "Col" + panelCount : queryPanel.getColumnName();
-                        query.put("columnName", columnName);
                         if (variableCreation) {
                             Component[] components = variablesPanel.getComponents();
                             variableValue = testQuery(query);
@@ -437,7 +435,8 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                             queryList.add(query);
                             panelCount++;
                         } else {
-
+                            final String columnName = queryPanel.getColumnName().equals("") ? "Col" + panelCount : queryPanel.getColumnName();
+                            query.put("columnName", columnName);
                             SloupecCustomGrafu sloupec = sloupceCustomGrafu.stream()
                                     .filter(sl -> columnName.equals(sl.getName())).findAny().orElse(null);
                             JSONObject detection = new JSONObject();
@@ -591,7 +590,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                         for (Object object : queries)
                         {
                             JSONObject query = (JSONObject) object;
-                            QueryPanel panel = new QueryPanel(query);
+                            QueryPanel panel = new QueryPanel(query, true);
                             panel.setBorder(new MatteBorder(0,0,0,1, Color.BLACK));
                             queryPanels.add(panel);
                             centerPanel.add(panel, "dock west, grow, width " + queryPanelWidth);
@@ -619,25 +618,36 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         /* Akce pro vytvoření proměnné */
         addVariableBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                variableCreation = true;
-                centerPanel.removeAll();
-                centerNorthPanel.removeAll();
+                FormularVytvoreniDotazu queryForm = new FormularVytvoreniDotazu(strukturyPohledu, null, preparedVariableValues);
+                JSONObject conditions = queryForm.getFormData();
+                if (!conditions.isEmpty()) {
+                    QueryPanel queryPanel = new QueryPanel(conditions, false);
+                    queryPanel.setBorder(new MatteBorder(0,0,0,1, Color.BLACK));
 
-                centerNorthPanel.add(addQueryBtn);
-                centerNorthPanel.add(lblName);
-                centerNorthPanel.add(varOrQueryNameTf, "width 10%");
-                varOrQueryNameTf.setText("");
-                centerNorthPanel.add(testVarQueryBtn);
+                    variableCreation = true;
+                    centerPanel.removeAll();
+                    centerNorthPanel.removeAll();
 
-                bottomPanel.removeAll();
-                bottomPanel.add(saveBtn);
-                bottomPanel.add(cancelBtn);
-                mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
+                    centerNorthPanel.add(lblName);
+                    centerNorthPanel.add(varOrQueryNameTf, "width 10%");
+                    varOrQueryNameTf.setText("");
+                    centerNorthPanel.add(testVarQueryBtn);
 
-                centerPanel.add(centerNorthPanel, "dock north, width 100%");
+                    bottomPanel.removeAll();
+                    bottomPanel.add(saveBtn);
+                    bottomPanel.add(cancelBtn);
+                    mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
 
-                mainFrame.revalidate();
-                mainFrame.repaint();
+                    centerPanel.add(centerNorthPanel, "dock north, width 100%");
+                    centerPanel.add(queryPanel, "dock west, h 555, width " + queryPanelWidth);
+                    queryPanels.add(queryPanel);
+                    centerPanel.revalidate();
+
+                    mainFrame.revalidate();
+                    mainFrame.repaint();
+                }
+
+
             }
         });
 
@@ -693,7 +703,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                 FormularVytvoreniDotazu queryForm = new FormularVytvoreniDotazu(strukturyPohledu, null, preparedVariableValues);
                 JSONObject conditions = queryForm.getFormData();
                 if (!conditions.isEmpty()) {
-                    QueryPanel queryPanel = new QueryPanel(conditions);
+                    QueryPanel queryPanel = new QueryPanel(conditions, true);
                     queryPanel.setBorder(new MatteBorder(0,0,0,1, Color.BLACK));
                     centerPanel.add(queryPanel, "dock west, h 555, width " + queryPanelWidth);
                     queryPanels.add(queryPanel);
@@ -1053,13 +1063,15 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
      * @return true pokud mají sloupce unikátní jména
      */
     private boolean haveSameColumnNames(List<QueryPanel> panels){
-        Set<String> nameSet = new HashSet<>();
         boolean result = true;
-        for(QueryPanel panel : panels){
-            nameSet.add(panel.getColumnName().trim());
-        }
-        if(nameSet.size() < panels.size()){
-            result = false;
+        if(!variableCreation) {
+            Set<String> nameSet = new HashSet<>();
+            for (QueryPanel panel : panels) {
+                nameSet.add(panel.getColumnName().trim());
+            }
+            if (nameSet.size() < panels.size()) {
+                result = false;
+            }
         }
         return result;
     }
@@ -1506,8 +1518,8 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                     centerPanel.removeAll();
                     centerNorthPanel.removeAll();
 
-                    centerNorthPanel.add(addQueryBtn);
                     varOrQueryNameTf.setText(name);
+                    centerNorthPanel.add(lblName);
                     centerNorthPanel.add(varOrQueryNameTf, "width 10%");
                     centerNorthPanel.add(testVarQueryBtn);
 
@@ -1524,7 +1536,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                     {
                         JSONObject query = (JSONObject) queryObj;
 
-                        QueryPanel panel = new QueryPanel(query);
+                        QueryPanel panel = new QueryPanel(query, false);
                         panel.setBorder(new MatteBorder(0,0,0,1, Color.BLACK));
                         queryPanels.add(panel);
                         centerPanel.add(panel, "dock west, height 555, width " + queryPanelWidth);
@@ -1604,7 +1616,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
          * Konstrukor panelu pro zobrazení vytvořeného dotazu
          * @param query SQL dotaz v JSON
          */
-        public QueryPanel(JSONObject query) {
+        public QueryPanel(JSONObject query, boolean includeName) {
             super();
             thisPanel = this;
             this.query = query;
@@ -1620,8 +1632,10 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                 columnName = "";
             }
 
-            columName = new JTextField(columnName);
-            this.add(columName, "wrap, width 100%");
+            if(includeName) {
+                columName = new JTextField(columnName);
+                this.add(columName, "wrap, width 100%");
+            }
 
             lblSelect = new JLabel("SELECT " + aggregate + "(" + agrColumn + ")");
             this.add(lblSelect, "wrap");
