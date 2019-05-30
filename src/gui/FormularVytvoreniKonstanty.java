@@ -39,7 +39,7 @@ class FormularVytvoreniKonstanty extends JDialog
     public FormularVytvoreniKonstanty(String name, String value){
         setModal(true);
 
-        setSize(Konstanty.VELIKOST_PRIHLASOVACIHO_OKNA);
+        setSize(380, 180);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
@@ -61,7 +61,7 @@ class FormularVytvoreniKonstanty extends JDialog
         tfName.setText(constName);
         tfValue.setText(constValue);
 
-        this.setLayout(new MigLayout());
+        this.setLayout(new MigLayout("ins 25 45 0 0"));
         this.add(lblName);
         this.add(tfName, "wrap, span 2");
         this.add(lblValue);

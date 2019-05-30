@@ -20,10 +20,11 @@ class FormularVytvoreniDotazu extends JDialog
     private static final long serialVersionUID = -8229943813762614201L;
     private JButton btnSubmit = new JButton(Konstanty.POPISY.getProperty("tlacitkoOk"));
     private JButton btnClose = new JButton(Konstanty.POPISY.getProperty("tlacitkoZrusit"));
-    private JButton btnAdd = new JButton(Konstanty.POPISY.getProperty("pridej"));
+    private JButton btnAdd;
     private boolean wasClosed = true;
     private List<ConditionPanel> conditionPanels = new ArrayList<>();
     private JPanel mainPanel = new JPanel();
+    private JPanel bottomPanel = new JPanel(new MigLayout("ins 0"));
     private int heightDifference = 28;
     private int conditionCount = 1;
     private int windowHeight = 250;
@@ -58,6 +59,26 @@ class FormularVytvoreniDotazu extends JDialog
         JRadioButton radioCount = new JRadioButton("COUNT");
         JLabel lblDateHint = new JLabel(Konstanty.POPISY.getProperty("textFormatDatumu"));
         JLabel lblWarningText = new JLabel(Konstanty.POPISY.getProperty("textSpatnyFormat"));
+        Font f = lblDateHint.getFont();
+        lblDateHint.setFont(f.deriveFont(f.getStyle() | Font.BOLD));
+        lblWarningText.setFont(f.deriveFont(f.getStyle() | Font.BOLD));
+        btnAdd = new JButton();
+        try {
+            Image img = ImageIO.read(Toolkit.getDefaultToolkit().getClass().getResource("/res/addImage.png"));
+            if (img != null){
+                Image newimg = img.getScaledInstance(16, 16,  java.awt.Image.SCALE_SMOOTH);
+                btnAdd.setIcon(new ImageIcon(newimg));
+            } else {
+                btnAdd.setText("A");
+            }
+            btnAdd.setMargin(new Insets(1,1,1,1));
+            btnAdd.setBorderPainted(false);
+            btnAdd.setContentAreaFilled(false);
+            btnAdd.setFocusPainted(false);
+            btnAdd.setOpaque(false);
+        } catch (Exception ex) {
+            log.error(ex);
+        }
 
         parentForm = this;
         boolean isFirst = true;
@@ -94,7 +115,7 @@ class FormularVytvoreniDotazu extends JDialog
         btnSubmit.setPreferredSize(Konstanty.VELIKOST_POLOVICNI_SIRKA);
         btnClose.setPreferredSize(Konstanty.VELIKOST_POLOVICNI_SIRKA);
         tfAttValue.setPreferredSize(Konstanty.VELIKOST_POLOVICNI_SIRKA);
-        btnAdd.setPreferredSize(new Dimension(60,28));
+//        btnAdd.setPreferredSize(new Dimension(60,28));
 
         btnSubmit.addActionListener(new ActionListener(){
                 public void actionPerformed(ActionEvent e){
@@ -190,21 +211,22 @@ class FormularVytvoreniDotazu extends JDialog
             }
         }
 
-        mainPanel.add(lblDateHint, "wrap, span 3");
-        mainPanel.add(lblWarningText, "wrap, span 3");
-        mainPanel.add(lblTable, "w 50");
+        mainPanel.add(lblDateHint, "wrap, span 4");
+        mainPanel.add(lblWarningText, "wrap, span 4");
+        mainPanel.add(lblTable, "w 50, span 2");
         mainPanel.add(cboxTables, "w 150, wrap");
-        mainPanel.add(lblJoinColumn, "w 50");
+        mainPanel.add(lblJoinColumn, "w 50, span 2");
         mainPanel.add(cboxJoinColumn, "w 150, wrap");
-        mainPanel.add(lblAgrColumn, "w 50");
+        mainPanel.add(lblAgrColumn, "w 50, span 2");
         mainPanel.add(cboxColumns, "w 150, wrap");
-        mainPanel.add(lblAggregate, "w 50");
+        mainPanel.add(lblAggregate, "w 50, span 2");
         mainPanel.add(radioSum, "split 5");
         mainPanel.add(radioCount);
         mainPanel.add(radioMax);
         mainPanel.add(radioMin);
         mainPanel.add(radioAvg, "wrap");
         mainPanel.add(lblCondition, "w 50");
+        mainPanel.add(btnAdd);
 
         if( constraint != null) {
             for (Enumeration<AbstractButton> buttons = btnGroupAggregate.getElements(); buttons.hasMoreElements();) {
@@ -239,10 +261,10 @@ class FormularVytvoreniDotazu extends JDialog
             mainPanel.add(conditionPanel, "wrap");
             conditionPanels.add(conditionPanel);
         }
-
-        mainPanel.add(btnAdd);
-        mainPanel.add(btnSubmit, "split 2");
-        mainPanel.add(btnClose);
+        
+        bottomPanel.add(btnSubmit);
+        bottomPanel.add(btnClose);
+        mainPanel.add(bottomPanel,"span 4");
         mainPanel.setVisible(true);
         this.setVisible(true);
     }

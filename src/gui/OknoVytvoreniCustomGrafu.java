@@ -49,6 +49,8 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
     private static String constantFolderPath = "res\\konstanty\\";
     private static String queryFolderPath = "res\\dotazy\\";
     private static String variableFolderPath = "res\\promenne\\";
+    private static JLabel lblConstants;
+    private static JLabel lblVariables;
     private static JButton addConstantBtn;
     private static JButton addVariableBtn;
     private static JButton addQueryBtn;
@@ -131,8 +133,10 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         mainFrame.setTitle(Konstanty.POPISY.getProperty("menuVytvorGraf"));
         mainFrame.setIconImage(Konstanty.IMG_ICON.getImage());
 
-        addConstantBtn = new JButton(Konstanty.POPISY.getProperty("pridejKonstantu"));
-        addVariableBtn = new JButton(Konstanty.POPISY.getProperty("pridejPromennou"));
+        lblConstants = new JLabel(Konstanty.POPISY.getProperty("konstanty"));
+        lblVariables = new JLabel(Konstanty.POPISY.getProperty("promenne"));
+        addConstantBtn = createButtonWithImage("add");
+        addVariableBtn = createButtonWithImage("add");
         addQueryBtn = new JButton(Konstanty.POPISY.getProperty("pridejSloupec"));
         createQueryBtn = new JButton(Konstanty.POPISY.getProperty("vytvorDotaz"));
         loadQueryBtn = new JButton(Konstanty.POPISY.getProperty("nactiDotaz"));
@@ -174,6 +178,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
 //        List<WorkUnitView> workUnitViews = pohledDAO.nactiWorkUnitView();
 
         constantsPanel.setBorder(new MatteBorder(0,0,1,0, Color.BLACK));
+        constantsPanel.add(lblConstants);
         constantsPanel.add(addConstantBtn);
 
         File queryFolder = new File(queryFolderPath);
@@ -206,6 +211,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         constantsPanel.setBorder(new MatteBorder(0,0,1,0, Color.BLACK));
         northPanel.add(constantsPanel,"dock north, w 100%, h 55");
 
+        variablesPanel.add(lblVariables, "align 50% 50%");
         variablesPanel.add(addVariableBtn, "align 50% 50%");
 
         File variableFolder = new File(variableFolderPath);
@@ -1277,7 +1283,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         JButton button = new JButton();
         Image img = null;
         try {
-            if(buttonOperation.equals("edit") || buttonOperation.equals("delete")) {
+            if(buttonOperation.equals("edit") || buttonOperation.equals("delete") || buttonOperation.equals("add")) {
                 img = ImageIO.read(Toolkit.getDefaultToolkit().getClass().getResource("/res/" + buttonOperation + "Image.png"));
             }
             if (img != null){
@@ -1288,6 +1294,8 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                     button.setText("E");
                 } else if (buttonOperation.equals("delete")){
                     button.setText("R");
+                } else if (buttonOperation.equals("add")){
+                    button.setText("A");
                 } else {
                     button.setText("X");
                 }
