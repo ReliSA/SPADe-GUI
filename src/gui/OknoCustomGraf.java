@@ -70,6 +70,8 @@ public class OknoCustomGraf extends JFrame {
 		osoby = (new Osoby(projekt.getID())).getSeznam();
 		iterace = projekt.getIterace();
 
+		setIconImage(Konstanty.IMG_ICON.getImage());
+
 		nastavZobrazení();
 		nastavMenu();
 		nactiData();

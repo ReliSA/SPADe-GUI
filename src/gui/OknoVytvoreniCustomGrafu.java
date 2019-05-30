@@ -117,7 +117,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
      * @param projekt zvolený projekt
      */
     public OknoVytvoreniCustomGrafu(Projekt projekt) {
-        super(Konstanty.POPISY.getProperty("menuVytvorGraf"));
+//        super(Konstanty.POPISY.getProperty("menuVytvorGraf"));
         if (instance != null)
             instance.dispose();
         instance = this;
@@ -127,6 +127,9 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         mainFrame.setLayout(new MigLayout());
         mainFrame.setBounds(100,100,1600,800);
         mainFrame.setVisible(true);
+
+        mainFrame.setTitle(Konstanty.POPISY.getProperty("menuVytvorGraf"));
+        mainFrame.setIconImage(Konstanty.IMG_ICON.getImage());
 
         addConstantBtn = new JButton(Konstanty.POPISY.getProperty("pridejKonstantu"));
         addVariableBtn = new JButton(Konstanty.POPISY.getProperty("pridejPromennou"));

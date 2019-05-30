@@ -239,6 +239,7 @@ public class OknoHlavni extends JFrame {
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setTitle("SPADe");
+		this.setIconImage(Konstanty.IMG_ICON.getImage());
 	}
 
 	/**

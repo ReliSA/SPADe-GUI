@@ -44,6 +44,7 @@ class FormularVytvoreniKonstanty extends JDialog
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         this.setTitle(Konstanty.POPISY.getProperty("vytvorKonstantu"));
+        this.setIconImage(Konstanty.IMG_ICON.getImage());
 
         JLabel lblName = new JLabel(Konstanty.POPISY.getProperty("popisNazev"));
         JLabel lblValue = new JLabel(Konstanty.POPISY.getProperty("popisHodnota"));

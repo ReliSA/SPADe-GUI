@@ -40,7 +40,8 @@ public class OknoProgresNacitani extends JDialog{
 	 */
 	private void nastavZobrazeni(){
 		this.setTitle(Konstanty.POPISY.getProperty("titleProgres"));
-		
+		this.setIconImage(Konstanty.IMG_ICON.getImage());
+
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 

@@ -32,6 +32,7 @@ public class OknoPrihlasovani extends JFrame {
     	setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setTitle(Konstanty.POPISY.getProperty("titlePrihlaseni"));
+		this.setIconImage(Konstanty.IMG_ICON.getImage());
 	
 		JLabel lblLogin = new JLabel(Konstanty.POPISY.getProperty("popisLogin"));
 		JLabel lblHeslo = new JLabel(Konstanty.POPISY.getProperty("popisHeslo"));

@@ -1,9 +1,6 @@
 package ostatni;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
+import java.awt.*;
 import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -11,10 +8,14 @@ import java.util.Properties;
 
 import gui.ComboBoxDynamicky;
 
+import javax.swing.*;
+
 /**
  * Třída konstant
  */
 public class Konstanty {
+
+	public static final ImageIcon IMG_ICON = new ImageIcon(Toolkit.getDefaultToolkit().getClass().getResource("/res/graphImage.png"));
 	
 	/*----------------Velikosti komponent------------------*/
 	public static final Dimension VELIKOST_PRIHLASOVACIHO_OKNA = new Dimension(380, 180);

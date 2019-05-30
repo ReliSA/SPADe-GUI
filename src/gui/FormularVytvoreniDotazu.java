@@ -10,7 +10,6 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -22,7 +21,7 @@ class FormularVytvoreniDotazu extends JDialog
     private JButton btnSubmit = new JButton(Konstanty.POPISY.getProperty("tlacitkoOk"));
     private JButton btnClose = new JButton(Konstanty.POPISY.getProperty("tlacitkoZrusit"));
     private JButton btnAdd = new JButton(Konstanty.POPISY.getProperty("pridej"));
-    private boolean closed = true;
+    private boolean wasClosed = true;
     private List<ConditionPanel> conditionPanels = new ArrayList<>();
     private JPanel mainPanel = new JPanel();
     private int heightDifference = 28;
@@ -44,6 +43,7 @@ class FormularVytvoreniDotazu extends JDialog
         this.setLocation(400,300);
         // TODO - cancel on close - don't know how
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        this.setIconImage(Konstanty.IMG_ICON.getImage());
         String tableName = "";
         JLabel lblTable = new JLabel(Konstanty.POPISY.getProperty("popisTabulka"));
         JLabel lblAgrColumn = new JLabel(Konstanty.POPISY.getProperty("sloupecAgr"));
@@ -99,7 +99,7 @@ class FormularVytvoreniDotazu extends JDialog
         btnSubmit.addActionListener(new ActionListener(){
                 public void actionPerformed(ActionEvent e){
                     if(validateForm(conditionPanels)){
-                        closed = false;
+                        wasClosed = false;
                         dispose();
                     } else {
                         JOptionPane.showMessageDialog(parentForm, Konstanty.POPISY.getProperty("textNevalidniHodnoty"), Konstanty.POPISY.getProperty("upozorneni"), JOptionPane.WARNING_MESSAGE);
@@ -262,13 +262,13 @@ class FormularVytvoreniDotazu extends JDialog
     }
 
     public boolean wasClosed(){
-        return this.closed;
+        return this.wasClosed;
     }
 
     public JSONObject getFormData()
     {
         JSONObject jsonConstraint = new JSONObject();
-        if(!closed) {
+        if(!wasClosed) {
             jsonConstraint.put("table", cboxTables.getSelectedItem());
             jsonConstraint.put("joinColumn", cboxJoinColumn.getSelectedItem());
             jsonConstraint.put("agrColumn", cboxColumns.getSelectedItem());
@@ -531,10 +531,6 @@ class FormularVytvoreniDotazu extends JDialog
         public Condition getCondition() {
             condition.setValue(getValue());
             return condition;
-        }
-
-        public String getJoinColumn(){
-            return (String) cboxJoinColumn.getSelectedItem();
         }
     }
 }
