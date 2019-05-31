@@ -1,5 +1,6 @@
 package gui;
 
+import com.sun.deploy.panel.JreDialog;
 import net.miginfocom.swing.MigLayout;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
@@ -29,7 +30,6 @@ public class SloupecCustomGrafu extends JPanel {
     private boolean fourthValid;
     private List<String> data;
     private JCheckBox checkBoxUseColumn;
-    private JCheckBox checkBoxCompareColumns;
     private JCheckBox checkBoxInvertValues;
     private JComboBox<String> operators;
     private JComboBox<ComboBoxItem> cboxVariableValues;
@@ -41,11 +41,18 @@ public class SloupecCustomGrafu extends JPanel {
     private JComboBox<String> cboxAritmethics;
     private JComboBox<String> cboxAritmethics2;
     private List<Boolean> detectedValues = new ArrayList<>();
+    private JRadioButton radioBtnCompareConst;
+    private JRadioButton radioBtnCompareColumn;
+    private ButtonGroup btnGroupCompare;
     private JPanel headerPanel;
     private JPanel inputPanel;
     private JPanel inputPanel2;
+    private JLabel lblCompare;
+    private JPanel radioButtonPanel;
+    private JButton detectBtn;
     private static JFrame mainFrame;
     private boolean between;
+    private OknoVytvoreniCustomGrafu okno;
     static Logger log = Logger.getLogger(SloupecCustomGrafu.class);
 
     /* For testing only - remove in final version*/
@@ -79,15 +86,23 @@ public class SloupecCustomGrafu extends JPanel {
                     detection.put("operator", "between");
                     detection.put("detect", "true");
                     detection.put("compareColumns", "true");
-                    detection.put("column1", "col1");
-                    detection.put("column2", "col2");
+                    JSONObject firstInput = new JSONObject();
+                    firstInput.put("value1", "col1");
+                    firstInput.put("arithmetic", "+");
+                    firstInput.put("value2", "2");
+                    detection.put("firstInput", firstInput);
+                    JSONObject secondInput = new JSONObject();
+                    secondInput.put("value1", "col3");
+                    secondInput.put("arithmetic", "-");
+                    secondInput.put("value2", "4");
+                    detection.put("secondInput", secondInput);
 
                     JSONObject object = new JSONObject();
                     object.put("detection", detection);
 
                     SloupecCustomGrafu graf = new SloupecCustomGrafu("ColumnName", new ArrayList<>(Arrays.asList("1","0","1")), 0,
                             new ArrayList<>(Arrays.asList(new ComboBoxItem("jmeno", "text", "name"), new ComboBoxItem("cislo","number","5"))),
-                            false, new ArrayList<>(Arrays.asList("col1","col2","col3")), object, true);
+                            false, new ArrayList<>(Arrays.asList("col1","col2","col3")), object, true, null);
 
                     mainFrame = new JFrame();
                     mainFrame.setLayout(new MigLayout("ins 0"));
@@ -116,14 +131,14 @@ public class SloupecCustomGrafu extends JPanel {
      * @param query SQL dotaz zapsaný v JSON
      * @param isDetectionColumn true pokud se jedná o sloupce s hodnotami detekce
      */
-    public SloupecCustomGrafu(String nazev, List<String> data, int index, List<ComboBoxItem> variableValues, boolean includeHeader, List<String> columnNames, JSONObject query, boolean isDetectionColumn) {
+    public SloupecCustomGrafu(String nazev, List<String> data, int index, List<ComboBoxItem> variableValues, boolean includeHeader, List<String> columnNames, JSONObject query, boolean isDetectionColumn, OknoVytvoreniCustomGrafu okno) {
         this.data = data;
         this.index = index;
+        this.okno = okno;
         setBackground(Color.white);
         setLayout(new MigLayout("ins 0, gap rel 0"));
 
         checkBoxUseColumn = new JCheckBox(Konstanty.POPISY.getProperty("pouzit"));
-        checkBoxCompareColumns = new JCheckBox(Konstanty.POPISY.getProperty("porovnatSloupce"));
         checkBoxInvertValues = new JCheckBox(Konstanty.POPISY.getProperty("invertovatHodnoty"));
         operators = new JComboBox<>();
         cboxVariableValues = new JComboBox<ComboBoxItem>();
@@ -135,14 +150,22 @@ public class SloupecCustomGrafu extends JPanel {
         cboxAritmethics = new JComboBox<>();
         cboxAritmethics2 = new JComboBox<>();
         detectedValues = new ArrayList<>();
+        lblCompare = new JLabel(Konstanty.POPISY.getProperty("porovnat"));
+        radioBtnCompareConst = new JRadioButton(Konstanty.POPISY.getProperty("konstprom"));
+        radioBtnCompareColumn = new JRadioButton(Konstanty.POPISY.getProperty("sloupec"));
+        btnGroupCompare = new ButtonGroup();
+        btnGroupCompare.add(radioBtnCompareConst);
+        btnGroupCompare.add(radioBtnCompareColumn);
+        radioBtnCompareConst.setSelected(true);
+        detectBtn = new JButton(Konstanty.POPISY.getProperty("spocitat"));
 
         headerPanel = new JPanel();
         headerPanel.setLayout(new MigLayout("ins 0"));
 
-        inputPanel = new JPanel();
-        inputPanel.setLayout(new MigLayout("ins 0"));
-        inputPanel2 = new JPanel();
-        inputPanel2.setLayout(new MigLayout("ins 0"));
+        inputPanel = new JPanel(new MigLayout("ins 0"));
+        inputPanel2 = new JPanel(new MigLayout("ins 0"));
+
+        radioButtonPanel = new JPanel(new MigLayout("ins 0"));
 
         this.lblNazev.setText(nazev);
         Font font = new Font("Courier", Font.BOLD, 12);
@@ -199,19 +222,76 @@ public class SloupecCustomGrafu extends JPanel {
         operators.addActionListener (new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if(operators.getSelectedItem().toString().equals("between") || operators.getSelectedItem().toString().equals("not between")){
-                    if(checkBoxCompareColumns.isSelected()){
-                        headerPanel.add(cboxColumns2, "span 3, width 50%");
+                    inputPanel2.removeAll();
+                    cboxAritmethics2.setSelectedIndex(0);
+                    if(radioBtnCompareColumn.isSelected()){
+                        inputPanel2.add(cboxColumns2);
+                        inputPanel2.add(cboxAritmethics2);
                     } else {
-                        headerPanel.add(inputPanel2, "span 3");
+                        cboxVariableValues3.setSelectedItem("");
+                        cboxVariableValues4.setSelectedItem("");
+                        inputPanel2.add(cboxVariableValues3);
+                        inputPanel2.add(cboxAritmethics2);
                     }
+                    headerPanel.add(inputPanel2, "span 3");
                     between = true;
                 } else {
-                    if(checkBoxCompareColumns.isSelected()){
-                        headerPanel.remove(cboxColumns2);
-                    } else {
-                        headerPanel.remove(inputPanel2);
-                    }
+                    headerPanel.remove(inputPanel2);
                     between = false;
+                }
+                revalidate();
+                repaint();
+            }
+        });
+
+        detectBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                okno.detectValues();
+            }
+        });
+
+        radioBtnCompareConst.addActionListener (new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if(radioBtnCompareConst.isSelected()) {
+                    headerPanel.remove(inputPanel2);
+                    inputPanel.removeAll();
+                    inputPanel2.removeAll();
+                    inputPanel.add(cboxVariableValues);
+                    inputPanel.add(cboxAritmethics);
+                    cboxAritmethics.setSelectedIndex(0);
+                    cboxVariableValues.setSelectedItem("");
+                    cboxVariableValues2.setSelectedItem("");
+                    if(operators.getSelectedItem().toString().equals("between") || operators.getSelectedItem().toString().equals("not between")){
+                        inputPanel2.add(cboxVariableValues3);
+                        inputPanel2.add(cboxAritmethics2);
+                        cboxAritmethics2.setSelectedIndex(0);
+                        cboxVariableValues3.setSelectedItem("");
+                        cboxVariableValues4.setSelectedItem("");
+                        headerPanel.add(inputPanel2);
+                    }
+                }
+                revalidate();
+                repaint();
+            }
+        });
+
+        radioBtnCompareColumn.addActionListener (new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if(radioBtnCompareColumn.isSelected()) {
+                    headerPanel.remove(inputPanel2);
+                    inputPanel.removeAll();
+                    inputPanel2.removeAll();
+                    inputPanel.add(cboxColumns);
+                    inputPanel.add(cboxAritmethics);
+                    cboxAritmethics.setSelectedIndex(0);
+                    cboxVariableValues2.setSelectedItem("");
+                    if(operators.getSelectedItem().toString().equals("between") || operators.getSelectedItem().toString().equals("not between")){
+                        inputPanel2.add(cboxColumns2);
+                        inputPanel2.add(cboxAritmethics2);
+                        cboxAritmethics2.setSelectedIndex(0);
+                        cboxVariableValues4.setSelectedItem("");
+                        headerPanel.add(inputPanel2);
+                    }
                 }
                 revalidate();
                 repaint();
@@ -242,36 +322,14 @@ public class SloupecCustomGrafu extends JPanel {
             }
         });
 
-        checkBoxCompareColumns.addActionListener (new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if(checkBoxCompareColumns.isSelected()){
-                    headerPanel.remove(inputPanel);
-                    headerPanel.remove(inputPanel2);
-                    headerPanel.add(cboxColumns, "span 3, wrap, width 50%");
-                    if(operators.getSelectedItem().toString().equals("between") || operators.getSelectedItem().toString().equals("not between")){
-                        headerPanel.add(cboxColumns2, "span 3, width 50%");
-                    }
-                } else {
-                    headerPanel.remove(cboxColumns);
-                    headerPanel.remove(cboxColumns2);
-                    headerPanel.add(inputPanel, "span 3, wrap");
-                    if(operators.getSelectedItem().toString().equals("between") || operators.getSelectedItem().toString().equals("not between")){
-                        headerPanel.add(inputPanel2, "span 3");
-                    }
-                }
-                revalidate();
-                repaint();
-            }
-        });
-
         checkBoxInvertValues.addActionListener (new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Collections.replaceAll(data, "0","2");
                 Collections.replaceAll(data, "1","0");
                 Collections.replaceAll(data, "2","1");
                 removeAll();
-                add(checkBoxInvertValues, "grow, span 3, wrap, gapy 57");
-
+                add(detectBtn, "span 3, wrap, align 50% 50%, gapy 84");
+                add(checkBoxInvertValues, "grow, span 3, wrap");
                 add(lblNazev, "grow, span 3, wrap");
                 JLabel lblHodnota;
                 for (String hodnota : data) {
@@ -286,23 +344,26 @@ public class SloupecCustomGrafu extends JPanel {
         });
 
         if(includeHeader) {
-            headerPanel.add(operators);
-            headerPanel.add(checkBoxUseColumn);
-            headerPanel.add(checkBoxCompareColumns, "wrap");
+            headerPanel.add(checkBoxUseColumn, "wrap");
+            radioButtonPanel.add(lblCompare);
+            radioButtonPanel.add(radioBtnCompareConst);
+            radioButtonPanel.add(radioBtnCompareColumn);
+            headerPanel.add(radioButtonPanel, "span 3, wrap");
+            headerPanel.add(operators, "wrap");
             inputPanel.add(cboxVariableValues);
             inputPanel.add(cboxAritmethics);
             inputPanel2.add(cboxVariableValues3);
             inputPanel2.add(cboxAritmethics2);
             headerPanel.add(inputPanel, "span 3, wrap");
             headerPanel.setBorder(new MatteBorder(0,0,1,0, Color.BLACK));
-//            headerPanel.setSize(300, 500);
-            add(headerPanel, "width 100%, height 80, wrap");
+            add(headerPanel, "width 100%, height 130, wrap");
             this.add(this.lblNazev, "grow, span 3, wrap");
         } else if (isDetectionColumn) {
-            this.add(checkBoxInvertValues, "grow, span 3, wrap, gapy 57");
+            this.add(detectBtn, "span 3, wrap, align 50% 50%, gapy 84");
+            this.add(checkBoxInvertValues, "grow, span 3, wrap");
             this.add(this.lblNazev, "grow, span 3, wrap");
         } else {
-            this.add(this.lblNazev, "grow, span 3, wrap, gapy 80");
+            this.add(this.lblNazev, "grow, span 3, wrap, gapy 130");
         }
 
         if(query != null){
@@ -318,34 +379,37 @@ public class SloupecCustomGrafu extends JPanel {
                 }
                 boolean compareColumns = detection.getBoolean("compareColumns");
                 if (!compareColumns) {
-                    checkBoxCompareColumns.setSelected(false);
-                    JSONObject firstInput = detection.getJSONObject("firstInput");
-                    String value1 = firstInput.getString("value1");
-                    cboxVariableValues.setSelectedItem(value1);
-                    if (firstInput.has("arithmetic")) {
-                        String arithmetic = firstInput.getString("arithmetic");
-                        cboxAritmethics.setSelectedItem(arithmetic);
-                        String value2 = firstInput.getString("value2");
-                        cboxVariableValues2.setSelectedItem(value2);
-                    }
-                    if (operator.equals("between") || operator.equals("not between")) {
-                        JSONObject secondInput = detection.getJSONObject("secondInput");
-                        String value3 = secondInput.getString("value1");
-                        cboxVariableValues3.setSelectedItem(value3);
-                        if (secondInput.has("arithmetic")) {
-                            String arithmetic = secondInput.getString("arithmetic");
-                            cboxAritmethics2.setSelectedItem(arithmetic);
-                            String value4 = secondInput.getString("value2");
-                            cboxVariableValues4.setSelectedItem(value4);
-                        }
-                    }
+                    radioBtnCompareConst.doClick();
                 } else {
-                    checkBoxCompareColumns.doClick();
-                    String column1 = detection.getString("column1");
-                    cboxColumns.setSelectedItem(column1);
-                    if (operator.equals("between") || operator.equals("not between")) {
-                        String column2 = detection.getString("column2");
-                        cboxColumns2.setSelectedItem(column2);
+                    radioBtnCompareColumn.doClick();
+                }
+
+                JSONObject firstInput = detection.getJSONObject("firstInput");
+                String value1 = firstInput.getString("value1");
+                if(!compareColumns) {
+                    cboxVariableValues.setSelectedItem(value1);
+                } else {
+                    cboxColumns.setSelectedItem(value1);
+                }
+                if (firstInput.has("arithmetic")) {
+                    String arithmetic = firstInput.getString("arithmetic");
+                    cboxAritmethics.setSelectedItem(arithmetic);
+                    String value2 = firstInput.getString("value2");
+                    cboxVariableValues2.setSelectedItem(value2);
+                }
+                if (operator.equals("between") || operator.equals("not between")) {
+                    JSONObject secondInput = detection.getJSONObject("secondInput");
+                    String value3 = secondInput.getString("value1");
+                    if(!compareColumns) {
+                        cboxVariableValues3.setSelectedItem(value3);
+                    } else {
+                        cboxColumns2.setSelectedItem(value3);
+                    }
+                    if (secondInput.has("arithmetic")) {
+                        String arithmetic = secondInput.getString("arithmetic");
+                        cboxAritmethics2.setSelectedItem(arithmetic);
+                        String value4 = secondInput.getString("value2");
+                        cboxVariableValues4.setSelectedItem(value4);
                     }
                 }
             }
@@ -375,26 +439,32 @@ public class SloupecCustomGrafu extends JPanel {
         this.secondValid = true;
         this.thirdValid = true;
         this.fourthValid = true;
+        String value = null;
+        String value2 = null;
+        String value3 = null;
+        String value4 = null;
+
         if(!compareColumns()) {
-            String value = getComboBoxValue(cboxVariableValues);
-            String value2 = null;
-            String value3 = null;
-            String value4 = null;
-            if (!cboxAritmethics.getSelectedItem().toString().equals("")) {
-                value2 = getComboBoxValue(cboxVariableValues2);
-            }
-            if (between) {
+            value = getComboBoxValue(cboxVariableValues);
+        }
+        if (!cboxAritmethics.getSelectedItem().toString().equals("")) {
+            value2 = getComboBoxValue(cboxVariableValues2);
+        }
+        if (between) {
+            if(!compareColumns()) {
                 value3 = getComboBoxValue(cboxVariableValues3);
-                if (!cboxAritmethics2.getSelectedItem().toString().equals("")) {
-                    value4 = getComboBoxValue(cboxVariableValues4);
-                }
             }
+            if (!cboxAritmethics2.getSelectedItem().toString().equals("")) {
+                value4 = getComboBoxValue(cboxVariableValues4);
+            }
+        }
 
-            setCboxVariableValuesOk(cboxVariableValues);
-            setCboxVariableValuesOk(cboxVariableValues2);
-            setCboxVariableValuesOk(cboxVariableValues3);
-            setCboxVariableValuesOk(cboxVariableValues4);
+        setCboxVariableValuesOk(cboxVariableValues);
+        setCboxVariableValuesOk(cboxVariableValues2);
+        setCboxVariableValuesOk(cboxVariableValues3);
+        setCboxVariableValuesOk(cboxVariableValues4);
 
+        if(value != null) {
             try {
                 Float.parseFloat(value);
             } catch (NumberFormatException e) {
@@ -414,70 +484,71 @@ public class SloupecCustomGrafu extends JPanel {
                     }
                 }
             }
-            if (value2 != null) {
+        }
+        if (value2 != null) {
+            try {
+                Float.parseFloat(value2);
+            } catch (NumberFormatException e) {
                 try {
-                    Float.parseFloat(value2);
-                } catch (NumberFormatException e) {
+                    Double.parseDouble(value2);
+                } catch (NumberFormatException e1) {
                     try {
-                        Double.parseDouble(value2);
-                    } catch (NumberFormatException e1) {
+                        Integer.parseInt(value2);
+                    } catch (NumberFormatException e2) {
                         try {
-                            Integer.parseInt(value2);
-                        } catch (NumberFormatException e2) {
-                            try {
-                                Long.parseLong(value2);
-                            } catch (NumberFormatException e3) {
-                                log.warn(e3);
-                                setSecondValid(false);
-                                setCboxVariableValuesWarning(cboxVariableValues2);
-                            }
-                        }
-                    }
-                }
-            }
-            if (value3 != null) {
-                try {
-                    Float.parseFloat(value3);
-                } catch (NumberFormatException e) {
-                    try {
-                        Double.parseDouble(value3);
-                    } catch (NumberFormatException e1) {
-                        try {
-                            Integer.parseInt(value3);
-                        } catch (NumberFormatException e2) {
-                            try {
-                                Long.parseLong(value3);
-                            } catch (NumberFormatException e3) {
-                                log.warn(e3);
-                                setThirdValid(false);
-                                setCboxVariableValuesWarning(cboxVariableValues3);
-                            }
-                        }
-                    }
-                }
-            }
-            if (value4 != null) {
-                try {
-                    Float.parseFloat(value4);
-                } catch (NumberFormatException e) {
-                    try {
-                        Double.parseDouble(value4);
-                    } catch (NumberFormatException e1) {
-                        try {
-                            Integer.parseInt(value4);
-                        } catch (NumberFormatException e2) {
-                            try {
-                                Long.parseLong(value4);
-                            } catch (NumberFormatException e3) {
-                                log.warn(e3);
-                                setFourthValid(false);
-                                setCboxVariableValuesWarning(cboxVariableValues4);
-                            }
+                            Long.parseLong(value2);
+                        } catch (NumberFormatException e3) {
+                            log.warn(e3);
+                            setSecondValid(false);
+                            setCboxVariableValuesWarning(cboxVariableValues2);
                         }
                     }
                 }
             }
         }
+        if (value3 != null) {
+            try {
+                Float.parseFloat(value3);
+            } catch (NumberFormatException e) {
+                try {
+                    Double.parseDouble(value3);
+                } catch (NumberFormatException e1) {
+                    try {
+                        Integer.parseInt(value3);
+                    } catch (NumberFormatException e2) {
+                        try {
+                            Long.parseLong(value3);
+                        } catch (NumberFormatException e3) {
+                            log.warn(e3);
+                            setThirdValid(false);
+                            setCboxVariableValuesWarning(cboxVariableValues3);
+                        }
+                    }
+                }
+            }
+        }
+        if (value4 != null) {
+            try {
+                Float.parseFloat(value4);
+            } catch (NumberFormatException e) {
+                try {
+                    Double.parseDouble(value4);
+                } catch (NumberFormatException e1) {
+                    try {
+                        Integer.parseInt(value4);
+                    } catch (NumberFormatException e2) {
+                        try {
+                            Long.parseLong(value4);
+                        } catch (NumberFormatException e3) {
+                            log.warn(e3);
+                            setFourthValid(false);
+                            setCboxVariableValuesWarning(cboxVariableValues4);
+                        }
+                    }
+                }
+            }
+        }
+
         return isFirstValid() && isSecondValid() && isThirdValid() && isFourthValid();
     }
 
@@ -814,7 +885,7 @@ public class SloupecCustomGrafu extends JPanel {
      * @return true pokud se má provést porovnání sloupců při detekc
      */
     public boolean compareColumns(){
-        return checkBoxCompareColumns.isSelected();
+        return radioBtnCompareColumn.isSelected();
     }
 
     /**

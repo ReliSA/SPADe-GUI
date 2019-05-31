@@ -60,7 +60,6 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
     private static JButton testVarQueryBtn;
     private static JButton runQueryBtn;
     private static JButton goBackBtn;
-    private static JButton detectBtn;
     private static JButton showGraphBtn;
     private static JButton saveBtn;
     private static JButton cancelBtn;
@@ -79,8 +78,8 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
     private static JPanel constantsPanel;
     private static JPanel variablesPanel;
     private static JTextField varOrQueryNameTf = new JTextField(10);
-    private JDatePickerImpl dpDatumOD;			//datum od
-    private JDatePickerImpl dpDatumDO;			//datum do
+    private JDatePickerImpl dpDatumOD;
+    private JDatePickerImpl dpDatumDO;
     private static JComboBox<String> cboxAxisOptions;
     private static List<Iteration> iterationList = new ArrayList<>();
     private static final JFileChooser fileChooser = new JFileChooser();
@@ -144,7 +143,6 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         testVarQueryBtn = new JButton(Konstanty.POPISY.getProperty("otestujDotaz"));
         runQueryBtn = new JButton(Konstanty.POPISY.getProperty("spust"));
         goBackBtn = new JButton(Konstanty.POPISY.getProperty("zpet"));
-        detectBtn = new JButton(Konstanty.POPISY.getProperty("detekuj"));
         showGraphBtn = new JButton(Konstanty.POPISY.getProperty("ukazGraf"));
         saveBtn = new JButton(Konstanty.POPISY.getProperty("uloz"));
         cancelBtn = new JButton(Konstanty.POPISY.getProperty("tlacitkoZrusit"));
@@ -170,13 +168,6 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         }
 
         iterationList = pohledDAO.getIterationsForProject(projekt.getID());
-
-//        List<ArtifactView> artifactViews = pohledDAO.nactiArtifactView();
-//        List<CommitedConfigView> commitedConfigViews = pohledDAO.nactiCommitedConfigView();
-//        List<CommitView> commitViews = pohledDAO.nactiCommitView();
-//        List<ConfigurationView> configurationViews = pohledDAO.nactiConfigurationView();
-//        List<FieldChangeView> fieldChangeViews = pohledDAO.nactiFieldChangeView();
-//        List<WorkUnitView> workUnitViews = pohledDAO.nactiWorkUnitView();
 
         constantsPanel.setBorder(new MatteBorder(0,0,1,0, Color.BLACK));
         constantsPanel.add(lblConstants);
@@ -338,13 +329,16 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                centerNorthPanel.removeAll();
+                centerNorthPanel.add(addQueryBtn);
+                centerNorthPanel.add(lblName);
+                centerNorthPanel.add(varOrQueryNameTf);
                 centerPanel.remove(centerTablePanel);
                 centerPanel.add(axisPanel, "dock west, h 555");
 
                 for(QueryPanel panel : queryPanels){
                     centerPanel.add(panel, "dock west, h 555, width " + queryPanelWidth);
                 }
-//                queryPanels.clear();
                 sloupceCustomGrafu.clear();
 
                 bottomPanel.removeAll();
@@ -444,28 +438,30 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                             detection.put("operator", sloupec.getOperator());
                             detection.put("detect", sloupec.useColum());
                             detection.put("compareColumns", sloupec.compareColumns());
-                            if (sloupec.compareColumns()) {
-                                detection.put("column1", sloupec.getCboxColumns().getSelectedItem());
-                                if (sloupec.isBetween()) {
-                                    detection.put("column2", sloupec.getCboxColumns2().getSelectedItem());
-                                }
-                            } else {
-                                JSONObject firstInput = new JSONObject();
+
+                            JSONObject firstInput = new JSONObject();
+                            if(!sloupec.compareColumns()) {
                                 firstInput.put("value1", sloupec.getComboBoxValue(sloupec.getCboxVariableValues()));
-                                if (!sloupec.getArithmeticOperator(sloupec.getCboxAritmethics()).equals("")) {
-                                    firstInput.put("arithmetic", sloupec.getArithmeticOperator(sloupec.getCboxAritmethics()));
-                                    firstInput.put("value2", sloupec.getComboBoxValue(sloupec.getCboxVariableValues2()));
-                                }
-                                detection.put("firstInput", firstInput);
-                                if (sloupec.isBetween()) {
-                                    JSONObject secondInput = new JSONObject();
+                            } else {
+                                firstInput.put("value1", sloupec.getCboxColumns().getSelectedItem());
+                            }
+                            if (!sloupec.getArithmeticOperator(sloupec.getCboxAritmethics()).equals("")) {
+                                firstInput.put("arithmetic", sloupec.getArithmeticOperator(sloupec.getCboxAritmethics()));
+                                firstInput.put("value2", sloupec.getComboBoxValue(sloupec.getCboxVariableValues2()));
+                            }
+                            detection.put("firstInput", firstInput);
+                            if (sloupec.isBetween()) {
+                                JSONObject secondInput = new JSONObject();
+                                if(!sloupec.compareColumns()) {
                                     secondInput.put("value1", sloupec.getComboBoxValue(sloupec.getCboxVariableValues3()));
-                                    if (!sloupec.getArithmeticOperator(sloupec.getCboxAritmethics2()).equals("")) {
-                                        secondInput.put("arithmetic", sloupec.getArithmeticOperator(sloupec.getCboxAritmethics2()));
-                                        secondInput.put("value2", sloupec.getComboBoxValue(sloupec.getCboxVariableValues4()));
-                                    }
-                                    detection.put("secondInput", secondInput);
+                                } else {
+                                    secondInput.put("value1", sloupec.getCboxColumns2().getSelectedItem());
                                 }
+                                if (!sloupec.getArithmeticOperator(sloupec.getCboxAritmethics2()).equals("")) {
+                                    secondInput.put("arithmetic", sloupec.getArithmeticOperator(sloupec.getCboxAritmethics2()));
+                                    secondInput.put("value2", sloupec.getComboBoxValue(sloupec.getCboxVariableValues4()));
+                                }
+                                detection.put("secondInput", secondInput);
                             }
 
                             query.put("detection", detection);
@@ -562,6 +558,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                                 centerNorthPanel.removeAll();
 
                                 centerNorthPanel.add(addQueryBtn);
+                                centerNorthPanel.add(lblName);
                                 varOrQueryNameTf.setText(file.getName().substring(0, file.getName().indexOf('.')));
                                 centerNorthPanel.add(varOrQueryNameTf, "width 10%");
 
@@ -799,9 +796,12 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
 
                     firstColumn = prepareGraphsFirstColumn(axisTable);
 
-                    axisColumn = new SloupecCustomGrafu(axisTable, firstColumn, -1, preparedVariableValues, false, columnNames, null, false);
+                    axisColumn = new SloupecCustomGrafu(axisTable, firstColumn, -1, preparedVariableValues, false, columnNames, null, false, instance);
                     centerPanel.removeAll();
                     centerTablePanel.removeAll();
+                    centerNorthPanel.removeAll();
+                    centerNorthPanel.add(lblName);
+                    centerNorthPanel.add(varOrQueryNameTf, "width 10%");
                     centerPanel.add(centerNorthPanel, "dock north, width 100%");
                     centerTablePanel.add(axisColumn, "dock west, grow");
                     columnsNumber++;
@@ -862,16 +862,15 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                         centerTablePanel.add(sloupec, "dock west, width 240");
                     }
                     columnsNumber++;
-                    detected = new SloupecCustomGrafu("detected", new ArrayList<>(), columnsNumber, preparedVariableValues, false, columnNames, null, true);
+                    detected = new SloupecCustomGrafu("detected", new ArrayList<>(), columnsNumber, preparedVariableValues, false, columnNames, null, true, instance);
                     centerTablePanel.add(detected, "dock west, grow");
 
                     graphData.addNazvySloupcu("detected");
 
                     centerPanel.add(centerTablePanel, "grow");
                     bottomPanel.removeAll();
-                    bottomPanel.add(detectBtn);
                     if (doDetect){
-                        detectBtn.doClick();
+                        detectValues();
                     }
                     if (doInvertValues){
                         detected.invertValues();
@@ -884,75 +883,6 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                     bottomPanel.add(cancelBtn);
                     mainFrame.revalidate();
                     mainFrame.repaint();
-                }
-            }
-        });
-
-        /* Akce pro detekci podle zadaných kritérií */
-        detectBtn.addActionListener(new ActionListener(){
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ArrayList<String> columnData = new ArrayList<>();
-                List<List<Boolean>> detectionValues = new ArrayList<>();
-                List<SloupecCustomGrafu> columnsToDetect = new ArrayList<>();
-                List<SloupecCustomGrafu> allColumns = new ArrayList<>();
-                List<String> columnNames = new ArrayList<>();
-                for(QueryPanel panel : queryPanels){
-                    columnNames.add(panel.getColumnName());
-                }
-                Component[] components = centerTablePanel.getComponents();
-                for(Component comp : components){
-                    if(comp instanceof SloupecCustomGrafu){
-                        SloupecCustomGrafu temp = (SloupecCustomGrafu) comp;
-                        allColumns.add(temp);
-                        if(temp.useColum()) {
-                            columnsToDetect.add(temp);
-                        }
-                    }
-                }
-                if(!columnsToDetect.isEmpty()){
-                    boolean valid = validateInputs(columnsToDetect);
-                    if(valid) {
-                        for (SloupecCustomGrafu sloupec : columnsToDetect) {
-                            if (sloupec.useColum()) {
-                                detectionValues.add(sloupec.detectValues(allColumns));
-                            }
-                        }
-
-                        for (int i = 0; i < detectionValues.get(0).size(); i++) {
-                            Boolean val = true;
-                            for (int j = 0; j < detectionValues.size(); j++) {
-                                val &= detectionValues.get(j).get(i);
-                            }
-                            if (val) {
-                                columnData.add("1");
-                            } else {
-                                columnData.add("0");
-                            }
-                        }
-                        centerTablePanel.remove(centerTablePanel.getComponentCount() - 1);
-
-                        detected = new SloupecCustomGrafu("detected", columnData, columnsNumber, preparedVariableValues, false, columnNames, null, true);
-                        centerTablePanel.add(detected, "dock west, grow");
-
-                        graphData.getDataSloupec(columnsNumber - 2).clear();
-                        for (String s : columnData) {
-                            graphData.addData(columnsNumber, Double.parseDouble(s));
-                        }
-
-                        centerTablePanel.revalidate();
-                        centerTablePanel.repaint();
-                    } else {
-                        JOptionPane.showMessageDialog(mainFrame,
-                                Konstanty.POPISY.getProperty("textNevalidniHodnoty"),
-                                Konstanty.POPISY.getProperty("upozorneni"),
-                                JOptionPane.WARNING_MESSAGE);
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(mainFrame,
-                            Konstanty.POPISY.getProperty("textZvoleniSloupce"),
-                            Konstanty.POPISY.getProperty("upozorneni"),
-                            JOptionPane.WARNING_MESSAGE);
                 }
             }
         });
@@ -1049,6 +979,71 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
         });
     }
 
+    public void detectValues(){
+        ArrayList<String> columnData = new ArrayList<>();
+        List<List<Boolean>> detectionValues = new ArrayList<>();
+        List<SloupecCustomGrafu> columnsToDetect = new ArrayList<>();
+        List<SloupecCustomGrafu> allColumns = new ArrayList<>();
+        List<String> columnNames = new ArrayList<>();
+        for(QueryPanel panel : queryPanels){
+            columnNames.add(panel.getColumnName());
+        }
+        Component[] components = centerTablePanel.getComponents();
+        for(Component comp : components){
+            if(comp instanceof SloupecCustomGrafu){
+                SloupecCustomGrafu temp = (SloupecCustomGrafu) comp;
+                allColumns.add(temp);
+                if(temp.useColum()) {
+                    columnsToDetect.add(temp);
+                }
+            }
+        }
+        if(!columnsToDetect.isEmpty()){
+            boolean valid = validateInputs(columnsToDetect);
+            if(valid) {
+                for (SloupecCustomGrafu sloupec : columnsToDetect) {
+                    if (sloupec.useColum()) {
+                        detectionValues.add(sloupec.detectValues(allColumns));
+                    }
+                }
+
+                for (int i = 0; i < detectionValues.get(0).size(); i++) {
+                    Boolean val = true;
+                    for (int j = 0; j < detectionValues.size(); j++) {
+                        val &= detectionValues.get(j).get(i);
+                    }
+                    if (val) {
+                        columnData.add("1");
+                    } else {
+                        columnData.add("0");
+                    }
+                }
+                centerTablePanel.remove(centerTablePanel.getComponentCount() - 1);
+
+                detected = new SloupecCustomGrafu("detected", columnData, columnsNumber, preparedVariableValues, false, columnNames, null, true, instance);
+                centerTablePanel.add(detected, "dock west, grow");
+
+                graphData.getDataSloupec(columnsNumber - 2).clear();
+                for (String s : columnData) {
+                    graphData.addData(columnsNumber, Double.parseDouble(s));
+                }
+
+                centerTablePanel.revalidate();
+                centerTablePanel.repaint();
+            } else {
+                JOptionPane.showMessageDialog(mainFrame,
+                        Konstanty.POPISY.getProperty("textNevalidniHodnoty"),
+                        Konstanty.POPISY.getProperty("upozorneni"),
+                        JOptionPane.WARNING_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(mainFrame,
+                    Konstanty.POPISY.getProperty("textZvoleniSloupce"),
+                    Konstanty.POPISY.getProperty("upozorneni"),
+                    JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
     /**
      * Zvaliduje uživatelské vstupy při zadávání kritérií pro detekce
      * @param sloupce seznam sloupců v tabulce hodnot
@@ -1121,7 +1116,7 @@ public class OknoVytvoreniCustomGrafu extends JFrame{
                 found = false;
             }
         }
-        return new SloupecCustomGrafu(columnName, values, 1, preparedVariableValues, true, columnNames, query, false);
+        return new SloupecCustomGrafu(columnName, values, 1, preparedVariableValues, true, columnNames, query, false, instance);
     }
 
     /**
