@@ -792,7 +792,7 @@ public class WindowCreatePatternDetection extends JFrame{
                     }
 
                     graphData = new CustomGraf(queryPanels.size() + 1);
-                    graphData.addColumnNames(axisTable);
+                    graphData.addNazvySloupcu(axisTable);
 
                     firstColumn = prepareGraphsFirstColumn(axisTable);
 
@@ -846,7 +846,7 @@ public class WindowCreatePatternDetection extends JFrame{
                         } else {
                             column = mapData(data, firstColumn, columnName, false, columnNames, panel.getQuery());
                         }
-                        graphData.addColumnNames(columnName);
+                        graphData.addNazvySloupcu(columnName);
 
                         detectionColumns.add(column);
 
@@ -865,7 +865,7 @@ public class WindowCreatePatternDetection extends JFrame{
                     detected = new PanelDetectionColumn("detected", new ArrayList<>(), columnsNumber, preparedVariableValues, false, columnNames, null, true, instance);
                     centerTablePanel.add(detected, "dock west, grow");
 
-                    graphData.addColumnNames("detected");
+                    graphData.addNazvySloupcu("detected");
 
                     centerPanel.add(centerTablePanel, "grow");
                     bottomPanel.removeAll();
@@ -1023,7 +1023,7 @@ public class WindowCreatePatternDetection extends JFrame{
                 detected = new PanelDetectionColumn("detected", columnData, columnsNumber, preparedVariableValues, false, columnNames, null, true, instance);
                 centerTablePanel.add(detected, "dock west, grow");
 
-                graphData.getColumnData(columnsNumber - 2).clear();
+                graphData.getDataSloupec(columnsNumber - 2).clear();
                 for (String s : columnData) {
                     graphData.addData(columnsNumber, Double.parseDouble(s));
                 }
