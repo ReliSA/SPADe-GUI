@@ -13,7 +13,7 @@ import java.awt.event.WindowEvent;
 /**
  * Okno pro vytvoření konstanty
  */
-class FormularVytvoreniKonstanty extends JDialog
+class FormCreateConstant extends JDialog
 {
     private JButton btnOk = new JButton(Konstanty.POPISY.getProperty("tlacitkoOk"));
     private JButton btnCancel = new JButton(Konstanty.POPISY.getProperty("tlacitkoZrusit"));
@@ -22,12 +22,12 @@ class FormularVytvoreniKonstanty extends JDialog
     private String constName;
     private String constValue;
     private boolean cancelled = false;
-    static Logger log = Logger.getLogger(FormularVytvoreniKonstanty.class);
+    static Logger log = Logger.getLogger(FormCreateConstant.class);
 
     /**
      * Konstruktor okna
      */
-    public FormularVytvoreniKonstanty() {
+    public FormCreateConstant() {
         this("","");
     }
 
@@ -36,7 +36,7 @@ class FormularVytvoreniKonstanty extends JDialog
      * @param name název konstanty
      * @param value hodnota konstanty
      */
-    public FormularVytvoreniKonstanty(String name, String value){
+    public FormCreateConstant(String name, String value){
         setModal(true);
 
         setSize(380, 180);
@@ -54,7 +54,7 @@ class FormularVytvoreniKonstanty extends JDialog
         btnOk.setPreferredSize(Konstanty.VELIKOST_POLOVICNI_SIRKA);
         btnCancel.setPreferredSize(Konstanty.VELIKOST_POLOVICNI_SIRKA);
 
-        nastavAkce();        //nastaví akce tlačítek
+        setActions();
 
         constName = name;
         constValue = value;
@@ -107,7 +107,7 @@ class FormularVytvoreniKonstanty extends JDialog
     /**
      * Nastavení akcí pro ovládací prvky
      */
-    private void nastavAkce(){
+    private void setActions(){
         /*akce po kliknutí na tlačítko přihlásit*/
         ActionListener actOk = new ActionListener() {
             public void actionPerformed(ActionEvent e) {

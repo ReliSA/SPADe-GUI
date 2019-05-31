@@ -1277,7 +1277,7 @@ public class OknoHlavni extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 
 				SwingUtilities.invokeLater(() -> {
-					OknoVytvoreniCustomGrafu example = new OknoVytvoreniCustomGrafu(getProjekt());
+					WindowCreatePatternDetection example = new WindowCreatePatternDetection(getProjekt());
 					//example.setSize(800, 400);
 					//example.setLocationRelativeTo(null);
 					//example.setVisible(true);

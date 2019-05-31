@@ -1,6 +1,5 @@
 package gui;
 
-import com.sun.deploy.panel.JreDialog;
 import net.miginfocom.swing.MigLayout;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
@@ -21,8 +20,8 @@ import java.util.List;
 /**
  * Panel zobrazující data v tabulce výsledků
  */
-public class SloupecCustomGrafu extends JPanel {
-    private JLabel lblNazev = new JLabel(); // popisek název
+public class PanelDetectionColumn extends JPanel {
+    private JLabel lblName = new JLabel();
     private int index;
     private boolean firstValid;
     private boolean secondValid;
@@ -52,8 +51,8 @@ public class SloupecCustomGrafu extends JPanel {
     private JButton detectBtn;
     private static JFrame mainFrame;
     private boolean between;
-    private OknoVytvoreniCustomGrafu okno;
-    static Logger log = Logger.getLogger(SloupecCustomGrafu.class);
+    private WindowCreatePatternDetection okno;
+    static Logger log = Logger.getLogger(PanelDetectionColumn.class);
 
     /* For testing only - remove in final version*/
     public static void main(String[] args) {
@@ -100,7 +99,7 @@ public class SloupecCustomGrafu extends JPanel {
                     JSONObject object = new JSONObject();
                     object.put("detection", detection);
 
-                    SloupecCustomGrafu graf = new SloupecCustomGrafu("ColumnName", new ArrayList<>(Arrays.asList("1","0","1")), 0,
+                    PanelDetectionColumn graf = new PanelDetectionColumn("ColumnName", new ArrayList<>(Arrays.asList("1","0","1")), 0,
                             new ArrayList<>(Arrays.asList(new ComboBoxItem("jmeno", "text", "name"), new ComboBoxItem("cislo","number","5"))),
                             false, new ArrayList<>(Arrays.asList("col1","col2","col3")), object, true, null);
 
@@ -122,7 +121,7 @@ public class SloupecCustomGrafu extends JPanel {
 
     /**
      * Konstruktor panelu
-     * @param nazev název sloupce
+     * @param columnName název sloupce
      * @param data seznam s daty
      * @param index pořadí sloupce
      * @param variableValues hodnoty vytvořených konstant a proměnných
@@ -131,10 +130,10 @@ public class SloupecCustomGrafu extends JPanel {
      * @param query SQL dotaz zapsaný v JSON
      * @param isDetectionColumn true pokud se jedná o sloupce s hodnotami detekce
      */
-    public SloupecCustomGrafu(String nazev, List<String> data, int index, List<ComboBoxItem> variableValues, boolean includeHeader, List<String> columnNames, JSONObject query, boolean isDetectionColumn, OknoVytvoreniCustomGrafu okno) {
+    public PanelDetectionColumn(String columnName, List<String> data, int index, List<ComboBoxItem> variableValues, boolean includeHeader, List<String> columnNames, JSONObject query, boolean isDetectionColumn, WindowCreatePatternDetection window) {
         this.data = data;
         this.index = index;
-        this.okno = okno;
+        this.okno = window;
         setBackground(Color.white);
         setLayout(new MigLayout("ins 0, gap rel 0"));
 
@@ -167,14 +166,14 @@ public class SloupecCustomGrafu extends JPanel {
 
         radioButtonPanel = new JPanel(new MigLayout("ins 0"));
 
-        this.lblNazev.setText(nazev);
+        this.lblName.setText(columnName);
         Font font = new Font("Courier", Font.BOLD, 12);
-        this.lblNazev.setFont(font);
-        this.lblNazev.setHorizontalAlignment(SwingConstants.CENTER);
+        this.lblName.setFont(font);
+        this.lblName.setHorizontalAlignment(SwingConstants.CENTER);
 
-        for(String columnName : columnNames){
-            cboxColumns.addItem(columnName);
-            cboxColumns2.addItem(columnName);
+        for(String name : columnNames){
+            cboxColumns.addItem(name);
+            cboxColumns2.addItem(name);
         }
 
         cboxVariableValues.setEditor(new CustomComboBoxEditor());
@@ -246,7 +245,7 @@ public class SloupecCustomGrafu extends JPanel {
 
         detectBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                okno.detectValues();
+                window.detectValues();
             }
         });
 
@@ -330,13 +329,13 @@ public class SloupecCustomGrafu extends JPanel {
                 removeAll();
                 add(detectBtn, "span 3, wrap, align 50% 50%, gapy 84");
                 add(checkBoxInvertValues, "grow, span 3, wrap");
-                add(lblNazev, "grow, span 3, wrap");
-                JLabel lblHodnota;
-                for (String hodnota : data) {
-                    lblHodnota = new JLabel(hodnota);
-                    lblHodnota.setBorder(new MatteBorder(1,0,1,0, Color.BLACK));
-                    lblHodnota.setHorizontalAlignment(SwingConstants.CENTER);
-                    add(lblHodnota, "grow, span 4, wrap");
+                add(lblName, "grow, span 3, wrap");
+                JLabel lblValue;
+                for (String value : data) {
+                    lblValue = new JLabel(value);
+                    lblValue.setBorder(new MatteBorder(1,0,1,0, Color.BLACK));
+                    lblValue.setHorizontalAlignment(SwingConstants.CENTER);
+                    add(lblValue, "grow, span 4, wrap");
                 }
                 revalidate();
                 repaint();
@@ -357,13 +356,13 @@ public class SloupecCustomGrafu extends JPanel {
             headerPanel.add(inputPanel, "span 3, wrap");
             headerPanel.setBorder(new MatteBorder(0,0,1,0, Color.BLACK));
             add(headerPanel, "width 100%, height 130, wrap");
-            this.add(this.lblNazev, "grow, span 3, wrap");
+            this.add(this.lblName, "grow, span 3, wrap");
         } else if (isDetectionColumn) {
             this.add(detectBtn, "span 3, wrap, align 50% 50%, gapy 84");
             this.add(checkBoxInvertValues, "grow, span 3, wrap");
-            this.add(this.lblNazev, "grow, span 3, wrap");
+            this.add(this.lblName, "grow, span 3, wrap");
         } else {
-            this.add(this.lblNazev, "grow, span 3, wrap, gapy 130");
+            this.add(this.lblName, "grow, span 3, wrap, gapy 130");
         }
 
         if(query != null){
@@ -415,15 +414,15 @@ public class SloupecCustomGrafu extends JPanel {
             }
         }
 
-        this.lblNazev.setBorder(new MatteBorder(1,0,1,0, Color.BLACK));
+        this.lblName.setBorder(new MatteBorder(1,0,1,0, Color.BLACK));
         this.setBorder(BorderFactory.createLineBorder(Color.BLACK,1));
 
-        JLabel lblHodnota;
-        for (String hodnota : data) {
-            lblHodnota = new JLabel(hodnota);
-            lblHodnota.setBorder(new MatteBorder(1,0,1,0, Color.BLACK));
-            lblHodnota.setHorizontalAlignment(SwingConstants.CENTER);
-            this.add(lblHodnota, "grow, span 4, wrap");
+        JLabel lblValue;
+        for (String value : data) {
+            lblValue = new JLabel(value);
+            lblValue.setBorder(new MatteBorder(1,0,1,0, Color.BLACK));
+            lblValue.setHorizontalAlignment(SwingConstants.CENTER);
+            this.add(lblValue, "grow, span 4, wrap");
         }
 
         revalidate();
@@ -554,28 +553,28 @@ public class SloupecCustomGrafu extends JPanel {
 
     /**
      * Provede detekci podle zadaných kritérií
-     * @param sloupce seznam sloupců pro detekce
+     * @param columns seznam sloupců pro detekce
      * @return seznam výsledků validací
      */
-    public List<Boolean> detectValues(List<SloupecCustomGrafu> sloupce){
+    public List<Boolean> detectValues(List<PanelDetectionColumn> columns){
         List<Boolean> tempDetect = new ArrayList<>();
         String operator = getOperator();
         if(compareColumns()){
-            SloupecCustomGrafu sloupec1 = null;
-            SloupecCustomGrafu sloupec2 = null;
+            PanelDetectionColumn column1 = null;
+            PanelDetectionColumn column2 = null;
             List<String> columnData = getData();
-            for(SloupecCustomGrafu sloupec : sloupce){
-                if(sloupec.getName().equals(cboxColumns.getSelectedItem().toString())){
-                    sloupec1 = sloupec;
-                } else if (sloupec.getName().equals(cboxColumns2.getSelectedItem().toString())){
-                    sloupec2 = sloupec;
+            for(PanelDetectionColumn column : columns){
+                if(column.getName().equals(cboxColumns.getSelectedItem().toString())){
+                    column1 = column;
+                } else if (column.getName().equals(cboxColumns2.getSelectedItem().toString())){
+                    column2 = column;
                 }
             }
             switch (operator) {
                 case "=":
                     for (int i = 0; i < columnData.size(); i++) {
                         Double temp = Double.parseDouble(columnData.get(i));
-                        Double temp2 = Double.parseDouble(sloupec1.getData().get(i));
+                        Double temp2 = Double.parseDouble(column1.getData().get(i));
                         if (temp.compareTo(temp2) == 0) {
                             tempDetect.add(true);
                         } else {
@@ -586,7 +585,7 @@ public class SloupecCustomGrafu extends JPanel {
                 case "<":
                     for (int i = 0; i < columnData.size(); i++) {
                         Double temp = Double.parseDouble(columnData.get(i));
-                        Double temp2 = Double.parseDouble(sloupec1.getData().get(i));
+                        Double temp2 = Double.parseDouble(column1.getData().get(i));
                         if (temp < temp2) {
                             tempDetect.add(true);
                         } else {
@@ -597,7 +596,7 @@ public class SloupecCustomGrafu extends JPanel {
                 case ">":
                     for (int i = 0; i < columnData.size(); i++) {
                         Double temp = Double.parseDouble(columnData.get(i));
-                        Double temp2 = Double.parseDouble(sloupec1.getData().get(i));
+                        Double temp2 = Double.parseDouble(column1.getData().get(i));
                         if (temp > temp2) {
                             tempDetect.add(true);
                         } else {
@@ -608,7 +607,7 @@ public class SloupecCustomGrafu extends JPanel {
                 case ">=":
                     for (int i = 0; i < columnData.size(); i++) {
                         Double temp = Double.parseDouble(columnData.get(i));
-                        Double temp2 = Double.parseDouble(sloupec1.getData().get(i));
+                        Double temp2 = Double.parseDouble(column1.getData().get(i));
                         if (temp >= temp2) {
                             tempDetect.add(true);
                         } else {
@@ -619,7 +618,7 @@ public class SloupecCustomGrafu extends JPanel {
                 case "<=":
                     for (int i = 0; i < columnData.size(); i++) {
                         Double temp = Double.parseDouble(columnData.get(i));
-                        Double temp2 = Double.parseDouble(sloupec1.getData().get(i));
+                        Double temp2 = Double.parseDouble(column1.getData().get(i));
                         if (temp <= temp2) {
                             tempDetect.add(true);
                         } else {
@@ -630,7 +629,7 @@ public class SloupecCustomGrafu extends JPanel {
                 case "!=":
                     for (int i = 0; i < columnData.size(); i++) {
                         Double temp = Double.parseDouble(columnData.get(i));
-                        Double temp2 = Double.parseDouble(sloupec1.getData().get(i));
+                        Double temp2 = Double.parseDouble(column1.getData().get(i));
                         if (temp.compareTo(temp2) != 0) {
                             tempDetect.add(true);
                         } else {
@@ -641,8 +640,8 @@ public class SloupecCustomGrafu extends JPanel {
                 case "between":
                     for (int i = 0; i < columnData.size(); i++) {
                         Double temp = Double.parseDouble(columnData.get(i));
-                        Double temp2 = Double.parseDouble(sloupec1.getData().get(i));
-                        Double temp3 = Double.parseDouble(sloupec2.getData().get(i));
+                        Double temp2 = Double.parseDouble(column1.getData().get(i));
+                        Double temp3 = Double.parseDouble(column2.getData().get(i));
                         Double change = temp2;
                         if (change > temp3) {
                             temp2 = temp3;
@@ -658,8 +657,8 @@ public class SloupecCustomGrafu extends JPanel {
                 case "not between":
                     for (int i = 0; i < columnData.size(); i++) {
                         Double temp = Double.parseDouble(columnData.get(i));
-                        Double temp2 = Double.parseDouble(sloupec1.getData().get(i));
-                        Double temp3 = Double.parseDouble(sloupec2.getData().get(i));
+                        Double temp2 = Double.parseDouble(column1.getData().get(i));
+                        Double temp3 = Double.parseDouble(column2.getData().get(i));
                         Double change = temp2;
                         if (change > temp3) {
                             temp2 = temp3;
@@ -877,7 +876,7 @@ public class SloupecCustomGrafu extends JPanel {
      * @return název sloupce
      */
     public String getName(){
-        return lblNazev.getText();
+        return lblName.getText();
     }
 
     /**

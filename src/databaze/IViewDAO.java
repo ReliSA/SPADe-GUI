@@ -1,7 +1,7 @@
 package databaze;
 
 import ostatni.Iteration;
-import ostatni.Sloupec;
+import ostatni.Column;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Rozhraní pro výběr dat z databázových pohledů
  */
-public interface IPohledDAO {
+public interface IViewDAO {
 
     /**
      * Vratí 2 seznamy dat. První s hodnotami pro JOIN výsledků a druhý s číselnými výsledky agregačního dotazu
@@ -44,5 +44,5 @@ public interface IPohledDAO {
      * @param viewName název pohledu
      * @return seznam sloupců v pohledu
      */
-    List<Sloupec> getViewStructure(String viewName);
+    List<Column> getViewStructure(String viewName);
 }

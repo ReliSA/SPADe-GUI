@@ -15,7 +15,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 
-class FormularVytvoreniDotazu extends JDialog
+class FormCreateQuery extends JDialog
 {
     private static final long serialVersionUID = -8229943813762614201L;
     private JButton btnSubmit = new JButton(Konstanty.POPISY.getProperty("tlacitkoOk"));
@@ -35,14 +35,13 @@ class FormularVytvoreniDotazu extends JDialog
     private JComboBox<String> cboxColumns = new JComboBox<>();
     private JComboBox<String> cboxJoinColumn = new JComboBox<>();
     private JTextField tfAttValue = new JTextField(Konstanty.POPISY.getProperty("popisHodnota"));
-    static Logger log = Logger.getLogger(FormularVytvoreniDotazu.class);
+    static Logger log = Logger.getLogger(FormCreateQuery.class);
 
-    private FormularVytvoreniDotazu parentForm;
+    private FormCreateQuery parentForm;
 
-    public FormularVytvoreniDotazu(Map<String, List<Sloupec>> strukturaPohledu, JSONObject constraint, List<ComboBoxItem> variableValues){
+    public FormCreateQuery(Map<String, List<Column>> viewStructure, JSONObject constraint, List<ComboBoxItem> variableValues){
         this.setModal(true);
         this.setLocation(400,300);
-        // TODO - cancel on close - don't know how
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         this.setIconImage(Konstanty.IMG_ICON.getImage());
         String tableName = "";
@@ -102,7 +101,7 @@ class FormularVytvoreniDotazu extends JDialog
         this.setLocationRelativeTo(null);
         this.setTitle(Konstanty.POPISY.getProperty("textVytvoreniDotazu"));
 
-        for(Map.Entry<String, List<Sloupec>> entry : strukturaPohledu.entrySet()) {
+        for(Map.Entry<String, List<Column>> entry : viewStructure.entrySet()) {
             cboxTables.addItem(entry.getKey());
         }
 
@@ -144,7 +143,7 @@ class FormularVytvoreniDotazu extends JDialog
                      }
                      mainPanel.remove(bottomPanel);
 
-                     ConditionPanel conditionPanel = new ConditionPanel(strukturaPohledu.get((String) cboxTables.getSelectedItem()), variableValues, parentForm, false);
+                     ConditionPanel conditionPanel = new ConditionPanel(viewStructure.get((String) cboxTables.getSelectedItem()), variableValues, parentForm, false);
                      mainPanel.add(conditionPanel, "gapleft 80, span 3, wrap");
                      if(conditionPanels.size() == 1){
                         conditionPanels.get(0).addRemoveButton();
@@ -175,18 +174,18 @@ class FormularVytvoreniDotazu extends JDialog
 
                 cboxColumns.removeAllItems();
                 cboxJoinColumn.removeAllItems();
-                for(Sloupec s : strukturaPohledu.get(cboxTables.getSelectedItem())){
-                    cboxColumns.addItem(s.getName());
-                    if(s.getName().equals("authorName") || s.getName().equals("relatedName") || s.getName().equals("assigneeName")){
-                        cboxJoinColumn.addItem(s.getName());
+                for(Column col : viewStructure.get(cboxTables.getSelectedItem())){
+                    cboxColumns.addItem(col.getName());
+                    if(col.getName().equals("authorName") || col.getName().equals("relatedName") || col.getName().equals("assigneeName")){
+                        cboxJoinColumn.addItem(col.getName());
                     }
-                    if(s.getType().equals("datetime") || s.getType().equals("date")){
-                        cboxJoinColumn.addItem(s.getName());
+                    if(col.getType().equals("datetime") || col.getType().equals("date")){
+                        cboxJoinColumn.addItem(col.getName());
                     }
                 }
 
                 conditionPanels.clear();
-                ConditionPanel conditionPanel = new ConditionPanel(null, strukturaPohledu.get(cboxTables.getSelectedItem()), variableValues, parentForm, true);
+                ConditionPanel conditionPanel = new ConditionPanel(null, viewStructure.get(cboxTables.getSelectedItem()), variableValues, parentForm, true);
                 mainPanel.add(conditionPanel, "wrap");
                 conditionPanels.add(conditionPanel);
                 mainPanel.add(bottomPanel, "span 3");
@@ -195,13 +194,13 @@ class FormularVytvoreniDotazu extends JDialog
             }
         });
 
-        for (Sloupec s : strukturaPohledu.get(cboxTables.getSelectedItem())){
-            cboxColumns.addItem(s.getName());
-            if(s.getName().equals("authorName") || s.getName().equals("assigneeName")){
-                cboxJoinColumn.addItem(s.getName());
+        for (Column col : viewStructure.get(cboxTables.getSelectedItem())){
+            cboxColumns.addItem(col.getName());
+            if(col.getName().equals("authorName") || col.getName().equals("assigneeName")){
+                cboxJoinColumn.addItem(col.getName());
             }
-            if(s.getType().equals("datetime") || s.getType().equals("date")){
-                cboxJoinColumn.addItem(s.getName());
+            if(col.getType().equals("datetime") || col.getType().equals("date")){
+                cboxJoinColumn.addItem(col.getName());
             }
         }
 
@@ -238,11 +237,11 @@ class FormularVytvoreniDotazu extends JDialog
                 JSONObject condition = (JSONObject) obj;
                 ConditionPanel conditionPanel;
                 if(isFirst){
-                    conditionPanel = new ConditionPanel(condition.getString("name"), condition.getString("operator"), condition.getString("value"), condition.getString("type"), strukturaPohledu.get((tableName)), variableValues, parentForm, true);
+                    conditionPanel = new ConditionPanel(condition.getString("name"), condition.getString("operator"), condition.getString("value"), condition.getString("type"), viewStructure.get((tableName)), variableValues, parentForm, true);
                     mainPanel.add(conditionPanel, "span 3, wrap");
                     isFirst = false;
                 } else {
-                    conditionPanel = new ConditionPanel(condition.getString("name"), condition.getString("operator"), condition.getString("value"), condition.getString("type"), strukturaPohledu.get((tableName)), variableValues, parentForm, false);
+                    conditionPanel = new ConditionPanel(condition.getString("name"), condition.getString("operator"), condition.getString("value"), condition.getString("type"), viewStructure.get((tableName)), variableValues, parentForm, false);
                     mainPanel.add(conditionPanel, "gapleft 80, span 3, wrap");
                 }
                 conditionPanels.add(conditionPanel);
@@ -254,7 +253,7 @@ class FormularVytvoreniDotazu extends JDialog
                 conditionPanels.get(0).addRemoveButton();
             }
         } else {
-            ConditionPanel conditionPanel = new ConditionPanel(strukturaPohledu.get((String) cboxTables.getSelectedItem()), variableValues, parentForm, true);
+            ConditionPanel conditionPanel = new ConditionPanel(viewStructure.get((String) cboxTables.getSelectedItem()), variableValues, parentForm, true);
             mainPanel.add(conditionPanel, "span 3, wrap");
             conditionPanels.add(conditionPanel);
         }
@@ -370,18 +369,18 @@ class FormularVytvoreniDotazu extends JDialog
         JComboBox<String> cboxAttributes = new JComboBox<>();
         JComboBox<String> cboxOperators = new JComboBox<>();
         JComboBox<ComboBoxItem> cboxVariableValues = new JComboBox();
-        FormularVytvoreniDotazu parentForm;
+        FormCreateQuery parentForm;
         JButton removeBtn;
 
-        public ConditionPanel(List<Sloupec> sloupce, List<ComboBoxItem> variableValues, FormularVytvoreniDotazu parentForm, boolean isFirst) {
-            this(null, sloupce, variableValues, parentForm, isFirst);
+        public ConditionPanel(List<Column> columns, List<ComboBoxItem> variableValues, FormCreateQuery parentForm, boolean isFirst) {
+            this(null, columns, variableValues, parentForm, isFirst);
         }
 
-        public ConditionPanel(String name, String operator, String value, String type, List<Sloupec> sloupce, List<ComboBoxItem> variableValues, FormularVytvoreniDotazu parentForm, boolean isFirst) {
-            this(new Condition(name, operator, value, type), sloupce, variableValues, parentForm, isFirst);
+        public ConditionPanel(String name, String operator, String value, String type, List<Column> columns, List<ComboBoxItem> variableValues, FormCreateQuery parentForm, boolean isFirst) {
+            this(new Condition(name, operator, value, type), columns, variableValues, parentForm, isFirst);
         }
 
-        public ConditionPanel(Condition newCondition, List<Sloupec> sloupce, List<ComboBoxItem> variableValues, FormularVytvoreniDotazu parentForm, boolean isFirst){
+        public ConditionPanel(Condition newCondition, List<Column> columns, List<ComboBoxItem> variableValues, FormCreateQuery parentForm, boolean isFirst){
             super();
             thisPanel = this;
             this.parentForm = parentForm;
@@ -395,15 +394,15 @@ class FormularVytvoreniDotazu extends JDialog
             }
             cboxVariableValues.setSelectedIndex(-1);
 
-            for(Sloupec sloupec : sloupce){
-                cboxAttributes.addItem(sloupec.getName());
+            for(Column column : columns){
+                cboxAttributes.addItem(column.getName());
             }
 
             if(newCondition == null) {
-                Sloupec sl = sloupce.iterator().next();
+                Column col = columns.iterator().next();
                 condition = new Condition();
-                condition.setName(sl.getName());
-                List<String> operators = getOperatorForColumnType(sl.getType());
+                condition.setName(col.getName());
+                List<String> operators = getOperatorForColumnType(col.getType());
                 for(String operator : operators){
                     cboxOperators.addItem(operator);
                 }
@@ -457,11 +456,11 @@ class FormularVytvoreniDotazu extends JDialog
                 public void actionPerformed(ActionEvent e) {
                     condition.setName((String) cboxAttributes.getSelectedItem());
                     cboxOperators.removeAllItems();
-                    Sloupec sloupec = sloupce.stream()
+                    Column column = columns.stream()
                             .filter(sl -> condition.getName().equals(sl.getName()))
                             .findAny()
                             .orElse(null);
-                    for(String operator : getOperatorForColumnType(sloupec.getType())){
+                    for(String operator : getOperatorForColumnType(column.getType())){
                         cboxOperators.addItem(operator);
                     }
                     // TODO - přidat conditionu type

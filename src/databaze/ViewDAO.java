@@ -9,13 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Třída poskytující data z pohledů, implementuje rozhraní IPohledDAO
+ * Třída poskytující data z pohledů, implementuje rozhraní IViewDAO
  */
-public class PohledDAO implements IPohledDAO{
+public class ViewDAO implements IViewDAO {
     private Connection pripojeni;					//připojení k databázi
-    static Logger log = Logger.getLogger(PohledDAO.class);
+    static Logger log = Logger.getLogger(ViewDAO.class);
 
-    public PohledDAO(){
+    public ViewDAO(){
         this.pripojeni = Konstanty.PRIPOJENI;		//nastaví připojení uložené ve třídě Konstanty
     }
 
@@ -179,8 +179,8 @@ public class PohledDAO implements IPohledDAO{
         return result;
     }
 
-    public List<Sloupec> getViewStructure(String viewName){
-        List<Sloupec> sloupce = new ArrayList<>();
+    public List<Column> getViewStructure(String viewName){
+        List<Column> columns = new ArrayList<>();
         PreparedStatement stmt = null;
         ResultSet rs = null;
         String query;
@@ -192,7 +192,7 @@ public class PohledDAO implements IPohledDAO{
 
             rs = stmt.executeQuery();
             while(rs.next()){
-                sloupce.add(new Sloupec(rs.getString("COLUMN_NAME"), rs.getString("DATA_TYPE")) );
+                columns.add(new Column(rs.getString("COLUMN_NAME"), rs.getString("DATA_TYPE")) );
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaScriptStrukturyPohledu"));
@@ -208,6 +208,6 @@ public class PohledDAO implements IPohledDAO{
                 e.printStackTrace();
             }
         }
-        return sloupce;
+        return columns;
     }
 }

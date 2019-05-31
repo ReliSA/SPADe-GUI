@@ -1,6 +1,6 @@
 package ostatni;
 
-public enum PohledEnum {
+public enum ViewEnum {
     ARTIFACT_VIEW("artifactView"),
     CONFIGURATION_VIEW("configurationView"),
     COMMITED_CONFIGURATION_VIEW("commitedConfigView"),
@@ -10,7 +10,7 @@ public enum PohledEnum {
 
     private final String viewName;
 
-    PohledEnum(String viewName) {
+    ViewEnum(String viewName) {
         this.viewName = viewName;
     }
 

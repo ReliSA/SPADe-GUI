@@ -3,11 +3,11 @@ package ostatni;
 /**
  * Tato třída představuje strukturu sloupce v tabulce
  */
-public class Sloupec {
+public class Column {
     private String name;
     private String type;
 
-    public Sloupec(String name, String type) {
+    public Column(String name, String type) {
         this.name = name;
         this.type = type;
     }
