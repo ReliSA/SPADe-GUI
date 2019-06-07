@@ -65,6 +65,7 @@ public class WindowCreatePatternDetection extends JFrame{
     private static JButton cancelBtn;
     private static JButton exportBtn;
     private static JScrollPane scrollPanelNorth;
+    private static JScrollPane scrollPanelCenter;
     private static JPanel northPanel;
     private static JPanel centerNorthPanel;
     private static JPanel centerPanel;
@@ -236,10 +237,10 @@ public class WindowCreatePatternDetection extends JFrame{
         scrollPanelNorth.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
         mainFrame.add(scrollPanelNorth, "dock north, h 125");
 
-        JScrollPane scrollPane = new JScrollPane(centerPanel);
-        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        mainFrame.add(scrollPane, "dock center");
+        scrollPanelCenter = new JScrollPane(centerPanel);
+        scrollPanelCenter.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPanelCenter.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        mainFrame.add(scrollPanelCenter, "dock center");
 
         centerNorthPanel.setBorder(new MatteBorder(0,0,2,0, Color.BLACK));
         centerNorthPanel.add(createQueryBtn);
@@ -274,6 +275,9 @@ public class WindowCreatePatternDetection extends JFrame{
         bottomPanel.add(cancelBtn);
 
         setActions();
+        mainFrame.revalidate();
+        mainFrame.repaint();
+        mainFrame.setVisible(true);
     }
 
     /**
@@ -344,6 +348,10 @@ public class WindowCreatePatternDetection extends JFrame{
                 bottomPanel.removeAll();
                 bottomPanel.add(cancelBtn);
                 bottomPanel.add(runQueryBtn);
+
+                mainFrame.remove(scrollPanelCenter);
+                mainFrame.add(scrollPanelNorth, "dock north, h 125");
+                mainFrame.add(scrollPanelCenter, "dock center");
 
                 mainFrame.revalidate();
                 mainFrame.repaint();
@@ -881,6 +889,12 @@ public class WindowCreatePatternDetection extends JFrame{
                     bottomPanel.add(exportBtn);
                     bottomPanel.add(goBackBtn);
                     bottomPanel.add(cancelBtn);
+                    mainFrame.remove(scrollPanelNorth);
+                    mainFrame.remove(scrollPanelCenter);
+                    mainFrame.remove(bottomPanel);
+                    
+                    mainFrame.add(scrollPanelCenter, "dock center");
+                    mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
                     mainFrame.revalidate();
                     mainFrame.repaint();
                 }
