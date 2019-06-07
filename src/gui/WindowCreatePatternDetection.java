@@ -532,6 +532,8 @@ public class WindowCreatePatternDetection extends JFrame{
                     centerNorthPanel.add(createQueryBtn);
                     centerNorthPanel.add(loadQueryBtn);
                     centerPanel.add(centerNorthPanel, "dock north, width 100%");
+                    mainFrame.add(scrollPanelNorth, "dock north, h 125");
+                    mainFrame.add(scrollPanelCenter, "dock center");
 
                     mainFrame.revalidate();
                     mainFrame.repaint();
@@ -892,7 +894,7 @@ public class WindowCreatePatternDetection extends JFrame{
                     mainFrame.remove(scrollPanelNorth);
                     mainFrame.remove(scrollPanelCenter);
                     mainFrame.remove(bottomPanel);
-                    
+
                     mainFrame.add(scrollPanelCenter, "dock center");
                     mainFrame.add(bottomPanel, "dock south, height 40, width 100%");
                     mainFrame.revalidate();
