@@ -15,30 +15,46 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Okno pro vytvoření dotazu
+ *
+ * @author Patrik Bezděk
+ */
 class FormCreateQuery extends JDialog
 {
     private static final long serialVersionUID = -8229943813762614201L;
     private JButton btnSubmit = new JButton(Konstanty.POPISY.getProperty("tlacitkoOk"));
     private JButton btnClose = new JButton(Konstanty.POPISY.getProperty("tlacitkoZrusit"));
     private JButton btnAdd;
-    private boolean wasClosed = true;
-    private List<ConditionPanel> conditionPanels = new ArrayList<>();
     private JPanel mainPanel = new JPanel();
     private JPanel bottomPanel = new JPanel(new MigLayout("ins 0"));
-    private int heightDifference = 28;
-    private int conditionCount = 1;
-    private int windowHeight = 250;
-    private int windowWidth = 700;
-
     private ButtonGroup btnGroupAggregate = new ButtonGroup();
     private JComboBox<String> cboxTables = new JComboBox<>();
     private JComboBox<String> cboxColumns = new JComboBox<>();
     private JComboBox<String> cboxJoinColumn = new JComboBox<>();
     private JTextField tfAttValue = new JTextField(Konstanty.POPISY.getProperty("popisHodnota"));
+    private FormCreateQuery parentForm;
+    /**
+     * Seznam podmínek v dotazu
+     */
+    private List<ConditionPanel> conditionPanels = new ArrayList<>();
+    /**
+     * Ukazatel toho, jestli byl formulář zrušen
+     */
+    private boolean wasCancelled = true;
+    private int heightDifference = 28;
+    private int conditionCount = 1;
+    private int windowHeight = 250;
+    private int windowWidth = 700;
+
     static Logger log = Logger.getLogger(FormCreateQuery.class);
 
-    private FormCreateQuery parentForm;
-
+    /**
+     * Konstruktor okna
+     * @param viewStructure struktura sloupců pohledů
+     * @param constraint podmínka zapsaná v JSON objektu
+     * @param variableValues seznam vytvořených konstant/proměnných
+     */
     public FormCreateQuery(Map<String, List<Column>> viewStructure, JSONObject constraint, List<ComboBoxItem> variableValues){
         this.setModal(true);
         this.setLocation(400,300);
@@ -118,7 +134,7 @@ class FormCreateQuery extends JDialog
         btnSubmit.addActionListener(new ActionListener(){
                 public void actionPerformed(ActionEvent e){
                     if(validateForm(conditionPanels)){
-                        wasClosed = false;
+                        wasCancelled = false;
                         dispose();
                     } else {
                         JOptionPane.showMessageDialog(parentForm, Konstanty.POPISY.getProperty("textNevalidniHodnoty"), Konstanty.POPISY.getProperty("upozorneni"), JOptionPane.WARNING_MESSAGE);
@@ -265,7 +281,12 @@ class FormCreateQuery extends JDialog
         this.setVisible(true);
     }
 
-    public boolean validateForm(List<ConditionPanel> conditionPanels){
+    /**
+     * Zkontroluje jestli souhlasí typy zadaných hodnot s typy slupců u všechn panelů podmínek
+     * @param conditionPanels seznam panelů s podmínkami
+     * @return true pokud souhlasí zadaná hodnota s typem sloupce
+     */
+    private boolean validateForm(List<ConditionPanel> conditionPanels){
         boolean validForm = true;
         for(ConditionPanel conditionPanel : conditionPanels){
             boolean valid = conditionPanel.getCondition().validate();
@@ -279,14 +300,22 @@ class FormCreateQuery extends JDialog
         return validForm;
     }
 
+    /**
+     * Vrací informaci jestli byl formulář potvrzen nebo zrušen
+     * @return true pokud byl formulář zrušen
+     */
     public boolean wasClosed(){
-        return this.wasClosed;
+        return this.wasCancelled;
     }
 
+    /**
+     * Vrací hodnoty vyplněné ve formuláři v podobě JSON
+     * @return hodnoty vyplněné ve formuláři v JSON objektu
+     */
     public JSONObject getFormData()
     {
         JSONObject jsonConstraint = new JSONObject();
-        if(!wasClosed) {
+        if(!wasCancelled) {
             jsonConstraint.put("table", cboxTables.getSelectedItem());
             jsonConstraint.put("joinColumn", cboxJoinColumn.getSelectedItem());
             jsonConstraint.put("agrColumn", cboxColumns.getSelectedItem());
@@ -314,7 +343,11 @@ class FormCreateQuery extends JDialog
         return jsonConstraint;
     }
 
-    public void resizeComponent(ConditionPanel conditionPanel){
+    /**
+     * Odstraní podmínkový panel z formuláře a pokud je potřeba tak okno formuláře změnší
+     * @param conditionPanel panel podmínky, který se odstraňuje
+     */
+    private void resizeComponent(ConditionPanel conditionPanel){
         if(conditionCount < 8) {
             setSize(getWidth(), getHeight() - heightDifference);
         }
@@ -324,7 +357,10 @@ class FormCreateQuery extends JDialog
         mainPanel.repaint();
     }
 
-    public void repaintConditions(){
+    /**
+     * Překreslí ve formuláři podmínkové panely
+     */
+    private void repaintConditions(){
         boolean first = true;
         for(ConditionPanel conditionPanel : conditionPanels){
             mainPanel.remove(conditionPanel);
@@ -341,7 +377,12 @@ class FormCreateQuery extends JDialog
         mainPanel.add(bottomPanel, "span 3");
     }
 
-    public void scroll(JScrollPane scrollPane, ScrollDirection direction) {
+    /**
+     * Odscrolluje vstupní panel úplně nahoru nebo úplně dolů
+     * @param scrollPane scrollovací panel
+     * @param direction směr scrollování
+     */
+    private void scroll(JScrollPane scrollPane, ScrollDirection direction) {
         JScrollBar verticalBar = scrollPane.getVerticalScrollBar();
         int topOrBottom = direction == ScrollDirection.UP ?
                 verticalBar.getMinimum() :
@@ -352,17 +393,26 @@ class FormCreateQuery extends JDialog
             public void adjustmentValueChanged(AdjustmentEvent e) {
                 Adjustable adjustable = e.getAdjustable();
                 adjustable.setValue(topOrBottom);
-                // We have to remove the listener, otherwise the user would be unable to scroll afterwards
                 verticalBar.removeAdjustmentListener(this);
             }
         };
         verticalBar.addAdjustmentListener(scroller);
     }
 
+    /**
+     * Seznam se směry scrollování
+     *
+     * @author Patrik Bezděk
+     */
     public enum ScrollDirection {
         UP, DOWN
     }
 
+    /**
+     * Třída představuje jednotlivé podmínky dotazu vytvořeného ve formuláři
+     *
+     * @author Patrik Bezděk
+     */
     private class ConditionPanel extends JPanel{
         Condition condition;
         ConditionPanel thisPanel;
@@ -372,14 +422,40 @@ class FormCreateQuery extends JDialog
         FormCreateQuery parentForm;
         JButton removeBtn;
 
+        /**
+         * Přetížený konstuktor panelu. Používá se pro vytvoření prvního panelu podmínky při otevření formuláře nebo přepnutí pohledu ve formuláři
+         * @param columns seznam sloupců pohledu
+         * @param variableValues seznam vytvořených konstant/proměnných
+         * @param parentForm odkaz na formulář, ve kterém se panely vytváří
+         * @param isFirst ukazatel jestli je panel jako první podmínka
+         */
         public ConditionPanel(List<Column> columns, List<ComboBoxItem> variableValues, FormCreateQuery parentForm, boolean isFirst) {
             this(null, columns, variableValues, parentForm, isFirst);
         }
 
+        /**
+         * Přetížený konstuktor panelu. Používá se pro vytvoření panelů podmínek při editaci dotazu, kde už podmínky existují.
+         * @param name název sloupce v podmínce
+         * @param operator operátor porování
+         * @param value hodnota k porovnání
+         * @param type typ sloupce
+         * @param columns seznam sloupců pohledu
+         * @param variableValues seznam vytvořených konstant/proměnných
+         * @param parentForm odkaz na formulář, ve kterém se panely vytváří
+         * @param isFirst ukazatel jestli je panel jako první podmínka
+         */
         public ConditionPanel(String name, String operator, String value, String type, List<Column> columns, List<ComboBoxItem> variableValues, FormCreateQuery parentForm, boolean isFirst) {
             this(new Condition(name, operator, value, type), columns, variableValues, parentForm, isFirst);
         }
 
+        /**
+         * Konstruktor panelu. Slouží jako přetěžovaný konstruktor pro ostatní
+         * @param newCondition nová podmínka
+         * @param columns seznam sloupců pohledu
+         * @param variableValues seznam vytvořených konstant/proměnných
+         * @param parentForm odkaz na formulář, ve kterém se panely vytváří
+         * @param isFirst ukazatel jestli je panel jako první podmínka
+         */
         public ConditionPanel(Condition newCondition, List<Column> columns, List<ComboBoxItem> variableValues, FormCreateQuery parentForm, boolean isFirst){
             super();
             thisPanel = this;
@@ -483,25 +559,42 @@ class FormCreateQuery extends JDialog
             this.setVisible(true);
         }
 
+        /**
+         * Nastaví základní barvu pozadí komponenty
+         */
         private void setCboxValuesOk(){
             ((CustomComboBoxEditor) cboxVariableValues.getEditor()).changeBackground(null);
         }
 
+        /**
+         * Nastaví varovnou barvu pozadí komponenty
+         */
         private void setCboxValuesWarning(){
             ((CustomComboBoxEditor) cboxVariableValues.getEditor()).changeBackground(Color.PINK);
         }
 
+        /**
+         * Přidá do panelu tlačítko na smazání panelu
+         */
         private void addRemoveButton(){
             thisPanel.add(removeBtn);
         }
 
+        /**
+         * Odstraní z panelu tlačítko na smazání panelu
+         */
         private void removeRemoveButton(){
             thisPanel.remove(removeBtn);
         }
 
-        private List<String> getOperatorForConditionType(String attType){
+        /**
+         * Vrací seznam operátorů pro zadaný typ podmínky
+         * @param conditionType typ podmínky
+         * @return sezman operátorů pro zadaný typ podmínky
+         */
+        private List<String> getOperatorForConditionType(String conditionType){
             List<String> operators = new ArrayList<>();
-            switch(attType){
+            switch(conditionType){
                 case "number":
                 case "date":
                     operators.add("<");
@@ -521,6 +614,11 @@ class FormCreateQuery extends JDialog
             return operators;
         }
 
+        /**
+         * Vrací seznam operátorů pro zadaný typ sloupce a nastaví typ podmínky
+         * @param columnType typ sloupce
+         * @return sezman operátorů pro daný typ sloupce
+         */
         private List<String> getOperatorForColumnType(String columnType){
             List<String> operators = new ArrayList<>();
             switch(columnType){
@@ -557,14 +655,18 @@ class FormCreateQuery extends JDialog
             return operators;
         }
 
-        public String getAttributeName() {
-            return (String) cboxAttributes.getSelectedItem();
-        }
-
+        /**
+         * Vrací operátor podmínky
+         * @return operátor podmínky
+         */
         public String getOperator() {
             return (String) cboxOperators.getSelectedItem();
         }
 
+        /**
+         * Vrací hodnotu podmínky
+         * @return hodnota podmínky
+         */
         public String getValue() {
             String value;
             if(cboxVariableValues.getEditor().getItem() instanceof ComboBoxItem){
@@ -579,6 +681,10 @@ class FormCreateQuery extends JDialog
             return value;
         }
 
+        /**
+         * Vrací objekt podmínky
+         * @return objekt podmínky
+         */
         public Condition getCondition() {
             condition.setValue(getValue());
             return condition;

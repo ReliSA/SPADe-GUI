@@ -1,8 +1,12 @@
 package gui;
 
 import data.Projekt;
+import data.Segment;
 import data.custom.CustomGraf;
+import data.polozky.Polozka;
+import databaze.IProjektDAO;
 import databaze.IViewDAO;
+import databaze.ProjektDAO;
 import databaze.ViewDAO;
 import net.miginfocom.swing.MigLayout;
 import org.apache.commons.io.FileUtils;
@@ -38,18 +42,16 @@ import org.json.*;
 
 /**
  * Okno pro vytváření grafů
+ *
+ * @author Patrik Bezděk
  */
 public class WindowCreatePatternDetection extends JFrame{
 
     public static WindowCreatePatternDetection instance;
     private static int queryPanelWidth = 200;
-    private static boolean variableCreation = false;
     private static JFrame mainFrame;
     private Projekt projekt;
     private CustomGraf graphData;
-    private static String constantFolderPath = "res\\konstanty\\";
-    private static String queryFolderPath = "res\\dotazy\\";
-    private static String variableFolderPath = "res\\promenne\\";
     private static JLabel lblConstants;
     private static JLabel lblVariables;
     private static JButton addConstantBtn;
@@ -75,23 +77,46 @@ public class WindowCreatePatternDetection extends JFrame{
     private static JLabel lblName = new JLabel(Konstanty.POPISY.getProperty("popisNazev"));
     private static JLabel lblFromDate = new JLabel(Konstanty.POPISY.getProperty("popisOd"));
     private static JLabel lblToDate = new JLabel(Konstanty.POPISY.getProperty("popisDo"));
-    private static IViewDAO viewDAO = new ViewDAO();
     private static JPanel constantsPanel;
     private static JPanel variablesPanel;
     private static JTextField varOrQueryNameTf = new JTextField(10);
     private JDatePickerImpl dpDateFrom;
     private JDatePickerImpl dpDateTo;
-    private static JComboBox<String> cboxAxisOptions;
-    private static List<Iteration> iterationList = new ArrayList<>();
-    private static final JFileChooser fileChooser = new JFileChooser();
-    private static final Map<String, List<Column>> viewStructures = new TreeMap<>();
-    private static List<ComboBoxItem> preparedVariableValues;
     private PanelDetectionColumn detected;
     private PanelDetectionColumn axisColumn;
     private List<QueryPanel> queryPanels;
     private List<PanelDetectionColumn> detectionColumns;
-    private int columnsNumber = 0;
+    private static final JFileChooser fileChooser = new JFileChooser();
+    private static IViewDAO viewDAO = new ViewDAO();
+    private static IProjektDAO projektDAO = new ProjektDAO();
+    private static String constantFolderPath = "res\\konstanty\\";
+    private static String queryFolderPath = "res\\dotazy\\";
+    private static String variableFolderPath = "res\\promenne\\";
+    /**
+     * Seznam možností dat pro osu X
+     */
+    private static JComboBox<String> cboxAxisOptions;
+    /**
+     * Seznam iterací pro zadaný projekt
+     */
+    private static ArrayList<Segment> iterations;
+    /**
+     * Názvy a typy sloupců pohledů
+     */
+    private static final Map<String, List<Column>> viewStructures = new TreeMap<>();
+    /**
+     * Seznam vytvořených konstant/proměnných
+     */
+    private static List<ComboBoxItem> preparedVariableValues;
+    /**
+     * Ukazatel toho jestli se vytváří konstanta nebo pattern
+     */
+    private static boolean variableCreation = false;
+    /**
+     * Ukazatel toho, jestli se má při načtení dotazu invertovat hodnoty u detekcí
+     */
     private static boolean doInvertValues = false;
+    private int columnsNumber = 0;
     static Logger log = Logger.getLogger(WindowCreatePatternDetection.class);
 
     /* For testing only - remove in final version*/
@@ -168,7 +193,8 @@ public class WindowCreatePatternDetection extends JFrame{
             viewStructures.put(view.getViewName(), columns);
         }
 
-        iterationList = viewDAO.getIterationsForProject(projekt.getID());
+        iterations = projektDAO.getIterace(projekt.getID());
+        Collections.sort(iterations, Comparator.comparing(Polozka::getNazev));
 
         constantsPanel.setBorder(new MatteBorder(0,0,1,0, Color.BLACK));
         constantsPanel.add(lblConstants);
@@ -451,10 +477,10 @@ public class WindowCreatePatternDetection extends JFrame{
                             if(!column.compareColumns()) {
                                 firstInput.put("value1", column.getComboBoxValue(column.getCboxVariableValues()));
                             } else {
-                                firstInput.put("value1", column.getCboxColumns().getSelectedItem());
+                                firstInput.put("value1", column.getFirstColumn());
                             }
-                            if (!column.getArithmeticOperator(column.getCboxAritmethics()).equals("")) {
-                                firstInput.put("arithmetic", column.getArithmeticOperator(column.getCboxAritmethics()));
+                            if (!(column.getFirstArithmetic()).equals("")) {
+                                firstInput.put("arithmetic", column.getFirstArithmetic());
                                 firstInput.put("value2", column.getComboBoxValue(column.getCboxVariableValues2()));
                             }
                             detection.put("firstInput", firstInput);
@@ -463,10 +489,10 @@ public class WindowCreatePatternDetection extends JFrame{
                                 if(!column.compareColumns()) {
                                     secondInput.put("value1", column.getComboBoxValue(column.getCboxVariableValues3()));
                                 } else {
-                                    secondInput.put("value1", column.getCboxColumns2().getSelectedItem());
+                                    secondInput.put("value1", column.getSecondColumn());
                                 }
-                                if (!column.getArithmeticOperator(column.getCboxAritmethics2()).equals("")) {
-                                    secondInput.put("arithmetic", column.getArithmeticOperator(column.getCboxAritmethics2()));
+                                if (!(column.getSecondArithmetic()).equals("")) {
+                                    secondInput.put("arithmetic", column.getSecondArithmetic());
                                     secondInput.put("value2", column.getComboBoxValue(column.getCboxVariableValues4()));
                                 }
                                 detection.put("secondInput", secondInput);
@@ -995,6 +1021,9 @@ public class WindowCreatePatternDetection extends JFrame{
         });
     }
 
+    /**
+     * Pro vybrané sloupec proběhne kontrola hodnoty a podmínky a výsledky se zapíší do příslušného sloupce
+     */
     public void detectValues(){
         ArrayList<String> columnData = new ArrayList<>();
         List<List<Boolean>> detectionValues = new ArrayList<>();
@@ -1108,11 +1137,11 @@ public class WindowCreatePatternDetection extends JFrame{
         boolean found = false;
 
         if(isIteration) {
-            for (Iteration iteration : iterationList) {
+            for (Segment iteration : iterations) {
                 Double sum = 0.0;
                 for (int i = 0; i < data.get(0).size(); i++) {
                     LocalDate temp = LocalDate.parse(data.get(0).get(i));
-                    if (!temp.isBefore(iteration.getStartDate()) && !temp.isAfter(iteration.getEndDate())) {
+                    if (!temp.isBefore(iteration.getDatumPocatku()) && !temp.isAfter(iteration.getDatumKonce())) {
                         sum += Double.parseDouble(data.get(1).get(i));
                     }
                 }
@@ -1159,8 +1188,8 @@ public class WindowCreatePatternDetection extends JFrame{
                 firstColumn = viewDAO.getPeopleForProject(projekt.getID());
                 break;
             case "Iteration":
-                for (Iteration iterace : iterationList) {
-                    firstColumn.add(iterace.getName());
+                for (Segment iterace : iterations) {
+                    firstColumn.add(iterace.getNazev());
                 }
                 break;
             case "Day":
@@ -1208,22 +1237,6 @@ public class WindowCreatePatternDetection extends JFrame{
             }
         }
         return joinColumn;
-    }
-
-    /**
-     * Připraví datumy, po které iterace běžela
-     * @param iteration iterace projektu
-     * @return seznam datumů pro iteraci
-     */
-    private List<String> prepareDatesForIteration(Iteration iteration){
-        List<String> totalDates = new ArrayList<>();
-        LocalDate start = LocalDate.parse(iteration.getStartDate().toString());
-        LocalDate end = LocalDate.parse(iteration.getEndDate().toString());
-        while (!start.isAfter(end)) {
-            totalDates.add(start.toString());
-            start = start.plusDays(1);
-        }
-        return totalDates;
     }
 
     /**
@@ -1390,11 +1403,22 @@ public class WindowCreatePatternDetection extends JFrame{
 
     /**
      * Vnitřní třída zobrazující vytvořené konstanty v hlavním okně
+     *
+     * @author Patrik Bezděk
      */
     private class ConstantPanel extends JPanel{
         ConstantPanel thisPanel;
+        /**
+         * Název konstatny
+         */
         String name;
+        /**
+         * Hodnota konstanty
+         */
         String value;
+        /**
+         * Popis konstanty zobrazující se v hlavním okně
+         */
         JLabel label;
 
         /**
@@ -1477,21 +1501,37 @@ public class WindowCreatePatternDetection extends JFrame{
             this.add(removeBtn);
         }
 
+        /**
+         * Varcí název konstatny
+         * @return název konstatny
+         */
         @Override
         public String getName() {
             return name;
         }
 
+        /**
+         * Nastaví název konstanty
+         * @param name název konstanty
+         */
         @Override
         public void setName(String name) {
             label.setText(name + ":" + value);
             this.name = name;
         }
 
+        /**
+         * Vrací hodnotu konstanty
+         * @return hodnota konstatny
+         */
         public String getValue() {
             return value;
         }
 
+        /**
+         * Nastaví hodnotu konstanty
+         * @param value hodnota konstanty
+         */
         public void setValue(String value) {
             label.setText(name + ":" + value);
             this.value = value;
@@ -1500,12 +1540,26 @@ public class WindowCreatePatternDetection extends JFrame{
 
     /**
      * Vnitřní třída zobrazující vytvořené proměnné v hlavním okně
+     *
+     * @author Patrik Bezděk
      */
     private class VariablePanel extends JPanel{
         VariablePanel thisPanel;
+        /**
+         * Název proměnné
+         */
         String name;
+        /**
+         * Hodnota proměnné
+         */
         Long value;
+        /**
+         * Zápis proměnné v JSON
+         */
         String content;
+        /**
+         * Popis proměnné zobrazující se v hlavním okně
+         */
         JLabel label;
 
         /**
@@ -1616,10 +1670,15 @@ public class WindowCreatePatternDetection extends JFrame{
 
     /**
      * Vnitřní třída zobrazující vytvořené panely s dotazy v hlavním okně
+     *
+     * @author Patrik Bezděk
      */
     private class QueryPanel extends JPanel {
 
         QueryPanel thisPanel;
+        /**
+         * Zápis dotazu v JSON
+         */
         JSONObject query;
         JTextField columName;
         JLabel lblSelect;

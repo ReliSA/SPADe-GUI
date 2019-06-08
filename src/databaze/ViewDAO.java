@@ -10,6 +10,8 @@ import java.util.List;
 
 /**
  * Třída poskytující data z pohledů, implementuje rozhraní IViewDAO
+ *
+ * @author Patrik Bezděk
  */
 public class ViewDAO implements IViewDAO {
     private Connection pripojeni;					//připojení k databázi
@@ -17,19 +19,6 @@ public class ViewDAO implements IViewDAO {
 
     public ViewDAO(){
         this.pripojeni = Konstanty.PRIPOJENI;		//nastaví připojení uložené ve třídě Konstanty
-    }
-
-    public int getRows(ResultSet res){
-        int totalRows = 0;
-        try {
-            res.last();
-            totalRows = res.getRow();
-            res.beforeFirst();
-        }
-        catch(Exception ex)  {
-            return 0;
-        }
-        return totalRows ;
     }
 
     public List<List<String>> runQuery(String query){
@@ -135,38 +124,6 @@ public class ViewDAO implements IViewDAO {
             e.printStackTrace();
         } catch (Exception e){
             JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaDataOsoby"));
-            e.printStackTrace();
-        } finally {
-            try {
-                rs.close();
-                stmt.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        return result;
-    }
-
-    public ArrayList<Iteration> getIterationsForProject(int projektId){
-        ArrayList<Iteration> result = new ArrayList<>();
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-        String query;
-        String logHeader = "\n==============================\nData: Iterations" + "\n==============================\n";
-        try {
-            query = "SELECT\n\tstartDate, endDate, name\nFROM\n\titeration\nWHERE\n\tsuperProjectId = " + projektId + "\nORDER BY\n\tname ASC";
-            log.info(logHeader + query);
-            stmt = pripojeni.prepareStatement(query);
-
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                result.add(new Iteration(rs.getDate("startDate").toLocalDate(), rs.getDate("endDate").toLocalDate(), rs.getString("name")));
-            }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaScriptIterace"));
-            e.printStackTrace();
-        } catch (Exception e){
-            JOptionPane.showMessageDialog(null , Konstanty.POPISY.getProperty("chybaDataIterace"));
             e.printStackTrace();
         } finally {
             try {

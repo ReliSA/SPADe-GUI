@@ -19,6 +19,8 @@ import java.util.List;
 
 /**
  * Panel zobrazující data v tabulce výsledků
+ *
+ * @author Patrik Bezděk
  */
 public class PanelDetectionColumn extends JPanel {
     private JLabel lblName = new JLabel();
@@ -823,15 +825,6 @@ public class PanelDetectionColumn extends JPanel {
     }
 
     /**
-     * Vrátí aritmetický operátor
-     * @param comboBox ComboBox s operátory
-     * @return aritmetický operátor
-     */
-    public String getArithmeticOperator(JComboBox comboBox) {
-        return comboBox.getSelectedItem().toString();
-    }
-
-    /**
      * Vrací rozhodnutí o tom, jestli je chceme použít sloupec při detekci
      * @return true pokud se má sloupec použít při detekci
      */
@@ -910,67 +903,131 @@ public class PanelDetectionColumn extends JPanel {
         checkBoxInvertValues.doClick();
     }
 
-    public boolean isFirstValid() {
+    /**
+     * Vrací ukazatel validity prvního vstupu
+     * @return true pokud je první vstup validní
+     */
+    private boolean isFirstValid() {
         return firstValid;
     }
 
-    public void setFirstValid(boolean firstValid) {
+    /**
+     * Nastaví prvnímu vstupu jestli je validní nebo ne
+     * @param firstValid ukazatel validity
+     */
+    private void setFirstValid(boolean firstValid) {
         this.firstValid = firstValid;
     }
 
-    public boolean isSecondValid() {
+    /**
+     * Vrací ukazatel validity druhého vstupu
+     * @return true pokud je druhý vstup validní
+     */
+    private boolean isSecondValid() {
         return secondValid;
     }
 
-    public void setSecondValid(boolean secondValid) {
+    /**
+     * Nastaví druhému vstupu jestli je validní nebo ne
+     * @param secondValid ukazatel validity
+     */
+    private void setSecondValid(boolean secondValid) {
         this.secondValid = secondValid;
     }
 
-    public boolean isThirdValid() {
+    /**
+     * Vrací ukazatel validity třetího vstupu
+     * @return true pokud je třetí vstup validní
+     */
+    private boolean isThirdValid() {
         return thirdValid;
     }
 
-    public void setThirdValid(boolean thirdValid) {
+    /**
+     * Nastaví třetímu vstupu jestli je validní nebo ne
+     * @param thirdValid ukazatel validity
+     */
+    private void setThirdValid(boolean thirdValid) {
         this.thirdValid = thirdValid;
     }
 
-    public boolean isFourthValid() {
+    /**
+     * Vrací ukazatel validity čtvrtého vstupu
+     * @return true pokud je čtvrtý vstup validní
+     */
+    private boolean isFourthValid() {
         return fourthValid;
     }
 
-    public void setFourthValid(boolean fourthValid) {
+    /**
+     * Nastaví čtvrtému vstupu jestli je validní nebo ne
+     * @param fourthValid ukazatel validity
+     */
+    private void setFourthValid(boolean fourthValid) {
         this.fourthValid = fourthValid;
     }
 
+    /**
+     * Vrací komponentu pro zadávání prvního vstupu
+     * @return komponenta prvního vstupu
+     */
     public JComboBox<ComboBoxItem> getCboxVariableValues() {
         return cboxVariableValues;
     }
 
+    /**
+     * Vrací komponentu pro zadávání druhého vstupu
+     * @return komponenta druhého vstupu
+     */
     public JComboBox<ComboBoxItem> getCboxVariableValues2() {
         return cboxVariableValues2;
     }
 
+    /**
+     * Vrací komponentu pro zadávání třetího vstupu
+     * @return komponenta třetího vstupu
+     */
     public JComboBox<ComboBoxItem> getCboxVariableValues3() {
         return cboxVariableValues3;
     }
 
+    /**
+     * Vrací komponentu pro zadávání čtvrtého vstupu
+     * @return komponenta čtvrtého vstupu
+     */
     public JComboBox<ComboBoxItem> getCboxVariableValues4() {
         return cboxVariableValues4;
     }
 
-    public JComboBox<String> getCboxColumns() {
-        return cboxColumns;
+    /**
+     * Vrací název sloupce v první podmínce
+     * @return název sloupce v první podmínce
+     */
+    public String getFirstColumn() {
+        return (String) cboxColumns.getSelectedItem();
     }
 
-    public JComboBox<String> getCboxColumns2() {
-        return cboxColumns2;
+    /**
+     * Vrací název sloupce ve druhé podmínce
+     * @return název sloupce ve druhé podmínce
+     */
+    public String getSecondColumn() {
+        return (String) cboxColumns2.getSelectedItem();
     }
 
-    public JComboBox<String> getCboxAritmethics() {
-        return cboxAritmethics;
+    /**
+     * Vrací první operátor
+     * @return operátor první podmínky
+     */
+    public String getFirstArithmetic() {
+        return (String) cboxAritmethics.getSelectedItem();
     }
 
-    public JComboBox<String> getCboxAritmethics2() {
-        return cboxAritmethics2;
+    /**
+     * Vrací druhý operátor
+     * @return operátor druhé podmínky
+     */
+    public String getSecondArithmetic() {
+        return (String) cboxAritmethics2.getSelectedItem();
     }
 }

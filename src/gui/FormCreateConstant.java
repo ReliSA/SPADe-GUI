@@ -12,6 +12,8 @@ import java.awt.event.WindowEvent;
 
 /**
  * Okno pro vytvoření konstanty
+ *
+ * @author Patrik Bezděk
  */
 class FormCreateConstant extends JDialog
 {
@@ -19,9 +21,18 @@ class FormCreateConstant extends JDialog
     private JButton btnCancel = new JButton(Konstanty.POPISY.getProperty("tlacitkoZrusit"));
     private JTextField tfName = new JTextField();
     private JTextField tfValue = new JTextField();
+    /**
+     * Název konstanty
+     */
     private String constName;
+    /**
+     * Hodnota konstanty
+     */
     private String constValue;
-    private boolean cancelled = false;
+    /**
+     * Ukazatel toho, jestli byl formulář zrušen
+     */
+    private boolean wasCancelled = false;
     static Logger log = Logger.getLogger(FormCreateConstant.class);
 
     /**
@@ -78,7 +89,7 @@ class FormCreateConstant extends JDialog
      */
     public String getConstName(){
         String returnValue = this.constName;
-        if(!cancelled){
+        if(!wasCancelled){
             returnValue = tfName.getText();
         }
         return returnValue;
@@ -90,7 +101,7 @@ class FormCreateConstant extends JDialog
      */
     public String getConstValue(){
         String returnValue = this.constValue;
-        if(!cancelled){
+        if(!wasCancelled){
             returnValue = tfValue.getText();
         }
         return returnValue;
@@ -98,10 +109,10 @@ class FormCreateConstant extends JDialog
 
     /**
      * Vrací informaci jestli byl formulář potvrzen nebo zrušen
-     * @return true pokud nebyl formulář potvrzen
+     * @return true pokud byl formulář zrušen
      */
     public boolean wasCancelled(){
-        return cancelled;
+        return wasCancelled;
     }
 
     /**
@@ -117,7 +128,7 @@ class FormCreateConstant extends JDialog
         /*akce po kliknutí na tlačítko ukončit*/
         ActionListener actCancel = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                cancelled = true;
+                wasCancelled = true;
                 dispose();
             }
         };
@@ -129,7 +140,7 @@ class FormCreateConstant extends JDialog
         {
             public void windowClosing(WindowEvent e)
             {
-                cancelled = true;
+                wasCancelled = true;
             }
         });
     }
