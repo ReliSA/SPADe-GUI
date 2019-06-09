@@ -349,7 +349,7 @@ public class WindowCreatePatternDetection extends JFrame{
                 axisPanel.revalidate();
                 axisPanel.repaint();
                 if(queryPanels.size() > 0) {
-                    JOptionPane.showMessageDialog(mainFrame, Konstanty.POPISY.getProperty("textZmenaOsy"), Konstanty.POPISY.getProperty("upozorneni"), JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(null, Konstanty.POPISY.getProperty("textZmenaOsy"), Konstanty.POPISY.getProperty("upozorneni"), JOptionPane.WARNING_MESSAGE);
                 }
             }
         });
