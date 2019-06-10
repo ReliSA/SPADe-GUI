@@ -45,11 +45,16 @@ public class PanelDetectionColumn extends JPanel {
     private JRadioButton radioBtnCompareConst;
     private JRadioButton radioBtnCompareColumn;
     private ButtonGroup btnGroupCompare;
+    private JRadioButton radioBtnAnd;
+    private JRadioButton radioBtnOr;
+    private ButtonGroup btnGroupCompareLogic;
     private JPanel headerPanel;
     private JPanel inputPanel;
     private JPanel inputPanel2;
     private JLabel lblCompare;
-    private JPanel radioButtonPanel;
+    private JLabel lblLogic;
+    private JPanel radioButtonComparePanel;
+    private JPanel radioButtonLogicPanel;
     private JButton detectBtn;
     private static JFrame mainFrame;
     private boolean between;
@@ -152,12 +157,19 @@ public class PanelDetectionColumn extends JPanel {
         cboxAritmethics2 = new JComboBox<>();
         detectedValues = new ArrayList<>();
         lblCompare = new JLabel(Konstanty.POPISY.getProperty("porovnat"));
+        lblLogic = new JLabel(Konstanty.POPISY.getProperty("operator"));
         radioBtnCompareConst = new JRadioButton(Konstanty.POPISY.getProperty("konstprom"));
         radioBtnCompareColumn = new JRadioButton(Konstanty.POPISY.getProperty("sloupec"));
         btnGroupCompare = new ButtonGroup();
         btnGroupCompare.add(radioBtnCompareConst);
         btnGroupCompare.add(radioBtnCompareColumn);
         radioBtnCompareConst.setSelected(true);
+        radioBtnAnd = new JRadioButton("AND");
+        radioBtnOr = new JRadioButton("OR");
+        btnGroupCompareLogic = new ButtonGroup();
+        btnGroupCompareLogic.add(radioBtnAnd);
+        btnGroupCompareLogic.add(radioBtnOr);
+        radioBtnAnd.setSelected(true);
         detectBtn = new JButton(Konstanty.POPISY.getProperty("spocitat"));
 
         headerPanel = new JPanel();
@@ -166,7 +178,13 @@ public class PanelDetectionColumn extends JPanel {
         inputPanel = new JPanel(new MigLayout("ins 0"));
         inputPanel2 = new JPanel(new MigLayout("ins 0"));
 
-        radioButtonPanel = new JPanel(new MigLayout("ins 0"));
+        radioButtonComparePanel = new JPanel(new MigLayout("ins 0"));
+        radioButtonComparePanel.add(lblCompare);
+        radioButtonComparePanel.add(radioBtnCompareConst);
+        radioButtonComparePanel.add(radioBtnCompareColumn);
+        radioButtonLogicPanel = new JPanel(new MigLayout("ins 0"));
+        radioButtonLogicPanel.add(radioBtnAnd);
+        radioButtonLogicPanel.add(radioBtnOr);
 
         this.lblName.setText(columnName);
         Font font = new Font("Courier", Font.BOLD, 12);
@@ -247,7 +265,7 @@ public class PanelDetectionColumn extends JPanel {
 
         detectBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                window.detectValues();
+                window.detectValues(detectWithAnd());
             }
         });
 
@@ -325,11 +343,16 @@ public class PanelDetectionColumn extends JPanel {
 
         checkBoxInvertValues.addActionListener (new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                window.setDoInvertValues(checkBoxInvertValues.isSelected());
+
                 Collections.replaceAll(data, "0","2");
                 Collections.replaceAll(data, "1","0");
                 Collections.replaceAll(data, "2","1");
                 removeAll();
-                add(detectBtn, "span 3, wrap, align 50% 50%, gapy 84");
+
+                add(lblLogic, "wrap, align 50% 50%, gapy 47");
+                add(radioButtonLogicPanel, "span 3, wrap");
+                add(detectBtn, "span 3, wrap, align 50% 50%");
                 add(checkBoxInvertValues, "grow, span 3, wrap");
                 add(lblName, "grow, span 3, wrap");
                 JLabel lblValue;
@@ -346,10 +369,7 @@ public class PanelDetectionColumn extends JPanel {
 
         if(includeHeader) {
             headerPanel.add(checkBoxUseColumn, "wrap");
-            radioButtonPanel.add(lblCompare);
-            radioButtonPanel.add(radioBtnCompareConst);
-            radioButtonPanel.add(radioBtnCompareColumn);
-            headerPanel.add(radioButtonPanel, "span 3, wrap");
+            headerPanel.add(radioButtonComparePanel, "span 3, wrap");
             headerPanel.add(operators, "wrap");
             inputPanel.add(cboxVariableValues);
             inputPanel.add(cboxAritmethics);
@@ -360,7 +380,11 @@ public class PanelDetectionColumn extends JPanel {
             add(headerPanel, "width 100%, height 130, wrap");
             this.add(this.lblName, "grow, span 3, wrap");
         } else if (isDetectionColumn) {
-            this.add(detectBtn, "span 3, wrap, align 50% 50%, gapy 84");
+            this.add(lblLogic, "wrap, align 50% 50%, gapy 47");
+            radioButtonLogicPanel.add(radioBtnAnd);
+            radioButtonLogicPanel.add(radioBtnOr);
+            this.add(radioButtonLogicPanel, "span 3, wrap");
+            this.add(detectBtn, "span 3, wrap, align 50% 50%");
             this.add(checkBoxInvertValues, "grow, span 3, wrap");
             this.add(this.lblName, "grow, span 3, wrap");
         } else {
@@ -846,6 +870,26 @@ public class PanelDetectionColumn extends JPanel {
      */
     public void setCboxVariableValuesWarning(JComboBox comboBox){
         ((CustomComboBoxEditor) comboBox.getEditor()).changeBackground(Color.PINK);
+    }
+
+    /**
+     * Vrací rozhodnutí, jestli se mají detekce počítat přes AND
+     * @return true pokud se mají detekce počítat přes AND, false pokud přes OR
+     */
+    public boolean detectWithAnd(){
+       return radioBtnAnd.isSelected();
+    }
+
+    /**
+     * Nastaví přepínač operátoru na AND nebo OR
+     * @param detectWithAnd true pokud se mají detekce počítat s AND, false pokus s OR
+     */
+    public void setDetectWithAnd(boolean detectWithAnd){
+        if(detectWithAnd){
+            radioBtnAnd.setSelected(true);
+        } else {
+            radioBtnOr.setSelected(true);
+        }
     }
 
     /**

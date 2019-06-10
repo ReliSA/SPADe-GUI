@@ -82,7 +82,7 @@ public class WindowCreatePatternDetection extends JFrame{
     private static JTextField varOrQueryNameTf = new JTextField(10);
     private JDatePickerImpl dpDateFrom;
     private JDatePickerImpl dpDateTo;
-    private PanelDetectionColumn detected;
+    private PanelDetectionColumn detectedColumn;
     private PanelDetectionColumn axisColumn;
     private List<QueryPanel> queryPanels;
     private List<PanelDetectionColumn> detectionColumns;
@@ -115,7 +115,11 @@ public class WindowCreatePatternDetection extends JFrame{
     /**
      * Ukazatel toho, jestli se má při načtení dotazu invertovat hodnoty u detekcí
      */
-    private static boolean doInvertValues = false;
+    private boolean doInvertValues = false;
+    /**
+     * Ukazatel toho, jestli se mají detekce počítat s AND
+     */
+    private static boolean detectWithAnd = false;
     private int columnsNumber = 0;
     static Logger log = Logger.getLogger(WindowCreatePatternDetection.class);
 
@@ -319,7 +323,6 @@ public class WindowCreatePatternDetection extends JFrame{
                 centerNorthPanel.removeAll();
                 centerPanel.removeAll();
                 bottomPanel.removeAll();
-                bottomPanel.add(cancelBtn);
                 mainFrame.remove(bottomPanel);
 
                 varOrQueryNameTf.setText("");
@@ -327,6 +330,9 @@ public class WindowCreatePatternDetection extends JFrame{
                 centerNorthPanel.add(createQueryBtn);
                 centerNorthPanel.add(loadQueryBtn);
                 centerPanel.add(centerNorthPanel, "dock north, width 100%");
+
+                mainFrame.add(scrollPanelNorth, "dock north, h 125");
+                mainFrame.add(scrollPanelCenter, "dock center");
 
                 mainFrame.revalidate();
                 mainFrame.repaint();
@@ -422,7 +428,8 @@ public class WindowCreatePatternDetection extends JFrame{
                         }
                         jsonObject.put("dateFrom", dateFrom);
                         jsonObject.put("dateTo", dateTo);
-                        jsonObject.put("invertValues", detected.doInvertValues());
+                        jsonObject.put("invertValues", detectedColumn.doInvertValues());
+                        jsonObject.put("detectWithAnd", detectedColumn.detectWithAnd());
                     } else {
                         file = new File(variableFolderPath + fileName + ".json");
                     }
@@ -575,6 +582,7 @@ public class WindowCreatePatternDetection extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 doInvertValues = false;
+                detectWithAnd = false;
                 fileChooser.setCurrentDirectory(new File(queryFolderPath));
                 int returnVal = fileChooser.showOpenDialog(centerNorthPanel);
 
@@ -605,6 +613,7 @@ public class WindowCreatePatternDetection extends JFrame{
                                 String dateTo = obj.getString("dateTo");
                                 String dateFrom = obj.getString("dateFrom");
                                 doInvertValues = obj.getBoolean("invertValues");
+                                detectWithAnd = obj.getBoolean("detectWithAnd");
                                 axisCBox.setSelectedItem(axis);
                                 if (!axis.equals("Person") && !axis.equals("Iteration")) {
                                     axisPanel.add(lblFromDate);
@@ -642,7 +651,7 @@ public class WindowCreatePatternDetection extends JFrame{
                                 mainFrame.revalidate();
                                 mainFrame.repaint();
                             }
-                        } catch (IOException ex) {
+                        } catch (Exception ex) {
                             JOptionPane.showMessageDialog(mainFrame, Konstanty.POPISY.getProperty("textNelzeNacist"), Konstanty.POPISY.getProperty("upozorneni"), JOptionPane.WARNING_MESSAGE);
                             log.warn(ex);
                         }
@@ -770,6 +779,7 @@ public class WindowCreatePatternDetection extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 doInvertValues = false;
+                detectWithAnd = true;
                 centerPanel.removeAll();
                 centerNorthPanel.removeAll();
 
@@ -791,7 +801,6 @@ public class WindowCreatePatternDetection extends JFrame{
 
         /* Akce pro spuštění dotazu a načtení dat do tabulky */
         runQueryBtn.addActionListener(new ActionListener(){
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!haveSameColumnNames(queryPanels)) {
@@ -898,19 +907,19 @@ public class WindowCreatePatternDetection extends JFrame{
                         centerTablePanel.add(column, "dock west, width 240");
                     }
                     columnsNumber++;
-                    detected = new PanelDetectionColumn("detected", new ArrayList<>(), columnsNumber, preparedVariableValues, false, columnNames, null, true, instance);
-                    centerTablePanel.add(detected, "dock west, grow");
+                    detectedColumn = new PanelDetectionColumn("detected", new ArrayList<>(), columnsNumber, preparedVariableValues, false, columnNames, null, true, instance);
+                    detectedColumn.setDetectWithAnd(detectWithAnd);
+                    centerTablePanel.add(detectedColumn, "dock west, grow");
 
                     graphData.addNazvySloupcu("detected");
 
                     centerPanel.add(centerTablePanel, "grow");
                     bottomPanel.removeAll();
                     if (doDetect){
-                        detectValues();
+                        detectValues(detectWithAnd);
                     }
                     if (doInvertValues){
-                        detected.invertValues();
-                        doInvertValues = false;
+                        detectedColumn.invertValues();
                     }
                     bottomPanel.add(saveBtn);
                     bottomPanel.add(showGraphBtn);
@@ -933,7 +942,7 @@ public class WindowCreatePatternDetection extends JFrame{
         exportBtn.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (detected.getData().size() == 0) {
+                if (detectedColumn.getData().size() == 0) {
                     JOptionPane.showMessageDialog(mainFrame,
                             Konstanty.POPISY.getProperty("textNutnaDetekce"),
                             Konstanty.POPISY.getProperty("upozorneni"),
@@ -962,7 +971,7 @@ public class WindowCreatePatternDetection extends JFrame{
                         values.add(column.getData());
                     }
                     sb.append(",detected\n");
-                    values.add(detected.getData());
+                    values.add(detectedColumn.getData());
 
                     first = true;
                     for (int i = 0; i < values.get(0).size(); i++) {
@@ -1006,7 +1015,7 @@ public class WindowCreatePatternDetection extends JFrame{
         showGraphBtn.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(detected.getData().size() == 0){
+                if(detectedColumn.getData().size() == 0){
                     JOptionPane.showMessageDialog(mainFrame,
                             Konstanty.POPISY.getProperty("textNutnaDetekce"),
                             Konstanty.POPISY.getProperty("upozorneni"),
@@ -1024,7 +1033,7 @@ public class WindowCreatePatternDetection extends JFrame{
     /**
      * Pro vybrané sloupec proběhne kontrola hodnoty a podmínky a výsledky se zapíší do příslušného sloupce
      */
-    public void detectValues(){
+    public void detectValues(boolean detectWithAnd){
         ArrayList<String> columnData = new ArrayList<>();
         List<List<Boolean>> detectionValues = new ArrayList<>();
         List<PanelDetectionColumn> columnsToDetect = new ArrayList<>();
@@ -1047,15 +1056,21 @@ public class WindowCreatePatternDetection extends JFrame{
             boolean valid = validateInputs(columnsToDetect);
             if(valid) {
                 for (PanelDetectionColumn column : columnsToDetect) {
-                    if (column.useColum()) {
-                        detectionValues.add(column.detectValues(allColumns));
-                    }
+                    detectionValues.add(column.detectValues(allColumns));
                 }
 
                 for (int i = 0; i < detectionValues.get(0).size(); i++) {
-                    Boolean val = true;
-                    for (int j = 0; j < detectionValues.size(); j++) {
-                        val &= detectionValues.get(j).get(i);
+                    Boolean val;
+                    if(detectWithAnd) {
+                        val = true;
+                        for (int j = 0; j < detectionValues.size(); j++) {
+                            val &= detectionValues.get(j).get(i);
+                        }
+                    } else {
+                        val = false;
+                        for (int j = 0; j < detectionValues.size(); j++) {
+                            val |= detectionValues.get(j).get(i);
+                        }
                     }
                     if (val) {
                         columnData.add("1");
@@ -1065,8 +1080,9 @@ public class WindowCreatePatternDetection extends JFrame{
                 }
                 centerTablePanel.remove(centerTablePanel.getComponentCount() - 1);
 
-                detected = new PanelDetectionColumn("detected", columnData, columnsNumber, preparedVariableValues, false, columnNames, null, true, instance);
-                centerTablePanel.add(detected, "dock west, grow");
+                detectedColumn = new PanelDetectionColumn("detected", columnData, columnsNumber, preparedVariableValues, false, columnNames, null, true, instance);
+                detectedColumn.setDetectWithAnd(detectWithAnd);
+                centerTablePanel.add(detectedColumn, "dock west, grow");
 
                 graphData.getDataSloupec(columnsNumber - 2).clear();
                 for (String s : columnData) {
@@ -1399,6 +1415,22 @@ public class WindowCreatePatternDetection extends JFrame{
         log.info(logHeader + query);
 
         return result;
+    }
+
+    /**
+     * Vrací přepínač invertování hodnot
+     * @return true pokud se mají u detekcí invertovat hodnoty
+     */
+    public boolean isDoInvertValues() {
+        return doInvertValues;
+    }
+
+    /**
+     * Nastaví přepínač invertování hodnot
+     * @param doInvertValues true pokud se mají u detekcí invertovat hodnoty
+     */
+    public void setDoInvertValues(boolean doInvertValues) {
+        this.doInvertValues = doInvertValues;
     }
 
     /**
