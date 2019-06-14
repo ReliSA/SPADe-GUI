@@ -368,7 +368,7 @@ public class WindowCreatePatternDetection extends JFrame{
                 centerNorthPanel.removeAll();
                 centerNorthPanel.add(addQueryBtn);
                 centerNorthPanel.add(lblName);
-                centerNorthPanel.add(varOrQueryNameTf);
+                centerNorthPanel.add(varOrQueryNameTf, "width 10%");
                 centerPanel.remove(centerTablePanel);
                 centerPanel.add(axisPanel, "dock west, h 555");
 
@@ -652,6 +652,23 @@ public class WindowCreatePatternDetection extends JFrame{
                                 mainFrame.repaint();
                             }
                         } catch (Exception ex) {
+                            queryPanels.clear();
+                            centerNorthPanel.removeAll();
+                            centerPanel.removeAll();
+                            bottomPanel.removeAll();
+                            mainFrame.remove(bottomPanel);
+
+                            varOrQueryNameTf.setText("");
+                            detectionColumns.clear();
+                            centerNorthPanel.add(createQueryBtn);
+                            centerNorthPanel.add(loadQueryBtn);
+                            centerPanel.add(centerNorthPanel, "dock north, width 100%");
+
+                            mainFrame.add(scrollPanelNorth, "dock north, h 125");
+                            mainFrame.add(scrollPanelCenter, "dock center");
+
+                            mainFrame.revalidate();
+                            mainFrame.repaint();
                             JOptionPane.showMessageDialog(mainFrame, Konstanty.POPISY.getProperty("textNelzeNacist"), Konstanty.POPISY.getProperty("upozorneni"), JOptionPane.WARNING_MESSAGE);
                             log.warn(ex);
                         }

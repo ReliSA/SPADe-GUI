@@ -596,107 +596,122 @@ public class PanelDetectionColumn extends JPanel {
                     column2 = column;
                 }
             }
+
+            Double userInput2 = 0.0;
+            Double userInput4 = 0.0;
+            String arit1 = cboxAritmethics.getSelectedItem().toString();
+            String arit2 = cboxAritmethics2.getSelectedItem().toString();
+
+            if (!arit1.equals("")) {
+                userInput2 = Double.parseDouble(getComboBoxValue(cboxVariableValues2));
+            }
+            if (between) {
+                if (!arit2.equals("")) {
+                    userInput4 = Double.parseDouble(getComboBoxValue(cboxVariableValues4));
+                }
+            }
+
             switch (operator) {
-                case "=":
-                    for (int i = 0; i < columnData.size(); i++) {
-                        Double temp = Double.parseDouble(columnData.get(i));
-                        Double temp2 = Double.parseDouble(column1.getData().get(i));
-                        if (temp.compareTo(temp2) == 0) {
-                            tempDetect.add(true);
-                        } else {
-                            tempDetect.add(false);
-                        }
+            case "=":
+                for (int i = 0; i < columnData.size(); i++) {
+                    Double temp = Double.parseDouble(columnData.get(i));
+                    Double temp2 = arithmeticCount(Double.parseDouble(column1.getData().get(i)), arit1, userInput2);
+                    if (temp.compareTo(temp2) == 0) {
+                        tempDetect.add(true);
+                    } else {
+                        tempDetect.add(false);
                     }
-                    break;
-                case "<":
-                    for (int i = 0; i < columnData.size(); i++) {
-                        Double temp = Double.parseDouble(columnData.get(i));
-                        Double temp2 = Double.parseDouble(column1.getData().get(i));
-                        if (temp < temp2) {
-                            tempDetect.add(true);
-                        } else {
-                            tempDetect.add(false);
-                        }
+                }
+                break;
+            case "<":
+                for (int i = 0; i < columnData.size(); i++) {
+                    Double temp = Double.parseDouble(columnData.get(i));
+                    Double temp2 = arithmeticCount(Double.parseDouble(column1.getData().get(i)), arit1, userInput2);
+                    if (temp < temp2) {
+                        tempDetect.add(true);
+                    } else {
+                        tempDetect.add(false);
                     }
-                    break;
-                case ">":
-                    for (int i = 0; i < columnData.size(); i++) {
-                        Double temp = Double.parseDouble(columnData.get(i));
-                        Double temp2 = Double.parseDouble(column1.getData().get(i));
-                        if (temp > temp2) {
-                            tempDetect.add(true);
-                        } else {
-                            tempDetect.add(false);
-                        }
+                }
+                break;
+            case ">":
+                for (int i = 0; i < columnData.size(); i++) {
+                    Double temp = Double.parseDouble(columnData.get(i));
+                    Double temp2 = arithmeticCount(Double.parseDouble(column1.getData().get(i)), arit1, userInput2);
+                    if (temp > temp2) {
+                        tempDetect.add(true);
+                    } else {
+                        tempDetect.add(false);
                     }
-                    break;
-                case ">=":
-                    for (int i = 0; i < columnData.size(); i++) {
-                        Double temp = Double.parseDouble(columnData.get(i));
-                        Double temp2 = Double.parseDouble(column1.getData().get(i));
-                        if (temp >= temp2) {
-                            tempDetect.add(true);
-                        } else {
-                            tempDetect.add(false);
-                        }
+                }
+                break;
+            case ">=":
+                for (int i = 0; i < columnData.size(); i++) {
+                    Double temp = Double.parseDouble(columnData.get(i));
+                    Double temp2 = arithmeticCount(Double.parseDouble(column1.getData().get(i)), arit1, userInput2);
+                    if (temp >= temp2) {
+                        tempDetect.add(true);
+                    } else {
+                        tempDetect.add(false);
                     }
-                    break;
-                case "<=":
-                    for (int i = 0; i < columnData.size(); i++) {
-                        Double temp = Double.parseDouble(columnData.get(i));
-                        Double temp2 = Double.parseDouble(column1.getData().get(i));
-                        if (temp <= temp2) {
-                            tempDetect.add(true);
-                        } else {
-                            tempDetect.add(false);
-                        }
+                }
+                break;
+            case "<=":
+                for (int i = 0; i < columnData.size(); i++) {
+                    Double temp = Double.parseDouble(columnData.get(i));
+                    Double temp2 = arithmeticCount(Double.parseDouble(column1.getData().get(i)), arit1, userInput2);
+                    if (temp <= temp2) {
+                        tempDetect.add(true);
+                    } else {
+                        tempDetect.add(false);
                     }
-                    break;
-                case "!=":
-                    for (int i = 0; i < columnData.size(); i++) {
-                        Double temp = Double.parseDouble(columnData.get(i));
-                        Double temp2 = Double.parseDouble(column1.getData().get(i));
-                        if (temp.compareTo(temp2) != 0) {
-                            tempDetect.add(true);
-                        } else {
-                            tempDetect.add(false);
-                        }
+                }
+                break;
+            case "!=":
+                for (int i = 0; i < columnData.size(); i++) {
+                    Double temp = Double.parseDouble(columnData.get(i));
+                    Double temp2 = arithmeticCount(Double.parseDouble(column1.getData().get(i)), arit1, userInput2);
+                    if (temp.compareTo(temp2) != 0) {
+                        tempDetect.add(true);
+                    } else {
+                        tempDetect.add(false);
                     }
-                    break;
-                case "between":
-                    for (int i = 0; i < columnData.size(); i++) {
-                        Double temp = Double.parseDouble(columnData.get(i));
-                        Double temp2 = Double.parseDouble(column1.getData().get(i));
-                        Double temp3 = Double.parseDouble(column2.getData().get(i));
-                        Double change = temp2;
-                        if (change > temp3) {
-                            temp2 = temp3;
-                            temp3 = change;
-                        }
-                        if (temp > temp2 && temp < temp3) {
-                            tempDetect.add(true);
-                        } else {
-                            tempDetect.add(false);
-                        }
+                }
+                break;
+            case "between":
+                for (int i = 0; i < columnData.size(); i++) {
+                    Double temp = Double.parseDouble(columnData.get(i));
+                    Double temp2 = arithmeticCount(Double.parseDouble(column1.getData().get(i)), arit1, userInput2);
+                    Double temp3 = arithmeticCount(Double.parseDouble(column2.getData().get(i)), arit1, userInput4);
+                    Double change = temp2;
+                    if (change > temp3) {
+                        temp2 = temp3;
+                        temp3 = change;
                     }
-                    break;
-                case "not between":
-                    for (int i = 0; i < columnData.size(); i++) {
-                        Double temp = Double.parseDouble(columnData.get(i));
-                        Double temp2 = Double.parseDouble(column1.getData().get(i));
-                        Double temp3 = Double.parseDouble(column2.getData().get(i));
-                        Double change = temp2;
-                        if (change > temp3) {
-                            temp2 = temp3;
-                            temp3 = change;
-                        }
-                        if (temp < temp2 || temp > temp3) {
-                            tempDetect.add(true);
-                        } else {
-                            tempDetect.add(false);
-                        }
+                    if (temp > temp2 && temp < temp3) {
+                        tempDetect.add(true);
+                    } else {
+                        tempDetect.add(false);
                     }
-                    break;
+                }
+                break;
+            case "not between":
+                for (int i = 0; i < columnData.size(); i++) {
+                    Double temp = Double.parseDouble(columnData.get(i));
+                    Double temp2 = arithmeticCount(Double.parseDouble(column1.getData().get(i)), arit1, userInput2);
+                    Double temp3 = arithmeticCount(Double.parseDouble(column2.getData().get(i)), arit1, userInput4);
+                    Double change = temp2;
+                    if (change > temp3) {
+                        temp2 = temp3;
+                        temp3 = change;
+                    }
+                    if (temp < temp2 || temp > temp3) {
+                        tempDetect.add(true);
+                    } else {
+                        tempDetect.add(false);
+                    }
+                }
+                break;
             }
         } else {
             Double userInput = Double.parseDouble(getComboBoxValue(cboxVariableValues));
@@ -715,6 +730,12 @@ public class PanelDetectionColumn extends JPanel {
                     case "-":
                         resultValue -= userInput2;
                         break;
+                    case "*":
+                        resultValue *= userInput2;
+                        break;
+                    case "/":
+                        resultValue /= userInput2;
+                        break;
                 }
             }
             if (between) {
@@ -728,6 +749,12 @@ public class PanelDetectionColumn extends JPanel {
                             break;
                         case "-":
                             resultValue2 -= userInput4;
+                            break;
+                        case "*":
+                            resultValue2 *= userInput4;
+                            break;
+                        case "/":
+                            resultValue2 /= userInput4;
                             break;
                     }
                 }
@@ -830,7 +857,35 @@ public class PanelDetectionColumn extends JPanel {
     }
 
     /**
-     * Vrátí hodnotu z ComboBoxu
+     * Vrací výsledek početní operace mezi zadanými čísly a vstupním operátorem
+     * @param number vstupní číslo
+     * @param operator operátor
+     * @param number2 druhé vstupní číslo
+     * @return výsledek početní operace
+     */
+    public Double arithmeticCount(Double number, String operator, Double number2){
+        Double result = number;
+        switch (operator) {
+            case "+":
+                result += number2;
+                break;
+            case "-":
+                result -= number2;
+                break;
+            case "*":
+                result *= number2;
+                break;
+            case "/":
+                result /= number2;
+                break;
+            case "":
+                break;
+        }
+        return result;
+    }
+
+    /**
+     * Vrací hodnotu z ComboBoxu
      * @param comboBox objekt ComboBoxu
      * @return hodnota v ComboBoxu
      */
