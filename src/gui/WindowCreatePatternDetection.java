@@ -1791,7 +1791,7 @@ public class WindowCreatePatternDetection extends JFrame{
                         columnName = tempQuery.getString("columnName");
                         query.put("columnName", columnName);
                     } else {
-                        columnName = "";
+                        columnName = columName.getText();
                     }
                     if(!form.wasClosed()) {
                         for(JLabel label : conditionLabelList){
