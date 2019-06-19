@@ -123,27 +123,6 @@ public class WindowCreatePatternDetection extends JFrame{
     private int columnsNumber = 0;
     static Logger log = Logger.getLogger(WindowCreatePatternDetection.class);
 
-    /* For testing only - remove in final version*/
-    public static void main(String[] args) {
-
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                } catch (Exception e) {
-                    JOptionPane.showMessageDialog(null , "Chyba");
-                    e.printStackTrace();
-                    System.exit(0);
-                }
-                try {
-                    WindowCreatePatternDetection frame = new WindowCreatePatternDetection(new Projekt(12, null, null ,null));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-
     /**
      * Konstruktor hlavního okna
      * @param projekt zvolený projekt
