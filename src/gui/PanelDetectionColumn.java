@@ -617,7 +617,7 @@ public class PanelDetectionColumn extends JPanel {
                 for (int i = 0; i < columnData.size(); i++) {
                     Double temp = Double.parseDouble(columnData.get(i));
                     Double temp2 = arithmeticCount(Double.parseDouble(column1.getData().get(i)), arit1, userInput2);
-                    Double temp3 = arithmeticCount(Double.parseDouble(column2.getData().get(i)), arit1, userInput4);
+                    Double temp3 = arithmeticCount(Double.parseDouble(column2.getData().get(i)), arit2, userInput4);
                     Double change = temp2;
                     if (change > temp3) {
                         temp2 = temp3;
@@ -634,7 +634,7 @@ public class PanelDetectionColumn extends JPanel {
                 for (int i = 0; i < columnData.size(); i++) {
                     Double temp = Double.parseDouble(columnData.get(i));
                     Double temp2 = arithmeticCount(Double.parseDouble(column1.getData().get(i)), arit1, userInput2);
-                    Double temp3 = arithmeticCount(Double.parseDouble(column2.getData().get(i)), arit1, userInput4);
+                    Double temp3 = arithmeticCount(Double.parseDouble(column2.getData().get(i)), arit2, userInput4);
                     Double change = temp2;
                     if (change > temp3) {
                         temp2 = temp3;
@@ -851,7 +851,7 @@ public class PanelDetectionColumn extends JPanel {
      * @param comboBox ComboBox pro obarvení
      */
     public void setCboxVariableValuesOk(JComboBox comboBox){
-        ((CustomComboBoxEditor) comboBox.getEditor()).changeBackground(null);
+        ((CustomComboBoxEditor) comboBox.getEditor()).changeBackground(new Color(238,238,238));
     }
 
     /**
@@ -941,7 +941,7 @@ public class PanelDetectionColumn extends JPanel {
      * Vrací ukazatel validity prvního vstupu
      * @return true pokud je první vstup validní
      */
-    private boolean isFirstValid() {
+    public boolean isFirstValid() {
         return firstValid;
     }
 
@@ -949,7 +949,7 @@ public class PanelDetectionColumn extends JPanel {
      * Nastaví prvnímu vstupu jestli je validní nebo ne
      * @param firstValid ukazatel validity
      */
-    private void setFirstValid(boolean firstValid) {
+    public void setFirstValid(boolean firstValid) {
         this.firstValid = firstValid;
     }
 
@@ -957,7 +957,7 @@ public class PanelDetectionColumn extends JPanel {
      * Vrací ukazatel validity druhého vstupu
      * @return true pokud je druhý vstup validní
      */
-    private boolean isSecondValid() {
+    public boolean isSecondValid() {
         return secondValid;
     }
 
@@ -965,7 +965,7 @@ public class PanelDetectionColumn extends JPanel {
      * Nastaví druhému vstupu jestli je validní nebo ne
      * @param secondValid ukazatel validity
      */
-    private void setSecondValid(boolean secondValid) {
+    public void setSecondValid(boolean secondValid) {
         this.secondValid = secondValid;
     }
 
@@ -973,7 +973,7 @@ public class PanelDetectionColumn extends JPanel {
      * Vrací ukazatel validity třetího vstupu
      * @return true pokud je třetí vstup validní
      */
-    private boolean isThirdValid() {
+    public boolean isThirdValid() {
         return thirdValid;
     }
 
@@ -981,7 +981,7 @@ public class PanelDetectionColumn extends JPanel {
      * Nastaví třetímu vstupu jestli je validní nebo ne
      * @param thirdValid ukazatel validity
      */
-    private void setThirdValid(boolean thirdValid) {
+    public void setThirdValid(boolean thirdValid) {
         this.thirdValid = thirdValid;
     }
 
@@ -989,7 +989,7 @@ public class PanelDetectionColumn extends JPanel {
      * Vrací ukazatel validity čtvrtého vstupu
      * @return true pokud je čtvrtý vstup validní
      */
-    private boolean isFourthValid() {
+    public boolean isFourthValid() {
         return fourthValid;
     }
 
@@ -997,7 +997,7 @@ public class PanelDetectionColumn extends JPanel {
      * Nastaví čtvrtému vstupu jestli je validní nebo ne
      * @param fourthValid ukazatel validity
      */
-    private void setFourthValid(boolean fourthValid) {
+    public void setFourthValid(boolean fourthValid) {
         this.fourthValid = fourthValid;
     }
 

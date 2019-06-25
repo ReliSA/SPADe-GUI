@@ -212,7 +212,7 @@ class FormCreateQuery extends JDialog
 
         for (Column col : viewStructure.get(cboxTables.getSelectedItem())){
             cboxColumns.addItem(col.getName());
-            if(col.getName().equals("authorName") || col.getName().equals("assigneeName")){
+            if(col.getName().equals("authorName") || col.getName().equals("assigneeName") || col.getName().equals("relatedName")){
                 cboxJoinColumn.addItem(col.getName());
             }
             if(col.getType().equals("datetime") || col.getType().equals("date")){
